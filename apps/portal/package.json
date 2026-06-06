@@ -1,9 +1,9 @@
 {
-  "name": "web",
+  "name": "portal",
   "version": "0.0.1",
   "type": "module",
   "private": true,
-   "imports": {
+  "imports": {
     "#components/*": "./src/components/*.tsx",
     "#lib/*": "./src/lib/*.ts",
     "#hooks/*": "./src/hooks/*.ts"
