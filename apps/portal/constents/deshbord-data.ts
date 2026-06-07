@@ -134,13 +134,13 @@ export const data = {
       url: "/dashboard/resources/basic",
       icon: IconFileText,
     },
+  ],
+  navSecondary: [
     {
       title: "My Profile",
       url: "/dashboard/profile",
       icon: IconUser,
     },
-  ],
-  navSecondary: [
     {
       title: "Settings",
       url: "/dashboard/settings",
