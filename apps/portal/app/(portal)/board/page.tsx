@@ -1,5 +1,4 @@
-import React from "react"
-import { IconDashboard, IconInfoCircle, IconArrowRight } from "@tabler/icons-react"
+import { IconArrowRight, IconInfoCircle } from "@tabler/icons-react"
 import Link from "next/link"
 
 export default function BoardRoomPage() {
@@ -10,7 +9,8 @@ export default function BoardRoomPage() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Board Room</h2>
           <p className="text-muted-foreground">
-            Welcome to the FCH Board Portal. Access corporate governance documents, financial audits, committee files, and voting tools.
+            Welcome to the FCH Board Portal. Access corporate governance
+            documents, financial audits, committee files, and voting tools.
           </p>
         </div>
       </div>
@@ -20,10 +20,19 @@ export default function BoardRoomPage() {
         <div className="flex items-start gap-3">
           <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
           <div>
-            <h4 className="font-semibold text-primary">Developer TODO Checklist:</h4>
+            <h4 className="font-semibold text-primary">
+              Developer TODO Checklist:
+            </h4>
             <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>Strict Access Control: Ensure only users in the `Board Member` Okta group can load this route. Reject others with a 403.</li>
-              <li>Setup live widgets: Render date of next scheduled board meeting, active resolution voting indicators, and recent financial upload logs.</li>
+              <li>
+                Strict Access Control: Ensure only users in the `Board Member`
+                Okta group can load this route. Reject others with a 403.
+              </li>
+              <li>
+                Setup live widgets: Render date of next scheduled board meeting,
+                active resolution voting indicators, and recent financial upload
+                logs.
+              </li>
             </ul>
           </div>
         </div>
@@ -45,12 +54,14 @@ export default function BoardRoomPage() {
           {
             title: "Financial Reports",
             href: "/board/financials",
-            description: "Access balance sheets, tax audits, and treasury details.",
+            description:
+              "Access balance sheets, tax audits, and treasury details.",
           },
           {
             title: "Committees Workspace",
             href: "/board/committees",
-            description: "Collaborate on Audit, Finance, and Membership committees.",
+            description:
+              "Collaborate on Audit, Finance, and Membership committees.",
           },
           {
             title: "Internal Planning",
@@ -60,24 +71,26 @@ export default function BoardRoomPage() {
           {
             title: "Collaboration & Voting",
             href: "/board/collaboration",
-            description: "Cast votes on resolutions and enter secure workspaces.",
+            description:
+              "Cast votes on resolutions and enter secure workspaces.",
           },
         ].map((item, index) => (
           <Link
             key={index}
             href={item.href}
-            className="flex flex-col justify-between rounded-lg border bg-card p-6 shadow-xs hover:border-muted-foreground/30 hover:shadow-md transition-all group"
+            className="group flex flex-col justify-between rounded-lg border bg-card p-6 shadow-xs transition-all hover:border-muted-foreground/30 hover:shadow-md"
           >
             <div>
-              <h4 className="font-bold tracking-tight text-base group-hover:text-primary transition-colors">
+              <h4 className="text-base font-bold tracking-tight transition-colors group-hover:text-primary">
                 {item.title}
               </h4>
-              <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+              <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
                 {item.description}
               </p>
             </div>
             <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-primary">
-              Open Section <IconArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
+              Open Section{" "}
+              <IconArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
             </div>
           </Link>
         ))}

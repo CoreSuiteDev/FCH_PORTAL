@@ -1,5 +1,4 @@
-import React from "react"
-import { IconUsers, IconInfoCircle, IconDownload, IconFilter } from "@tabler/icons-react"
+import { IconDownload, IconInfoCircle } from "@tabler/icons-react"
 
 export default function AdminMembersPage() {
   return (
@@ -13,7 +12,7 @@ export default function AdminMembersPage() {
           </p>
         </div>
         <div className="flex shrink-0">
-          <button className="flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs">
+          <button className="flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90">
             <IconDownload className="size-4" /> Export Member List
           </button>
         </div>
@@ -24,22 +23,37 @@ export default function AdminMembersPage() {
         <div className="flex items-start gap-3">
           <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
           <div>
-            <h4 className="font-semibold text-primary">Developer TODO Checklist:</h4>
+            <h4 className="font-semibold text-primary">
+              Developer TODO Checklist:
+            </h4>
             <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>Database Querying: Fetch full user profiles from database.</li>
-              <li>Filter implementation: Filter members dynamically by membership level (General, Pastoral, Board) and status (Active, Expired, Canceled, Pending).</li>
-              <li>CSV exporter: Integrate a CSV compiler that converts filtered query results into a downloadable file.</li>
-              <li>Manage detailed profile: Clicking a row should route to `/admin/members/[id]` to inspect full payment history and status controls.</li>
+              <li>
+                Database Querying: Fetch full user profiles from database.
+              </li>
+              <li>
+                Filter implementation: Filter members dynamically by membership
+                level (General, Pastoral, Board) and status (Active, Expired,
+                Canceled, Pending).
+              </li>
+              <li>
+                CSV exporter: Integrate a CSV compiler that converts filtered
+                query results into a downloadable file.
+              </li>
+              <li>
+                Manage detailed profile: Clicking a row should route to
+                `/admin/members/[id]` to inspect full payment history and status
+                controls.
+              </li>
             </ul>
           </div>
         </div>
       </div>
 
       {/* Mock Members Table */}
-      <div className="rounded-md border bg-card overflow-hidden">
+      <div className="overflow-hidden rounded-md border bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-secondary/40 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b">
+            <thead className="border-b bg-secondary/40 text-xs font-bold tracking-wider text-muted-foreground uppercase">
               <tr>
                 <th className="px-6 py-4">Name</th>
                 <th className="px-6 py-4">Email</th>
@@ -91,16 +105,27 @@ export default function AdminMembersPage() {
                   date: "June 04, 2026",
                 },
               ].map((member, index) => (
-                <tr key={index} className="hover:bg-secondary/20 transition-colors cursor-pointer">
+                <tr
+                  key={index}
+                  className="cursor-pointer transition-colors hover:bg-secondary/20"
+                >
                   <td className="px-6 py-4 font-semibold">{member.name}</td>
-                  <td className="px-6 py-4 text-muted-foreground">{member.email}</td>
-                  <td className="px-6 py-4 font-semibold text-primary">{member.level}</td>
+                  <td className="px-6 py-4 text-muted-foreground">
+                    {member.email}
+                  </td>
+                  <td className="px-6 py-4 font-semibold text-primary">
+                    {member.level}
+                  </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${member.statusColor}`}>
+                    <span
+                      className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${member.statusColor}`}
+                    >
                       {member.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-muted-foreground">{member.date}</td>
+                  <td className="px-6 py-4 text-muted-foreground">
+                    {member.date}
+                  </td>
                 </tr>
               ))}
             </tbody>

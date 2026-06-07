@@ -1,5 +1,10 @@
 import React from "react"
-import { IconPresentation, IconInfoCircle, IconDownload, IconFileText } from "@tabler/icons-react"
+import {
+  IconPresentation,
+  IconInfoCircle,
+  IconDownload,
+  IconFileText,
+} from "@tabler/icons-react"
 
 export default function BoardMeetingsPage() {
   return (
@@ -7,9 +12,12 @@ export default function BoardMeetingsPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Board Meetings & Minutes</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Board Meetings & Minutes
+          </h2>
           <p className="text-muted-foreground">
-            Access upcoming agendas, download past meeting minutes, and check calendar schedules.
+            Access upcoming agendas, download past meeting minutes, and check
+            calendar schedules.
           </p>
         </div>
       </div>
@@ -19,11 +27,19 @@ export default function BoardMeetingsPage() {
         <div className="flex items-start gap-3">
           <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
           <div>
-            <h4 className="font-semibold text-primary">Developer TODO Checklist:</h4>
+            <h4 className="font-semibold text-primary">
+              Developer TODO Checklist:
+            </h4>
             <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
               <li>Secure Access: Ensure only Board users can load.</li>
-              <li>Fetch meeting objects: Pull schedules (dates, zoom links, locations) and documents (agendas, minutes PDFs) from DB.</li>
-              <li>Implement archiving: Create a collapsible accordion sorted by Year/Month for past meetings history.</li>
+              <li>
+                Fetch meeting objects: Pull schedules (dates, zoom links,
+                locations) and documents (agendas, minutes PDFs) from DB.
+              </li>
+              <li>
+                Implement archiving: Create a collapsible accordion sorted by
+                Year/Month for past meetings history.
+              </li>
             </ul>
           </div>
         </div>
@@ -56,17 +72,28 @@ export default function BoardMeetingsPage() {
         ].map((meeting, index) => (
           <div key={index} className="rounded-lg border bg-card p-6 shadow-xs">
             <div className="flex items-center justify-between gap-4">
-              <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${meeting.badgeColor}`}>
+              <span
+                className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${meeting.badgeColor}`}
+              >
                 {meeting.status}
               </span>
-              <span className="text-sm text-muted-foreground">{meeting.date}</span>
+              <span className="text-sm text-muted-foreground">
+                {meeting.date}
+              </span>
             </div>
-            <h3 className="mt-3 text-lg font-bold tracking-tight">{meeting.title}</h3>
-            
+            <h3 className="mt-3 text-lg font-bold tracking-tight">
+              {meeting.title}
+            </h3>
+
             <div className="mt-4 space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground">Meeting Attachments:</p>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Meeting Attachments:
+              </p>
               {meeting.files.map((file, fIndex) => (
-                <div key={fIndex} className="flex items-center justify-between rounded-md bg-secondary/50 p-2.5 text-xs border">
+                <div
+                  key={fIndex}
+                  className="flex items-center justify-between rounded-md border bg-secondary/50 p-2.5 text-xs"
+                >
                   <div className="flex items-center gap-2">
                     <IconFileText className="size-4 text-muted-foreground" />
                     <span>{file}</span>

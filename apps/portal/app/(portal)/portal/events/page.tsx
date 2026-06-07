@@ -1,5 +1,9 @@
 import React from "react"
-import { IconCalendarEvent, IconInfoCircle, IconLink } from "@tabler/icons-react"
+import {
+  IconCalendarEvent,
+  IconInfoCircle,
+  IconLink,
+} from "@tabler/icons-react"
 
 export default function EventsPage() {
   return (
@@ -9,7 +13,8 @@ export default function EventsPage() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Member Events</h2>
           <p className="text-muted-foreground">
-            Register for upcoming faith summits, virtual roundtables, workshops, and webinars.
+            Register for upcoming faith summits, virtual roundtables, workshops,
+            and webinars.
           </p>
         </div>
       </div>
@@ -19,12 +24,27 @@ export default function EventsPage() {
         <div className="flex items-start gap-3">
           <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
           <div>
-            <h4 className="font-semibold text-primary">Developer TODO Checklist:</h4>
+            <h4 className="font-semibold text-primary">
+              Developer TODO Checklist:
+            </h4>
             <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>Fetch events from the calendar database or external APIs (e.g. Google Calendar, Zoom Events).</li>
-              <li>Setup registration: Connect the "Register" button to a checkout form (Stripe for paid, custom register API for free).</li>
-              <li>Save registrations: Store registrants' Okta sub/userID in database to show registration status (e.g. 'You are registered!').</li>
-              <li>Implement filtering: Sort by "All Events", "My Registered Events", "Past Events".</li>
+              <li>
+                Fetch events from the calendar database or external APIs (e.g.
+                Google Calendar, Zoom Events).
+              </li>
+              <li>
+                {` Setup registration: Connect the "Register" button to a checkout
+                form (Stripe for paid, custom register API for free).`}
+              </li>
+              <li>
+                {` Save registrations: Store registrants' Okta sub/userID in
+                database to show registration status (e.g. 'You are
+                registered!').`}
+              </li>
+              <li>
+                {` Implement filtering: Sort by "All Events", "My Registered
+                Events", "Past Events".`}
+              </li>
             </ul>
           </div>
         </div>
@@ -38,7 +58,8 @@ export default function EventsPage() {
             date: "July 12-14, 2026",
             time: "09:00 AM - 05:00 PM EST",
             location: "Orlando Convention Center (Hybrid)",
-            description: "Join hundreds of faith leaders, ministry practitioners, and catechists for three days of fellowship, presentations, and workshops.",
+            description:
+              "Join hundreds of faith leaders, ministry practitioners, and catechists for three days of fellowship, presentations, and workshops.",
             status: "Open",
             btnText: "Register for Summit",
           },
@@ -47,7 +68,8 @@ export default function EventsPage() {
             date: "June 25, 2026",
             time: "03:00 PM - 04:30 PM EST",
             location: "Online (Zoom)",
-            description: "An open roundtable for general and pastoral members focusing on parish community engagement post-pandemic.",
+            description:
+              "An open roundtable for general and pastoral members focusing on parish community engagement post-pandemic.",
             status: "Open",
             btnText: "Reserve Zoom Link",
           },
@@ -56,30 +78,45 @@ export default function EventsPage() {
             date: "June 18, 2026",
             time: "01:00 PM - 03:00 PM EST",
             location: "Online (Vimeo Interactive)",
-            description: "Specialized training workshop covering standard Level 1 catechetical teaching templates and toolkits.",
+            description:
+              "Specialized training workshop covering standard Level 1 catechetical teaching templates and toolkits.",
             status: "Limited Space",
             btnText: "Apply for Entry",
           },
         ].map((event, index) => (
-          <div key={index} className="flex flex-col md:flex-row md:items-center justify-between rounded-lg border bg-card p-6 shadow-xs gap-6 hover:border-muted-foreground/30 transition-colors">
-            <div className="space-y-2 max-w-2xl">
+          <div
+            key={index}
+            className="flex flex-col justify-between gap-6 rounded-lg border bg-card p-6 shadow-xs transition-colors hover:border-muted-foreground/30 md:flex-row md:items-center"
+          >
+            <div className="max-w-2xl space-y-2">
               <div className="flex items-center gap-2">
                 <span className="rounded-md bg-primary/10 p-1.5 text-primary">
                   <IconCalendarEvent className="size-5" />
                 </span>
-                <span className="text-xs font-semibold text-primary">{event.date} • {event.time}</span>
+                <span className="text-xs font-semibold text-primary">
+                  {event.date} • {event.time}
+                </span>
               </div>
-              <h3 className="text-lg font-bold tracking-tight">{event.title}</h3>
-              <p className="text-xs text-muted-foreground">Location: <span className="font-semibold text-foreground">{event.location}</span></p>
-              <p className="text-sm text-muted-foreground mt-1">
+              <h3 className="text-lg font-bold tracking-tight">
+                {event.title}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Location:{" "}
+                <span className="font-semibold text-foreground">
+                  {event.location}
+                </span>
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
                 {event.description}
               </p>
             </div>
-            <div className="flex flex-col items-stretch md:items-end justify-center shrink-0 gap-2 min-w-[150px]">
-              <span className={`inline-flex self-start md:self-end items-center rounded-md px-2 py-1 text-xs font-medium ${event.status === "Open" ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500"}`}>
+            <div className="flex min-w-[150px] shrink-0 flex-col items-stretch justify-center gap-2 md:items-end">
+              <span
+                className={`inline-flex items-center self-start rounded-md px-2 py-1 text-xs font-medium md:self-end ${event.status === "Open" ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500"}`}
+              >
                 {event.status}
               </span>
-              <button className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
+              <button className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
                 <IconLink className="size-4" /> {event.btnText}
               </button>
             </div>

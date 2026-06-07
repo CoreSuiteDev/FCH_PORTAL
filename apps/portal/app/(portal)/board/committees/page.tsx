@@ -1,5 +1,10 @@
 import React from "react"
-import { IconHierarchy, IconInfoCircle, IconLock, IconFolder } from "@tabler/icons-react"
+import {
+  IconHierarchy,
+  IconInfoCircle,
+  IconLock,
+  IconFolder,
+} from "@tabler/icons-react"
 
 export default function BoardCommitteesPage() {
   return (
@@ -7,9 +12,12 @@ export default function BoardCommitteesPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Committees Workspace</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Committees Workspace
+          </h2>
           <p className="text-muted-foreground">
-            Access files, projects, and discussions for active Board sub-committees.
+            Access files, projects, and discussions for active Board
+            sub-committees.
           </p>
         </div>
       </div>
@@ -19,11 +27,22 @@ export default function BoardCommitteesPage() {
         <div className="flex items-start gap-3">
           <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
           <div>
-            <h4 className="font-semibold text-primary">Developer TODO Checklist:</h4>
+            <h4 className="font-semibold text-primary">
+              Developer TODO Checklist:
+            </h4>
             <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>Role Access restriction: Strictly limit directories based on committee membership (e.g. Audit Committee folders are only visible to Audit members).</li>
-              <li>Setup upload endpoint: Allow committee chairs to upload meeting summaries, briefings, and audit requests.</li>
-              <li>Track downloads: Implement detailed download tracking metrics.</li>
+              <li>
+                Role Access restriction: Strictly limit directories based on
+                committee membership (e.g. Audit Committee folders are only
+                visible to Audit members).
+              </li>
+              <li>
+                Setup upload endpoint: Allow committee chairs to upload meeting
+                summaries, briefings, and audit requests.
+              </li>
+              <li>
+                Track downloads: Implement detailed download tracking metrics.
+              </li>
             </ul>
           </div>
         </div>
@@ -48,18 +67,25 @@ export default function BoardCommitteesPage() {
             updated: "Updated 3 days ago",
           },
         ].map((committee, index) => (
-          <div key={index} className="flex flex-col justify-between rounded-lg border bg-card p-6 shadow-xs hover:border-muted-foreground/30 transition-all cursor-pointer group">
+          <div
+            key={index}
+            className="group flex cursor-pointer flex-col justify-between rounded-lg border bg-card p-6 shadow-xs transition-all hover:border-muted-foreground/30"
+          >
             <div className="flex items-start justify-between">
-              <span className="rounded-md bg-primary/10 p-2.5 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+              <span className="rounded-md bg-primary/10 p-2.5 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                 <IconFolder className="size-6" />
               </span>
               <IconLock className="size-4 text-amber-500" />
             </div>
             <div className="mt-4">
-              <h4 className="font-bold tracking-tight text-base">{committee.name}</h4>
-              <p className="text-xs text-muted-foreground mt-1">{committee.filesCount} • {committee.updated}</p>
+              <h4 className="text-base font-bold tracking-tight">
+                {committee.name}
+              </h4>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {committee.filesCount} • {committee.updated}
+              </p>
             </div>
-            <div className="mt-5 pt-3 border-t flex items-center justify-between text-xs font-semibold text-primary">
+            <div className="mt-5 flex items-center justify-between border-t pt-3 text-xs font-semibold text-primary">
               <span>Open Committee Folder</span>
               <span>→</span>
             </div>

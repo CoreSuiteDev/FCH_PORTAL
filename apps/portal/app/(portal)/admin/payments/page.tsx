@@ -1,5 +1,4 @@
-import React from "react"
-import { IconCreditCard, IconInfoCircle, IconRefresh } from "@tabler/icons-react"
+import { IconInfoCircle } from "@tabler/icons-react"
 
 export default function AdminPaymentsPage() {
   return (
@@ -7,9 +6,12 @@ export default function AdminPaymentsPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Payments & Transactions</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Payments & Transactions
+          </h2>
           <p className="text-muted-foreground">
-            Track MemberPress payments, Stripe transaction IDs, subscription logs, and refunds.
+            Track MemberPress payments, Stripe transaction IDs, subscription
+            logs, and refunds.
           </p>
         </div>
       </div>
@@ -19,21 +21,32 @@ export default function AdminPaymentsPage() {
         <div className="flex items-start gap-3">
           <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
           <div>
-            <h4 className="font-semibold text-primary">Developer TODO Checklist:</h4>
+            <h4 className="font-semibold text-primary">
+              Developer TODO Checklist:
+            </h4>
             <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>Stripe Integration: Sync with Stripe charges API or payment logs database.</li>
-              <li>Show invoice fields: Transaction ID, Member Name, Amount (USD), Status (Succeeded, Failed, Refunded), Timestamp.</li>
-              <li>Refund actions: Implement a refund button that calls the Stripe refund API endpoint and updates membership status.</li>
+              <li>
+                Stripe Integration: Sync with Stripe charges API or payment logs
+                database.
+              </li>
+              <li>
+                Show invoice fields: Transaction ID, Member Name, Amount (USD),
+                Status (Succeeded, Failed, Refunded), Timestamp.
+              </li>
+              <li>
+                Refund actions: Implement a refund button that calls the Stripe
+                refund API endpoint and updates membership status.
+              </li>
             </ul>
           </div>
         </div>
       </div>
 
       {/* Mock Payments Table */}
-      <div className="rounded-md border bg-card overflow-hidden">
+      <div className="overflow-hidden rounded-md border bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-secondary/40 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b">
+            <thead className="border-b bg-secondary/40 text-xs font-bold tracking-wider text-muted-foreground uppercase">
               <tr>
                 <th className="px-6 py-4">Transaction ID</th>
                 <th className="px-6 py-4">Member</th>
@@ -69,12 +82,19 @@ export default function AdminPaymentsPage() {
                   date: "May 20, 2026",
                 },
               ].map((tx, index) => (
-                <tr key={index} className="hover:bg-secondary/20 transition-colors">
+                <tr
+                  key={index}
+                  className="transition-colors hover:bg-secondary/20"
+                >
                   <td className="px-6 py-4 font-mono text-xs">{tx.id}</td>
                   <td className="px-6 py-4 font-semibold">{tx.name}</td>
-                  <td className="px-6 py-4 font-semibold text-primary">{tx.amount}</td>
+                  <td className="px-6 py-4 font-semibold text-primary">
+                    {tx.amount}
+                  </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${tx.color}`}>
+                    <span
+                      className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${tx.color}`}
+                    >
                       {tx.status}
                     </span>
                   </td>

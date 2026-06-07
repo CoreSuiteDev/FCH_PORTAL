@@ -1,5 +1,10 @@
 import React from "react"
-import { IconFileText, IconInfoCircle, IconDownload, IconShieldLock } from "@tabler/icons-react"
+import {
+  IconFileText,
+  IconInfoCircle,
+  IconDownload,
+  IconShieldLock,
+} from "@tabler/icons-react"
 
 export default function BoardDocumentsPage() {
   return (
@@ -7,9 +12,12 @@ export default function BoardDocumentsPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Corporate Governance & Bylaws</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Corporate Governance & Bylaws
+          </h2>
           <p className="text-muted-foreground">
-            Bylaws, charters, conflict policies, and governance guidelines reserved strictly for the Board.
+            Bylaws, charters, conflict policies, and governance guidelines
+            reserved strictly for the Board.
           </p>
         </div>
       </div>
@@ -19,11 +27,19 @@ export default function BoardDocumentsPage() {
         <div className="flex items-start gap-3">
           <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
           <div>
-            <h4 className="font-semibold text-primary">Developer TODO Checklist:</h4>
+            <h4 className="font-semibold text-primary">
+              Developer TODO Checklist:
+            </h4>
             <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
               <li>Access control: Block users without Board permissions.</li>
-              <li>Setup secure pdf viewer: Add inline secure PDF display to prevent unauthorized downloading or hotlinking.</li>
-              <li>Version control tracking: List historical revisions of bylaws and charter amendments.</li>
+              <li>
+                Setup secure pdf viewer: Add inline secure PDF display to
+                prevent unauthorized downloading or hotlinking.
+              </li>
+              <li>
+                Version control tracking: List historical revisions of bylaws
+                and charter amendments.
+              </li>
             </ul>
           </div>
         </div>
@@ -51,17 +67,25 @@ export default function BoardDocumentsPage() {
             date: "Effective Oct 2024",
           },
         ].map((doc, index) => (
-          <div key={index} className="flex items-center justify-between rounded-lg border bg-card p-4 shadow-xs hover:border-muted-foreground/30 transition-colors">
+          <div
+            key={index}
+            className="flex items-center justify-between rounded-lg border bg-card p-4 shadow-xs transition-colors hover:border-muted-foreground/30"
+          >
             <div className="flex items-center gap-3">
               <span className="rounded-md bg-secondary p-2 text-primary">
                 <IconShieldLock className="size-6 text-zinc-400" />
               </span>
               <div>
-                <h4 className="font-semibold text-sm hover:underline cursor-pointer">{doc.name}</h4>
-                <p className="text-xs text-muted-foreground">PDF Document • {doc.size} • Revision: {doc.version} ({doc.date})</p>
+                <h4 className="cursor-pointer text-sm font-semibold hover:underline">
+                  {doc.name}
+                </h4>
+                <p className="text-xs text-muted-foreground">
+                  PDF Document • {doc.size} • Revision: {doc.version} (
+                  {doc.date})
+                </p>
               </div>
             </div>
-            <button className="flex items-center gap-1.5 rounded-md border px-3 py-2 text-xs font-semibold hover:bg-secondary transition-colors">
+            <button className="flex items-center gap-1.5 rounded-md border px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary">
               <IconDownload className="size-3.5" /> Secure Download
             </button>
           </div>

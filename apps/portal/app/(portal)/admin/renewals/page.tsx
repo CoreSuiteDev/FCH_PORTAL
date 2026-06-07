@@ -1,5 +1,5 @@
 import React from "react"
-import { IconAlertTriangle, IconInfoCircle, IconMailForward } from "@tabler/icons-react"
+import { IconInfoCircle, IconMailForward } from "@tabler/icons-react"
 
 export default function AdminRenewalsPage() {
   return (
@@ -7,9 +7,12 @@ export default function AdminRenewalsPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Track Renewals & Expirations</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Track Renewals & Expirations
+          </h2>
           <p className="text-muted-foreground">
-            Monitor members with upcoming subscription expirations. Send renewal reminders.
+            Monitor members with upcoming subscription expirations. Send renewal
+            reminders.
           </p>
         </div>
       </div>
@@ -19,11 +22,23 @@ export default function AdminRenewalsPage() {
         <div className="flex items-start gap-3">
           <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
           <div>
-            <h4 className="font-semibold text-primary">Developer TODO Checklist:</h4>
+            <h4 className="font-semibold text-primary">
+              Developer TODO Checklist:
+            </h4>
             <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>Renewal queries: Query database for users whose memberships will expire within the next 30 days.</li>
-              <li>Transactional Emails: Connect the "Send Reminder" button to your transactional email service (SendGrid, SES, Mailchimp) to send pre-formatted renewal prompts.</li>
-              <li>Automate cron: Propose setting up a nightly CRON task that checks expirations and triggers reminders automatically.</li>
+              <li>
+                Renewal queries: Query database for users whose memberships will
+                expire within the next 30 days.
+              </li>
+              <li>
+                {`Transactional Emails: Connect the "Send Reminder" button to your
+                transactional email service (SendGrid, SES, Mailchimp) to send
+                pre-formatted renewal prompts.`}
+              </li>
+              <li>
+                Automate cron: Propose setting up a nightly CRON task that
+                checks expirations and triggers reminders automatically.
+              </li>
             </ul>
           </div>
         </div>
@@ -47,17 +62,28 @@ export default function AdminRenewalsPage() {
             status: "Upcoming",
           },
         ].map((item, index) => (
-          <div key={index} className="flex flex-col md:flex-row md:items-center justify-between rounded-lg border bg-card p-6 shadow-xs gap-4">
+          <div
+            key={index}
+            className="flex flex-col justify-between gap-4 rounded-lg border bg-card p-6 shadow-xs md:flex-row md:items-center"
+          >
             <div className="space-y-1">
-              <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold ${item.status === "Urgent" ? "bg-red-500/10 text-red-500" : "bg-amber-500/10 text-amber-500"}`}>
+              <span
+                className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold ${item.status === "Urgent" ? "bg-red-500/10 text-red-500" : "bg-amber-500/10 text-amber-500"}`}
+              >
                 {item.status}
               </span>
-              <h4 className="font-bold tracking-tight text-base">{item.name}</h4>
-              <p className="text-sm text-muted-foreground">{item.email} • {item.level}</p>
-              <p className="text-xs font-semibold text-red-500 mt-1">{item.expires}</p>
+              <h4 className="text-base font-bold tracking-tight">
+                {item.name}
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                {item.email} • {item.level}
+              </p>
+              <p className="mt-1 text-xs font-semibold text-red-500">
+                {item.expires}
+              </p>
             </div>
             <div className="flex shrink-0">
-              <button className="flex items-center gap-2 rounded-md bg-secondary border px-3 py-2 text-xs font-semibold hover:bg-secondary/80 transition-colors">
+              <button className="flex items-center gap-2 rounded-md border bg-secondary px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary/80">
                 <IconMailForward className="size-4" /> Send Renewal Email
               </button>
             </div>
