@@ -4,18 +4,32 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import morgan from "morgan";
+import * as trpcExpress from '@trpc/server/adapters/express';
+import { generateOpenApiDocument, createOpenApiExpressMiddleware } from 'trpc-to-openapi';
 
 import { toNodeHandler } from "better-auth/node";
 import { errorMiddleware } from "./apps/middleware/error.middleware.js";
 import { auth } from "./lib/auth.js";
+import fs from "fs/promises"
 
-import routes from "./routes/index.js";
 import { AppError } from "./utils/AppError.js";
+import { appRouter } from "./server/index.js";
+import { createContext } from "./server/context.js";
 
 const app:Application = express();
 
-// 1. Security & Optimization Middleware
+
+app.use(express.json());
 app.use(helmet());
+
+const openapiDocument = generateOpenApiDocument(appRouter, {
+  baseUrl: 'http://localhost:5000/api/v1',
+  title: 'FCH API',
+  version: '1.0.0'
+})
+
+fs.writeFile("./openapi-fch.json", JSON.stringify(openapiDocument))
+
 
 app.use(
   cors({
@@ -40,7 +54,21 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 
 // 6. API Routes
-app.use("/api/v1", routes);
+app.use(
+  "/trpc",
+  trpcExpress.createExpressMiddleware({
+    router: appRouter,
+    createContext,
+  })
+);
+
+app.use(
+  "/api/v1",
+  createOpenApiExpressMiddleware({
+    router: appRouter,
+    createContext,
+  })
+);
 
 app.get("/health", (_: Request, res: Response) => {
   res.status(200).json({ status: "ok", message: "Server is healthy" });
