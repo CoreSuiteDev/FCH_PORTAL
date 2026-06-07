@@ -2,27 +2,7 @@
 
 import * as React from "react"
 import {
-  IconDashboard,
-  IconUsers,
-  IconLockSquare,
-  IconCreditCard,
-  IconCalendarEvent,
-  IconVideo,
-  IconMail,
-  IconPresentation,
-  IconFileText,
-  IconReceipt2,
-  IconHierarchy,
-  IconBooks,
-  IconSchool,
-  IconAward,
-  IconBriefcase,
-  IconBell,
-  IconUser,
   IconInnerShadowTop,
-  IconSettings,
-  IconHelp,
-  IconSearch,
 } from "@tabler/icons-react"
 import {
   Sidebar,
