@@ -1,20 +1,27 @@
+// @/components/BoardAccess.tsx
 "use client"
 
-import React, { useState } from "react"
+import React, { useMemo } from "react"
 import {
-  ShieldCheck,
-  Key,
+  Search,
+  Filter,
   Lock,
-  UserCheck,
-  Fingerprint,
   RefreshCw,
-  AlertOctagon,
-  Eye,
-  Settings2,
-  Terminal,
   ShieldAlert,
-  Server,
+  SlidersHorizontal,
+  Terminal,
+  ShieldCheck,
+  UserCheck,
+  LayoutGrid,
 } from "lucide-react"
+import {
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  flexRender,
+  ColumnDef,
+} from "@tanstack/react-table"
+
 import { Button } from "@workspace/ui/components/button"
 import {
   Card,
@@ -24,282 +31,428 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
-import { Progress } from "@workspace/ui/components/progress"
+import { Input } from "@workspace/ui/components/input"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@workspace/ui/components/table"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
+
 import {
   BoardMemberAccess,
-  boardMembersAccessData,
-  boardSecurityMetrics,
-  PermissionScope,
-  permissionScopesData,
-  SecurityMetric,
+  AllowedClearance,
 } from "@/constants/board-access-data"
+import { useBoardAccessStore } from "@/store/use-board-access-store"
 
 export default function BoardAccess() {
-  const [accessList, setAccessList] = useState<BoardMemberAccess[]>(
-    boardMembersAccessData
+  const {
+    accessList,
+    globalFilter,
+    selectedTier,
+    setGlobalFilter,
+    setSelectedTier,
+    updateClearanceLevel,
+    rotateTokens,
+  } = useBoardAccessStore()
+
+  const clearanceOptions: AllowedClearance[] = ["General", "Pastoral", "Board"]
+
+  // Stats calculation
+  const totalOperators = accessList.length
+  const mfaEnabledCount = accessList.filter(
+    (m) => m.mfaStatus === "Enabled"
+  ).length
+  const mfaPercentage =
+    totalOperators > 0
+      ? Math.round((mfaEnabledCount / totalOperators) * 100)
+      : 0
+  const boardCount = accessList.filter(
+    (m) => m.clearanceLevel === "Board"
+  ).length
+
+  // Simplified color helper matched with ManageUsers theme
+  const getTierStyles = (tier: string) => {
+    switch (tier) {
+      case "Board":
+        return "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-900/50"
+      case "Pastoral":
+        return "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/50"
+      default:
+        return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+    }
+  }
+
+  const columns = useMemo<ColumnDef<BoardMemberAccess>[]>(
+    () => [
+      {
+        accessorKey: "id",
+        header: "Operator ID",
+        cell: ({ row }) => (
+          <span className="font-mono text-xs font-semibold text-slate-500">
+            {row.original.id}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "name",
+        header: "Identity Profile",
+        cell: ({ row }) => (
+          <div>
+            <div className="font-medium text-slate-900 dark:text-slate-100">
+              {row.original.name}
+            </div>
+            <div className="mt-0.5 text-xs text-slate-400">
+              {row.original.role}
+            </div>
+          </div>
+        ),
+      },
+      {
+        accessorKey: "mfaStatus",
+        header: "Security Verification",
+        cell: ({ row }) => {
+          const mfa = row.original.mfaStatus
+          return (
+            <span className="flex items-center gap-1.5 text-xs font-medium">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  mfa === "Enabled" ? "bg-emerald-500" : "bg-rose-500"
+                }`}
+              />
+              {mfa}
+            </span>
+          )
+        },
+      },
+      {
+        accessorKey: "lastActive",
+        header: "Activity Log",
+        cell: ({ row }) => (
+          <span className="text-xs text-slate-500">
+            {row.original.lastActive}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "clearanceLevel",
+        header: "Clearance Authority",
+        cell: ({ row }) => {
+          const member = row.original
+          return (
+            <div className="w-[140px]">
+              <Select
+                value={member.clearanceLevel}
+                onValueChange={(value) =>
+                  updateClearanceLevel(member.id, value as AllowedClearance)
+                }
+              >
+                <SelectTrigger
+                  className={`h-8 rounded-md border text-xs font-medium shadow-sm transition-all focus:ring-1 focus:ring-primary ${getTierStyles(member.clearanceLevel)}`}
+                >
+                  <SelectValue placeholder="Select Clearance" />
+                </SelectTrigger>
+                <SelectContent className="rounded-md border-slate-200 dark:border-slate-800">
+                  {clearanceOptions.map((level) => (
+                    <SelectItem
+                      key={level}
+                      value={level}
+                      className="cursor-pointer text-xs font-medium"
+                    >
+                      {level}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )
+        },
+      },
+    ],
+    [updateClearanceLevel]
   )
 
-  const triggerKeyRotation = () => {
-    alert("Cryptographic access keys have been queued for global rotation.")
-  }
+  const finalFilteredData = useMemo(() => {
+    if (selectedTier === "All") return accessList
+    return accessList.filter((user) => user.clearanceLevel === selectedTier)
+  }, [accessList, selectedTier])
+
+  const table = useReactTable({
+    data: finalFilteredData,
+    columns,
+    state: { globalFilter },
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: (row, columnId, filterValue) => {
+      const search = filterValue.toLowerCase()
+      const name = String(row.getValue("name") || "").toLowerCase()
+      const id = String(row.getValue("id") || "").toLowerCase()
+      const role = String(row.original.role || "").toLowerCase()
+      return (
+        name.includes(search) || id.includes(search) || role.includes(search)
+      )
+    },
+  })
 
   return (
     <div className="min-h-screen space-y-6 bg-slate-50 p-4 text-slate-900 md:p-6 dark:bg-slate-900 dark:text-slate-50">
-      {/* HEADER SECTION WITH IMMEDIATE ADMINISTRATIVE ACTION */}
+      {/* HEADER CONTROL */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight md:text-3xl">
-            <Lock className="h-7 w-7 text-indigo-600" /> Board Access Control
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+            Directory Permissions
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            High-privilege security management, cryptographic keys, and token
-            lifecycles.
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            Manage system access criteria and instantly revoke or elevate
+            operator tokens.
           </p>
         </div>
         <Button
           size="sm"
-          onClick={triggerKeyRotation}
-          className="flex w-full items-center justify-center gap-2 bg-indigo-600 text-white hover:bg-indigo-500 sm:w-auto"
+          onClick={rotateTokens}
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto"
         >
-          <RefreshCw className="h-4 w-4" /> Rotate Access Tokens
+          <RefreshCw className="mr-2 h-4 w-4" /> Rotate Access Tokens
         </Button>
       </div>
 
-      {/* PRIVILEGED SECURITY COMPLIANCE METRICS */}
+      {/* QUICK METRICS BAR */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {boardSecurityMetrics.map((metric: SecurityMetric, index: number) => (
-          <Card
-            key={index}
-            className="border-l-4 border-l-indigo-500 shadow-sm"
-          >
-            <CardContent className="lifted space-y-3 p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
-                  {metric.label}
-                </span>
-                <span className="font-mono text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                  {metric.value}
-                </span>
-              </div>
-              <div className="space-y-1">
-                <Progress
-                  value={metric.percentage}
-                  className="h-1.5 [&>div]:bg-green-600"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <Card className="shadow-sm">
+          <CardContent className="flex items-center justify-between p-5">
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Total Operators
+            </span>
+            <Badge variant="secondary" className="font-mono">
+              {totalOperators} Users
+            </Badge>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm">
+          <CardContent className="flex items-center justify-between p-5">
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              MFA Secure Ratio
+            </span>
+            <Badge variant="secondary" className="font-mono">
+              {mfaPercentage}%
+            </Badge>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm">
+          <CardContent className="flex items-center justify-between p-5">
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Board Tier Members
+            </span>
+            <Badge variant="secondary" className="font-mono">
+              {boardCount} Users
+            </Badge>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* PRIVILEGED DIRECTORY & IDENTITY POLICIES */}
-        <Card className="flex flex-col shadow-sm lg:col-span-2">
-          <CardHeader className="border-b border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900/50">
-            <div className="flex items-center gap-2">
-              <Fingerprint className="h-5 w-5 text-indigo-500" />
-              <div>
-                <CardTitle className="text-base font-semibold">
-                  Authorized Board Operators
-                </CardTitle>
-                <CardDescription>
-                  Live state of multi-factor states and clearance matrixes.
-                </CardDescription>
-              </div>
+      {/* SEARCH AND FILTERS CONTROLS */}
+      <Card className="shadow-sm">
+        <CardContent className="p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="relative flex-1">
+              <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search by name, token string, role identity..."
+                className="w-full bg-white pl-9 dark:bg-slate-800"
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+              />
             </div>
-          </CardHeader>
 
-          <CardContent className="flex-1 p-0">
-            {/* DESKTOP MATRIX */}
-            <div className="hidden overflow-x-auto md:block">
-              <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold text-slate-500 uppercase dark:border-slate-800 dark:bg-slate-800/40">
-                  <tr>
-                    <th className="px-6 py-3">Operator ID</th>
-                    <th className="px-6 py-3">Profile Identity</th>
-                    <th className="px-6 py-3">Clearance Threshold</th>
-                    <th className="px-6 py-3">MFA Status</th>
-                    <th className="px-6 py-3">Session State</th>
-                    <th className="px-6 py-3 text-right">Policy Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {accessList.map((member: BoardMemberAccess) => (
-                    <tr
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                <Filter className="h-3.5 w-3.5" />
+                <span>Filter Tier:</span>
+              </div>
+              {["All", "General", "Pastoral", "Board"].map((tier) => (
+                <Button
+                  key={tier}
+                  variant={selectedTier === tier ? "default" : "outline"}
+                  size="sm"
+                  className="h-8 px-3 text-xs"
+                  onClick={() => setSelectedTier(tier)}
+                >
+                  {tier}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* CORE PERMISSIONS CONTAINER */}
+      <Card className="overflow-hidden shadow-sm">
+        <CardHeader className="border-b border-slate-100 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-900/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base font-semibold">
+                Active Vault Records
+              </CardTitle>
+              <CardDescription>
+                Showing {table.getRowModel().rows.length} filtered identities
+                registered inside system.
+              </CardDescription>
+            </div>
+            <SlidersHorizontal className="hidden h-4 w-4 text-slate-400 sm:block" />
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          {table.getRowModel().rows.length === 0 ? (
+            <div className="flex h-48 flex-col items-center justify-center gap-2 p-6 text-sm text-slate-400">
+              <ShieldAlert className="h-8 w-8 text-slate-300" />
+              No matching security profiles identified inside this scope.
+            </div>
+          ) : (
+            <>
+              {/* DESKTOP VIEW */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader className="bg-slate-50/70 dark:bg-slate-800/40">
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <TableRow
+                        key={headerGroup.id}
+                        className="border-b border-slate-100 dark:border-slate-800"
+                      >
+                        {headerGroup.headers.map((header) => (
+                          <TableHead
+                            key={header.id}
+                            className="h-auto px-6 py-3 text-xs font-semibold text-slate-500 uppercase"
+                          >
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableHeader>
+                  <TableBody>
+                    {table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        className="border-b border-slate-100/60 bg-white hover:bg-slate-50/30 dark:border-slate-800/30 dark:bg-slate-900 dark:hover:bg-slate-800/20"
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            className="px-6 py-3.5 text-sm whitespace-nowrap"
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* MOBILE Adaptable Interface Card Grid */}
+              <div className="grid grid-cols-1 gap-3 p-4 md:hidden">
+                {table.getRowModel().rows.map((row) => {
+                  const member = row.original
+                  return (
+                    <div
                       key={member.id}
-                      className="bg-white hover:bg-slate-50/50 dark:bg-slate-900"
+                      className="space-y-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/40"
                     >
-                      <td className="px-6 py-4 font-mono text-xs font-semibold text-slate-400">
-                        {member.id}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-semibold text-slate-900 dark:text-slate-100">
-                          {member.name}
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <span className="font-mono text-[10px] text-slate-400">
+                            {member.id}
+                          </span>
+                          <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                            {member.name}
+                          </h4>
+                          <p className="text-xs text-slate-400">
+                            {member.role}
+                          </p>
                         </div>
-                        <div className="text-xs text-slate-400">
-                          {member.role}
-                        </div>
-                      </td>
-                      <td className="lifted px-6 py-4">
                         <Badge
                           variant="outline"
-                          className="border-indigo-200 bg-indigo-50/50 text-xs text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400"
-                        >
-                          {member.clearanceLevel}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge
                           className={
                             member.mfaStatus === "Enabled"
-                              ? "bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/10"
-                              : "bg-rose-500/10 text-rose-700 hover:bg-rose-500/10"
+                              ? "border-emerald-200 bg-emerald-50 text-emerald-600"
+                              : "border-rose-200 bg-rose-50 text-rose-700"
                           }
                         >
                           {member.mfaStatus}
                         </Badge>
-                      </td>
-                      <td className="px-6 py-4 text-xs text-slate-500">
-                        {member.lastActive}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 px-2 text-slate-500 hover:text-indigo-600"
+                      </div>
+
+                      <div className="space-y-1 border-t border-slate-200/60 pt-2.5 dark:border-slate-800">
+                        <Select
+                          value={member.clearanceLevel}
+                          onValueChange={(value) =>
+                            updateClearanceLevel(
+                              member.id,
+                              value as AllowedClearance
+                            )
+                          }
                         >
-                          <Settings2 className="h-4 w-4" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                          <SelectTrigger
+                            className={`h-8 w-full rounded-md border text-xs font-medium ${getTierStyles(member.clearanceLevel)}`}
+                          >
+                            <SelectValue placeholder="Clearance Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {clearanceOptions.map((level) => (
+                              <SelectItem
+                                key={level}
+                                value={level}
+                                className="text-xs font-medium"
+                              >
+                                {level}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-            {/* MOBILE ADAPTIVE MATRIX */}
-            <div className="grid grid-cols-1 gap-4 p-4 md:hidden">
-              {accessList.map((member: BoardMemberAccess) => (
-                <div
-                  key={member.id}
-                  className="space-y-3 rounded-xl border border-slate-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-800"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="font-mono text-[10px] text-slate-400">
-                        {member.id}
-                      </span>
-                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                        {member.name}
-                      </h4>
-                      <p className="text-xs text-slate-400">{member.role}</p>
+                      <div className="flex items-center justify-between text-[11px] text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <UserCheck className="h-3 w-3" /> Heartbeat:
+                        </span>
+                        <span className="font-mono">{member.lastActive}</span>
+                      </div>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className="border-indigo-100 text-[10px] text-indigo-700"
-                    >
-                      {member.clearanceLevel.split("-")[0]}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-slate-50 pt-2 text-xs dark:border-slate-700">
-                    <span className="text-slate-400">MFA Validation</span>
-                    <span
-                      className={
-                        member.mfaStatus === "Enabled"
-                          ? "font-medium text-emerald-600"
-                          : "font-medium text-rose-600"
-                      }
-                    >
-                      {member.mfaStatus}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between pt-1 text-xs">
-                    <span className="text-slate-400">Heartbeat</span>
-                    <span className="text-slate-500">{member.lastActive}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* GRANULAR PERMISSION SCOPES MANAGEMENT */}
-        <Card className="shadow-sm">
-          <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/50">
-            <div className="flex items-center gap-2">
-              <Server className="h-4 w-4 text-indigo-500" />
-              <CardTitle className="text-base font-semibold">
-                Active Access Scopes
-              </CardTitle>
-            </div>
-            <CardDescription>
-              System modules locked behind cryptographic board clearance keys.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 p-4">
-            {permissionScopesData.map((scope: PermissionScope) => (
-              <div
-                key={scope.id}
-                className="space-y-2 rounded-xl border border-slate-100 bg-white p-3 text-xs shadow-sm dark:border-slate-800 dark:bg-slate-800"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">
-                    {scope.module}
-                  </span>
-                  <Badge
-                    variant="outline"
-                    className={
-                      scope.riskScore === "High"
-                        ? "border-rose-300 bg-rose-50 text-[10px] text-rose-700"
-                        : scope.riskScore === "Medium"
-                          ? "border-amber-300 bg-amber-50 text-[10px] text-amber-700"
-                          : "border-slate-200 bg-slate-50 text-[10px] text-slate-600"
-                    }
-                  >
-                    {scope.riskScore} Risk
-                  </Badge>
-                </div>
-                <p className="text-[11px] leading-relaxed text-slate-400">
-                  {scope.description}
-                </p>
-                <div className="flex items-center justify-between pt-1 text-[10px] font-medium text-slate-500">
-                  <span>Scope Reference: {scope.id}</span>
-                  <span className="text-indigo-600 dark:text-indigo-400">
-                    {scope.totalGrants} Active Grants
-                  </span>
-                </div>
+                  )
+                })}
               </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* SECURITY LOG AUDIT BANNER FOOTER */}
-      <Card className="border-none bg-slate-900 text-slate-100 shadow-md dark:bg-black/40">
-        <CardContent className="flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
-          <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
-            <div className="rounded-lg bg-indigo-500/10 p-2 text-indigo-400">
-              <Terminal className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm font-medium">
-                Immutable Security Auditing Protocol Enforced
-              </p>
-              <p className="text-xs text-slate-400">
-                All modifications to board privilege sets are cryptographically
-                signed and routed to isolated cloud monitors.
-              </p>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 w-full border-none bg-white text-xs font-semibold text-slate-900 hover:bg-slate-100 sm:w-auto"
-          >
-            View Audit Crypts
-          </Button>
+            </>
+          )}
         </CardContent>
       </Card>
+
+      {/* Footer Audit Badge */}
+      <div className="flex items-center justify-center gap-2 pt-2 text-xs text-slate-400 dark:text-slate-500">
+        <Terminal className="h-3.5 w-3.5 text-primary" />
+        <span>
+          Cryptographic audit log system fully locked down under active global
+          configurations.
+        </span>
+      </div>
     </div>
   )
 }

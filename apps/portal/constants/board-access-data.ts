@@ -1,4 +1,6 @@
-// board-data.ts
+// @/constants/board-access-data.ts
+
+export type AllowedClearance = "General" | "Pastoral" | "Board"
 
 export interface BoardMemberAccess {
   id: string
@@ -6,21 +8,7 @@ export interface BoardMemberAccess {
   role: string
   mfaStatus: "Enabled" | "Disabled"
   lastActive: string
-  clearanceLevel: "L3-Full-Admin" | "L2-Financial-Only" | "L1-Read-Only"
-}
-
-export interface PermissionScope {
-  id: string
-  module: string
-  description: string
-  totalGrants: number
-  riskScore: "High" | "Medium" | "Low"
-}
-
-export interface SecurityMetric {
-  label: string
-  value: string
-  percentage: number
+  clearanceLevel: AllowedClearance
 }
 
 export const boardMembersAccessData: BoardMemberAccess[] = [
@@ -30,7 +18,7 @@ export const boardMembersAccessData: BoardMemberAccess[] = [
     role: "Strategic Advisor",
     mfaStatus: "Enabled",
     lastActive: "Just Now",
-    clearanceLevel: "L3-Full-Admin",
+    clearanceLevel: "Board",
   },
   {
     id: "BRD-002",
@@ -38,7 +26,7 @@ export const boardMembersAccessData: BoardMemberAccess[] = [
     role: "Managing Director",
     mfaStatus: "Enabled",
     lastActive: "14 mins ago",
-    clearanceLevel: "L3-Full-Admin",
+    clearanceLevel: "Board",
   },
   {
     id: "BRD-003",
@@ -46,7 +34,7 @@ export const boardMembersAccessData: BoardMemberAccess[] = [
     role: "Honorary Trustee",
     mfaStatus: "Enabled",
     lastActive: "2 hours ago",
-    clearanceLevel: "L1-Read-Only",
+    clearanceLevel: "General",
   },
   {
     id: "BRD-004",
@@ -54,49 +42,6 @@ export const boardMembersAccessData: BoardMemberAccess[] = [
     role: "Financial Overseer",
     mfaStatus: "Disabled",
     lastActive: "Yesterday",
-    clearanceLevel: "L2-Financial-Only",
+    clearanceLevel: "Pastoral",
   },
-]
-
-export const permissionScopesData: PermissionScope[] = [
-  {
-    id: "SCP-901",
-    module: "Core Ledger & Banking",
-    description: "Read/Write access to primary financial transaction streams.",
-    totalGrants: 2,
-    riskScore: "High",
-  },
-  {
-    id: "SCP-902",
-    module: "Automated Tier Provisioning",
-    description:
-      "Ability to bypass stripe webhooks and manually scale user states.",
-    totalGrants: 3,
-    riskScore: "High",
-  },
-  {
-    id: "SCP-903",
-    module: "Audit Log Clearances",
-    description:
-      "Permission to archive or review application runtime console outputs.",
-    totalGrants: 1,
-    riskScore: "Medium",
-  },
-  {
-    id: "SCP-904",
-    module: "General Member Metadata",
-    description: "Access to view profiles, email registers, and basic logs.",
-    totalGrants: 4,
-    riskScore: "Low",
-  },
-]
-
-export const boardSecurityMetrics: SecurityMetric[] = [
-  { label: "MFA Enforcement Coverage", value: "75%", percentage: 75 },
-  {
-    label: "Cryptographic Key Rotation",
-    value: "On Schedule",
-    percentage: 100,
-  },
-  { label: "Privileged Access Compliance", value: "92%", percentage: 92 },
 ]
