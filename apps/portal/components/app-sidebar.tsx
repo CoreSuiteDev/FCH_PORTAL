@@ -1,9 +1,7 @@
 "use client"
 
 import * as React from "react"
-import {
-  IconInnerShadowTop,
-} from "@tabler/icons-react"
+import { IconInnerShadowTop } from "@tabler/icons-react"
 import {
   Sidebar,
   SidebarContent,

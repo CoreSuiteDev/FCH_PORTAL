@@ -1,5 +1,10 @@
 import React from "react"
-import { IconVideo, IconInfoCircle, IconLock, IconPlayerPlay } from "@tabler/icons-react"
+import {
+  IconVideo,
+  IconInfoCircle,
+  IconLock,
+  IconPlayerPlay,
+} from "@tabler/icons-react"
 
 export default function AdvancedWebinarsPage() {
   return (
@@ -7,9 +12,12 @@ export default function AdvancedWebinarsPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Advanced Webinar & Training</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Advanced Webinar & Training
+          </h2>
           <p className="text-muted-foreground">
-            Specialized training videos, guest theological seminars, and advanced pastoral leadership webinars.
+            Specialized training videos, guest theological seminars, and
+            advanced pastoral leadership webinars.
           </p>
         </div>
       </div>
@@ -19,11 +27,23 @@ export default function AdvancedWebinarsPage() {
         <div className="flex items-start gap-3">
           <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
           <div>
-            <h4 className="font-semibold text-primary">Developer TODO Checklist:</h4>
+            <h4 className="font-semibold text-primary">
+              Developer TODO Checklist:
+            </h4>
             <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>Role Access verification: Enforce that only logged-in users with a valid `Pastoral` or `Board` membership status are permitted to access this page. Block or redirect general users.</li>
-              <li>Setup advanced video embeds: Connect to your Vimeo Advanced folder or Mux streams.</li>
-              <li>Implement discussion forums: Setup a comments/chat forum underneath the webinar streams to support member Q&A.</li>
+              <li>
+                Role Access verification: Enforce that only logged-in users with
+                a valid `Pastoral` or `Board` membership status are permitted to
+                access this page. Block or redirect general users.
+              </li>
+              <li>
+                Setup advanced video embeds: Connect to your Vimeo Advanced
+                folder or Mux streams.
+              </li>
+              <li>
+                Implement discussion forums: Setup a comments/chat forum
+                underneath the webinar streams to support member Q&A.
+              </li>
             </ul>
           </div>
         </div>
@@ -45,32 +65,37 @@ export default function AdvancedWebinarsPage() {
             desc: "Expert panel outlining crisis counseling methodologies, legal frameworks, and support networks for parish leadership.",
           },
         ].map((webinar, index) => (
-          <div key={index} className="flex flex-col overflow-hidden rounded-lg border bg-card shadow-xs relative">
-            <div className="absolute top-2 right-2 z-10 flex items-center gap-1 rounded bg-amber-500/95 text-white px-2 py-0.5 text-[10px] font-semibold">
+          <div
+            key={index}
+            className="relative flex flex-col overflow-hidden rounded-lg border bg-card shadow-xs"
+          >
+            <div className="absolute top-2 right-2 z-10 flex items-center gap-1 rounded bg-amber-500/95 px-2 py-0.5 text-[10px] font-semibold text-white">
               <IconLock className="size-3" /> Locked
             </div>
             {/* Video Thumbnail Placeholder */}
             <div className="relative flex aspect-video items-center justify-center bg-zinc-950 text-white">
               <IconVideo className="size-12 opacity-30" />
-              <button className="absolute flex size-12 items-center justify-center rounded-full bg-primary/95 text-primary-foreground shadow-md hover:scale-105 transition-all">
+              <button className="absolute flex size-12 items-center justify-center rounded-full bg-primary/95 text-primary-foreground shadow-md transition-all hover:scale-105">
                 <IconPlayerPlay className="size-6 fill-current" />
               </button>
-              <span className="absolute bottom-2 right-2 rounded-sm bg-black/80 px-2 py-0.5 text-[10px] font-semibold">
+              <span className="absolute right-2 bottom-2 rounded-sm bg-black/80 px-2 py-0.5 text-[10px] font-semibold">
                 {webinar.duration}
               </span>
             </div>
             {/* Details */}
             <div className="flex flex-1 flex-col justify-between p-6">
               <div>
-                <h4 className="font-semibold text-base tracking-tight hover:underline cursor-pointer">
+                <h4 className="cursor-pointer text-base font-semibold tracking-tight hover:underline">
                   {webinar.title}
                 </h4>
-                <p className="mt-1 text-xs text-muted-foreground">Presented by {webinar.speaker}</p>
-                <p className="mt-3 text-sm text-muted-foreground line-clamp-3">
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Presented by {webinar.speaker}
+                </p>
+                <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
                   {webinar.desc}
                 </p>
               </div>
-              <div className="mt-5 pt-3 border-t">
+              <div className="mt-5 border-t pt-3">
                 <button className="text-xs font-semibold text-primary hover:underline">
                   Unlock Webinar & Study Guides →
                 </button>
