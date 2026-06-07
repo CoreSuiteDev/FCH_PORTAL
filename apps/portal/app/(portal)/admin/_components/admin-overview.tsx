@@ -41,14 +41,14 @@ import {
 
 export default function DashboardOverview() {
   return (
-    <div className="min-h-screen space-y-6 bg-slate-50 p-4 text-slate-900 md:p-6 dark:bg-slate-900 dark:text-slate-50">
+    <div className="min-h-screen space-y-6 bg-slate-50 p-4 text-slate-900 md:px-6 dark:bg-slate-900 dark:text-slate-50">
       {/* HEADER SECTION */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
             Dashboard Overview
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Internal Custom Membership & Financial Control Center.
           </p>
         </div>
