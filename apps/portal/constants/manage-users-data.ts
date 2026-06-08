@@ -200,7 +200,6 @@ export const userMembersData: UserMember[] = [
   },
 ]
 
-// total data (২০ জন মেম্বার) অনুযায়ী রেশিও বা পার্সেন্টেজ আপডেট করা হয়েছে
 export const tierSummaries: TierSummary[] = [
   { name: "General Tier", count: 10, percentage: 50.0, color: "bg-primary" },
   {
