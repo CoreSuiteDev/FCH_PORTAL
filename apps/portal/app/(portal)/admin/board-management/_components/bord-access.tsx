@@ -1,23 +1,22 @@
-// @/components/BoardAccess.tsx
 "use client"
 
 import React, { useMemo } from "react"
 import {
   Search,
   Filter,
-  Lock,
   RefreshCw,
   ShieldAlert,
   SlidersHorizontal,
   Terminal,
-  ShieldCheck,
   UserCheck,
-  LayoutGrid,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import {
   useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   flexRender,
   ColumnDef,
 } from "@tanstack/react-table"
@@ -55,6 +54,7 @@ import {
 import { useBoardAccessStore } from "@/store/use-board-access-store"
 
 export default function BoardAccess() {
+  // Pulling everything from separate zustand store
   const {
     accessList,
     globalFilter,
@@ -63,24 +63,13 @@ export default function BoardAccess() {
     setSelectedTier,
     updateClearanceLevel,
     rotateTokens,
+    getNeedsAttentionCount,
+    getActivePrivilegedCount,
+    getMfaPercentage,
   } = useBoardAccessStore()
 
   const clearanceOptions: AllowedClearance[] = ["General", "Pastoral", "Board"]
 
-  // Stats calculation
-  const totalOperators = accessList.length
-  const mfaEnabledCount = accessList.filter(
-    (m) => m.mfaStatus === "Enabled"
-  ).length
-  const mfaPercentage =
-    totalOperators > 0
-      ? Math.round((mfaEnabledCount / totalOperators) * 100)
-      : 0
-  const boardCount = accessList.filter(
-    (m) => m.clearanceLevel === "Board"
-  ).length
-
-  // Simplified color helper matched with ManageUsers theme
   const getTierStyles = (tier: string) => {
     switch (tier) {
       case "Board":
@@ -125,9 +114,7 @@ export default function BoardAccess() {
           return (
             <span className="flex items-center gap-1.5 text-xs font-medium">
               <span
-                className={`h-2 w-2 rounded-full ${
-                  mfa === "Enabled" ? "bg-emerald-500" : "bg-rose-500"
-                }`}
+                className={`h-2 w-2 rounded-full ${mfa === "Enabled" ? "bg-emerald-500" : "bg-rose-500"}`}
               />
               {mfa}
             </span>
@@ -193,6 +180,12 @@ export default function BoardAccess() {
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10, // Max 10 rows before shifting to Next Page
+      },
+    },
     globalFilterFn: (row, columnId, filterValue) => {
       const search = filterValue.toLowerCase()
       const name = String(row.getValue("name") || "").toLowerCase()
@@ -224,40 +217,6 @@ export default function BoardAccess() {
         >
           <RefreshCw className="mr-2 h-4 w-4" /> Rotate Access Tokens
         </Button>
-      </div>
-
-      {/* QUICK METRICS BAR */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Card className="shadow-sm">
-          <CardContent className="flex items-center justify-between p-5">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Total Operators
-            </span>
-            <Badge variant="secondary" className="font-mono">
-              {totalOperators} Users
-            </Badge>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm">
-          <CardContent className="flex items-center justify-between p-5">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              MFA Secure Ratio
-            </span>
-            <Badge variant="secondary" className="font-mono">
-              {mfaPercentage}%
-            </Badge>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm">
-          <CardContent className="flex items-center justify-between p-5">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Board Tier Members
-            </span>
-            <Badge variant="secondary" className="font-mono">
-              {boardCount} Users
-            </Badge>
-          </CardContent>
-        </Card>
       </div>
 
       {/* SEARCH AND FILTERS CONTROLS */}
@@ -304,8 +263,8 @@ export default function BoardAccess() {
                 Active Vault Records
               </CardTitle>
               <CardDescription>
-                Showing {table.getRowModel().rows.length} filtered identities
-                registered inside system.
+                Showing {table.getRowModel().rows.length} entries matching
+                current criteria.
               </CardDescription>
             </div>
             <SlidersHorizontal className="hidden h-4 w-4 text-slate-400 sm:block" />
@@ -368,7 +327,7 @@ export default function BoardAccess() {
                 </Table>
               </div>
 
-              {/* MOBILE Adaptable Interface Card Grid */}
+              {/* MOBILE VIEW */}
               <div className="grid grid-cols-1 gap-3 p-4 md:hidden">
                 {table.getRowModel().rows.map((row) => {
                   const member = row.original
@@ -439,6 +398,40 @@ export default function BoardAccess() {
                     </div>
                   )
                 })}
+              </div>
+
+              {/* PAGINATION CONTROLS */}
+              <div className="flex items-center justify-between border-t border-slate-100 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-900">
+                <div className="text-xs text-slate-500">
+                  Page{" "}
+                  <span className="font-medium text-slate-800 dark:text-slate-200">
+                    {table.getState().pagination.pageIndex + 1}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-medium text-slate-800 dark:text-slate-200">
+                    {table.getPageCount()}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </>
           )}
