@@ -10,6 +10,7 @@ import {
   Mail,
   Shield,
   Trash2,
+  Activity,
 } from "lucide-react"
 import {
   useReactTable,
@@ -62,14 +63,60 @@ export default function ManageUsers() {
     users,
     globalFilter,
     selectedTier,
+    selectedStatus,
     isDeleteDialogOpen,
     setGlobalFilter,
     setSelectedTier,
+    setSelectedStatus,
     toggleUserStatus,
     openDeleteDialog,
     closeDeleteDialog,
     confirmDeleteUser,
   } = useManageUserStore()
+
+  // 1. DYNAMIC STATUS METRICS CALCULATION (Will not shift when table updates)
+  const statusStats = useMemo(() => {
+    const totalUsers = users.length || 1
+    const activeCount = users.filter(
+      (u) => u.status.toLowerCase() === "active"
+    ).length
+    const expiredCount = users.filter(
+      (u) => u.status.toLowerCase() === "expired"
+    ).length
+    const canceledCount = users.filter(
+      (u) => u.status.toLowerCase() === "canceled"
+    ).length
+    const pendingCount = users.filter(
+      (u) => u.status.toLowerCase() === "pending"
+    ).length
+
+    return [
+      {
+        name: "Active",
+        count: activeCount,
+        pct: Math.round((activeCount / totalUsers) * 100),
+        color: "bg-emerald-500",
+      },
+      {
+        name: "Expired",
+        count: expiredCount,
+        pct: Math.round((expiredCount / totalUsers) * 100),
+        color: "bg-amber-500",
+      },
+      {
+        name: "Canceled",
+        count: canceledCount,
+        pct: Math.round((canceledCount / totalUsers) * 100),
+        color: "bg-rose-500",
+      },
+      {
+        name: "Pending",
+        count: pendingCount,
+        pct: Math.round((pendingCount / totalUsers) * 100),
+        color: "bg-blue-500",
+      },
+    ]
+  }, [users])
 
   // Columns definition for TanStack Table
   const columns = useMemo<ColumnDef<UserMember>[]>(
@@ -140,14 +187,31 @@ export default function ManageUsers() {
         cell: ({ row }) => {
           const status = row.original.status
           return (
-            <span className="flex items-center gap-1.5 text-xs font-medium">
+            <Badge
+              variant="outline"
+              className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
+                status.toLowerCase() === "active"
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400"
+                  : status.toLowerCase() === "expired"
+                    ? "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400"
+                    : status.toLowerCase() === "canceled"
+                      ? "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400"
+                      : "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400"
+              }`}
+            >
               <span
-                className={`h-2 w-2 rounded-full ${
-                  status === "Active" ? "bg-emerald-500" : "bg-rose-500"
+                className={`mr-1.5 h-1.5 w-1.5 rounded-full ${
+                  status.toLowerCase() === "active"
+                    ? "bg-emerald-500"
+                    : status.toLowerCase() === "expired"
+                      ? "bg-amber-500"
+                      : status.toLowerCase() === "canceled"
+                        ? "bg-rose-500"
+                        : "bg-blue-500"
                 }`}
               />
               {status}
-            </span>
+            </Badge>
           )
         },
       },
@@ -186,11 +250,16 @@ export default function ManageUsers() {
     [toggleUserStatus, openDeleteDialog]
   )
 
-  // Filtering data by Selected Tier first
+  // 2. COMBINED FILTERING LOGIC (Handles Tier and Membership Status updates dynamically)
   const finalFilteredData = useMemo(() => {
-    if (selectedTier === "All") return users
-    return users.filter((user) => user.tier === selectedTier)
-  }, [users, selectedTier])
+    return users.filter((user) => {
+      const matchesTier = selectedTier === "All" || user.tier === selectedTier
+      const matchesStatus =
+        selectedStatus === "All" ||
+        user.status.toLowerCase() === selectedStatus.toLowerCase()
+      return matchesTier && matchesStatus
+    })
+  }, [users, selectedTier, selectedStatus])
 
   // TanStack Table Instance
   const table = useReactTable({
@@ -222,7 +291,8 @@ export default function ManageUsers() {
             Manage Users
           </h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Monitor, modify roles, and oversee all automated tier accounts.
+            Monitor, modify roles, and oversee all automated tier accounts and
+            status states.
           </p>
         </div>
         <Button
@@ -266,9 +336,32 @@ export default function ManageUsers() {
         ))}
       </div>
 
+      {/* NEW: MEMBERSHIP STATUS SNAPSHOT CARD ROWS */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {statusStats.map((stat) => (
+          <Card
+            key={stat.name}
+            className="bg-white shadow-xs dark:bg-slate-900"
+          >
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between space-y-0 pb-1">
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  {stat.name} Status
+                </span>
+                <span className={`h-2 w-2 rounded-full ${stat.color}`} />
+              </div>
+              <div className="text-xl font-bold">{stat.count}</div>
+              <p className="mt-0.5 text-[10px] text-slate-400">
+                {stat.pct}% total ratio
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       {/* SEARCH AND FILTERS CONTROLS */}
       <Card className="shadow-sm">
-        <CardContent className="p-4">
+        <CardContent className="space-y-4 p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative flex-1">
               <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
@@ -282,23 +375,51 @@ export default function ManageUsers() {
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                <Filter className="h-3.5 w-3.5" />
-                <span>Filter Tier:</span>
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Tier Filters */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                  <Filter className="h-3.5 w-3.5" />
+                  <span>Tier:</span>
+                </div>
+                {["All", "General", "Pastoral", "Board"].map((tier) => (
+                  <Button
+                    key={tier}
+                    variant={selectedTier === tier ? "default" : "outline"}
+                    size="sm"
+                    className="h-8 px-3 text-xs"
+                    onClick={() => setSelectedTier(tier)}
+                  >
+                    {tier}
+                  </Button>
+                ))}
               </div>
-              {["All", "General", "Pastoral", "Board"].map((tier) => (
-                <Button
-                  key={tier}
-                  variant={selectedTier === tier ? "default" : "outline"}
-                  size="sm"
-                  className="h-8 px-3 text-xs"
-                  onClick={() => setSelectedTier(tier)}
-                >
-                  {tier}
-                </Button>
-              ))}
             </div>
+          </div>
+
+          {/* NEW: MEMBERSHIP STATUS INTERACTIVE FILTER ROW */}
+          <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+              <Activity className="h-3.5 w-3.5" />
+              <span>Membership:</span>
+            </div>
+            {["All", "Active", "Expired", "Canceled", "Pending"].map(
+              (status) => (
+                <Button
+                  key={status}
+                  variant={selectedStatus === status ? "secondary" : "ghost"}
+                  size="sm"
+                  className={`h-7 px-3 text-xs ${
+                    selectedStatus === status
+                      ? "bg-slate-200 font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                      : "text-slate-500"
+                  }`}
+                  onClick={() => setSelectedStatus(status)}
+                >
+                  {status}
+                </Button>
+              )
+            )}
           </div>
         </CardContent>
       </Card>
@@ -423,9 +544,17 @@ export default function ManageUsers() {
                           <span className="block text-[10px] font-medium tracking-wider text-slate-400 uppercase">
                             Access State
                           </span>
-                          <span className="mt-0.5 flex items-center gap-1.5 font-medium">
+                          <span className="mt-0.5 flex items-center gap-1.5 font-medium capitalize">
                             <span
-                              className={`h-1.5 w-1.5 rounded-full ${user.status === "Active" ? "bg-emerald-500" : "bg-rose-500"}`}
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                user.status.toLowerCase() === "active"
+                                  ? "bg-emerald-500"
+                                  : user.status.toLowerCase() === "expired"
+                                    ? "bg-amber-500"
+                                    : user.status.toLowerCase() === "canceled"
+                                      ? "bg-rose-500"
+                                      : "bg-blue-500"
+                              }`}
                             />
                             {user.status}
                           </span>

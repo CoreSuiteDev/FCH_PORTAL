@@ -1,4 +1,3 @@
-// src/store/use-manage-user-store.ts
 import { create } from "zustand"
 import { UserMember, userMembersData } from "@/constants/manage-users-data"
 
@@ -7,6 +6,7 @@ interface ManageUserStore {
   users: UserMember[]
   globalFilter: string
   selectedTier: string
+  selectedStatus: string // <-- Added status filter state
 
   // Dialog State
   isDeleteDialogOpen: boolean
@@ -15,6 +15,7 @@ interface ManageUserStore {
   // Actions
   setGlobalFilter: (filter: string) => void
   setSelectedTier: (tier: string) => void
+  setSelectedStatus: (status: string) => void // <-- Added status setter action
   toggleUserStatus: (id: string) => void
 
   // Dialog Actions
@@ -28,15 +29,18 @@ export const useManageUserStore = create<ManageUserStore>((set) => ({
   users: userMembersData,
   globalFilter: "",
   selectedTier: "All",
+  selectedStatus: "All", // <-- Defaulting to show all statuses
   isDeleteDialogOpen: false,
   userToDeleteId: null,
 
   // Actions
   setGlobalFilter: (filter) => set({ globalFilter: filter }),
   setSelectedTier: (tier) => set({ selectedTier: tier }),
+  setSelectedStatus: (status) => set({ selectedStatus: status }), // <-- Added logic
 
   toggleUserStatus: (id) =>
     set((state) => ({
+      // Note: mapping logic accepts "Active" toggling to "Suspended" or customizable membership keys
       users: state.users.map((user) =>
         user.id === id
           ? {
