@@ -10,7 +10,7 @@ import {
   useCodeForm,
   useEmailForm,
   useForgotPasswordStore,
-} from "@/store/use-forget-password-store"
+} from "@/store/auth/use-forget-password-store"
 
 export default function ForgotPasswordForm() {
   const { currentStep, isLoading, sendOtpCode, verifyOtpCode, resetStatus } =

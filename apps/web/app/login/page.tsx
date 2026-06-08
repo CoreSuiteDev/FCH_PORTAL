@@ -8,7 +8,7 @@ import {
   useAuthStore,
   useLoginForm,
   LoginFormValues,
-} from "@/store/use-auth-store"
+} from "@/store/auth/use-auth-store"
 import Link from "next/link"
 
 export default function LoginForm() {

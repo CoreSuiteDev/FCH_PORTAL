@@ -8,7 +8,7 @@ import {
   useResetPasswordStore,
   useResetPasswordForm,
   ResetPasswordFormValues,
-} from "@/store/use-reset-password-store"
+} from "@/store/auth/use-reset-password-store"
 
 export default function ResetPasswordForm() {
   const { updatePassword, isLoading, isSuccess, resetStatus } =

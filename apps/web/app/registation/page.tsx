@@ -8,7 +8,7 @@ import {
   RegisterFormValues,
   useRegisterForm,
   useRegisterStore,
-} from "@/store/use-register-store"
+} from "@/store/auth/use-register-store"
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
