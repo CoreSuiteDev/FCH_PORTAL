@@ -9,6 +9,7 @@ import {
   useLoginForm,
   LoginFormValues,
 } from "@/store/use-auth-store"
+import Link from "next/link"
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -32,10 +33,10 @@ export default function LoginForm() {
       <div className="pointer-events-none absolute top-[-20%] left-[-10%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
       <div className="pointer-events-none absolute right-[-10%] bottom-[-20%] h-[500px] w-[500px] rounded-full bg-accent/20 blur-[120px]" />
 
-      <div className="relative z-10 w-full max-w-[440px] rounded-2xl border border-border/60 bg-card p-8 text-card-foreground shadow-xl backdrop-blur-md">
+      <div className="relative z-10 w-full max-w-[500px] rounded-2xl border border-border/60 bg-card p-8 text-card-foreground shadow-xl backdrop-blur-md">
         {/* Header Section */}
         <div className="mb-8 flex flex-col items-center text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-foreground">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground">
             Welcome back
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -197,12 +198,12 @@ export default function LoginForm() {
         {/* Footer Link */}
         <div className="mt-8 text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <a
-            href="/register"
+          <Link
+            href="/registation"
             className="font-semibold text-primary transition-colors hover:underline"
           >
-            Sign up for free
-          </a>
+            <span>Sign Up</span>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,0 +1,197 @@
+"use client"
+
+import React, { useEffect } from "react"
+import { Mail, Loader2, ArrowLeft, CheckCircle2, KeyRound } from "lucide-react"
+
+import { Button } from "@workspace/ui/components/button"
+import {
+  CodeFormValues,
+  EmailFormValues,
+  useCodeForm,
+  useEmailForm,
+  useForgotPasswordStore,
+} from "@/store/use-forget-password-store"
+
+export default function ForgotPasswordForm() {
+  const { currentStep, isLoading, sendOtpCode, verifyOtpCode, resetStatus } =
+    useForgotPasswordStore()
+
+  // Initialize both hooks for independent form steps tracking
+  const emailForm = useEmailForm()
+  const codeForm = useCodeForm()
+
+  // Clear store values when the element unmounts
+  useEffect(() => {
+    return () => resetStatus()
+  }, [resetStatus])
+
+  const onEmailSubmit = (data: EmailFormValues) => {
+    sendOtpCode(data)
+  }
+
+  const onCodeSubmit = (data: CodeFormValues) => {
+    verifyOtpCode(data)
+  }
+
+  return (
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 font-sans text-foreground transition-colors duration-300">
+      {/* Background Decorative Gradients */}
+      <div className="pointer-events-none absolute top-[-20%] left-[-10%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
+      <div className="pointer-events-none absolute right-[-10%] bottom-[-20%] h-[500px] w-[500px] rounded-full bg-accent/20 blur-[120px]" />
+
+      <div className="relative z-10 w-full max-w-[440px] rounded-2xl border border-border/60 bg-card p-8 text-card-foreground shadow-xl backdrop-blur-md">
+        {/* STEP 1: Enter Email Layout */}
+        {currentStep === "ENTER_EMAIL" && (
+          <div className="animate-in duration-300 fade-in">
+            <div className="mb-8 flex flex-col items-center text-center">
+              <h2 className="text-4xl font-bold tracking-tight text-foreground">
+                Forgot Password?
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Enter your email address to receive a 6-digit verification code.
+              </p>
+            </div>
+
+            <form
+              onSubmit={emailForm.handleSubmit(onEmailSubmit)}
+              className="space-y-5"
+            >
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium tracking-wide text-foreground/90">
+                  Email Address
+                </label>
+                <div className="group relative">
+                  <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
+                    <Mail size={18} />
+                  </span>
+                  <input
+                    placeholder="name@example.com"
+                    type="email"
+                    disabled={isLoading}
+                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-3 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    {...emailForm.register("email")}
+                  />
+                </div>
+                {emailForm.formState.errors.email && (
+                  <p className="mt-1 px-1 text-xs font-medium text-destructive">
+                    {emailForm.formState.errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="h-11 w-full font-medium shadow-md transition-all active:scale-[0.99]"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <span>Send Code</span>
+                )}
+              </Button>
+            </form>
+          </div>
+        )}
+
+        {/* STEP 2: Verify OTP Code Layout */}
+        {currentStep === "VERIFY_CODE" && (
+          <div className="animate-in duration-300 zoom-in-95 fade-in">
+            <div className="mb-8 flex flex-col items-center text-center">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-md shadow-primary/20">
+                <KeyRound size={20} className="text-primary-foreground" />
+              </div>
+              <h2 className="text-3xl font-bold tracking-tight text-foreground">
+                Enter Security Code
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Please enter the 6-digit verification code sent to your email.
+              </p>
+            </div>
+
+            <form
+              onSubmit={codeForm.handleSubmit(onCodeSubmit)}
+              className="space-y-5"
+            >
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium tracking-wide text-foreground/90">
+                  Verification Code
+                </label>
+                <div className="group relative">
+                  <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
+                    <KeyRound size={18} />
+                  </span>
+                  <input
+                    placeholder="000000"
+                    type="text"
+                    maxLength={6}
+                    disabled={isLoading}
+                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-3 pl-11 text-sm tracking-widest ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    {...codeForm.register("code")}
+                  />
+                </div>
+                {codeForm.formState.errors.code && (
+                  <p className="mt-1 px-1 text-xs font-medium text-destructive">
+                    {codeForm.formState.errors.code.message}
+                  </p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="h-11 w-full font-medium shadow-md transition-all active:scale-[0.99]"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <span>Verify Code</span>
+                )}
+              </Button>
+            </form>
+          </div>
+        )}
+
+        {/* STEP 3: Verification Success Layout (Route redirection setup trigger placeholder) */}
+        {currentStep === "SUCCESS" && (
+          <div className="flex animate-in flex-col items-center text-center duration-300 zoom-in-95 fade-in">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 shadow-md">
+              <CheckCircle2 size={24} />
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              Identity Verified
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Your security code matches. Click below to proceed and update your
+              current password credentials safely.
+            </p>
+
+            <Button
+              type="button"
+              className="mt-6 h-11 w-full font-medium shadow-md"
+              onClick={() => (window.location.href = "/reset-password")} // Change window location target route as per requirement
+            >
+              Reset Password Now
+            </Button>
+          </div>
+        )}
+
+        {/* Universal Back to Sign In Nav Footer */}
+        {currentStep !== "SUCCESS" && (
+          <div className="mt-8 text-center text-sm">
+            <a
+              href="/login"
+              className="group inline-flex items-center gap-1.5 font-semibold text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ArrowLeft
+                size={14}
+                className="transition-transform group-hover:-translate-x-0.5"
+              />
+              Back to Sign In
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
