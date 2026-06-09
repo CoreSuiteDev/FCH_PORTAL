@@ -8,9 +8,6 @@ import {
   ShieldAlert,
   SlidersHorizontal,
   Terminal,
-  UserCheck,
-  ChevronLeft,
-  ChevronRight,
   Download,
 } from "lucide-react"
 import {
@@ -33,7 +30,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
-import { Badge } from "@workspace/ui/components/badge"
+
 import { Input } from "@workspace/ui/components/input"
 import {
   Table,
