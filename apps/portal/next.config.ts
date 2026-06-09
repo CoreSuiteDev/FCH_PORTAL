@@ -1,7 +1,13 @@
-import type { NextConfig } from "next"
-
-const nextConfig: NextConfig = {
-  transpilePackages: ["@workspace/ui", "@workspace/types"],
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
+    ],
+  },
 }
 
-export default nextConfig
+module.exports = nextConfig

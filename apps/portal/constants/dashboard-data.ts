@@ -30,7 +30,7 @@ export const data = {
   adminMenu: [
     {
       title: "Admin Overview",
-      url: "/admin",
+      url: "/",
       icon: IconDashboard,
     },
     {
@@ -164,6 +164,8 @@ export const data = {
       url: "/portal/resources/basic",
       icon: IconFileText,
     },
+  ],
+  navSecondary: [
     {
       title: "General FCH Documents",
       url: "/portal/documents",
@@ -179,8 +181,6 @@ export const data = {
       url: "/portal/profile",
       icon: IconUser,
     },
-  ],
-  navSecondary: [
     {
       title: "Settings",
       url: "/portal/settings",

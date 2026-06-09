@@ -20,6 +20,15 @@ import { data } from "@/constants/dashboard-data"
 import Link from "next/link"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  // navSecondary theke items gulo ke separate/filter kore nilam static title er jonno
+  const internalDocs = data.navSecondary.filter((item) =>
+    ["General FCH Documents", "Newsletter Archive"].includes(item.title)
+  )
+
+  const accountAndHelp = data.navSecondary.filter((item) =>
+    ["My Profile", "Settings", "Get Help", "Search"].includes(item.title)
+  )
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -39,6 +48,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
+        {/* ================= Admin Panel ================= */}
         <SidebarGroup>
           <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
             Admin Panel
@@ -46,6 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain items={data.adminMenu} />
         </SidebarGroup>
 
+        {/* ================= Board Room ================= */}
         <SidebarGroup>
           <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
             Board Room
@@ -53,6 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain items={data.boardMenu} />
         </SidebarGroup>
 
+        {/* ================= Pastoral Resources ================= */}
         <SidebarGroup>
           <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
             Pastoral Resources
@@ -60,6 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain items={data.pastoralMenu} />
         </SidebarGroup>
 
+        {/* ================= General Area ================= */}
         <SidebarGroup>
           <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
             General Area
@@ -67,7 +80,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain items={data.generalMenu} />
         </SidebarGroup>
 
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* ================= Custom Section: FCH Resources ================= */}
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
+            FCH Resources
+          </SidebarGroupLabel>
+          <NavSecondary items={internalDocs} />
+        </SidebarGroup>
+
+        {/* ================= Custom Section: Account & Support ================= */}
+        {/* mt-auto deway eta ekdom niche push hoye thakbe */}
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
+            Account & Support
+          </SidebarGroupLabel>
+          <NavSecondary items={accountAndHelp} />
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>

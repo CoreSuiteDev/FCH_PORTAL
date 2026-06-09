@@ -1,93 +1,240 @@
-import React from "react"
-import { IconInfoCircle, IconPlus, IconUsers } from "@tabler/icons-react"
+"use client"
 
-export default function AdminEventsPage() {
+import React, { useState } from "react"
+import { useEventStore } from "@/store/use-event-store"
+import { Button } from "@workspace/ui/components/button"
+import { Badge } from "@workspace/ui/components/badge"
+import { Dialog, DialogContent } from "@workspace/ui/components/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
+import { Card } from "@workspace/ui/components/card"
+import {
+  Eye,
+  CalendarDays,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+  Info,
+  Tag,
+} from "lucide-react"
+
+export default function EventsManager() {
+  const {
+    getFilteredEvents,
+    setFilterStatus,
+    selectedEvent,
+    setSelectedEvent,
+    userRole,
+    setUserRole,
+  } = useEventStore()
+
+  const allEvents = getFilteredEvents()
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 8
+  const totalPages = Math.ceil(allEvents.length / itemsPerPage)
+  const paginatedEvents = allEvents.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
+  const getBadgeStyle = (clearance: string) => {
+    switch (clearance) {
+      case "Board":
+        return "bg-slate-900 text-white"
+      case "Pastoral":
+        return "bg-primary text-primary-foreground"
+      default:
+        return "bg-emerald-100 text-emerald-700"
+    }
+  }
+
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between space-y-2">
+    <div className="min-h-screen space-y-8 bg-slate-50/50 p-8">
+      <div className="flex items-end justify-between border-b border-slate-200 pb-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Events Manager</h2>
-          <p className="text-muted-foreground">
-            Schedule new portal events, manage zoom links, and track member
-            registrations.
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
+            Event Registry
+          </h2>
+          <p className="mt-1 text-slate-500">
+            Managing{" "}
+            <span className="font-bold text-slate-900">{allEvents.length}</span>{" "}
+            active events for{" "}
+            <span className="font-bold text-primary">{userRole}</span>.
           </p>
         </div>
-        <div className="flex shrink-0">
-          <button className="flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90">
-            <IconPlus className="size-4" /> Schedule Event
-          </button>
-        </div>
-      </div>
-
-      {/* Developer Notes / TODO */}
-      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
-        <div className="flex items-start gap-3">
-          <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
-          <div>
-            <h4 className="font-semibold text-primary">
-              Developer TODO Checklist:
-            </h4>
-            <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>
-                Event creation forms: Build forms to insert event details
-                (Title, date/time, Zoom details, category, paid/free ticket
-                details) into the events database.
-              </li>
-              <li>
-                Registrant list audits: Implement a sub-page displaying a list
-                of users registered for each event, with buttons to export
-                attendee CSVs.
-              </li>
-              <li>
-                Zoom Integration: Setup Zoom API or calendar hooks to
-                automatically schedule Zoom conferences when creating virtual
-                events.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Mock Events List */}
-      <div className="space-y-4">
-        {[
-          {
-            title: "FCH Summer Faith Summit 2026",
-            date: "July 12-14, 2026",
-            registrants: "148 registered",
-            status: "Active",
-          },
-          {
-            title: "Virtual Roundtable: Modern Parish Challenges",
-            date: "June 25, 2026",
-            registrants: "64 registered",
-            status: "Active",
-          },
-        ].map((event, index) => (
-          <div
-            key={index}
-            className="flex flex-col justify-between gap-4 rounded-lg border bg-card p-6 shadow-xs md:flex-row md:items-center"
+        <div className="flex gap-3">
+          <Select
+            onValueChange={(v: any) => {
+              setUserRole(v)
+              setCurrentPage(1)
+            }}
           >
-            <div className="space-y-1">
-              <span className="inline-flex items-center rounded bg-green-500/10 px-2 py-0.5 text-xs font-semibold text-green-500">
+            <SelectTrigger className="w-[140px] rounded-xl bg-white">
+              <SelectValue placeholder="Role: All" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All Roles</SelectItem>
+              <SelectItem value="General">General</SelectItem>
+              <SelectItem value="Pastoral">Pastoral</SelectItem>
+              <SelectItem value="Board">Board</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            onValueChange={(v: any) => {
+              setFilterStatus(v)
+              setCurrentPage(1)
+            }}
+          >
+            <SelectTrigger className="w-[140px] rounded-xl bg-white">
+              <SelectValue placeholder="Status: All" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All Status</SelectItem>
+              <SelectItem value="Upcoming">Upcoming</SelectItem>
+              <SelectItem value="Published">Published</SelectItem>
+              <SelectItem value="Ended">Ended</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {paginatedEvents.map((event) => (
+          <Card
+            key={event.id}
+            className="flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-xl"
+          >
+            <div className="flex items-start justify-between">
+              <Badge
+                className={`${getBadgeStyle(event.minClearance)} rounded-full px-3 text-[10px] font-bold tracking-wider uppercase`}
+              >
+                {event.minClearance}
+              </Badge>
+              <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
                 {event.status}
               </span>
-              <h4 className="text-base font-bold tracking-tight">
-                {event.title}
-              </h4>
-              <p className="text-sm text-muted-foreground">
-                Date: {event.date} • {event.registrants}
+            </div>
+            <div>
+              <h3 className="text-lg leading-tight font-bold text-slate-900">
+                {event.name}
+              </h3>
+              <p className="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
+                <CalendarDays className="h-3.5 w-3.5" /> {event.date}
               </p>
             </div>
-            <div className="flex shrink-0 gap-2">
-              <button className="flex items-center gap-1.5 rounded-md border bg-secondary px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary/80">
-                <IconUsers className="size-4" /> Manage Registrants
-              </button>
+            <div className="mt-auto grid grid-cols-2 gap-2 border-t border-slate-100 pt-4">
+              <div className="rounded-xl bg-slate-50 p-2 text-center">
+                <p className="text-[9px] font-bold text-slate-400 uppercase">
+                  Attendees
+                </p>
+                <p className="text-sm font-bold text-slate-900">
+                  {event.attendees}
+                </p>
+              </div>
+              <div className="rounded-xl bg-slate-50 p-2 text-center">
+                <p className="text-[9px] font-bold text-slate-400 uppercase">
+                  Registered
+                </p>
+                <p className="text-sm font-bold text-slate-900">
+                  {event.registeredMembers?.length || 0}
+                </p>
+              </div>
             </div>
-          </div>
+            <Button
+              variant="outline"
+              className="w-full rounded-xl border-slate-200 transition-all hover:bg-primary hover:text-white"
+              onClick={() => setSelectedEvent(event)}
+            >
+              <Eye className="mr-2 h-4 w-4" /> View Details
+            </Button>
+          </Card>
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-8">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="px-4 text-sm font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      <Dialog
+        open={!!selectedEvent}
+        onOpenChange={() => setSelectedEvent(null)}
+      >
+        <DialogContent className="max-w-sm overflow-hidden rounded-[2rem] border-0 bg-white/95 p-0 shadow-2xl backdrop-blur-2xl">
+          <div className="relative bg-primary px-8 pt-10 pb-8 text-center text-white">
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent" />
+            <h2 className="relative text-2xl font-black tracking-tight text-white">
+              {selectedEvent?.name}
+            </h2>
+            <p className="relative mt-1.5 text-xs font-medium tracking-widest text-white/80 uppercase">
+              {selectedEvent?.date}
+            </p>
+          </div>
+          <div className="space-y-6 px-8 py-8">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col items-center justify-center rounded-3xl bg-slate-50 p-4 transition-colors hover:bg-slate-100">
+                <Users className="mb-2 h-5 w-5 text-primary" />
+                <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                  Attendees
+                </div>
+                <div className="text-xl font-black text-slate-900">
+                  {selectedEvent?.attendees}
+                </div>
+              </div>
+              <div className="flex flex-col items-center justify-center rounded-3xl bg-slate-50 p-4 transition-colors hover:bg-slate-100">
+                <Tag className="mb-2 h-5 w-5 text-primary" />
+                <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                  Registered
+                </div>
+                <div className="text-xl font-black text-slate-900">
+                  {selectedEvent?.registeredMembers?.length || 0}
+                </div>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <h4 className="flex items-center gap-2 text-[11px] font-bold tracking-widest text-slate-400 uppercase">
+                <Info className="h-3.5 w-3.5 text-primary" /> Description
+              </h4>
+              <div className="rounded-2xl border border-slate-100 bg-white p-5 text-sm leading-relaxed text-slate-600 shadow-sm">
+                {selectedEvent?.description}
+              </div>
+            </div>
+            <Button
+              className="h-12 w-full rounded-2xl bg-slate-900 text-white shadow-lg transition-all hover:bg-black hover:shadow-xl active:scale-[0.98]"
+              onClick={() => setSelectedEvent(null)}
+            >
+              Close Details
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

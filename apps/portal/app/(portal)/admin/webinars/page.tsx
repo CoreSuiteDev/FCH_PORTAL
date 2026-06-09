@@ -1,96 +1,177 @@
-import { IconEye, IconInfoCircle, IconPlus } from "@tabler/icons-react"
+"use client"
 
-export default function AdminWebinarsPage() {
+import { useState } from "react"
+import Image from "next/image"
+import { useWebinarStore } from "@/store/use-webinar-store"
+import { Button } from "@workspace/ui/components/button"
+import { Badge } from "@workspace/ui/components/badge"
+import { Card, CardContent } from "@workspace/ui/components/card"
+import { Input } from "@workspace/ui/components/input"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover"
+import {
+  ChevronLeft,
+  ChevronRight,
+  User,
+  Search,
+  Filter,
+  Activity,
+  PlayCircle,
+  ChevronDown,
+} from "lucide-react"
+
+export default function WebinarManager() {
+  const {
+    getFilteredWebinars,
+    setFilterCategory,
+    setFilterStatus,
+    setSearchQuery,
+  } = useWebinarStore()
+  const [selectedTier, setSelectedTier] = useState("All")
+  const [selectedStatus, setSelectedStatus] = useState("All")
+
+  const allWebinars = getFilteredWebinars()
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 12
+  const totalPages = Math.ceil(allWebinars.length / itemsPerPage)
+  const paginatedData = allWebinars.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">
-            Manage Webinar Library
-          </h2>
-          <p className="text-muted-foreground">
-            Publish new webinars, track registrations, and monitor viewer
-            analytics logs.
-          </p>
-        </div>
-        <div className="flex shrink-0">
-          <button className="flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90">
-            <IconPlus className="size-4" /> Add New Webinar
-          </button>
-        </div>
+    <div className="min-h-screen space-y-8 bg-slate-50/50 p-8">
+      <div>
+        <h2 className="text-3xl font-black text-slate-900">Webinar Library</h2>
+        <p className="mt-2 font-medium text-slate-500">
+          Managing {allWebinars.length} active sessions.
+        </p>
       </div>
 
-      {/* Developer Notes / TODO */}
-      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
-        <div className="flex items-start gap-3">
-          <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
-          <div>
-            <h4 className="font-semibold text-primary">
-              Developer TODO Checklist:
-            </h4>
-            <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>
-                Webinar Forms: Build a complete metadata form (Title, Speaker,
-                Description, Vimeo Video ID/URL, duration, date, and access tier
-                like General/Pastoral).
-              </li>
-              <li>
-                Viewer Analytics: Implement log tracking to count how many times
-                each webinar has been viewed.
-              </li>
-              <li>
-                Access restriction validations: Ensure webinars tagged for
-                Pastoral members are hidden for General members.
-              </li>
-            </ul>
+      <Card className="shadow-sm">
+        <CardContent className="space-y-4 p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="relative flex-1">
+              <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search by name or speaker..."
+                className="w-full bg-white pl-9"
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              {/* Category Popover */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="h-8 gap-2 text-xs">
+                    <Filter className="h-3.5 w-3.5" /> Category: {selectedTier}{" "}
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-2">
+                  {["All", "Catechesis", "Hispanic Ministry"].map((cat) => (
+                    <Button
+                      key={cat}
+                      variant="ghost"
+                      className="w-full justify-start text-xs hover:bg-primary hover:text-white"
+                      onClick={() => {
+                        setSelectedTier(cat)
+                        setFilterCategory(cat)
+                      }}
+                    >
+                      {cat}
+                    </Button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+
+              {/* Status Popover */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="h-8 gap-2 text-xs">
+                    <Activity className="h-3.5 w-3.5" /> Status:{" "}
+                    {selectedStatus} <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-2">
+                  {["All", "Live", "Upcoming", "Recorded"].map((status) => (
+                    <Button
+                      key={status}
+                      variant="ghost"
+                      className="w-full justify-start text-xs hover:bg-primary hover:text-white"
+                      onClick={() => {
+                        setSelectedStatus(status)
+                        setFilterStatus(status)
+                      }}
+                    >
+                      {status}
+                    </Button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Mock Webinars list */}
-      <div className="space-y-4">
-        {[
-          {
-            title: "Welcome to FCH: General Member Induction",
-            speaker: "Sarah Jenkins",
-            tier: "General Tiers",
-            views: "142 views",
-            date: "June 05, 2026",
-          },
-          {
-            title: "Advanced Theology Seminar: Sacramental Models",
-            speaker: "Msgr. James Vance",
-            tier: "Pastoral / Board",
-            views: "34 views",
-            date: "June 02, 2026",
-          },
-        ].map((webinar, index) => (
-          <div
-            key={index}
-            className="flex flex-col justify-between gap-4 rounded-lg border bg-card p-6 shadow-xs md:flex-row md:items-center"
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        {paginatedData.map((w) => (
+          <Card
+            key={w.id}
+            className="group overflow-hidden rounded-2xl border-0 bg-white p-0 shadow-sm transition-all hover:shadow-md"
           >
-            <div className="space-y-1">
-              <span className="inline-flex items-center rounded bg-secondary px-2 py-0.5 text-xs font-semibold text-muted-foreground">
-                {webinar.tier}
-              </span>
-              <h4 className="text-base font-bold tracking-tight">
-                {webinar.title}
-              </h4>
-              <p className="text-sm text-muted-foreground">
-                Speaker: {webinar.speaker} • {webinar.views}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Uploaded: {webinar.date}
-              </p>
+            <div className="relative h-48 w-full overflow-hidden bg-slate-200">
+              <Image
+                src={w.image}
+                alt={w.title}
+                fill
+                className="mt-0 object-cover transition-transform duration-500 group-hover:scale-105"
+              />
             </div>
-            <div className="flex shrink-0 gap-2">
-              <button className="flex items-center gap-1.5 rounded-md border bg-secondary px-3 py-2 text-xs font-semibold transition-colors hover:bg-secondary/80">
-                <IconEye className="size-4" /> View Analytics
-              </button>
+            <div className="space-y-1 p-4">
+              <Badge
+                className={`${w.status === "Live" ? "bg-emerald-500" : "bg-primary"} rounded-full px-2 text-[9px] uppercase`}
+              >
+                {w.status}
+              </Badge>
+              <h3 className="text-sm leading-tight font-bold text-slate-900">
+                {w.title}
+              </h3>
+              <p className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                <User className="h-3 w-3" /> {w.speaker}
+              </p>
+              <Button className="mt-2 h-8 w-full rounded-lg bg-slate-900 text-[11px] font-semibold">
+                <PlayCircle className="mr-2 h-3.5 w-3.5" /> Watch Now
+              </Button>
             </div>
-          </div>
+          </Card>
         ))}
+      </div>
+
+      <div className="flex items-center justify-center gap-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          disabled={currentPage === 1}
+        >
+          <ChevronLeft size={16} />
+        </Button>
+        <span className="text-xs font-bold">
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          disabled={currentPage === totalPages}
+        >
+          <ChevronRight size={16} />
+        </Button>
       </div>
     </div>
   )
