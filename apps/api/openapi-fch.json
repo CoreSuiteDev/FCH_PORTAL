@@ -15,7 +15,9 @@
         "operationId": "hello",
         "summary": "Say hello",
         "description": "Returns a greeting message",
-        "tags": ["general"],
+        "tags": [
+          "general"
+        ],
         "security": [
           {
             "Authorization": []
@@ -42,7 +44,9 @@
                       "type": "string"
                     }
                   },
-                  "required": ["greeting"],
+                  "required": [
+                    "greeting"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -106,7 +110,9 @@
         "operationId": "user-getProfile",
         "summary": "Get user profile details",
         "description": "Returns a user profile record from the database",
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "security": [
           {
             "Authorization": []
@@ -155,7 +161,12 @@
                     "status": {
                       "default": "ACTIVE",
                       "type": "string",
-                      "enum": ["ACTIVE", "RESTRICTED", "SUSPENDED", "BANNED"]
+                      "enum": [
+                        "ACTIVE",
+                        "RESTRICTED",
+                        "SUSPENDED",
+                        "BANNED"
+                      ]
                     },
                     "createdAt": {
                       "type": "string"
@@ -179,7 +190,10 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["GENERAL", "PASTORAL"]
+                            "enum": [
+                              "GENERAL",
+                              "PASTORAL"
+                            ]
                           },
                           "status": {
                             "type": "string",
@@ -233,7 +247,12 @@
                             "type": "string"
                           }
                         },
-                        "required": ["id", "amount", "status", "createdAt"],
+                        "required": [
+                          "id",
+                          "amount",
+                          "status",
+                          "createdAt"
+                        ],
                         "additionalProperties": false
                       }
                     }
@@ -313,7 +332,9 @@
         "operationId": "user-listMembers",
         "summary": "List all registered members",
         "description": "Returns an array of all members",
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "security": [
           {
             "Authorization": []
@@ -354,7 +375,12 @@
                       "status": {
                         "default": "ACTIVE",
                         "type": "string",
-                        "enum": ["ACTIVE", "RESTRICTED", "SUSPENDED", "BANNED"]
+                        "enum": [
+                          "ACTIVE",
+                          "RESTRICTED",
+                          "SUSPENDED",
+                          "BANNED"
+                        ]
                       },
                       "createdAt": {
                         "type": "string"
@@ -378,7 +404,10 @@
                             },
                             "type": {
                               "type": "string",
-                              "enum": ["GENERAL", "PASTORAL"]
+                              "enum": [
+                                "GENERAL",
+                                "PASTORAL"
+                              ]
                             },
                             "status": {
                               "type": "string",
@@ -432,7 +461,12 @@
                               "type": "string"
                             }
                           },
-                          "required": ["id", "amount", "status", "createdAt"],
+                          "required": [
+                            "id",
+                            "amount",
+                            "status",
+                            "createdAt"
+                          ],
                           "additionalProperties": false
                         }
                       }
@@ -493,7 +527,9 @@
         "operationId": "user-updateStatus",
         "summary": "Update user operational status",
         "description": "Sets the user status to ACTIVE, RESTRICTED, SUSPENDED, or BANNED",
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "security": [
           {
             "Authorization": []
@@ -518,10 +554,17 @@
                 "properties": {
                   "status": {
                     "type": "string",
-                    "enum": ["ACTIVE", "RESTRICTED", "SUSPENDED", "BANNED"]
+                    "enum": [
+                      "ACTIVE",
+                      "RESTRICTED",
+                      "SUSPENDED",
+                      "BANNED"
+                    ]
                   }
                 },
-                "required": ["status"]
+                "required": [
+                  "status"
+                ]
               }
             }
           }
@@ -539,10 +582,18 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": ["ACTIVE", "RESTRICTED", "SUSPENDED", "BANNED"]
+                      "enum": [
+                        "ACTIVE",
+                        "RESTRICTED",
+                        "SUSPENDED",
+                        "BANNED"
+                      ]
                     }
                   },
-                  "required": ["success", "status"],
+                  "required": [
+                    "success",
+                    "status"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -606,7 +657,9 @@
         "operationId": "user-deleteUser",
         "summary": "Delete user account",
         "description": "Permanently deletes a user record from the database",
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "security": [
           {
             "Authorization": []
@@ -634,7 +687,9 @@
                       "type": "boolean"
                     }
                   },
-                  "required": ["success"],
+                  "required": [
+                    "success"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -698,7 +753,9 @@
         "operationId": "user-createMember",
         "summary": "Create a new member",
         "description": "Provisions a new member account with an optional status and membership tier",
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "security": [
           {
             "Authorization": []
@@ -720,14 +777,25 @@
                   },
                   "status": {
                     "type": "string",
-                    "enum": ["ACTIVE", "RESTRICTED", "SUSPENDED", "BANNED"]
+                    "enum": [
+                      "ACTIVE",
+                      "RESTRICTED",
+                      "SUSPENDED",
+                      "BANNED"
+                    ]
                   },
                   "tier": {
                     "type": "string",
-                    "enum": ["GENERAL", "PASTORAL"]
+                    "enum": [
+                      "GENERAL",
+                      "PASTORAL"
+                    ]
                   }
                 },
-                "required": ["name", "email"]
+                "required": [
+                  "name",
+                  "email"
+                ]
               }
             }
           }
@@ -765,7 +833,12 @@
                     "status": {
                       "default": "ACTIVE",
                       "type": "string",
-                      "enum": ["ACTIVE", "RESTRICTED", "SUSPENDED", "BANNED"]
+                      "enum": [
+                        "ACTIVE",
+                        "RESTRICTED",
+                        "SUSPENDED",
+                        "BANNED"
+                      ]
                     },
                     "createdAt": {
                       "type": "string"
@@ -789,7 +862,10 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["GENERAL", "PASTORAL"]
+                            "enum": [
+                              "GENERAL",
+                              "PASTORAL"
+                            ]
                           },
                           "status": {
                             "type": "string",
@@ -843,7 +919,12 @@
                             "type": "string"
                           }
                         },
-                        "required": ["id", "amount", "status", "createdAt"],
+                        "required": [
+                          "id",
+                          "amount",
+                          "status",
+                          "createdAt"
+                        ],
                         "additionalProperties": false
                       }
                     }
@@ -913,7 +994,9 @@
         "operationId": "auth-session",
         "summary": "Check authentication session status (Legacy)",
         "description": "Returns authentication status and role of a user",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "Authorization": []
@@ -947,7 +1030,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["authenticated", "userId", "role"],
+                  "required": [
+                    "authenticated",
+                    "userId",
+                    "role"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -1011,7 +1098,9 @@
         "operationId": "auth-signup",
         "summary": "User signup",
         "description": "Registers a new user using email & password",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "Authorization": []
@@ -1035,7 +1124,11 @@
                     "type": "string"
                   }
                 },
-                "required": ["name", "email", "password"]
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ]
               }
             }
           }
@@ -1108,7 +1201,9 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": ["user"],
+                  "required": [
+                    "user"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -1162,7 +1257,9 @@
         "operationId": "auth-login",
         "summary": "User login",
         "description": "Authenticates a user using email & password",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "Authorization": []
@@ -1183,7 +1280,10 @@
                     "type": "string"
                   }
                 },
-                "required": ["email", "password"]
+                "required": [
+                  "email",
+                  "password"
+                ]
               }
             }
           }
@@ -1256,7 +1356,9 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": ["user"],
+                  "required": [
+                    "user"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -1310,7 +1412,9 @@
         "operationId": "auth-forgotPassword",
         "summary": "Request password reset link",
         "description": "Sends a password reset link to the user's email",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "Authorization": []
@@ -1331,7 +1435,9 @@
                     "type": "string"
                   }
                 },
-                "required": ["email"]
+                "required": [
+                  "email"
+                ]
               }
             }
           }
@@ -1393,7 +1499,9 @@
         "operationId": "auth-resetPassword",
         "summary": "Reset password with token",
         "description": "Resets the user's password using the token sent in the reset link",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "Authorization": []
@@ -1414,7 +1522,10 @@
                     "type": "string"
                   }
                 },
-                "required": ["newPassword", "token"]
+                "required": [
+                  "newPassword",
+                  "token"
+                ]
               }
             }
           }
@@ -1476,7 +1587,9 @@
         "operationId": "auth-sendOtp",
         "summary": "Send OTP to email",
         "description": "Sends an OTP to the user's email for sign-in, verification, or password reset",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "Authorization": []
@@ -1495,10 +1608,17 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": ["sign-in", "email-verification", "forget-password"]
+                    "enum": [
+                      "sign-in",
+                      "email-verification",
+                      "forget-password"
+                    ]
                   }
                 },
-                "required": ["email", "type"]
+                "required": [
+                  "email",
+                  "type"
+                ]
               }
             }
           }
@@ -1560,7 +1680,9 @@
         "operationId": "auth-verifyOtp",
         "summary": "Verify OTP",
         "description": "Verifies the OTP sent to the email and processes sign-in, verification, or check depending on type",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "Authorization": []
@@ -1582,10 +1704,18 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": ["sign-in", "email-verification", "forget-password"]
+                    "enum": [
+                      "sign-in",
+                      "email-verification",
+                      "forget-password"
+                    ]
                   }
                 },
-                "required": ["email", "otp", "type"]
+                "required": [
+                  "email",
+                  "otp",
+                  "type"
+                ]
               }
             }
           }
@@ -1647,7 +1777,9 @@
         "operationId": "auth-resetPasswordWithOtp",
         "summary": "Reset password with OTP",
         "description": "Resets the user's password using the email OTP code",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "Authorization": []
@@ -1671,7 +1803,11 @@
                     "type": "string"
                   }
                 },
-                "required": ["email", "otp", "newPassword"]
+                "required": [
+                  "email",
+                  "otp",
+                  "newPassword"
+                ]
               }
             }
           }
@@ -1733,7 +1869,9 @@
         "operationId": "auth-me",
         "summary": "Get current session",
         "description": "Fetches details of the currently authenticated user session",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "security": [
           {
             "Authorization": []
@@ -1856,7 +1994,10 @@
                           "additionalProperties": false
                         }
                       },
-                      "required": ["session", "user"],
+                      "required": [
+                        "session",
+                        "user"
+                      ],
                       "additionalProperties": false
                     },
                     {
@@ -1925,7 +2066,9 @@
         "operationId": "dashboard-metrics",
         "summary": "Get dashboard overview metrics",
         "description": "Returns statistics summary for users, revenues, and rates",
-        "tags": ["dashboard"],
+        "tags": [
+          "dashboard"
+        ],
         "security": [
           {
             "Authorization": []
@@ -2001,7 +2144,9 @@
         "operationId": "events-list",
         "summary": "List all events",
         "description": "Returns an array of registered upcoming events",
-        "tags": ["events"],
+        "tags": [
+          "events"
+        ],
         "security": [
           {
             "Authorization": []
@@ -2030,7 +2175,12 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "title", "date", "location"],
+                    "required": [
+                      "id",
+                      "title",
+                      "date",
+                      "location"
+                    ],
                     "additionalProperties": false
                   }
                 }
@@ -2075,7 +2225,9 @@
         "operationId": "payment-history",
         "summary": "Get payment transaction history",
         "description": "Returns an array of user payment histories",
-        "tags": ["payment"],
+        "tags": [
+          "payment"
+        ],
         "security": [
           {
             "Authorization": []
@@ -2104,7 +2256,12 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "amount", "status", "date"],
+                    "required": [
+                      "id",
+                      "amount",
+                      "status",
+                      "date"
+                    ],
                     "additionalProperties": false
                   }
                 }
@@ -2149,7 +2306,9 @@
         "operationId": "portal-status",
         "summary": "Get portal system status",
         "description": "Returns system operational status and software version",
-        "tags": ["portal"],
+        "tags": [
+          "portal"
+        ],
         "security": [
           {
             "Authorization": []
@@ -2170,7 +2329,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["systemStatus", "version"],
+                  "required": [
+                    "systemStatus",
+                    "version"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -2214,7 +2376,9 @@
         "operationId": "resources-list",
         "summary": "List all resources",
         "description": "Returns an array of all general, pastoral, and board resources",
-        "tags": ["resources"],
+        "tags": [
+          "resources"
+        ],
         "security": [
           {
             "Authorization": []
@@ -2243,7 +2407,12 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "title", "category", "fileUrl"],
+                    "required": [
+                      "id",
+                      "title",
+                      "category",
+                      "fileUrl"
+                    ],
                     "additionalProperties": false
                   }
                 }
@@ -2288,7 +2457,9 @@
         "operationId": "webinar-list",
         "summary": "List all webinars",
         "description": "Returns an array of all general and advanced webinars",
-        "tags": ["webinar"],
+        "tags": [
+          "webinar"
+        ],
         "security": [
           {
             "Authorization": []
@@ -2317,7 +2488,12 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "title", "duration", "url"],
+                    "required": [
+                      "id",
+                      "title",
+                      "duration",
+                      "url"
+                    ],
                     "additionalProperties": false
                   }
                 }
@@ -2384,12 +2560,17 @@
                   "type": "string"
                 }
               },
-              "required": ["message"],
+              "required": [
+                "message"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["message", "code"],
+        "required": [
+          "message",
+          "code"
+        ],
         "additionalProperties": false,
         "title": "Invalid input data error (400)",
         "description": "The error information",
@@ -2423,12 +2604,17 @@
                   "type": "string"
                 }
               },
-              "required": ["message"],
+              "required": [
+                "message"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["message", "code"],
+        "required": [
+          "message",
+          "code"
+        ],
         "additionalProperties": false,
         "title": "Authorization not provided error (401)",
         "description": "The error information",
@@ -2462,12 +2648,17 @@
                   "type": "string"
                 }
               },
-              "required": ["message"],
+              "required": [
+                "message"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["message", "code"],
+        "required": [
+          "message",
+          "code"
+        ],
         "additionalProperties": false,
         "title": "Insufficient access error (403)",
         "description": "The error information",
@@ -2501,12 +2692,17 @@
                   "type": "string"
                 }
               },
-              "required": ["message"],
+              "required": [
+                "message"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["message", "code"],
+        "required": [
+          "message",
+          "code"
+        ],
         "additionalProperties": false,
         "title": "Not found error (404)",
         "description": "The error information",
@@ -2540,12 +2736,17 @@
                   "type": "string"
                 }
               },
-              "required": ["message"],
+              "required": [
+                "message"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["message", "code"],
+        "required": [
+          "message",
+          "code"
+        ],
         "additionalProperties": false,
         "title": "Internal server error error (500)",
         "description": "The error information",

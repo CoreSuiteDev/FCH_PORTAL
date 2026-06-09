@@ -1,0 +1,9 @@
+{
+  "home": {
+    "title": "Bienvenido al Portal FCH",
+    "description": "Conectando a nuestra comunidad con fe y esperanza.",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "selectLanguage": "Seleccionar idioma"
+  }
+}

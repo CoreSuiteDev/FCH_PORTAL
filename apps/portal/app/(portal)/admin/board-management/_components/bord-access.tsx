@@ -1,5 +1,4 @@
 "use client"
-"use no compiler"
 
 import {
   ColumnDef,
