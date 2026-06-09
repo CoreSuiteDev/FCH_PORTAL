@@ -1,10 +1,4 @@
-import React from "react"
-import {
-  IconReceipt2,
-  IconInfoCircle,
-  IconLock,
-  IconDownload,
-} from "@tabler/icons-react"
+import { IconDownload, IconInfoCircle, IconLock } from "@tabler/icons-react"
 
 export default function BoardFinancialsPage() {
   return (

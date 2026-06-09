@@ -10,8 +10,7 @@ import { generateOpenApiDocument, createOpenApiExpressMiddleware } from 'trpc-to
 import { toNodeHandler } from "better-auth/node";
 import { errorMiddleware } from "./apps/middleware/error.middleware.js";
 import { auth } from "./lib/auth.js";
-import fs from "fs/promises"
-
+import { writeFileSync } from "fs";
 import { AppError } from "./utils/AppError.js";
 import { appRouter } from "./server/index.js";
 import { createContext } from "./server/context.js";
@@ -28,7 +27,7 @@ const openapiDocument = generateOpenApiDocument(appRouter, {
   version: '1.0.0'
 })
 
-fs.writeFile("./openapi-fch.json", JSON.stringify(openapiDocument))
+writeFileSync("./openapi-fch.json", JSON.stringify(openapiDocument, null, 2))
 
 
 app.use(

@@ -1,17 +1,36 @@
 {
   "openapi": "3.1.0",
-  "info": { "title": "FCH API", "version": "1.0.0" },
-  "servers": [{ "url": "http://localhost:5000/api/v1" }],
+  "info": {
+    "title": "FCH API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api/v1"
+    }
+  ],
   "paths": {
     "/hello": {
       "get": {
         "operationId": "hello",
         "summary": "Say hello",
         "description": "Returns a greeting message",
-        "tags": ["general"],
-        "security": [{ "Authorization": [] }],
+        "tags": [
+          "general"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "parameters": [
-          { "in": "query", "name": "name", "schema": { "type": "string" } }
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -20,8 +39,14 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": { "greeting": { "type": "string" } },
-                  "required": ["greeting"],
+                  "properties": {
+                    "greeting": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "greeting"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -31,7 +56,9 @@
             "description": "Invalid input data",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.BAD_REQUEST" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
               }
             }
           },
@@ -39,7 +66,9 @@
             "description": "Authorization not provided",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.UNAUTHORIZED" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
               }
             }
           },
@@ -47,7 +76,9 @@
             "description": "Insufficient access",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.FORBIDDEN" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
               }
             }
           },
@@ -55,7 +86,9 @@
             "description": "Not found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.NOT_FOUND" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
               }
             }
           },
@@ -77,13 +110,21 @@
         "operationId": "user-getProfile",
         "summary": "Get user profile details",
         "description": "Returns a user profile record from the database",
-        "tags": ["users"],
-        "security": [{ "Authorization": [] }],
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "userId",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "required": true
           }
         ],
@@ -95,24 +136,138 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": { "type": "string" },
-                    "name": { "type": "string" },
-                    "email": { "type": "string" },
-                    "emailVerified": { "type": "boolean" },
-                    "image": {
-                      "anyOf": [{ "type": "string" }, { "type": "null" }]
+                    "id": {
+                      "type": "string"
                     },
-                    "createdAt": { "type": "string" },
-                    "updatedAt": { "type": "string" }
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "emailVerified": {
+                      "type": "boolean"
+                    },
+                    "image": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "default": "ACTIVE",
+                      "type": "string",
+                      "enum": [
+                        "ACTIVE",
+                        "RESTRICTED",
+                        "SUSPENDED",
+                        "BANNED"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "memberships": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "GENERAL",
+                              "PASTORAL"
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "ACTIVE",
+                              "EXPIRED",
+                              "CANCELED",
+                              "FAILED"
+                            ]
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "expiresAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "type",
+                          "status",
+                          "startsAt",
+                          "expiresAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "payments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "PAID",
+                              "FAILED",
+                              "REFUNDED",
+                              "PARTIAL_REFUNDED"
+                            ]
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "amount",
+                          "status",
+                          "createdAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
                   },
                   "required": [
                     "id",
                     "name",
                     "email",
                     "emailVerified",
-                    "image",
+                    "status",
                     "createdAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "roles",
+                    "memberships",
+                    "payments"
                   ],
                   "additionalProperties": false
                 }
@@ -123,7 +278,9 @@
             "description": "Invalid input data",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.BAD_REQUEST" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
               }
             }
           },
@@ -131,7 +288,9 @@
             "description": "Authorization not provided",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.UNAUTHORIZED" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
               }
             }
           },
@@ -139,7 +298,9 @@
             "description": "Insufficient access",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.FORBIDDEN" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
               }
             }
           },
@@ -147,7 +308,9 @@
             "description": "Not found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.NOT_FOUND" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
               }
             }
           },
@@ -169,8 +332,14 @@
         "operationId": "user-listMembers",
         "summary": "List all registered members",
         "description": "Returns an array of all members",
-        "tags": ["users"],
-        "security": [{ "Authorization": [] }],
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -181,24 +350,138 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "id": { "type": "string" },
-                      "name": { "type": "string" },
-                      "email": { "type": "string" },
-                      "emailVerified": { "type": "boolean" },
-                      "image": {
-                        "anyOf": [{ "type": "string" }, { "type": "null" }]
+                      "id": {
+                        "type": "string"
                       },
-                      "createdAt": { "type": "string" },
-                      "updatedAt": { "type": "string" }
+                      "name": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string"
+                      },
+                      "emailVerified": {
+                        "type": "boolean"
+                      },
+                      "image": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "status": {
+                        "default": "ACTIVE",
+                        "type": "string",
+                        "enum": [
+                          "ACTIVE",
+                          "RESTRICTED",
+                          "SUSPENDED",
+                          "BANNED"
+                        ]
+                      },
+                      "createdAt": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": "string"
+                      },
+                      "roles": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "memberships": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "GENERAL",
+                                "PASTORAL"
+                              ]
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": [
+                                "PENDING",
+                                "ACTIVE",
+                                "EXPIRED",
+                                "CANCELED",
+                                "FAILED"
+                              ]
+                            },
+                            "startsAt": {
+                              "type": "string"
+                            },
+                            "expiresAt": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "type",
+                            "status",
+                            "startsAt",
+                            "expiresAt"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "payments": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "amount": {
+                              "type": "number"
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": [
+                                "PENDING",
+                                "PAID",
+                                "FAILED",
+                                "REFUNDED",
+                                "PARTIAL_REFUNDED"
+                              ]
+                            },
+                            "createdAt": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "amount",
+                            "status",
+                            "createdAt"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
                     },
                     "required": [
                       "id",
                       "name",
                       "email",
                       "emailVerified",
-                      "image",
+                      "status",
                       "createdAt",
-                      "updatedAt"
+                      "updatedAt",
+                      "roles",
+                      "memberships",
+                      "payments"
                     ],
                     "additionalProperties": false
                   }
@@ -210,7 +493,9 @@
             "description": "Authorization not provided",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.UNAUTHORIZED" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
               }
             }
           },
@@ -218,7 +503,476 @@
             "description": "Insufficient access",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.FORBIDDEN" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{userId}/status": {
+      "patch": {
+        "operationId": "user-updateStatus",
+        "summary": "Update user operational status",
+        "description": "Sets the user status to ACTIVE, RESTRICTED, SUSPENDED, or BANNED",
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RESTRICTED",
+                      "SUSPENDED",
+                      "BANNED"
+                    ]
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ACTIVE",
+                        "RESTRICTED",
+                        "SUSPENDED",
+                        "BANNED"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{userId}": {
+      "delete": {
+        "operationId": "user-deleteUser",
+        "summary": "Delete user account",
+        "description": "Permanently deletes a user record from the database",
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/create": {
+      "post": {
+        "operationId": "user-createMember",
+        "summary": "Create a new member",
+        "description": "Provisions a new member account with an optional status and membership tier",
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "RESTRICTED",
+                      "SUSPENDED",
+                      "BANNED"
+                    ]
+                  },
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "GENERAL",
+                      "PASTORAL"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "emailVerified": {
+                      "type": "boolean"
+                    },
+                    "image": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "default": "ACTIVE",
+                      "type": "string",
+                      "enum": [
+                        "ACTIVE",
+                        "RESTRICTED",
+                        "SUSPENDED",
+                        "BANNED"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "memberships": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "GENERAL",
+                              "PASTORAL"
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "ACTIVE",
+                              "EXPIRED",
+                              "CANCELED",
+                              "FAILED"
+                            ]
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "expiresAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "type",
+                          "status",
+                          "startsAt",
+                          "expiresAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "payments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "PAID",
+                              "FAILED",
+                              "REFUNDED",
+                              "PARTIAL_REFUNDED"
+                            ]
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "amount",
+                          "status",
+                          "createdAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "emailVerified",
+                    "status",
+                    "createdAt",
+                    "updatedAt",
+                    "roles",
+                    "memberships",
+                    "payments"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
               }
             }
           },
@@ -238,15 +992,23 @@
     "/auth/session/{userId}": {
       "get": {
         "operationId": "auth-session",
-        "summary": "Check authentication session status",
+        "summary": "Check authentication session status (Legacy)",
         "description": "Returns authentication status and role of a user",
-        "tags": ["auth"],
-        "security": [{ "Authorization": [] }],
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "userId",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "required": true
           }
         ],
@@ -258,11 +1020,21 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "authenticated": { "type": "boolean" },
-                    "userId": { "type": "string" },
-                    "role": { "type": "string" }
+                    "authenticated": {
+                      "type": "boolean"
+                    },
+                    "userId": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    }
                   },
-                  "required": ["authenticated", "userId", "role"],
+                  "required": [
+                    "authenticated",
+                    "userId",
+                    "role"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -272,7 +1044,9 @@
             "description": "Invalid input data",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.BAD_REQUEST" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
               }
             }
           },
@@ -280,7 +1054,9 @@
             "description": "Authorization not provided",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.UNAUTHORIZED" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
               }
             }
           },
@@ -288,7 +1064,9 @@
             "description": "Insufficient access",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.FORBIDDEN" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
               }
             }
           },
@@ -296,7 +1074,977 @@
             "description": "Not found",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.NOT_FOUND" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "operationId": "auth-signup",
+        "summary": "User signup",
+        "description": "Registers a new user using email & password",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "redirect": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "emailVerified": {
+                          "type": "boolean"
+                        },
+                        "image": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "status": {
+                          "default": "ACTIVE",
+                          "type": "string",
+                          "enum": [
+                            "ACTIVE",
+                            "RESTRICTED",
+                            "SUSPENDED",
+                            "BANNED"
+                          ]
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "email",
+                        "emailVerified",
+                        "status",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "user"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "auth-login",
+        "summary": "User login",
+        "description": "Authenticates a user using email & password",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "redirect": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "emailVerified": {
+                          "type": "boolean"
+                        },
+                        "image": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "status": {
+                          "default": "ACTIVE",
+                          "type": "string",
+                          "enum": [
+                            "ACTIVE",
+                            "RESTRICTED",
+                            "SUSPENDED",
+                            "BANNED"
+                          ]
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "email",
+                        "emailVerified",
+                        "status",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "user"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "operationId": "auth-forgotPassword",
+        "summary": "Request password reset link",
+        "description": "Sends a password reset link to the user's email",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "redirectTo": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "operationId": "auth-resetPassword",
+        "summary": "Reset password with token",
+        "description": "Resets the user's password using the token sent in the reset link",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newPassword": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "newPassword",
+                  "token"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/send-otp": {
+      "post": {
+        "operationId": "auth-sendOtp",
+        "summary": "Send OTP to email",
+        "description": "Sends an OTP to the user's email for sign-in, verification, or password reset",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "sign-in",
+                      "email-verification",
+                      "forget-password"
+                    ]
+                  }
+                },
+                "required": [
+                  "email",
+                  "type"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/verify-otp": {
+      "post": {
+        "operationId": "auth-verifyOtp",
+        "summary": "Verify OTP",
+        "description": "Verifies the OTP sent to the email and processes sign-in, verification, or check depending on type",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "otp": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "sign-in",
+                      "email-verification",
+                      "forget-password"
+                    ]
+                  }
+                },
+                "required": [
+                  "email",
+                  "otp",
+                  "type"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/reset-password-otp": {
+      "post": {
+        "operationId": "auth-resetPasswordWithOtp",
+        "summary": "Reset password with OTP",
+        "description": "Resets the user's password using the email OTP code",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "otp": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "otp",
+                  "newPassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "auth-me",
+        "summary": "Get current session",
+        "description": "Fetches details of the currently authenticated user session",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "session": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "expiresAt": {
+                              "type": "string"
+                            },
+                            "token": {
+                              "type": "string"
+                            },
+                            "createdAt": {
+                              "type": "string"
+                            },
+                            "updatedAt": {
+                              "type": "string"
+                            },
+                            "ipAddress": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "userAgent": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "userId": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "expiresAt",
+                            "token",
+                            "createdAt",
+                            "updatedAt",
+                            "userId"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "type": "string"
+                            },
+                            "emailVerified": {
+                              "type": "boolean"
+                            },
+                            "image": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "status": {
+                              "default": "ACTIVE",
+                              "type": "string",
+                              "enum": [
+                                "ACTIVE",
+                                "RESTRICTED",
+                                "SUSPENDED",
+                                "BANNED"
+                              ]
+                            },
+                            "createdAt": {
+                              "type": "string"
+                            },
+                            "updatedAt": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "email",
+                            "emailVerified",
+                            "status",
+                            "createdAt",
+                            "updatedAt"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "session",
+                        "user"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
               }
             }
           },
@@ -318,8 +2066,14 @@
         "operationId": "dashboard-metrics",
         "summary": "Get dashboard overview metrics",
         "description": "Returns statistics summary for users, revenues, and rates",
-        "tags": ["dashboard"],
-        "security": [{ "Authorization": [] }],
+        "tags": [
+          "dashboard"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -328,10 +2082,18 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "activeMembers": { "type": "number" },
-                    "pendingMembers": { "type": "number" },
-                    "monthlyRevenue": { "type": "number" },
-                    "renewalsRate": { "type": "number" }
+                    "activeMembers": {
+                      "type": "number"
+                    },
+                    "pendingMembers": {
+                      "type": "number"
+                    },
+                    "monthlyRevenue": {
+                      "type": "number"
+                    },
+                    "renewalsRate": {
+                      "type": "number"
+                    }
                   },
                   "required": [
                     "activeMembers",
@@ -348,7 +2110,9 @@
             "description": "Authorization not provided",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.UNAUTHORIZED" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
               }
             }
           },
@@ -356,7 +2120,9 @@
             "description": "Insufficient access",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.FORBIDDEN" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
               }
             }
           },
@@ -378,8 +2144,14 @@
         "operationId": "events-list",
         "summary": "List all events",
         "description": "Returns an array of registered upcoming events",
-        "tags": ["events"],
-        "security": [{ "Authorization": [] }],
+        "tags": [
+          "events"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -390,12 +2162,25 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "id": { "type": "string" },
-                      "title": { "type": "string" },
-                      "date": { "type": "string" },
-                      "location": { "type": "string" }
+                      "id": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string"
+                      },
+                      "location": {
+                        "type": "string"
+                      }
                     },
-                    "required": ["id", "title", "date", "location"],
+                    "required": [
+                      "id",
+                      "title",
+                      "date",
+                      "location"
+                    ],
                     "additionalProperties": false
                   }
                 }
@@ -406,7 +2191,9 @@
             "description": "Authorization not provided",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.UNAUTHORIZED" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
               }
             }
           },
@@ -414,7 +2201,9 @@
             "description": "Insufficient access",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.FORBIDDEN" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
               }
             }
           },
@@ -436,8 +2225,14 @@
         "operationId": "payment-history",
         "summary": "Get payment transaction history",
         "description": "Returns an array of user payment histories",
-        "tags": ["payment"],
-        "security": [{ "Authorization": [] }],
+        "tags": [
+          "payment"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -448,12 +2243,25 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "id": { "type": "string" },
-                      "amount": { "type": "number" },
-                      "status": { "type": "string" },
-                      "date": { "type": "string" }
+                      "id": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "number"
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string"
+                      }
                     },
-                    "required": ["id", "amount", "status", "date"],
+                    "required": [
+                      "id",
+                      "amount",
+                      "status",
+                      "date"
+                    ],
                     "additionalProperties": false
                   }
                 }
@@ -464,7 +2272,9 @@
             "description": "Authorization not provided",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.UNAUTHORIZED" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
               }
             }
           },
@@ -472,7 +2282,9 @@
             "description": "Insufficient access",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.FORBIDDEN" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
               }
             }
           },
@@ -494,8 +2306,14 @@
         "operationId": "portal-status",
         "summary": "Get portal system status",
         "description": "Returns system operational status and software version",
-        "tags": ["portal"],
-        "security": [{ "Authorization": [] }],
+        "tags": [
+          "portal"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -504,10 +2322,17 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "systemStatus": { "type": "string" },
-                    "version": { "type": "string" }
+                    "systemStatus": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    }
                   },
-                  "required": ["systemStatus", "version"],
+                  "required": [
+                    "systemStatus",
+                    "version"
+                  ],
                   "additionalProperties": false
                 }
               }
@@ -517,7 +2342,9 @@
             "description": "Authorization not provided",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.UNAUTHORIZED" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
               }
             }
           },
@@ -525,7 +2352,9 @@
             "description": "Insufficient access",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.FORBIDDEN" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
               }
             }
           },
@@ -547,8 +2376,14 @@
         "operationId": "resources-list",
         "summary": "List all resources",
         "description": "Returns an array of all general, pastoral, and board resources",
-        "tags": ["resources"],
-        "security": [{ "Authorization": [] }],
+        "tags": [
+          "resources"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -559,12 +2394,25 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "id": { "type": "string" },
-                      "title": { "type": "string" },
-                      "category": { "type": "string" },
-                      "fileUrl": { "type": "string" }
+                      "id": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "category": {
+                        "type": "string"
+                      },
+                      "fileUrl": {
+                        "type": "string"
+                      }
                     },
-                    "required": ["id", "title", "category", "fileUrl"],
+                    "required": [
+                      "id",
+                      "title",
+                      "category",
+                      "fileUrl"
+                    ],
                     "additionalProperties": false
                   }
                 }
@@ -575,7 +2423,9 @@
             "description": "Authorization not provided",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.UNAUTHORIZED" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
               }
             }
           },
@@ -583,7 +2433,9 @@
             "description": "Insufficient access",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.FORBIDDEN" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
               }
             }
           },
@@ -605,8 +2457,14 @@
         "operationId": "webinar-list",
         "summary": "List all webinars",
         "description": "Returns an array of all general and advanced webinars",
-        "tags": ["webinar"],
-        "security": [{ "Authorization": [] }],
+        "tags": [
+          "webinar"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -617,12 +2475,25 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "id": { "type": "string" },
-                      "title": { "type": "string" },
-                      "duration": { "type": "number" },
-                      "url": { "type": "string" }
+                      "id": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "duration": {
+                        "type": "number"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
                     },
-                    "required": ["id", "title", "duration", "url"],
+                    "required": [
+                      "id",
+                      "title",
+                      "duration",
+                      "url"
+                    ],
                     "additionalProperties": false
                   }
                 }
@@ -633,7 +2504,9 @@
             "description": "Authorization not provided",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.UNAUTHORIZED" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
               }
             }
           },
@@ -641,7 +2514,9 @@
             "description": "Insufficient access",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/error.FORBIDDEN" }
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
               }
             }
           },
@@ -680,13 +2555,22 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": { "message": { "type": "string" } },
-              "required": ["message"],
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["message", "code"],
+        "required": [
+          "message",
+          "code"
+        ],
         "additionalProperties": false,
         "title": "Invalid input data error (400)",
         "description": "The error information",
@@ -715,13 +2599,22 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": { "message": { "type": "string" } },
-              "required": ["message"],
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["message", "code"],
+        "required": [
+          "message",
+          "code"
+        ],
         "additionalProperties": false,
         "title": "Authorization not provided error (401)",
         "description": "The error information",
@@ -750,13 +2643,22 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": { "message": { "type": "string" } },
-              "required": ["message"],
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["message", "code"],
+        "required": [
+          "message",
+          "code"
+        ],
         "additionalProperties": false,
         "title": "Insufficient access error (403)",
         "description": "The error information",
@@ -785,17 +2687,30 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": { "message": { "type": "string" } },
-              "required": ["message"],
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["message", "code"],
+        "required": [
+          "message",
+          "code"
+        ],
         "additionalProperties": false,
         "title": "Not found error (404)",
         "description": "The error information",
-        "example": { "code": "NOT_FOUND", "message": "Not found", "issues": [] }
+        "example": {
+          "code": "NOT_FOUND",
+          "message": "Not found",
+          "issues": []
+        }
       },
       "error.INTERNAL_SERVER_ERROR": {
         "type": "object",
@@ -816,13 +2731,22 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": { "message": { "type": "string" } },
-              "required": ["message"],
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["message", "code"],
+        "required": [
+          "message",
+          "code"
+        ],
         "additionalProperties": false,
         "title": "Internal server error error (500)",
         "description": "The error information",
@@ -834,7 +2758,10 @@
       }
     },
     "securitySchemes": {
-      "Authorization": { "type": "http", "scheme": "bearer" }
+      "Authorization": {
+        "type": "http",
+        "scheme": "bearer"
+      }
     }
   }
 }

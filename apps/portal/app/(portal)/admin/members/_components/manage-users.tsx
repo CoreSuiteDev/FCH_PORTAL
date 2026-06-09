@@ -1,4 +1,5 @@
 "use client"
+"use no compiler"
 
 import React, { useMemo } from "react"
 import {
@@ -262,6 +263,7 @@ export default function ManageUsers() {
   }, [users, selectedTier, selectedStatus])
 
   // TanStack Table Instance
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: finalFilteredData,
     columns,

@@ -1,0 +1,42 @@
+enum UserStatus {
+  ACTIVE
+  RESTRICTED
+  SUSPENDED
+  BANNED
+}
+
+enum MembershipType {
+  GENERAL
+  PASTORAL
+}
+
+enum MembershipStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  CANCELED
+  FAILED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIAL_REFUNDED
+}
+
+enum Currency {
+  USD
+  EUR
+}
+
+enum AuditEntity {
+  USER
+  MEMBERSHIP
+  PAYMENT
+  ROLE
+  EVENT
+  WEBINAR
+  RESOURCE
+}

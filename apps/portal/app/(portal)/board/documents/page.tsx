@@ -1,8 +1,6 @@
-import React from "react"
 import {
-  IconFileText,
-  IconInfoCircle,
   IconDownload,
+  IconInfoCircle,
   IconShieldLock,
 } from "@tabler/icons-react"
 

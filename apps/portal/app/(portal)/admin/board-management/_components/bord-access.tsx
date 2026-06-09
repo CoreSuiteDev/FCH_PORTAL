@@ -1,23 +1,24 @@
 "use client"
+"use no compiler"
 
-import React, { useMemo } from "react"
 import {
-  Search,
-  Filter,
-  RefreshCw,
-  ShieldAlert,
-  SlidersHorizontal,
-  Terminal,
-  Download,
-} from "lucide-react"
-import {
-  useReactTable,
+  ColumnDef,
+  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
-  flexRender,
-  ColumnDef,
+  useReactTable,
 } from "@tanstack/react-table"
+import {
+  Download,
+  Filter,
+  RefreshCw,
+  Search,
+  ShieldAlert,
+  SlidersHorizontal,
+  Terminal,
+} from "lucide-react"
+import { useMemo } from "react"
 
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
@@ -33,6 +34,13 @@ import {
 
 import { Input } from "@workspace/ui/components/input"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
+import {
   Table,
   TableBody,
   TableCell,
@@ -40,19 +48,14 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
 
 import {
-  BoardMemberAccess,
   AllowedClearance,
+  BoardMemberAccess,
 } from "@/constants/board-access-data"
 import { useBoardAccessStore } from "@/store/use-board-access-store"
+
+const clearanceOptions: AllowedClearance[] = ["General", "Pastoral", "Board"]
 
 export default function BoardAccess() {
   const {
@@ -64,8 +67,6 @@ export default function BoardAccess() {
     updateClearanceLevel,
     rotateTokens,
   } = useBoardAccessStore()
-
-  const clearanceOptions: AllowedClearance[] = ["General", "Pastoral", "Board"]
 
   const handleExportPDF = () => {
     const doc = new jsPDF()
@@ -194,6 +195,7 @@ export default function BoardAccess() {
     return accessList.filter((user) => user.clearanceLevel === selectedTier)
   }, [accessList, selectedTier])
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: finalFilteredData,
     columns,

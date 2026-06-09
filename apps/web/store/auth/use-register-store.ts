@@ -1,7 +1,7 @@
-import { create } from "zustand"
-import { useForm, UseFormReturn } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm, UseFormReturn } from "react-hook-form"
 import * as z from "zod"
+import { create } from "zustand"
 
 // 1. Zod Runtime Schema Setup with Password Match Check
 export const registerSchema = z
@@ -67,7 +67,7 @@ export const useRegisterStore = create<RegisterState>((set) => ({
       await new Promise((resolve) => setTimeout(resolve, 1000))
       console.log("Google Signup System Executed.")
       set({ isLoading: false })
-    } catch (err) {
+    } catch {
       set({ isLoading: false })
     }
   },

@@ -54,7 +54,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       set({ isLoading: false })
-    } catch (err) {
+    } catch {
       set({ isLoading: false })
     }
   },

@@ -26,7 +26,6 @@ import {
 } from "@workspace/ui/components/card"
 
 import {
-  PackageMetadata,
   PackageTier,
   usePackageStore,
 } from "@/store/use-membership-store"
@@ -45,20 +44,18 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
-  const [activePackage, setActivePackage] = useState<PackageMetadata | null>(
-    null
-  )
+
+  const slugId = resolvedParams.slug as PackageTier
+  const activePackage = (slugId && MEMBERSHIP_REGISTRY[slugId]) ? MEMBERSHIP_REGISTRY[slugId] : null
 
   useEffect(() => {
-    const slugId = resolvedParams.slug as PackageTier
     if (slugId && MEMBERSHIP_REGISTRY[slugId]) {
-      setActivePackage(MEMBERSHIP_REGISTRY[slugId])
       selectPackage(slugId) // Keep state synchronized with layout actions
     } else {
       // Direct unexpected or invalid parameters back to baseline catalog overview
       router.push("/membership")
     }
-  }, [resolvedParams, router, selectPackage])
+  }, [slugId, router, selectPackage])
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault()

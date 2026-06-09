@@ -1,4 +1,5 @@
 "use client"
+"use no compiler"
 
 import React, { useMemo } from "react"
 import { usePaymentStore } from "@/store/use-pyment-store"
@@ -200,6 +201,7 @@ export default function PaymentsPage() {
     []
   )
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: filteredData,
     columns,

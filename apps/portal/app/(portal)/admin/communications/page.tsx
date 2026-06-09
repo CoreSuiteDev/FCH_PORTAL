@@ -1,20 +1,21 @@
 "use client"
+"use no compiler"
 
-import React, { useMemo } from "react"
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
 import {
   ChevronLeft,
   ChevronRight,
-  Send,
   ChevronsLeft,
   ChevronsRight,
+  Send,
 } from "lucide-react"
-import {
-  useReactTable,
-  getCoreRowModel,
-  getPaginationRowModel,
-  flexRender,
-  ColumnDef,
-} from "@tanstack/react-table"
+import { useMemo } from "react"
 
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -23,6 +24,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@workspace/ui/components/dialog"
 import { Input } from "@workspace/ui/components/input"
 import {
   Table,
@@ -32,20 +39,14 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@workspace/ui/components/dialog"
 
-import { useCommunicationStore } from "@/store/use-communication-store"
 import {
   supportData,
-  UserMember,
   SupportTicket,
+  UserMember,
 } from "@/constants/communication-data"
 import { userMembersData } from "@/constants/manage-users-data"
+import { useCommunicationStore } from "@/store/use-communication-store"
 
 // Component for table pagination controls
 const PaginationControls = ({ table }: { table: any }) => (
@@ -173,6 +174,7 @@ export default function CommunicationUsers() {
   ]
 
   // Member table configuration
+  // eslint-disable-next-line react-hooks/incompatible-library
   const memberTable = useReactTable({
     data: filteredMembers,
     columns: memberColumns,

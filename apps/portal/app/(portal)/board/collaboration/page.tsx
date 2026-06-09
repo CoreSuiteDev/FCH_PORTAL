@@ -1,10 +1,4 @@
-import React from "react"
-import {
-  IconUsers,
-  IconInfoCircle,
-  IconLock,
-  IconChevronRight,
-} from "@tabler/icons-react"
+import { IconChevronRight, IconInfoCircle, IconLock } from "@tabler/icons-react"
 
 export default function BoardCollaborationPage() {
   return (
