@@ -1,6 +1,5 @@
 import { PackageMetadata, PackageTier } from "@/store/use-membership-store"
 
-// Centralizing Content Data Models Alada Bhabe
 export const MEMBERSHIP_REGISTRY: Record<PackageTier, PackageMetadata> = {
   general: {
     id: "general",
@@ -29,22 +28,6 @@ export const MEMBERSHIP_REGISTRY: Record<PackageTier, PackageMetadata> = {
       "Pastoral Leadership & Ministry Toolkits",
       "Parish & Diocese Shared Resources",
       "Advanced Webinars & Special Content",
-    ],
-  },
-  board: {
-    id: "board",
-    title: "Board Room",
-    price: 99,
-    billingPeriod: "per month",
-    description:
-      "Enterprise oversight tier for executive management profiles. Contains corporate tools, deep internal planning components, and audit frameworks.",
-    features: [
-      "Everything in Pastoral Area",
-      "Board Room Home & Executive Meetings Tracker",
-      "Governance Docs & Financial Audits Engine",
-      "Committees Management Systems",
-      "Internal Strategic Planning modules",
-      "Exclusive Collaboration Toolkits",
     ],
   },
 }
