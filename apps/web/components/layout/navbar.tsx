@@ -95,16 +95,24 @@ export default function Navbar() {
           />
         </Link>
 
+        {/* Desktop Menu with Underline Effect */}
         <nav className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className={`text-sm font-medium ${pathname === link.href ? "text-red-700" : "text-gray-700"}`}
-            >
-              {link.name}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href
+            return (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={`relative py-1 text-sm font-medium transition-colors hover:text-red-700 ${
+                  isActive ? "text-red-700" : "text-gray-700"
+                } after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-red-700 after:transition-all hover:after:w-full ${
+                  isActive ? "after:w-full" : ""
+                }`}
+              >
+                {link.name}
+              </Link>
+            )
+          })}
           <Button size="lg" className="bg-green-700">
             Donate
           </Button>

@@ -30,12 +30,10 @@ export default function RootLayout({
       )}
     >
       <body>
-        <ThemeProvider>
-          <TooltipProvider>
-            <Navbar />
-            {children}
-          </TooltipProvider>
-        </ThemeProvider>
+        <TooltipProvider>
+          <Navbar />
+          {children}
+        </TooltipProvider>
       </body>
     </html>
   )
