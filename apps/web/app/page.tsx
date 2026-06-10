@@ -16,10 +16,11 @@ export default function Page() {
     <ReactLenis
       root
       options={{
-        lerp: 0.1,
-        duration: 1.5,
+        lerp: 0.05,
+        duration: 1.2,
         smoothWheel: true,
         syncTouch: true,
+        wheelMultiplier: 2.0,
       }}
     >
       {/* Background Layer: Fixed position to prevent rendering issues */}
