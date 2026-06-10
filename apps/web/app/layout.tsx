@@ -1,13 +1,12 @@
-import { Geist, Geist_Mono } from "next/font/google"
-
-import { ThemeProvider } from "@/components/theme-provider"
+/* eslint-disable react/no-unknown-property */
+import { Footer } from "@/components/layout/footer"
+import Navbar from "@/components/layout/navbar"
 import { TooltipProvider } from "@workspace/ui/components/tooltip"
 import "@workspace/ui/globals.css"
 import { cn } from "@workspace/ui/lib/utils"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
-import Navbar from "@/components/layout/navbar"
-import { Footer } from "@/components/layout/footer"
+import { Geist, Geist_Mono } from "next/font/google"
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
 

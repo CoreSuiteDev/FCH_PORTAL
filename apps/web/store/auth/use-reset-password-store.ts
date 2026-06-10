@@ -34,7 +34,8 @@ export const useResetPasswordStore = create<ResetPasswordState>((set) => ({
   isLoading: false,
   isSuccess: false,
 
-  updatePassword: async (data: ResetPasswordFormValues) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  updatePassword: async (_data: ResetPasswordFormValues) => {
     set({ isLoading: true })
     try {
       console.log("Updating password...")

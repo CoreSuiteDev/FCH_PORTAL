@@ -1,11 +1,12 @@
 "use client"
 
+import { LogIn, Menu, Phone } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Phone, LogIn, Menu } from "lucide-react"
 import { useEffect, useState } from "react"
 
+import { NavLink, navLinks } from "@/constents/nav-manus"
 import { useNavStore } from "@/store/use-nav-store"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -13,7 +14,6 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@workspace/ui/components/sheet"
-import { NavLink, navLinks } from "@/constents/nav-manus"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -55,15 +55,10 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Spacer div: Prevents layout jump when header becomes fixed */}
-      {isSticky && <div className="h-[90px] md:h-[110px]" />}
-
       <header
-        className={`${
-          isSticky
-            ? "fixed top-0 right-0 left-0 z-[1000] animate-in shadow-md duration-500 ease-out fade-in slide-in-from-top-full"
-            : "relative"
-        } w-full bg-white transition-all duration-300`}
+        className={`sticky top-0 z-1000 w-full bg-white transition-shadow duration-300 ${
+          isSticky ? "shadow-md" : ""
+        }`}
       >
         {/* Top Bar - Hidden on Mobile */}
         <div className="hidden border-b bg-gray-50 md:block">
@@ -132,7 +127,7 @@ export default function Navbar() {
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="z-[1001] flex w-[300px] flex-col p-0"
+                className="z-1001 flex w-[300px] flex-col p-0"
               >
                 <div className="flex items-center justify-between border-b bg-gray-50 px-5 py-4">
                   <Link href="/" className="relative block h-[20px] w-[80px]">
