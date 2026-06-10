@@ -6,6 +6,7 @@ import "@workspace/ui/globals.css"
 import { cn } from "@workspace/ui/lib/utils"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
+import Navbar from "@/components/layout/navbar"
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -37,6 +38,7 @@ export default async function RootLayout({
         <ThemeProvider>
           <TooltipProvider>
             <NextIntlClientProvider locale={locale} messages={messages}>
+              <Navbar />
               {children}
             </NextIntlClientProvider>
           </TooltipProvider>
