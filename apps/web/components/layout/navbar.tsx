@@ -73,9 +73,11 @@ export default function Navbar() {
               <span className="flex cursor-pointer items-center gap-1 hover:text-red-600">
                 <Phone className="h-3 w-3" /> Contact
               </span>
-              <span className="flex cursor-pointer items-center gap-1 hover:text-red-600">
-                <LogIn className="h-3 w-3" /> Log In
-              </span>
+              <Link href="/login">
+                <span className="flex cursor-pointer items-center gap-1 hover:text-red-600">
+                  <LogIn className="h-3 w-3" /> Log In
+                </span>
+              </Link>
             </div>
           </div>
         </div>
@@ -109,10 +111,10 @@ export default function Navbar() {
                 </Link>
               )
             })}
-            <Button size="lg" className="bg-green-700">
-              Donate
-            </Button>
-            <Link href="/login">
+            <Link href="/donation">
+              <Button className="w-full bg-green-700">Donate</Button>
+            </Link>
+            <Link href="/registation">
               <Button size="lg" className="bg-red-700">
                 Sign Up
               </Button>
@@ -148,8 +150,12 @@ export default function Navbar() {
                   ))}
                 </nav>
                 <div className="space-y-3 border-t p-5">
-                  <Button className="w-full bg-green-700">Donate</Button>
-                  <Button className="w-full bg-red-700">Sign Up</Button>
+                  <Link href="/donation">
+                    <Button className="w-full bg-green-700">Donate</Button>
+                  </Link>
+                  <Link href="/registation">
+                    <Button className="w-full bg-red-700">Sign Up</Button>
+                  </Link>
                 </div>
               </SheetContent>
             </Sheet>

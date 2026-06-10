@@ -3,6 +3,7 @@
 import Container from "@/components/shared/container"
 import { supportData } from "@/constents/support-data"
 import { Button } from "@workspace/ui/components/button"
+import Link from "next/link"
 
 export function SupportSection() {
   return (
@@ -42,15 +43,16 @@ export function SupportSection() {
             <p className="mb-10 max-w-sm leading-relaxed font-medium text-gray-600">
               {supportData.supportText}
             </p>
-
-            <Button className="group relative overflow-hidden rounded-full bg-[#1a824e] px-10 py-6 text-lg text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#156a40] hover:shadow-2xl">
-              <span className="relative z-10 flex items-center gap-2">
-                {supportData.buttonText}
-                <span className="transition-transform group-hover:translate-x-1">
-                  →
+            <Link href="/donation/">
+              <Button className="group relative overflow-hidden rounded-full bg-[#1a824e] px-10 py-6 text-lg text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#156a40] hover:shadow-2xl">
+                <span className="relative z-10 flex items-center gap-2">
+                  {supportData.buttonText}
+                  <span className="transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
                 </span>
-              </span>
-            </Button>
+              </Button>
+            </Link>
           </div>
         </div>
       </Container>

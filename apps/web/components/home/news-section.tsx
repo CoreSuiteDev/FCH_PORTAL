@@ -4,6 +4,7 @@ import { newsData } from "@/constents/news-data"
 import { Button } from "@workspace/ui/components/button"
 import Image from "next/image"
 import Container from "../shared/container"
+import Link from "next/link"
 
 export function NewsSection() {
   return (
@@ -14,9 +15,11 @@ export function NewsSection() {
           <h2 className="font-trajan text-4xl font-bold text-[#8b0000]">
             LATEST NEWS
           </h2>
-          <Button className="rounded-md bg-[#b91c1c] px-6 text-white hover:bg-[#991b1b]">
-            More News
-          </Button>
+          <Link href="/news">
+            <Button className="rounded-md bg-[#b91c1c] px-6 text-white hover:bg-[#991b1b]">
+              More News
+            </Button>
+          </Link>
         </div>
 
         {/* News Grid */}
@@ -54,7 +57,7 @@ export function NewsSection() {
               </div>
 
               <div className="px-6 pb-6">
-                <Button className="w-full bg-[#b91c1c] text-white hover:bg-[#991b1b]">
+                <Button className="w-full bg-[#b91c1c] py-5 text-white hover:bg-[#991b1b]">
                   Read More
                 </Button>
               </div>

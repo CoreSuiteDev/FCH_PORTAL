@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link" // next/link ইমপোর্ট করলাম
 
 export function Footer() {
   return (
@@ -6,38 +7,53 @@ export function Footer() {
       <div className="mx-auto flex max-w-6xl flex-col items-center">
         {/* Logo Section */}
         <div className="mb-8">
-          <Image
-            src="/assets/fch-logo-new-xp-scaled.png"
-            alt="FCH Logo"
-            width={150}
-            height={60}
-            className="h-16 w-auto rounded bg-white object-contain p-2" //
-          />
+          <Link href="/">
+            <Image
+              src="/assets/fch-logo-new-xp-scaled.png"
+              alt="FCH Logo"
+              width={150}
+              height={60}
+              className="h-16 w-auto rounded bg-white object-contain p-2"
+            />
+          </Link>
         </div>
 
-        {/* Navigation Links */}
+        {/* Navigation Links using next/link */}
         <nav className="mb-6 flex flex-wrap justify-center gap-8 text-lg font-medium">
-          <a href="#" className="hover:underline">
+          <Link href="/about" className="underline-offset-4 hover:underline">
             About
-          </a>
-          <a href="#" className="hover:underline">
+          </Link>
+          <Link href="/events" className="underline-offset-4 hover:underline">
             Events
-          </a>
-          <a href="#" className="hover:underline">
+          </Link>
+          <Link
+            href="/membership"
+            className="underline-offset-4 hover:underline"
+          >
             Membership
-          </a>
-          <a href="#" className="hover:underline">
+          </Link>
+          <Link href="/contact" className="underline-offset-4 hover:underline">
             Contact
-          </a>
+          </Link>
         </nav>
 
         {/* Social Links */}
         <div className="mb-8 flex gap-6 text-sm">
-          <a href="#" className="flex items-center gap-2 hover:text-gray-200">
-            <span>Facebook</span>
+          <a
+            href="https://facebook.com/your-page"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-gray-200"
+          >
+            Facebook
           </a>
-          <a href="#" className="flex items-center gap-2 hover:text-gray-200">
-            <span>LinkedIn</span>
+          <a
+            href="https://linkedin.com/company/your-company"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-gray-200"
+          >
+            LinkedIn
           </a>
         </div>
 
@@ -46,7 +62,7 @@ export function Footer() {
 
         {/* Copyright */}
         <p className="text-sm opacity-90">
-          Copyright &copy; 2026 FCH. All Rights Reserved.
+          &copy; {new Date().getFullYear()} FCH. All Rights Reserved.
         </p>
       </div>
     </footer>

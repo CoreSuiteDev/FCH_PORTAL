@@ -9,6 +9,7 @@ import {
 import Container from "@/components/shared/container"
 import { Button } from "@workspace/ui/components/button"
 import { slides } from "@/constents/slide-content"
+import Link from "next/link"
 
 export function HeroCarousel() {
   // Initialize Autoplay plugin with loop enabled
@@ -54,16 +55,19 @@ export function HeroCarousel() {
                   </p>
 
                   <div className="flex flex-col justify-start gap-4 md:flex-row">
-                    <Button className="h-auto rounded-sm bg-[#e6a84d] px-8 py-3 font-montserrat font-semibold text-black hover:bg-[#d6983d]">
-                      Become a Member
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      className="h-auto rounded-sm border-white bg-transparent px-8 py-3 font-montserrat font-semibold text-white hover:bg-white/10 hover:text-white"
-                    >
-                      Learn More
-                    </Button>
+                    <Link href="/membership">
+                      <Button className="h-auto rounded-sm bg-[#e6a84d] px-8 py-3 font-montserrat font-semibold text-black hover:bg-[#d6983d]">
+                        Become a Member
+                      </Button>
+                    </Link>
+                    <Link href="/about">
+                      <Button
+                        variant="outline"
+                        className="h-auto rounded-sm border-white bg-transparent px-8 py-3 font-montserrat font-semibold text-white hover:bg-white/10 hover:text-white"
+                      >
+                        Learn More
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </Container>

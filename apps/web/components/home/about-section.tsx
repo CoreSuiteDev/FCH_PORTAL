@@ -3,6 +3,7 @@ import Image from "next/image"
 import Container from "@/components/shared/container"
 import { Button } from "@workspace/ui/components/button"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
 export function AboutSection() {
   return (
@@ -57,9 +58,11 @@ export function AboutSection() {
             </p>
 
             <div className="mt-2">
-              <Button className="h-auto rounded-sm bg-[#e6a84d] px-8 py-3 font-montserrat font-semibold text-black transition-colors hover:bg-[#d6983d]">
-                More About Us
-              </Button>
+              <Link href="/about">
+                <Button className="h-auto rounded-sm bg-[#e6a84d] px-8 py-3 font-montserrat font-semibold text-black transition-colors hover:bg-[#d6983d]">
+                  More About Us
+                </Button>
+              </Link>
             </div>
           </motion.div>
         </div>
