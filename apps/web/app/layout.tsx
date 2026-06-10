@@ -34,15 +34,13 @@ export default async function RootLayout({
         geist.variable
       )}
     >
-      <body>
-        <ThemeProvider>
-          <TooltipProvider>
-            <NextIntlClientProvider locale={locale} messages={messages}>
-              <Navbar />
-              {children}
-            </NextIntlClientProvider>
-          </TooltipProvider>
-        </ThemeProvider>
+      <body cz-shortcut-listen="true">
+        <TooltipProvider>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <Navbar />
+            {children}
+          </NextIntlClientProvider>
+        </TooltipProvider>
       </body>
     </html>
   )
