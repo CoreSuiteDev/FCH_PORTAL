@@ -1,6 +1,8 @@
 "use client"
 
 import Image from "next/image"
+import { IconX } from "@tabler/icons-react"
+
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X, Phone, LogIn } from "lucide-react"
@@ -13,16 +15,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@workspace/ui/components/sheet"
-
-const navLinks = [
-  { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Membership", href: "/membership" },
-  { name: "Sponsor", href: "/sponsor" },
-  { name: "News", href: "/news" },
-  { name: "Events", href: "/events" },
-  { name: "Webinars", href: "/webinars" },
-]
+import { NavLink, navLinks } from "@/constents/nav-manus"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -97,11 +90,11 @@ export default function Navbar() {
 
         {/* Desktop Menu with Underline Effect */}
         <nav className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => {
+          {navLinks.map((link: NavLink) => {
             const isActive = pathname === link.href
             return (
               <Link
-                key={link.name}
+                key={link.id}
                 href={link.href}
                 className={`relative py-1 text-sm font-medium transition-colors hover:text-red-700 ${
                   isActive ? "text-red-700" : "text-gray-700"
@@ -116,9 +109,11 @@ export default function Navbar() {
           <Button size="lg" className="bg-green-700">
             Donate
           </Button>
-          <Button size="lg" className="bg-red-700">
-            Sign Up
-          </Button>
+          <Link href="/login">
+            <Button size="lg" className="bg-red-700">
+              Sign Up
+            </Button>
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3 md:hidden">
@@ -135,9 +130,6 @@ export default function Navbar() {
             >
               <div className="flex items-center justify-between border-b bg-gray-50 px-5 py-4">
                 <span className="font-bold">Menu</span>
-                <button onClick={() => setOpen(false)}>
-                  <X className="h-5 w-5" />
-                </button>
               </div>
               <nav className="flex-1 overflow-y-auto py-4">
                 {navLinks.map((link) => (

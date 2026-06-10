@@ -41,7 +41,7 @@ export function HeroCarousel() {
         {slides.map((slide) => (
           <CarouselItem key={slide.id}>
             <div
-              className="relative flex h-screen w-full items-center justify-start bg-cover bg-center px-12 md:px-24"
+              className="relative flex h-screen w-full items-center justify-start bg-cover bg-center px-12"
               style={{ backgroundImage: `url(${slide.src})` }}
             >
               {/* Dark Overlay - Moved outside Container to ensure it covers full width */}
@@ -53,17 +53,17 @@ export function HeroCarousel() {
                   <h3 className="mb-4 font-montserrat text-sm font-medium tracking-[0.2em] uppercase">
                     FEDERATION FOR CATECHESIS WITH HISPANICS
                   </h3>
-                  <h1 className="mb-8 font-trajan text-5xl leading-tight md:text-5xl">
+                  <h1 className="mb-8 font-trajan text-3xl leading-tight md:text-5xl">
                     TO SERVE THOSE WHO
                     <br /> MINISTER IN CATECHESIS
                     <br /> WITH HISPANICS.
                   </h1>
-                  <p className="mb-10 max-w-xl font-montserrat text-lg font-light md:text-lg">
+                  <p className="text-md mb-10 max-w-xl font-montserrat font-light md:text-lg">
                     Empowering Catholic leaders, teachers, organizations, and
                     groups through resource curation and community advocacy.
                   </p>
 
-                  <div className="flex justify-start gap-4">
+                  <div className="flex flex-col justify-start gap-4 md:flex-row">
                     <Button className="h-auto rounded-sm bg-[#e6a84d] px-8 py-3 font-montserrat font-semibold text-black hover:bg-[#d6983d]">
                       Become a Member
                     </Button>

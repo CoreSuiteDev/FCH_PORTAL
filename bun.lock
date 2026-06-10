@@ -80,6 +80,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@hookform/resolvers": "^5.4.0",
+        "@tabler/icons-react": "^3.44.0",
         "@workspace/types": "workspace:*",
         "@workspace/ui": "workspace:*",
         "embla-carousel-autoplay": "^8.6.0",

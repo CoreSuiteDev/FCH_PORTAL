@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl"
-import { HeroCarousel } from "./_components/hero-slider"
+import { HeroCarousel } from "../components/home/hero-slider"
+import { UpcomingEvents } from "../components/home/upcoming-events"
 
 export default function Page() {
   const t = useTranslations("home")
@@ -7,6 +8,7 @@ export default function Page() {
   return (
     <div>
       <HeroCarousel />
+      <UpcomingEvents />
     </div>
   )
 }
