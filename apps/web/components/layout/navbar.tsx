@@ -135,7 +135,15 @@ export default function Navbar() {
                 className="z-[1001] flex w-[300px] flex-col p-0"
               >
                 <div className="flex items-center justify-between border-b bg-gray-50 px-5 py-4">
-                  <span className="font-bold">Menu</span>
+                  <Link href="/" className="relative block h-[20px] w-[80px]">
+                    <Image
+                      src="/assets/fch-logo-new-xp-scaled.png"
+                      alt="FCH Logo"
+                      fill
+                      className="object-contain"
+                      priority
+                    />
+                  </Link>
                 </div>
                 <nav className="flex-1 overflow-y-auto py-4">
                   {navLinks.map((link) => (
