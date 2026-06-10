@@ -13,8 +13,9 @@ model User {
   sessions Session[]
   accounts Account[]
 
-  memberships Membership[]
-  payments    Payment[]
+  memberships   Membership[]
+  payments      Payment[]
+  subscriptions Subscription[]
 
   userRoles UserRole[]
 

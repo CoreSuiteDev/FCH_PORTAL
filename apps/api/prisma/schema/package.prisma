@@ -1,0 +1,53 @@
+model MembershipPackage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  slug String @unique
+
+  type         MembershipType
+  billingCycle BillingCycle
+
+  price    Decimal  @db.Decimal(10, 2)
+  currency Currency @default(USD)
+
+  oktaGroup String
+
+  description String?
+
+  isActive Boolean @default(true)
+
+  subscriptions Subscription[]
+
+  @@unique([type, billingCycle])
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  packageId String
+
+  startDate DateTime
+  endDate   DateTime
+
+  status SubscriptionStatus @default(PENDING)
+
+  stripeCustomerId String?
+  stripeSessionId  String?
+  stripeSubId      String?
+
+  cancelAtPeriodEnd Boolean   @default(false)
+  cancledAt         DateTime?
+
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package MembershipPackage @relation(fields: [packageId], references: [id])
+
+  @@index([userId])
+  @@index([stripeCustomerId])
+  @@index([status])
+  @@map("subscription")
+}

@@ -40,3 +40,15 @@ enum AuditEntity {
   WEBINAR
   RESOURCE
 }
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING
+}

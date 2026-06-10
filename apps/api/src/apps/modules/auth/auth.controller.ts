@@ -122,10 +122,17 @@ export class AuthController {
   }
 
   static async getCurrentSession(input: { req: Request; res: ExpressResponse }) {
-    const response = await AuthService.getCurrentSession({
+    const result = await AuthService.getCurrentSession({
       req: input.req,
     });
-    return AuthController.handleResponse(response, input.res);
+    if (!result) return null;
+    return {
+      session: result.session,
+      user: {
+        ...result.user,
+        status: (result.user.status || "ACTIVE") as "ACTIVE" | "RESTRICTED" | "SUSPENDED" | "BANNED",
+      },
+    };
   }
 }
 

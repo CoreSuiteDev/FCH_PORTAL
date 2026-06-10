@@ -1,6 +1,6 @@
+import type { Request } from "express"
 import { prisma } from "../../../infrastructure/database/prisma.js"
 import { auth } from "../../../lib/auth.js"
-import type { Request } from "express"
 
 export class AuthService {
   /**
@@ -144,7 +144,6 @@ export class AuthService {
   static async getCurrentSession(input: { req: Request }) {
     return auth.api.getSession({
       headers: AuthService.getHeaders(input.req),
-      asResponse: true,
     })
   }
 }
