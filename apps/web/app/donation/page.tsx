@@ -16,7 +16,7 @@ export default function DonateCard() {
         <h2 className="mb-2 text-center text-3xl font-bold text-red-900">
           Donate
         </h2>
-        <div className="mx-auto mb-8 h-1 w-16 rounded-full bg-gradient-to-r from-red-400 to-red-600" />
+        <div className="mx-auto mb-8 h-1 w-16 rounded-full bg-linear-to-r from-red-400 to-red-600" />
 
         <div className="mb-6 flex items-center gap-2 text-gray-700">
           <HandHeart className="h-5 w-5 text-red-600" />
