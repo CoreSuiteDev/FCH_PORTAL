@@ -7,7 +7,6 @@ import { eventsRouter } from "../apps/modules/events/events.router.js";
 import { paymentRouter } from "../apps/modules/payment/payment.router.js";
 import { portalRouter } from "../apps/modules/portral/portal.router.js";
 import { resourcesRouter } from "../apps/modules/resources/resources.router.js";
-import { webinarRouter } from "../apps/modules/webinar/webinar.router.js";
 import { packageRouter } from "../apps/modules/package/package.router.js";
 
 // Root Router
@@ -37,8 +36,7 @@ export const appRouter = router({
   payment: paymentRouter,
   portal: portalRouter,
   resources: resourcesRouter,
-  webinar: webinarRouter,
   package: packageRouter,
 });
 
-export type AppRouter = typeof appRouter;
+export type AppRouter = typeof appRouter;

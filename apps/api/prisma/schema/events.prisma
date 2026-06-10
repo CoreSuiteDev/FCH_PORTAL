@@ -1,0 +1,65 @@
+model Event {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  title       String
+  description String?
+
+  startDate   DateTime
+  endDate     DateTime?
+  
+  location    String
+  coverImage  String?
+  maxCapacity Int?   
+  meetingLink String?   
+
+  eventRegistrations EventRegistration[]
+
+  visibility  EventVisibility @default(PUBLIC)
+  isActive    Boolean         @default(true)
+  status      EventStatus     @default(UPCOMING)
+
+
+  eventType EventType @default(EVENT)
+
+  webinar Webinar?
+
+  @@index([visibility])
+  @@index([isActive])
+  @@index([status])          
+  @@index([startDate]) 
+  @@map("event")
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status RegistrationStatus @default(CONFIRMED)
+
+  @@unique([eventId, userId])
+  @@index([userId])
+  @@map("event_registration")
+}
+
+
+model Webinar {
+  id            String @id @default(cuid())
+
+  eventId       String @unique
+  event         Event @relation(fields:[eventId], references:[id])
+
+  speakerName   String
+  recordingUrl  String?
+  category      String?
+
+  createdAt     DateTime @default(now())
+}
