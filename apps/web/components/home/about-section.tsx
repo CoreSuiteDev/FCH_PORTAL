@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 
 export function AboutSection() {
   return (
-    <section className="py-20">
+    <section className="bg-[#F6F4F2] py-20">
       <Container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
           {/* Left Column: Image */}
@@ -39,7 +39,7 @@ export function AboutSection() {
               ABOUT FCH CATECHESIS
             </h2>
 
-            <p className="font-montserrat text-base leading-relaxed text-gray-700">
+            <p className="font-montserrat text-[18px] leading-relaxed text-gray-800">
               FCH is a national organization committed to advancing
               evangelization and catechesis among individuals and communities
               involved in ministry, leadership, and faith formation at every
@@ -48,7 +48,7 @@ export function AboutSection() {
               to sharing the Gospel and nurturing lifelong faith development.
             </p>
 
-            <p className="font-montserrat text-base leading-relaxed text-gray-700">
+            <p className="font-montserrat text-[18px] leading-relaxed text-gray-800">
               Rooted in the richness and diversity of the Hispanic/Latino
               community, FCH works to empower leaders, catechists, ministers,
               and families by providing guidance, resources, and opportunities
