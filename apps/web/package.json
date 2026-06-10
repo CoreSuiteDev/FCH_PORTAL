@@ -18,8 +18,13 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "@studio-freight/react-lenis": "^0.0.47",
+    "@tabler/icons-react": "^3.44.0",
     "@workspace/types": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
     "next": "16.2.6",
     "next-intl": "^4.13.0",
