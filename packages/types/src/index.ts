@@ -84,3 +84,132 @@ export const ZCICMeResponseSchema = z.object({
   user: ZCIUserSchema,
 }).nullable();
 export type ZTCMeResponse = z.infer<typeof ZCICMeResponseSchema>;
+
+// --- MEMBERSHIP PACKAGE SCHEMAS ---
+
+export const BillingCycleEnum = z.enum(["MONTHLY", "YEARLY"]);
+export type BillingCycle = z.infer<typeof BillingCycleEnum>;
+
+export const CurrencyEnum = z.enum(["USD", "EUR"]);
+export type Currency = z.infer<typeof CurrencyEnum>;
+
+export const ZCIMembershipPackageSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  type: MembershipTypeEnum,
+  billingCycle: BillingCycleEnum,
+  price: z.number(),
+  currency: CurrencyEnum.default("USD"),
+  oktaGroup: z.string(),
+  description: z.string().nullable().optional(),
+  isActive: z.boolean().default(true),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+export type ZTCMembershipPackage = z.infer<typeof ZCIMembershipPackageSchema>;
+
+export const ZCICreatePackageSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  type: MembershipTypeEnum,
+  billingCycle: BillingCycleEnum,
+  price: z.number().nonnegative("Price must be a non-negative number"),
+  currency: CurrencyEnum.default("USD"),
+  oktaGroup: z.string().min(1, "Okta Group is required"),
+  description: z.string().optional(),
+  isActive: z.boolean().default(true).optional(),
+});
+export type ZTCCreatePackage = z.infer<typeof ZCICreatePackageSchema>;
+
+export const ZCIUpdatePackageSchema = z.object({
+  name: z.string().optional(),
+  slug: z.string().optional(),
+  type: MembershipTypeEnum.optional(),
+  billingCycle: BillingCycleEnum.optional(),
+  price: z.number().nonnegative().optional(),
+  currency: CurrencyEnum.optional(),
+  oktaGroup: z.string().optional(),
+  description: z.string().optional(),
+  isActive: z.boolean().optional(),
+});
+export type ZTCUpdatePackage = z.infer<typeof ZCIUpdatePackageSchema>;
+
+// --- EVENT & WEBINAR SCHEMAS ---
+
+export const EventVisibilityEnum = z.enum([
+  "PUBLIC",
+  "FREE_WEBINAR",
+  "MEMBER_ONLY",
+  "PASTORAL_ONLY",
+  "BOARD_ONLY",
+]);
+export type EventVisibility = z.infer<typeof EventVisibilityEnum>;
+
+export const EventStatusEnum = z.enum(["UPCOMING", "ONGOING", "COMPLETED", "CANCELLED"]);
+export type EventStatus = z.infer<typeof EventStatusEnum>;
+
+export const EventTypeEnum = z.enum(["EVENT", "WEBINAR"]);
+export type EventType = z.infer<typeof EventTypeEnum>;
+
+export const RegistrationStatusEnum = z.enum(["PENDING", "CONFIRMED", "CANCELLED"]);
+export type RegistrationStatus = z.infer<typeof RegistrationStatusEnum>;
+
+export const ZCIWebinarSchema = z.object({
+  id: z.string(),
+  eventId: z.string(),
+  speakerName: z.string(),
+  recordingUrl: z.string().nullable().optional(),
+  category: z.string().nullable().optional(),
+  createdAt: z.coerce.date(),
+});
+export type ZTWebinar = z.infer<typeof ZCIWebinarSchema>;
+
+export const ZCIEventSchema = z.object({
+  id: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  title: z.string(),
+  description: z.string().nullable().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date().nullable().optional(),
+  location: z.string(),
+  coverImage: z.string().nullable().optional(),
+  maxCapacity: z.number().nullable().optional(),
+  meetingLink: z.string().nullable().optional(),
+  visibility: EventVisibilityEnum,
+  isActive: z.boolean(),
+  status: EventStatusEnum,
+  eventType: EventTypeEnum,
+  webinar: ZCIWebinarSchema.nullable().optional(),
+});
+export type ZTEvent = z.infer<typeof ZCIEventSchema>;
+
+export const ZCIEventRegistrationSchema = z.object({
+  id: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  eventId: z.string(),
+  userId: z.string(),
+  status: RegistrationStatusEnum,
+});
+export type ZTEventRegistration = z.infer<typeof ZCIEventRegistrationSchema>;
+
+export const ZCICreateEventSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date().optional(),
+  location: z.string().min(1, "Location is required"),
+  coverImage: z.string().optional(),
+  maxCapacity: z.number().int().nonnegative().optional(),
+  meetingLink: z.string().optional(),
+  visibility: EventVisibilityEnum.default("PUBLIC"),
+  eventType: EventTypeEnum.default("EVENT"),
+  speakerName: z.string().optional(),
+  recordingUrl: z.string().optional(),
+  category: z.string().optional(),
+});
+export type ZTCCreateEvent = z.infer<typeof ZCICreateEventSchema>;
+
+

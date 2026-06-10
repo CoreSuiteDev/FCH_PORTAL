@@ -18,6 +18,12 @@ export const auth = betterAuth({
   },
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 300, // 5 minutes cache
+    },
+  },
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,

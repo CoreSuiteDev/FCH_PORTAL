@@ -1,9 +1,5 @@
 import React from "react"
-import {
-  IconInfoCircle,
-  IconLock,
-  IconFolder,
-} from "@tabler/icons-react"
+import { IconInfoCircle, IconLock, IconFolder } from "@tabler/icons-react"
 
 export default function BoardCommitteesPage() {
   return (

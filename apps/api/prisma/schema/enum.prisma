@@ -40,3 +40,43 @@ enum AuditEntity {
   WEBINAR
   RESOURCE
 }
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING
+}
+
+
+enum EventVisibility {
+  PUBLIC
+  FREE_WEBINAR
+  MEMBER_ONLY
+  PASTORAL_ONLY
+  BOARD_ONLY
+}
+
+enum EventStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+
+enum EventType {
+  EVENT
+  WEBINAR
+}

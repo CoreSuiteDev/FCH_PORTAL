@@ -25,10 +25,7 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 
-import {
-  PackageTier,
-  usePackageStore,
-} from "@/store/use-membership-store"
+import { PackageTier, usePackageStore } from "@/store/use-membership-store"
 import { MEMBERSHIP_REGISTRY } from "@/constents/membership"
 
 interface PageProps {
@@ -46,7 +43,8 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
 
   const slugId = resolvedParams.slug as PackageTier
-  const activePackage = (slugId && MEMBERSHIP_REGISTRY[slugId]) ? MEMBERSHIP_REGISTRY[slugId] : null
+  const activePackage =
+    slugId && MEMBERSHIP_REGISTRY[slugId] ? MEMBERSHIP_REGISTRY[slugId] : null
 
   useEffect(() => {
     if (slugId && MEMBERSHIP_REGISTRY[slugId]) {
