@@ -8,6 +8,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@workspace/ui/components/carousel"
+
+import Image from "next/image" // Import Next.js Image component
 import { testimonials } from "@/constents/testimonial-data"
 
 export function TestimonialSection() {
@@ -37,7 +39,16 @@ export function TestimonialSection() {
                   </p>
 
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-white/20" />
+                    {/* Render the profile image */}
+                    <div className="h-12 w-12 overflow-hidden rounded-full border-2 border-white/20">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={48}
+                        height={48}
+                        className="object-cover"
+                      />
+                    </div>
                     <div>
                       <h4 className="text-sm font-bold">{item.name}</h4>
                       <p className="text-xs tracking-wider uppercase opacity-90">

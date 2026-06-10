@@ -8,19 +8,9 @@ import {
 } from "@workspace/ui/components/carousel"
 import Container from "@/components/shared/container"
 import { Button } from "@workspace/ui/components/button"
-
-interface SlideData {
-  id: number
-  src: string
-}
+import { slides } from "@/constents/slide-content"
 
 export function HeroCarousel() {
-  const slides: SlideData[] = [
-    { id: 1, src: "/assets/slide1.jpg" },
-    { id: 2, src: "/assets/slide2.jpg" },
-    { id: 3, src: "/assets/slide3.jpg" },
-  ]
-
   // Initialize Autoplay plugin with loop enabled
   const plugin = React.useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true })

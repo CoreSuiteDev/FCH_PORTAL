@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "@studio-freight/react-lenis": "^0.0.47",
     "@tabler/icons-react": "^3.44.0",
     "@workspace/types": "workspace:*",
     "@workspace/ui": "workspace:*",
