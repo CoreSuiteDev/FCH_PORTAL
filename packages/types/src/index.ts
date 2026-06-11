@@ -212,4 +212,45 @@ export const ZCICreateEventSchema = z.object({
 });
 export type ZTCCreateEvent = z.infer<typeof ZCICreateEventSchema>;
 
+// --- PAGINATION SCHEMAS ---
 
+export const PaginationInputSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+export type ZTPaginationInput = z.infer<typeof PaginationInputSchema>;
+
+export const PaginationMetaSchema = z.object({
+  totalCount: z.number(),
+  page: z.number(),
+  limit: z.number(),
+  totalPages: z.number(),
+  hasNextPage: z.boolean(),
+  hasPreviousPage: z.boolean(),
+});
+export type ZTPaginationMeta = z.infer<typeof PaginationMetaSchema>;
+
+export const ZCIPaginatedUsersSchema = z.object({
+  data: z.array(ZCIUserOutputSchema),
+  meta: PaginationMetaSchema,
+});
+export type ZTPaginatedUsers = z.infer<typeof ZCIPaginatedUsersSchema>;
+
+export const ZCIPaginatedPaymentsSchema = z.object({
+  data: z.array(
+    z.object({
+      id: z.string(),
+      amount: z.number(),
+      status: z.string(),
+      date: z.coerce.date(),
+    })
+  ),
+  meta: PaginationMetaSchema,
+});
+export type ZTPaginatedPayments = z.infer<typeof ZCIPaginatedPaymentsSchema>;
+
+export const ZCIPaginatedEventsSchema = z.object({
+  data: z.array(ZCIEventSchema),
+  meta: PaginationMetaSchema,
+});
+export type ZTPaginatedEvents = z.infer<typeof ZCIPaginatedEventsSchema>;

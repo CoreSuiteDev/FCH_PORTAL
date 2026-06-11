@@ -4,7 +4,10 @@ import { EventsController } from "./events.controller.js"
 import {
   ZCIEventSchema,
   ZCICreateEventSchema,
+  PaginationInputSchema,
+  ZCIPaginatedEventsSchema,
 } from "@workspace/types"
+import { getPaginationMeta } from "../../../utils/pagination.js"
 
 // Helper to map DB Event records (including webinars) to matching Zod schemas
 const mapEvent = (event: any) => ({
@@ -43,14 +46,23 @@ export const eventsRouter = router({
         path: "/events",
         tags: ["events"],
         summary: "List all events",
-        description: "Returns an array of registered upcoming events based on user access levels",
+        description: "Returns a paginated list of registered upcoming events based on user access levels",
       },
     })
-    .input(z.void())
-    .output(z.array(ZCIEventSchema))
-    .query(async ({ ctx }) => {
-      const events = await EventsController.getEventsList(ctx.role)
-      return events.map(mapEvent)
+    .input(PaginationInputSchema.optional())
+    .output(ZCIPaginatedEventsSchema)
+    .query(async ({ input, ctx }) => {
+      const page = input?.page ?? 1
+      const limit = input?.limit ?? 10
+      const { totalCount, data } = await EventsController.getEventsList({
+        userRole: ctx.role,
+        page,
+        limit,
+      })
+      return {
+        data: data.map(mapEvent),
+        meta: getPaginationMeta(totalCount, page, limit),
+      }
     }),
 
   getById: publicProcedure

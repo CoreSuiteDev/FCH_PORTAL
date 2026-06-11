@@ -5,11 +5,19 @@ import { EventVisibility, EventType } from "../../../generated/prisma/client.js"
 
 export class EventsController {
   /**
-   * Controller for resolving events listing based on visibility permissions
+   * Controller for resolving events listing based on visibility permissions (paginated)
    */
-  static async getEventsList(userRole: string) {
-    const events = await EventsService.getAllEvents()
-    return EventPolicy.filterVisibleEvents(userRole, events)
+  static async getEventsList(params: {
+    userRole: string | undefined
+    page: number
+    limit: number
+  }) {
+    const allowedVisibilities = EventPolicy.getAllowedVisibilities(params.userRole)
+    return EventsService.getAllEvents({
+      allowedVisibilities,
+      page: params.page,
+      limit: params.limit,
+    })
   }
 
   /**

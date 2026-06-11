@@ -1,7 +1,8 @@
 import { z } from "zod"
 import { router, publicProcedure } from "../../../server/trpc.js"
 import { UserController } from "./user.controller.js"
-import { ZCIUserOutputSchema } from "@workspace/types"
+import { ZCIUserOutputSchema, PaginationInputSchema, ZCIPaginatedUsersSchema } from "@workspace/types"
+import { getPaginationMeta } from "../../../utils/pagination.js"
 
 // Helper to map DB relations to Zod output schema format
 const mapUser = (user: any) => ({
@@ -58,14 +59,19 @@ export const userRouter = router({
         path: "/users/list",
         tags: ["users"],
         summary: "List all registered members",
-        description: "Returns an array of all members"
+        description: "Returns a paginated list of all members",
       },
     })
-    .input(z.void())
-    .output(z.array(ZCIUserOutputSchema))
-    .query(async () => {
-      const users = await UserController.listAllMembers()
-      return users.map(mapUser)
+    .input(PaginationInputSchema.optional())
+    .output(ZCIPaginatedUsersSchema)
+    .query(async ({ input }) => {
+      const page = input?.page ?? 1
+      const limit = input?.limit ?? 10
+      const { totalCount, data } = await UserController.listAllMembers({ page, limit })
+      return {
+        data: data.map(mapUser),
+        meta: getPaginationMeta(totalCount, page, limit),
+      }
     }),
 
   updateStatus: publicProcedure

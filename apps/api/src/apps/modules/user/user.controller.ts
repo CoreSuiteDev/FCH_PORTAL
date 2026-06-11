@@ -18,10 +18,10 @@ export class UserController {
   }
 
   /**
-   * Controller for listing all users
+   * Controller for listing all users (paginated)
    */
-  static async listAllMembers() {
-    return UserService.findAllUsers()
+  static async listAllMembers(params: { page: number; limit: number }) {
+    return UserService.findAllUsers(params)
   }
 
   /**
