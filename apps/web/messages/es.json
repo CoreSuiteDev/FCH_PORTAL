@@ -1,9 +1,191 @@
 {
+  "nav": {
+    "links": {
+      "home": "Inicio",
+      "about": "Acerca de",
+      "membership": "Membresía",
+      "sponsor": "Patrocinar",
+      "news": "Noticias",
+      "events": "Eventos",
+      "webinars": "Seminarios web"
+    },
+    "topBar": {
+      "contact": "Contacto",
+      "login": "Iniciar sesión"
+    },
+    "buttons": {
+      "donate": "Donar",
+      "signUp": "Registrarse"
+    }
+  },
   "home": {
-    "title": "Bienvenido al Portal FCH",
-    "description": "Conectando a nuestra comunidad con fe y esperanza.",
-    "login": "Iniciar sesión",
-    "register": "Registrarse",
-    "selectLanguage": "Seleccionar idioma"
+    "hero": {
+      "label": "FEDERACIÓN PARA LA CATEQUESIS CON HISPANOS",
+      "title": "SERVIR A QUIENES\nMINISTRAN EN LA CATEQUESIS\nCON HISPANOS.",
+      "description": "Fortaleciendo a líderes católicos, catequistas, organizaciones y grupos mediante la selección de recursos y la defensa de la comunidad.",
+      "buttons": {
+        "membership": "Hazte Miembro",
+        "learnMore": "Más Información"
+      }
+    },
+    "events": {
+      "sectionTitle": "PRÓXIMOS EVENTOS",
+      "items": [
+        {
+          "id": "1",
+          "date": "25 de junio de 2026",
+          "title": "Gala Anual de la Comunidad",
+          "description": "Únase a nosotros para una noche de celebración, convivencia y apreciación cultural.",
+          "location": "Gran Salón de Eventos, Dhaka"
+        },
+        {
+          "id": "2",
+          "date": "12 de julio de 2026",
+          "title": "Taller de Tecnología 2026",
+          "description": "Una mirada profunda a las últimas tendencias en desarrollo de software e inteligencia artificial.",
+          "location": "Tech Hub, Gulshan"
+        }
+      ]
+    },
+    "about": {
+      "title": "ACERCA DE LA CATEQUESIS FCH",
+      "description1": "FCH es una organización nacional comprometida con promover la evangelización y la catequesis entre individuos y comunidades involucradas en el ministerio, el liderazgo y la formación en la fe en todos los niveles. A través de la mentoría, la colaboración, la educación y la defensa, nos esforzamos por fortalecer y apoyar a quienes se dedican a compartir el Evangelio y fomentar el desarrollo de la fe durante toda la vida.",
+      "description2": "Arraigada en la riqueza y la diversidad de la comunidad hispana/latina, FCH trabaja para empoderar a líderes, catequistas, ministros y familias proporcionando orientación, recursos y oportunidades de formación que respondan a las necesidades culturales y espirituales de las personas a las que sirven.",
+      "button": "Más sobre nosotros"
+    },
+    "webinar": {
+      "title": "CONÉCTATE DESDE CUALQUIER LUGAR CON\nNUESTROS SEMINARIOS WEB",
+      "subtitle": "Llevando formación catequética de clase mundial directamente a su hogar u oficina parroquial a través de nuestra plataforma digital accesible",
+      "features": [
+        {
+          "id": "1",
+          "title": "Expertos",
+          "description": "Aprenda de teólogos renombrados y catequistas experimentados."
+        },
+        {
+          "id": "2",
+          "title": "Preguntas y Respuestas",
+          "description": "Participe directamente con los ponentes en sesiones en vivo."
+        },
+        {
+          "id": "3",
+          "title": "Biblioteca de Recursos",
+          "description": "Acceda a sesiones grabadas y materiales descargables."
+        },
+        {
+          "id": "4",
+          "title": "Comunidad Global",
+          "description": "Conéctese con colegas de diversas parroquias de todo el mundo."
+        }
+      ]
+    },
+    "prayer": {
+      "title": "ORACIÓN DEL MISAL ROMANO",
+      "lines": [
+        "Oh Dios, pastor y guía de todos los fieles,",
+        "mira con bondad a tu siervo, León XIV,",
+        "a quien has puesto al frente de tu Iglesia como su pastor;",
+        "concédele, te pedimos, que con su palabra y ejemplo",
+        "sea de servicio a aquellos sobre quienes preside",
+        "para que, junto con el rebaño confiado a su cuidado,",
+        "pueda llegar a la vida eterna."
+      ],
+      "closing": "Por nuestro Señor Jesucristo, tu Hijo,\nque vive y reina contigo en la unidad del Espíritu Santo,\núnico Dios, por los siglos de los siglos. Amén."
+    },
+
+    "testimonials": {
+      "title": "LO QUE DICE LA GENTE",
+      "items": [
+        {
+          "id": "1",
+          "text": "La Iglesia en los Estados Unidos debe tener un espacio donde los educadores religiosos y otros líderes pastorales se reúnan regularmente para reflexionar sobre cómo se lleva a cabo la catequesis a la luz de la experiencia católica hispana.",
+          "name": "DR. HOSFFMAN OSPINO",
+          "role": "Boston College"
+        },
+        {
+          "id": "2",
+          "text": "Los catequistas hispanos necesitan una organización para poder compartir. ¿Qué podemos compartir? Bueno, nuestras metas, logros, éxitos, desafíos y cómo aprendemos a lo largo del camino.",
+          "name": "IUPITA VITAL",
+          "role": "Directora del Apostolado Hispano, Diócesis de San José, CA"
+        },
+        {
+          "id": "3",
+          "text": "FCH es un lugar al que podemos acudir para encontrar una red de personas con quienes compartir lo que hago en mis sesiones de catecismo.",
+          "name": "MARIA GARCIA",
+          "role": "Catequista, Diócesis de Austin"
+        },
+        {
+          "id": "4",
+          "text": "Un recurso increíble que ha transformado la forma en que abordamos el liderazgo pastoral en nuestra comunidad parroquial.",
+          "name": "REV. ANTHONY SMITH",
+          "role": "Párroco, Parroquia St. Jude"
+        }
+      ]
+    },
+    "support": {
+      "title": "CONVIÉRTETE EN UN MIEMBRO ORGULLOSO DE FCH",
+      "description": "Juntos podemos ayudarnos mutuamente a ser mejores catequistas, 'un cristiano que recibe una llamada particular de Dios que, cuando es aceptada en la fe, lo capacita para el servicio de la transmisión de la fe y para la tarea de iniciar a otros en la vida cristiana' como lo describe el Directorio para la Catequesis.",
+      "supportTitle": "APÓYANOS",
+      "supportText": "Somos más que una organización o un sitio web. Somos un grupo de catequistas como tú que creemos que cuando compartimos nuestras mejores prácticas de enseñanza y evangelización, somos más fuertes.",
+      "buttonText": "Donar ahora"
+    },
+    "news": {
+      "title": "ÚLTIMAS NOTICIAS",
+      "button": "Más noticias",
+      "readMore": "Leer más",
+      "meta": {
+        "by": "Por",
+        "role": "Miembro de la junta"
+      },
+      "items": [
+        {
+          "id": "1",
+          "title": "AUGUSTINE INSTITUTE PATROCINA A FCH EN LA CONFERENCIA DE LA",
+          "description": "Un gran agradecimiento al Augustine Institute por patrocinar al Rev. Yojaneider García, teólogo de FCH, para asistir a la conferencia de Los Ángeles.",
+          "author": "Luke Admin",
+          "date": "20 de mayo de 2026"
+        },
+        {
+          "id": "2",
+          "title": "FCH SE UNE A LA INICIATIVA NUEVO MOMENTO EN BOSTON COLLEGE",
+          "description": "FCH se convierte en parte de Nuevo Momento, una iniciativa de Boston College bajo la dirección del Dr. Hosffman Ospino para empoderar.",
+          "author": "Luke Admin",
+          "date": "22 de mayo de 2026"
+        },
+        {
+          "id": "3",
+          "title": "PAPA FRANCISCO 1936-2025",
+          "description": "Que el amor y la paz de Dios sean un consuelo para todos aquellos que conocieron, amaron y fueron bendecidos por su ministerio.",
+          "author": "Luke Admin",
+          "date": "25 de mayo de 2026"
+        }
+      ]
+    },
+    "newsletter": {
+      "title": "SUSCRÍBETE A NUESTRO BOLETÍN",
+      "firstNameLabel": "Nombre",
+      "firstNamePlaceholder": "Nombre",
+      "lastNamePlaceholder": "Apellido",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@correo.com",
+      "button": "Enviar",
+      "errors": {
+        "firstName": "El nombre es obligatorio",
+        "email": "Se requiere un correo electrónico válido"
+      }
+    }
+  },
+  "footer": {
+    "nav": {
+      "about": "Sobre nosotros",
+      "events": "Eventos",
+      "membership": "Membresía",
+      "contact": "Contacto"
+    },
+    "social": {
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn"
+    },
+    "copyright": "Todos los derechos reservados."
   }
 }

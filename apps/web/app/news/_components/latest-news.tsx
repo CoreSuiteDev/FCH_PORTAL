@@ -3,11 +3,12 @@
 import React from "react"
 import { Button } from "@workspace/ui/components/button"
 import Image from "next/image"
-import Container from "../shared/container"
+
 import Link from "next/link"
 import { useTranslations } from "next-intl"
+import Container from "@/components/shared/container"
 
-export function NewsSection() {
+export function LatestNewsSection() {
   const t = useTranslations("home.news")
   const newsItems = t.raw("items") as any[]
 

@@ -7,11 +7,11 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 
-export function AboutSection() {
+export function AboutLeader() {
   const t = useTranslations("home.about")
 
   return (
-    <section className="bg-[#F6F4F2] py-20">
+    <section className="bg-white py-20">
       <Container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
           <motion.div

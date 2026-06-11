@@ -11,7 +11,6 @@ import {
   CheckCircle2,
 } from "lucide-react"
 
-// Shadcn UI Primitive Component Imports
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
@@ -26,7 +25,7 @@ import {
 } from "@workspace/ui/components/card"
 
 import { PackageTier, usePackageStore } from "@/store/use-membership-store"
-import { MEMBERSHIP_REGISTRY } from "@/constents/membership"
+import { MEMBERSHIP_REGISTRY } from "@/constants/membership"
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -34,10 +33,9 @@ interface PageProps {
 
 export default function PackageDynamicDetailsPage({ params }: PageProps) {
   const router = useRouter()
-
-  // Unwrap modern promise-based routing params parameters safely via React.use()
   const resolvedParams = use(params)
-  const selectPackage = usePackageStore((state) => state.selectPackage)
+
+  const { selectPackage, billingCycle } = usePackageStore()
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
@@ -48,18 +46,24 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
 
   useEffect(() => {
     if (slugId && MEMBERSHIP_REGISTRY[slugId]) {
-      selectPackage(slugId) // Keep state synchronized with layout actions
+      selectPackage(slugId)
     } else {
-      // Direct unexpected or invalid parameters back to baseline catalog overview
       router.push("/membership")
     }
   }, [slugId, router, selectPackage])
+
+  const getCalculatedPrice = (price: number) => {
+    return billingCycle === "monthly" ? price : Math.round(price * 10)
+  }
+
+  const basePrice = activePackage ? getCalculatedPrice(activePackage.price) : 0
+  const setupFee = basePrice > 0 ? 5.0 : 0
+  const totalInvoiceAmount = basePrice + setupFee
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setIsProcessing(true)
 
-    // Simulate standard asynchronous merchant checkout delay intervals
     setTimeout(() => {
       setIsProcessing(false)
       setShowSuccessModal(true)
@@ -68,7 +72,6 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
 
   const handleModalClose = () => {
     setShowSuccessModal(false)
-    // router.push(`/dashboard/${activePackage?.id}`)
     router.push(`/`)
   }
 
@@ -80,14 +83,9 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
     )
   }
 
-  const basePrice = activePackage.price
-  const setupFee = basePrice > 0 ? 5.0 : 0
-  const totalInvoiceAmount = basePrice + setupFee
-
   return (
     <div className="min-h-screen bg-[#F6F4F2] px-4 py-16 font-sans text-[#1C1A19]">
       <div className="mx-auto max-w-5xl">
-        {/* Navigation Return Utility Hook */}
         <button
           onClick={() => router.push("/membership")}
           className="group mb-8 inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-[#1C1A19]"
@@ -99,9 +97,7 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
           Back to Pricing Registry
         </button>
 
-        {/* Checkout Split Column Layout Grid */}
         <div className="grid items-stretch gap-8 md:grid-cols-12">
-          {/* LEFT COLUMN: Core Membership Value Specs Ledger */}
           <Card className="flex flex-col justify-between border-border/60 bg-card p-4 shadow-sm md:col-span-6">
             <div>
               <CardHeader className="p-4">
@@ -122,13 +118,12 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
               </CardHeader>
 
               <CardContent className="p-4">
-                {/* Financial Overview Metric Context */}
                 <div className="mb-6 flex items-baseline border-y border-border/50 py-4 text-[#1C1A19]">
                   <span className="text-4xl font-extrabold tracking-tight">
-                    ${activePackage.price}
+                    ${basePrice.toFixed(2)}
                   </span>
                   <span className="ml-1.5 text-xs text-muted-foreground">
-                    / {activePackage.billingPeriod}
+                    / {billingCycle === "monthly" ? "month" : "year"}
                   </span>
                 </div>
 
@@ -151,13 +146,11 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
             </div>
 
             <CardFooter className="border-t border-border/40 p-4 pt-4 text-[11px] text-muted-foreground">
-              You are selecting a system layout model. Upon payment activation,
-              access control rules will pass modifications down to your account
-              payload structure.
+              You are subscribing to the {billingCycle} plan. Upon payment,
+              access control rules will be applied to your account.
             </CardFooter>
           </Card>
 
-          {/* RIGHT COLUMN: Interactive Gateway Form Card */}
           <Card className="relative flex flex-col justify-between overflow-hidden border-border/80 bg-card p-4 shadow-lg md:col-span-6">
             <div className="absolute top-0 right-0 left-0 h-1 bg-primary" />
 
@@ -226,7 +219,6 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                     </div>
                   </div>
 
-                  {/* Pricing Breakdown Card Fragment */}
                   <div className="mt-6 space-y-2 rounded-xl bg-muted/50 p-4 text-[11px] font-medium text-muted-foreground">
                     <div className="flex justify-between">
                       <span>Base Tier Access:</span>
@@ -271,7 +263,6 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* DYNAMIC BACKDROP SUCCESS MODAL POPUP */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 py-4 backdrop-blur-sm duration-200 fade-in">
           <Card className="w-full max-w-md scale-100 transform animate-in rounded-2xl border-border/40 bg-card p-6 text-center shadow-2xl transition-all duration-300 zoom-in-95">
