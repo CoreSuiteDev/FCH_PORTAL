@@ -1,14 +1,18 @@
 "use client"
 
 import { ReactLenis } from "@studio-freight/react-lenis"
-import { HeroCarousel } from "@/components/home/hero-slider"
-import { UpcomingEvents } from "@/components/home/upcoming-events"
+
 import { AboutSection } from "@/components/home/about-section"
-import { WebinarFeatures } from "@/components/home/webinar-features"
-import { PrayerSection } from "@/components/home/prayer-secton"
 
 import DynamicHero from "@/components/shared/dynamic-hero"
 import AboutFCH from "./_components/aboutFCH"
+import MissionSection from "./_components/mission"
+import OurJourney from "./_components/our-journey"
+import OurProfessionalApproach from "./_components/our-approach"
+import { AboutLeader } from "./_components/about-leader"
+import BoardMembers from "./_components/board-member"
+import CollaborationObjectives from "./_components/objectives"
+import ConnectWithUs from "./_components/connect-with-us"
 
 export default function About() {
   return (
@@ -51,6 +55,13 @@ export default function About() {
           </div>
         </DynamicHero>
         <AboutFCH />
+        <MissionSection />
+        <OurJourney />
+        <OurProfessionalApproach />
+        <AboutLeader />
+        <BoardMembers />
+        <CollaborationObjectives />
+        <ConnectWithUs />
       </main>
     </ReactLenis>
   )
