@@ -26,7 +26,7 @@ import {
 } from "@workspace/ui/components/card"
 
 import { PackageTier, usePackageStore } from "@/store/use-membership-store"
-import { MEMBERSHIP_REGISTRY } from "@/constents/membership"
+import { MEMBERSHIP_REGISTRY } from "@/constants/membership"
 
 interface PageProps {
   params: Promise<{ slug: string }>

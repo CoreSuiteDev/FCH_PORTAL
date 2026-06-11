@@ -6,7 +6,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { NavLink, navLinks } from "@/constents/nav-manus"
+import { NavLink, navLinks } from "@/constants/nav-manus"
 import { useNavStore } from "@/store/use-nav-store"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -14,6 +14,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@workspace/ui/components/sheet"
+import { LanguageSwitcher } from "../LanguageSwitcher"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -63,7 +64,7 @@ export default function Navbar() {
         {/* Top Bar - Hidden on Mobile */}
         <div className="hidden border-b bg-gray-50 md:block">
           <div className="container mx-auto flex items-center justify-between px-4 py-1 text-xs text-gray-500">
-            <LanguageToggle />
+            <LanguageSwitcher />
             <div className="flex items-center gap-6">
               <span className="flex cursor-pointer items-center gap-1 hover:text-red-600">
                 <Phone className="h-3 w-3" /> Contact

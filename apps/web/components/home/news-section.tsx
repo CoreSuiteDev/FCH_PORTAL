@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { newsData } from "@/constents/news-data"
+import { newsData } from "@/constants/news-data"
 import { Button } from "@workspace/ui/components/button"
 import Image from "next/image"
 import Container from "../shared/container"

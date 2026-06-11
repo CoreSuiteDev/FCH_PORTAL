@@ -1,9 +1,13 @@
 {
   "home": {
-    "title": "Welcome to FCH Portal",
-    "description": "Connecting our community with faith and hope.",
-    "login": "Login",
-    "register": "Register",
-    "selectLanguage": "Select Language"
+    "hero": {
+      "label": "FEDERATION FOR CATECHESIS WITH HISPANICS",
+      "title": "TO SERVE THOSE WHO\nMINISTER IN CATECHESIS\nWITH HISPANICS.",
+      "description": "Empowering Catholic leaders, teachers, organizations, and groups through resource curation and community advocacy.",
+      "buttons": {
+        "membership": "Become a Member",
+        "learnMore": "Learn More"
+      }
+    }
   }
 }

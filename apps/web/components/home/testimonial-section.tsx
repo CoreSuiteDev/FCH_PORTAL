@@ -10,7 +10,7 @@ import {
 } from "@workspace/ui/components/carousel"
 
 import Image from "next/image" // Import Next.js Image component
-import { testimonials } from "@/constents/testimonial-data"
+import { testimonials } from "@/constants/testimonial-data"
 
 export function TestimonialSection() {
   return (

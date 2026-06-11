@@ -1,7 +1,7 @@
 "use client"
 
 import Container from "@/components/shared/container"
-import { supportData } from "@/constents/support-data"
+import { supportData } from "@/constants/support-data"
 import { Button } from "@workspace/ui/components/button"
 import Link from "next/link"
 

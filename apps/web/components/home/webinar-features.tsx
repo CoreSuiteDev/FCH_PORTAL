@@ -2,7 +2,7 @@
 import { Card, CardContent } from "@workspace/ui/components/card"
 import Container from "@/components/shared/container"
 import { motion } from "framer-motion"
-import { webinarFeatures } from "@/constents/features-data"
+import { webinarFeatures } from "@/constants/features-data"
 
 export function WebinarFeatures() {
   return (

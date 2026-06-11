@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Check } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { PackageTier, usePackageStore } from "@/store/use-membership-store"
-import { MEMBERSHIP_REGISTRY } from "@/constents/membership"
+import { MEMBERSHIP_REGISTRY } from "@/constants/membership"
 
 export default function MembershipPackagesPage() {
   const router = useRouter()
