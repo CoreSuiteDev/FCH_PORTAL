@@ -1,4 +1,24 @@
 {
+  "nav": {
+    "links": {
+      "home": "Home",
+      "about": "About",
+      "membership": "Membership",
+      "sponsor": "Sponsor",
+      "news": "News",
+      "events": "Events",
+      "webinars": "Webinars"
+    },
+    "topBar": {
+      "contact": "Contact",
+      "login": "Log In"
+    },
+    "buttons": {
+      "donate": "Donate",
+      "signUp": "Sign Up"
+    }
+  },
+
   "home": {
     "hero": {
       "label": "FEDERATION FOR CATECHESIS WITH HISPANICS",
@@ -8,6 +28,164 @@
         "membership": "Become a Member",
         "learnMore": "Learn More"
       }
+    },
+    "events": {
+      "sectionTitle": "UPCOMING EVENTS",
+      "items": [
+        {
+          "id": "1",
+          "date": "June 25, 2026",
+          "title": "Annual Community Gala",
+          "description": "Join us for an evening of celebration, networking, and cultural appreciation.",
+          "location": "Grand Ballroom, Dhaka"
+        },
+        {
+          "id": "2",
+          "date": "July 12, 2026",
+          "title": "Technology Workshop 2026",
+          "description": "A deep dive into the latest trends in software development and AI.",
+          "location": "Tech Hub, Gulshan"
+        }
+      ]
+    },
+    "about": {
+      "title": "ABOUT FCH CATECHESIS",
+      "description1": "FCH is a national organization committed to advancing evangelization and catechesis among individuals and communities involved in ministry, leadership, and faith formation at every level. Through mentorship, collaboration, education, and advocacy, we strive to strengthen and support those who dedicate themselves to sharing the Gospel and nurturing lifelong faith development.",
+      "description2": "Rooted in the richness and diversity of the Hispanic/Latino community, FCH works to empower leaders, catechists, ministers, and families by providing guidance, resources, and opportunities for formation that respond to the cultural and spiritual needs of the people they serve.",
+      "button": "More About Us"
+    },
+    "webinar": {
+      "title": "CONNECT ANYWHERE WITH\nOUR WEBINARS",
+      "subtitle": "Bringing world-class catechetical formation directly to your home or parish office through our accessible digital platform",
+      "features": [
+        {
+          "id": "1",
+          "title": "Expert Speakers",
+          "description": "Learn from renowned theologians and experienced catechists."
+        },
+        {
+          "id": "2",
+          "title": "Interactive Q&A",
+          "description": "Engage directly with speakers in real-time sessions."
+        },
+        {
+          "id": "3",
+          "title": "Resource Library",
+          "description": "Access recorded sessions and downloadable materials."
+        },
+        {
+          "id": "4",
+          "title": "Global Community",
+          "description": "Connect with peers from various parishes worldwide."
+        }
+      ]
+    },
+    "prayer": {
+      "title": "PRAYER OF THE ROMAN MISSAL",
+      "lines": [
+        "O God, shepherd and ruler of all the faithful,",
+        "look favorably upon your servant, Leo XIV,",
+        "whom you have set at the head of your Church as her shepherd;",
+        "grant, we pray, that by word and example",
+        "he may be of service to those over whom he presides",
+        "so that, together with the flock entrusted to his care,",
+        "he may come to everlasting life."
+      ],
+      "closing": "Through our Lord Jesus Christ, your Son,\nwho lives and reigns with you in the unity of the Holy Spirit,\none God, for ever and ever. Amen."
+    },
+    "testimonials": {
+      "title": "WHAT PEOPLE SAY",
+      "items": [
+        {
+          "id": "1",
+          "text": "The Church in the United States must have a space where religious educators and other pastoral leaders come together on a regular basis to reflect about how catechesis takes place in light of the Hispanic Catholic Experience.",
+          "name": "HOSFFMAN OSPINO, PHD",
+          "role": "Boston college"
+        },
+        {
+          "id": "2",
+          "text": "Hispanic catechists need an organization to be able to share. What can we share? Well, our goals, achievements, successes, challenges and how we learn along the way.",
+          "name": "IUPITA VITAL",
+          "role": "Director to the Hispanic Apostolate, San Jose Diócesis, CA"
+        },
+        {
+          "id": "3",
+          "text": "FCH is a place to go and find a network of people with whom we can share what I do in catechism sessions.",
+          "name": "MARIA GARCIA",
+          "role": "Catechist, Diocese of Austin"
+        },
+        {
+          "id": "4",
+          "text": "An incredible resource that has transformed how we approach pastoral leadership in our parish community.",
+          "name": "REV. ANTHONY SMITH",
+          "role": "Pastor, St. Jude Parish"
+        }
+      ]
+    },
+    "support": {
+      "title": "BECOME A PROUD FCH MEMBER",
+      "description": "Together we can help each other be better catechists, 'a Christian who receives a particular calling from God that, when accepted in faith, empowers him for the service of transmission of the faith and for the task of initiating others into the Christian life' as describe by The Directory for Catechesis.",
+      "supportTitle": "SUPPORT US",
+      "supportText": "We are more than an organization or a website. We are a group of catechists like you who believe that when we share our teaching/evangelization best practices, we are stronger.",
+      "buttonText": "Donate Now"
+    },
+    "news": {
+      "title": "LATEST NEWS",
+      "button": "More News",
+      "readMore": "Read More",
+      "meta": {
+        "by": "By",
+        "role": "Board Member"
+      },
+      "items": [
+        {
+          "id": "1",
+          "title": "AUGUSTINE INSTITUTE SPONSORS FCH AT THE LA CONFERENCE",
+          "description": "A big thank you to the Augustine Institute for sponsoring Rev. Yojaneider Garcia, FCH Theologian, to attend the Los Angeles.",
+          "author": "Luke Admin",
+          "date": "May 20, 2026"
+        },
+        {
+          "id": "2",
+          "title": "FCH JOINS NUEVO MOMENTO INITIATIVE AT BOSTON COLLEGE",
+          "description": "FCH becomes part of the Nuevo Momento, a Boston College Initiative under the direction of Dr. Hoffman Ospino to empower.",
+          "author": "Luke Admin",
+          "date": "May 22, 2026"
+        },
+        {
+          "id": "3",
+          "title": "POPE FRANCIS 1936-2025",
+          "description": "May God's love and peace be a comfort to all those who knew, loved and were blessed by the ministry.",
+          "author": "Luke Admin",
+          "date": "May 25, 2026"
+        }
+      ]
+    },
+    "newsletter": {
+      "title": "SIGN UP FOR OUR NEWSLETTER",
+      "firstNameLabel": "Name",
+      "firstNamePlaceholder": "First Name",
+      "lastNamePlaceholder": "Last Name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@mail.com",
+      "button": "Submit",
+      "errors": {
+        "firstName": "First name is required",
+        "email": "Valid email is required"
+      }
     }
+  },
+  "footer": {
+    "nav": {
+      "about": "About",
+      "events": "Events",
+      "membership": "Membership",
+      "contact": "Contact"
+    },
+    "social": {
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn"
+    },
+    "copyright": "All Rights Reserved."
   }
 }

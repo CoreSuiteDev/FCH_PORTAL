@@ -1,4 +1,5 @@
 "use client"
+
 import * as React from "react"
 import Container from "@/components/shared/container"
 import {
@@ -8,18 +9,37 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@workspace/ui/components/carousel"
-
-import Image from "next/image" // Import Next.js Image component
-import { testimonials } from "@/constants/testimonial-data"
-
+import Image from "next/image"
+import { useTranslations } from "next-intl"
+import Autoplay from "embla-carousel-autoplay"
+interface Testimonial {
+  id: string
+  text: string
+  name: string
+  role: string
+}
 export function TestimonialSection() {
+  const t = useTranslations("home.testimonials")
+  const testimonials: Testimonial[] = t.raw("items")
+
   return (
     <section className="bg-white py-20">
       <Container>
-        <Carousel className="w-full">
+        <Carousel
+          className="w-full"
+          opts={{
+            loop: true,
+            align: "start",
+          }}
+          plugins={[
+            Autoplay({
+              delay: 3000, // 3 seconds por por slide hobe
+            }),
+          ]}
+        >
           <div className="mb-10 flex items-center justify-between">
             <h2 className="font-trajan text-3xl text-[#8b0000] md:text-4xl">
-              WHAT PEOPLE SAY
+              {t("title")}
             </h2>
 
             <div className="flex gap-2">
@@ -30,7 +50,7 @@ export function TestimonialSection() {
 
           <CarouselContent>
             {testimonials.map((item) => (
-              <CarouselItem key={item.id} className="md:basis-1/2">
+              <CarouselItem key={item.id} className="md:basis-1/3">
                 <div className="flex h-full flex-col justify-between rounded-xl bg-[#1a824e] p-8 text-white">
                   <div className="mb-4 text-xl text-yellow-500">★★★★★</div>
 
@@ -39,14 +59,13 @@ export function TestimonialSection() {
                   </p>
 
                   <div className="flex items-center gap-4">
-                    {/* Render the profile image */}
-                    <div className="h-12 w-12 overflow-hidden rounded-full border-2 border-white/20">
+                    <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-white/20">
                       <Image
-                        src={item.image}
+                        src={`/assets/user-${item.id}.png`}
                         alt={item.name}
-                        width={48}
-                        height={48}
+                        fill
                         className="object-cover"
+                        sizes="48px"
                       />
                     </div>
                     <div>

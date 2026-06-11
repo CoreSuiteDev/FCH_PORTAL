@@ -1,15 +1,15 @@
 export interface NavLink {
-  id: number // Added id field
-  name: string
+  id: number
+  key: string
   href: string
 }
 
 export const navLinks: NavLink[] = [
-  { id: 1, name: "Home", href: "/" },
-  { id: 2, name: "About", href: "/about" },
-  { id: 3, name: "Membership", href: "/membership" },
-  { id: 4, name: "Sponsor", href: "/sponsor" },
-  { id: 5, name: "News", href: "/news" },
-  { id: 6, name: "Events", href: "/events" },
-  { id: 7, name: "Webinars", href: "/webinars" },
+  { id: 1, key: "home", href: "/" },
+  { id: 2, key: "about", href: "/about" },
+  { id: 3, key: "membership", href: "/membership" },
+  { id: 4, key: "sponsor", href: "/sponsor" },
+  { id: 5, key: "news", href: "/news" },
+  { id: 6, key: "events", href: "/events" },
+  { id: 7, key: "webinars", href: "/webinars" },
 ]
