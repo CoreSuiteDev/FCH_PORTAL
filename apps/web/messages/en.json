@@ -543,5 +543,62 @@
       "linkedin": "LinkedIn"
     },
     "copyright": "All Rights Reserved."
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Enter your credentials to access your account",
+      "emailLabel": "Email Address",
+      "passwordLabel": "Password",
+      "forgotPassword": "Forgot password?",
+      "rememberMe": "Remember me for 30 days",
+      "signIn": "Sign In",
+      "orContinueWith": "Or continue with",
+      "continueWithGoogle": "Continue with Google",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign Up"
+    },
+    "register": {
+      "title": "Create an account",
+      "subtitle": "Get started with your free account setup today",
+      "nameLabel": "Full Name",
+      "emailLabel": "Email Address",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "agreeTerms": "I agree to the",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "mustAcceptTerms": "Must accept terms and conditions",
+      "createAccount": "Create Account",
+      "orSignUpWith": "Or sign up with",
+      "signUpWithGoogle": "Sign up with Google",
+      "alreadyHaveAccount": "Already have an account?",
+      "signInHere": "Sign in here"
+    },
+    "forgotPassword": {
+      "step1Title": "Forgot Password?",
+      "step1Subtitle": "Enter your email address to receive a 6-digit verification code.",
+      "emailLabel": "Email Address",
+      "sendCode": "Send Code",
+      "step2Title": "Enter Security Code",
+      "step2Subtitle": "Please enter the 6-digit verification code sent to your email.",
+      "codeLabel": "Verification Code",
+      "verifyCode": "Verify Code",
+      "step3Title": "Identity Verified",
+      "step3Subtitle": "Your security code matches. Click below to proceed and update your current password credentials safely.",
+      "resetPasswordNow": "Reset Password Now",
+      "backToSignIn": "Back to Sign In"
+    },
+    "resetPassword": {
+      "title": "Set New Password",
+      "subtitle": "Please construct a secure and completely unique password for your account protection.",
+      "newPasswordLabel": "New Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "resetPassword": "Reset Password",
+      "successTitle": "Password Reset Complete",
+      "successSubtitle": "Your password has been successfully updated. You can now use your new security credentials to sign in.",
+      "signIn": "Sign In"
+    }
   }
 }

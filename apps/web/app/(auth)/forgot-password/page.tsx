@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react"
 import { Mail, Loader2, ArrowLeft, CheckCircle2, KeyRound } from "lucide-react"
-
+import { useTranslations } from "next-intl" // Import useTranslations
 import { Button } from "@workspace/ui/components/button"
 import {
   CodeFormValues,
@@ -13,14 +13,13 @@ import {
 } from "@/store/auth/use-forget-password-store"
 
 export default function ForgotPasswordForm() {
+  const t = useTranslations("auth.forgotPassword") // Initialize translations
   const { currentStep, isLoading, sendOtpCode, verifyOtpCode, resetStatus } =
     useForgotPasswordStore()
 
-  // Initialize both hooks for independent form steps tracking
   const emailForm = useEmailForm()
   const codeForm = useCodeForm()
 
-  // Clear store values when the element unmounts
   useEffect(() => {
     return () => resetStatus()
   }, [resetStatus])
@@ -35,20 +34,19 @@ export default function ForgotPasswordForm() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 font-sans text-foreground transition-colors duration-300">
-      {/* Background Decorative Gradients */}
       <div className="pointer-events-none absolute top-[-20%] left-[-10%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
       <div className="pointer-events-none absolute right-[-10%] bottom-[-20%] h-[500px] w-[500px] rounded-full bg-accent/20 blur-[120px]" />
 
       <div className="relative z-10 w-full max-w-[440px] rounded-2xl border border-border/60 bg-card p-8 text-card-foreground shadow-xl backdrop-blur-md">
-        {/* STEP 1: Enter Email Layout */}
+        {/* STEP 1: Enter Email */}
         {currentStep === "ENTER_EMAIL" && (
           <div className="animate-in duration-300 fade-in">
             <div className="mb-8 flex flex-col items-center text-center">
               <h2 className="text-4xl font-bold tracking-tight text-foreground">
-                Forgot Password?
+                {t("step1Title")}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Enter your email address to receive a 6-digit verification code.
+                {t("step1Subtitle")}
               </p>
             </div>
 
@@ -58,7 +56,7 @@ export default function ForgotPasswordForm() {
             >
               <div className="space-y-1.5">
                 <label className="text-sm font-medium tracking-wide text-foreground/90">
-                  Email Address
+                  {t("emailLabel")}
                 </label>
                 <div className="group relative">
                   <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
@@ -68,7 +66,7 @@ export default function ForgotPasswordForm() {
                     placeholder="name@example.com"
                     type="email"
                     disabled={isLoading}
-                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-3 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-3 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
                     {...emailForm.register("email")}
                   />
                 </div>
@@ -87,14 +85,14 @@ export default function ForgotPasswordForm() {
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <span>Send Code</span>
+                  <span>{t("sendCode")}</span>
                 )}
               </Button>
             </form>
           </div>
         )}
 
-        {/* STEP 2: Verify OTP Code Layout */}
+        {/* STEP 2: Verify OTP */}
         {currentStep === "VERIFY_CODE" && (
           <div className="animate-in duration-300 zoom-in-95 fade-in">
             <div className="mb-8 flex flex-col items-center text-center">
@@ -102,10 +100,10 @@ export default function ForgotPasswordForm() {
                 <KeyRound size={20} className="text-primary-foreground" />
               </div>
               <h2 className="text-3xl font-bold tracking-tight text-foreground">
-                Enter Security Code
+                {t("step2Title")}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Please enter the 6-digit verification code sent to your email.
+                {t("step2Subtitle")}
               </p>
             </div>
 
@@ -115,7 +113,7 @@ export default function ForgotPasswordForm() {
             >
               <div className="space-y-1.5">
                 <label className="text-sm font-medium tracking-wide text-foreground/90">
-                  Verification Code
+                  {t("codeLabel")}
                 </label>
                 <div className="group relative">
                   <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
@@ -126,7 +124,7 @@ export default function ForgotPasswordForm() {
                     type="text"
                     maxLength={6}
                     disabled={isLoading}
-                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-3 pl-11 text-sm tracking-widest ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-3 pl-11 text-sm tracking-widest ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
                     {...codeForm.register("code")}
                   />
                 </div>
@@ -145,38 +143,37 @@ export default function ForgotPasswordForm() {
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <span>Verify Code</span>
+                  <span>{t("verifyCode")}</span>
                 )}
               </Button>
             </form>
           </div>
         )}
 
-        {/* STEP 3: Verification Success Layout (Route redirection setup trigger placeholder) */}
+        {/* STEP 3: Success */}
         {currentStep === "SUCCESS" && (
           <div className="flex animate-in flex-col items-center text-center duration-300 zoom-in-95 fade-in">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 shadow-md">
               <CheckCircle2 size={24} />
             </div>
             <h2 className="text-2xl font-bold tracking-tight text-foreground">
-              Identity Verified
+              {t("step3Title")}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Your security code matches. Click below to proceed and update your
-              current password credentials safely.
+              {t("step3Subtitle")}
             </p>
 
             <Button
               type="button"
               className="mt-6 h-11 w-full font-medium shadow-md"
-              onClick={() => (window.location.href = "/reset-password")} // Change window location target route as per requirement
+              onClick={() => (window.location.href = "/reset-password")}
             >
-              Reset Password Now
+              {t("resetPasswordNow")}
             </Button>
           </div>
         )}
 
-        {/* Universal Back to Sign In Nav Footer */}
+        {/* Footer */}
         {currentStep !== "SUCCESS" && (
           <div className="mt-8 text-center text-sm">
             <a
@@ -187,7 +184,7 @@ export default function ForgotPasswordForm() {
                 size={14}
                 className="transition-transform group-hover:-translate-x-0.5"
               />
-              Back to Sign In
+              {t("backToSignIn")}
             </a>
           </div>
         )}

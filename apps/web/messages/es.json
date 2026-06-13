@@ -557,5 +557,62 @@
       "linkedin": "LinkedIn"
     },
     "copyright": "Todos los derechos reservados."
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Ingrese sus credenciales para acceder a su cuenta",
+      "emailLabel": "Correo electrónico",
+      "passwordLabel": "Contraseña",
+      "forgotPassword": "¿Olvidó su contraseña?",
+      "rememberMe": "Recordarme por 30 días",
+      "signIn": "Iniciar sesión",
+      "orContinueWith": "O continuar con",
+      "continueWithGoogle": "Continuar con Google",
+      "noAccount": "¿No tiene una cuenta?",
+      "signUp": "Registrarse"
+    },
+    "register": {
+      "title": "Crear una cuenta",
+      "subtitle": "Comience con la configuración de su cuenta gratuita hoy",
+      "nameLabel": "Nombre completo",
+      "emailLabel": "Correo electrónico",
+      "passwordLabel": "Contraseña",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "agreeTerms": "Acepto los",
+      "termsOfService": "Términos de servicio",
+      "and": "y la",
+      "privacyPolicy": "Política de privacidad",
+      "mustAcceptTerms": "Debe aceptar los términos y condiciones",
+      "createAccount": "Crear cuenta",
+      "orSignUpWith": "O registrarse con",
+      "signUpWithGoogle": "Registrarse con Google",
+      "alreadyHaveAccount": "¿Ya tiene una cuenta?",
+      "signInHere": "Inicie sesión aquí"
+    },
+    "forgotPassword": {
+      "step1Title": "¿Olvidó su contraseña?",
+      "step1Subtitle": "Ingrese su correo electrónico para recibir un código de verificación de 6 dígitos.",
+      "emailLabel": "Correo electrónico",
+      "sendCode": "Enviar código",
+      "step2Title": "Ingrese el código de seguridad",
+      "step2Subtitle": "Por favor, ingrese el código de verificación de 6 dígitos enviado a su correo electrónico.",
+      "codeLabel": "Código de verificación",
+      "verifyCode": "Verificar código",
+      "step3Title": "Identidad verificada",
+      "step3Subtitle": "Su código de seguridad coincide. Haga clic a continuación para proceder y actualizar sus credenciales de contraseña de forma segura.",
+      "resetPasswordNow": "Restablecer contraseña ahora",
+      "backToSignIn": "Volver al inicio de sesión"
+    },
+    "resetPassword": {
+      "title": "Establecer nueva contraseña",
+      "subtitle": "Por favor, cree una contraseña segura y completamente única para proteger su cuenta.",
+      "newPasswordLabel": "Nueva contraseña",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "resetPassword": "Restablecer contraseña",
+      "successTitle": "Restablecimiento de contraseña completo",
+      "successSubtitle": "Su contraseña ha sido actualizada exitosamente. Ahora puede usar sus nuevas credenciales de seguridad para iniciar sesión.",
+      "signIn": "Iniciar sesión"
+    }
   }
 }
