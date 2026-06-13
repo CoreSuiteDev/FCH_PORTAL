@@ -459,41 +459,49 @@
     }
   },
 
-  "eventsPage": {
+  "eventsList": {
     "hero": {
-      "title": "Reúnase. Aprenda. Celebre. Crezca en la Fe.",
-      "description": "Los eventos de FCH reúnen a las personas para aprender, celebrar y crecer en nuestra misión compartida de catequesis y ministerio. Explore próximos encuentros, seminarios web y oportunidades para conectarse con otros que sirven a las comunidades católicas hispanas."
+      "featured": "Evento Destacado",
+      "register": "Regístrese Ahora"
     },
-    "sectionTitle": "Eventos y Encuentros",
-    "mainEvent": {
-      "title": "Próximos Seminarios Web",
-      "date": "15 de julio de 2026",
-      "time": "7:00 PM EST",
-      "location": "En línea / Zoom",
-      "button": "Regístrese Ahora"
+    "tabs": {
+      "Upcoming": "Próximos",
+      "Ongoing": "En Curso",
+      "Ended": "Finalizados"
     },
-    "subEvents": [
-      {
-        "title": "Taller de Ética Clínica",
-        "date": "02 de agosto de 2026"
+    "card": {
+      "datePrefix": "📅",
+      "locationPrefix": "📍",
+      "capacityPrefix": "👥 Capacidad:",
+      "viewDetails": "Ver Detalles"
+    },
+    "detail": {
+      "form": {
+        "title": "Regístrese Ahora",
+        "subtitle": "Por favor, ingrese sus datos a continuación.",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "email": "Correo Electrónico",
+        "phone": "Número de Teléfono",
+        "attendees": "Número de Asistentes",
+        "submit": "Confirmar Registro",
+        "placeholders": {
+          "firstName": "Juan",
+          "lastName": "Pérez",
+          "email": "juan@ejemplo.com",
+          "phone": "+880 1XXX-XXXXXX"
+        }
       },
-      {
-        "title": "Seminario sobre Atención Basada en la Fe",
-        "date": "10 de agosto de 2026"
+      "closed": {
+        "title": "Registro Cerrado",
+        "statusLabel": "Estado actual:"
       },
-      {
-        "title": "Encuentro de Liderazgo Espiritual",
-        "date": "22 de agosto de 2026"
-      },
-      {
-        "title": "Conferencia de Salud Comunitaria",
-        "date": "01 de septiembre de 2026"
+      "labels": {
+        "capacity": "Capacidad",
+        "seats": "asientos"
       }
-    ],
-    "subEventDesc": "Aprenda de expertos y participe en eventos de liderazgo a nivel mundial.",
-    "viewDetails": "Ver detalles"
+    }
   },
-
   "webinarsPage": {
     "hero": {
       "title": "Únase a Nuestros Seminarios Web",

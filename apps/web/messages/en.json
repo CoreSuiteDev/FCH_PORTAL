@@ -473,6 +473,32 @@
       "locationPrefix": "📍",
       "capacityPrefix": "👥 Capacity:",
       "viewDetails": "View Details"
+    },
+    "detail": {
+      "form": {
+        "title": "Register Now",
+        "subtitle": "Please provide your details below.",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email Address",
+        "phone": "Phone Number",
+        "attendees": "Number of Attendees",
+        "submit": "Confirm Registration",
+        "placeholders": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john@example.com",
+          "phone": "+880 1XXX-XXXXXX"
+        }
+      },
+      "closed": {
+        "title": "Registration Closed",
+        "statusLabel": "Current status:"
+      },
+      "labels": {
+        "capacity": "Capacity",
+        "seats": "seats"
+      }
     }
   },
   "webinarsPage": {

@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl"
 import DynamicHero from "@/components/shared/dynamic-hero"
 import EventsList from "./_components/event-list"
 
-export default function About() {
+export default function Event() {
   // Initialize the translations for the 'about' namespace
   const t = useTranslations("about")
 
