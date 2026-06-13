@@ -1,12 +1,9 @@
-// data.ts
-
 export interface MembershipTrend {
   month: string
   general: number
   pastoral: number
   board: number
 }
-
 export interface RecentBoardMember {
   id: number
   name: string
@@ -14,19 +11,28 @@ export interface RecentBoardMember {
   role: string
   joinedDate: string
 }
-
 export interface UserDistribution {
   tier: string
   percentage: number
   count: number
   color: string
 }
-
 export interface UpkeepMetric {
   id: number
   label: string
   value: string
   status: "good" | "warning" | "neutral"
+}
+export interface FormSubmission {
+  id: number
+  type: string
+  sender: string
+  time: string
+}
+export interface Task {
+  id: number
+  title: string
+  priority: "High" | "Medium" | "Low"
 }
 
 export const membershipTrends: MembershipTrend[] = [
@@ -60,13 +66,6 @@ export const recentBoardMembers: RecentBoardMember[] = [
     role: "Managing Director",
     joinedDate: "April 18, 2026",
   },
-  {
-    id: 4,
-    name: "Dr. Maria Hernandez",
-    email: "m.hernandez@example.com",
-    role: "Managing Director",
-    joinedDate: "April 18, 2026",
-  },
 ]
 
 export const userDistributions: UserDistribution[] = [
@@ -84,5 +83,21 @@ export const platformUpkeepMetrics: UpkeepMetric[] = [
   { id: 1, label: "Automated Renewal Success", value: "98.4%", status: "good" },
   { id: 2, label: "Payment Gateway Health", value: "100%", status: "good" },
   { id: 3, label: "System Sync Latency", value: "45ms", status: "neutral" },
-  { id: 4, label: "Pending Stripe Webhooks", value: "0", status: "good" },
+]
+
+export const recentFormSubmissions: FormSubmission[] = [
+  { id: 1, type: "Contact Form", sender: "John Doe", time: "2h ago" },
+  {
+    id: 2,
+    type: "Webinar Registration",
+    sender: "Sarah Smith",
+    time: "5h ago",
+  },
+  { id: 3, type: "Newsletter Sign-up", sender: "User_882", time: "1d ago" },
+]
+
+export const pendingTasks: Task[] = [
+  { id: 1, title: "Review New Member Application", priority: "High" },
+  { id: 2, title: "Approve Refund Request #4402", priority: "Medium" },
+  { id: 3, title: "Update Subscription Tiers", priority: "Low" },
 ]
