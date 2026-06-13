@@ -458,28 +458,6 @@
     }
   },
 
-  "eventsPage": {
-    "hero": {
-      "title": "Gather. Learn. Celebrate. Grow in Faith.",
-      "description": "FCH events bring people together to learn, celebrate, and grow in our shared mission of catechesis and ministry. Explore upcoming gatherings, webinars, and opportunities to connect with others serving Hispanic Catholic communities."
-    },
-    "sectionTitle": "Events & Gatherings",
-    "mainEvent": {
-      "title": "Upcoming Webinars",
-      "date": "July 15, 2026",
-      "time": "7:00 PM EST",
-      "location": "Online / Zoom",
-      "button": "Register Now"
-    },
-    "subEvents": [
-      { "title": "Clinical Ethics Workshop", "date": "Aug 02, 2026" },
-      { "title": "Faith-Based Care Seminar", "date": "Aug 10, 2026" },
-      { "title": "Spiritual Leadership Meet", "date": "Aug 22, 2026" },
-      { "title": "Community Health Conference", "date": "Sep 01, 2026" }
-    ],
-    "subEventDesc": "Learn from experts and join global leadership events.",
-    "viewDetails": "View details"
-  },
   "webinarsPage": {
     "hero": {
       "title": "Join Our Webinars",
