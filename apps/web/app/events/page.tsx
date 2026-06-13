@@ -1,11 +1,14 @@
 "use client"
 
 import { ReactLenis } from "@studio-freight/react-lenis"
+import { useTranslations } from "next-intl"
 
 import DynamicHero from "@/components/shared/dynamic-hero"
 import UpcomingEvents from "./components/upcoming-event"
 
-export default function About() {
+export default function EventsPage() {
+  const t = useTranslations("eventsPage.hero")
+
   return (
     <ReactLenis
       root
@@ -17,24 +20,22 @@ export default function About() {
         wheelMultiplier: 2.0,
       }}
     >
-      {/* Background Layer: Fixed position to prevent rendering issues */}
+      {/* Background Layer */}
       <div className="fixed inset-0 -z-10 bg-[url('/assets/about-baner.jpg')] bg-cover bg-center bg-no-repeat" />
 
       <main className="relative">
         <DynamicHero>
           <div className="relative z-10">
             <h2 className="mb-4 font-serif text-4xl font-bold text-white md:text-6xl">
-              Gather. Learn. Celebrate. Grow in Faith.
+              {t("title")}
             </h2>
 
             <p className="md:text-md mb-8 max-w-2xl text-white">
-              FCH events bring people together to learn, celebrate, and grow in
-              our shared mission of catechesis and ministry. Explore upcoming
-              gatherings, webinars, and opportunities to connect with others
-              serving Hispanic Catholic communities.
+              {t("description")}
             </p>
           </div>
         </DynamicHero>
+
         <UpcomingEvents />
       </main>
     </ReactLenis>

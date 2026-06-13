@@ -2,26 +2,23 @@
 
 import React from "react"
 import Container from "@/components/shared/container"
+import { useTranslations } from "next-intl"
 
 const OurJourney: React.FC = () => {
+  const t = useTranslations("about.journey")
+
   return (
     <section className="bg-white py-24">
       <Container className="mx-auto max-w-7xl">
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
           {/* Left Content */}
           <div className="space-y-6">
-            <h2 className="text-4xl text-[#800000]">Our Journey</h2>
+            <h2 className="text-4xl text-[#800000]">{t("title")}</h2>
             <p className="leading-relaxed text-gray-700">
-              Originally established as a collaborative Forum, FaithCommunity
-              evolved through a shared vision of national unity. Recognizing the
-              growing need for a dedicated, autonomous voice for Hispanic
-              catechesis, we transitioned into an independent national
-              organization.
+              {t("description1")}
             </p>
             <p className="leading-relaxed text-gray-700">
-              This transition allowed us to expand our reach, formalize our
-              leadership structures, and create more impactful partnerships with
-              dioceses and educational institutions across the country.
+              {t("description2")}
             </p>
           </div>
 
@@ -31,17 +28,17 @@ const OurJourney: React.FC = () => {
             <div className="grid grid-cols-2 overflow-hidden bg-[#F3F3F3]">
               {/* Stat 1: 20+ Years */}
               <div className="flex h-190 flex-col items-center justify-center md:h-[260px]">
-                <span className="text-5xl text-red-800">20+</span>
-                <span className="mt-2 text-sm font-semibold text-gray-600">
-                  Years of Service
+                <span className="text-5xl text-red-800">{t("years")}</span>
+                <span className="mt-2 text-sm font-semibold text-gray-666">
+                  {t("yearsLabel")}
                 </span>
               </div>
 
               {/* Stat 2: 50 Partners */}
               <div className="flex flex-col items-center justify-center bg-[#B82A32] py-12 text-white">
-                <span className="text-5xl">50</span>
+                <span className="text-5xl">{t("partners")}</span>
                 <span className="mt-2 text-sm font-medium text-white">
-                  Diocesan Partners
+                  {t("partnersLabel")}
                 </span>
               </div>
             </div>

@@ -175,6 +175,376 @@
       }
     }
   },
+
+  "about": {
+    "hero": {
+      "title": "COLABORE CON NOSOTROS EN LA MISIÓN",
+      "description": "Apoye el trabajo de FCH para promover la catequesis, la formación en la fe y el compromiso comunitario dentro de las comunidades católicas hispanas. Su patrocinio ayuda a que nuestros programas, eventos y recursos sean posibles.",
+      "buttonSponsor": "Ver niveles de patrocinio",
+      "buttonInquire": "Consulte hoy mismo"
+    },
+    "fch": {
+      "title": "Acerca de FCH",
+      "description1": "La Federación para la Catequesis con Hispanos es una organización nacional que promueve la evangelización y la catequesis para quienes sirven en el ministerio catequético en todos los niveles.",
+      "description2": "FCH asesora y apoya a los líderes que sirven a las comunidades hispanas/latinas mediante el desarrollo de líderes, la promoción de nuevos liderazgos y la identificación de recursos que fortalecen a los catequistas y al ministerio catequético.",
+      "historyTitle": "Resumen de la historia de la Federación para la Catequesis con Hispanos (FCH)",
+      "historyDescription": "La Federación para la Catequesis con Hispanos (FCH) comenzó como un Foro para la Catequesis con Hispanos dentro de la NCCL, y más tarde se convirtió en la Federación para la Catequesis con Hispanos (FCH). In 2022, FCH se convirtió en una organización nacional independiente sin fines de lucro."
+    },
+    "mission": {
+      "missionTitle": "Nuestra misión",
+      "missionText": "SERVIR A QUIENES MINISTRAN EN LA CATEQUESIS CON HISPANOS.",
+      "serveTitle": "A quiénes servimos",
+      "serveText1": "FCH está aquí para aquellos que sirven, lideran y acompañan a las comunidades hispanas/latinas en la formación en la fe y la evangelización.",
+      "serveText2": "Apoyamos a líderes diocesanos, catequistas parroquiales, voluntarios del ministerio, educadores, organizaciones y líderes pastorales en todos los niveles. Ya sea que tenga experiencia en el ministerio catequético o esté comenzando su camino, FCH brinda apoyo, orientación, recursos y una comunidad comprometida a caminar con usted."
+    },
+    "journey": {
+      "title": "Nuestro viaje",
+      "description1": "Establecido originalmente como un foro de colaboración, FaithCommunity evolucionó a través de una visión compartida de unidad nacional. Al reconocer la creciente necesidad de una voz dedicada y autónoma para la catequesis hispana, nos convertimos en una organización nacional independiente.",
+      "description2": "Esta transición nos permitió ampliar nuestro alcance, formalizar nuestras estructuras de liderazgo y crear asociaciones de mayor impacto con diócesis e instituciones educativas en todo el país.",
+      "years": "20+",
+      "yearsLabel": "Años de servicio",
+      "partners": "50",
+      "partnersLabel": "Socios diocesanos"
+    },
+    "approach": {
+      "title": "Nuestro enfoque profesional",
+      "subtitle": "Una metodología holística que combina la tradición con los estándares profesionales modernos.",
+      "cards": [
+        {
+          "title": "Fundamentos teológicos",
+          "description": "Basamos nuestro trabajo en un estudio teológico sólido, asegurando que todos los líderes catequéticos estén bien equipados con las herramientas intelectuales necesarias para enseñar la fe."
+        },
+        {
+          "title": "Competencia cultural",
+          "description": "Uniendo idiomas y tradiciones con gracia."
+        },
+        {
+          "title": "Desarrollo de liderazgo",
+          "description": "Fomentando las habilidades administrativas y la planificación estratégica para las organizaciones de la iglesia."
+        },
+        {
+          "title": "Crecimiento espiritual",
+          "description": "La formación no es solo profesional; es personal. Brindamos retiros y dirección espiritual adaptados a las necesidades de quienes desempeñan funciones ministeriales de alta intensidad."
+        }
+      ]
+    },
+    "board": {
+      "title": "Miembros de la junta",
+      "members": [
+        {
+          "name": "Dr. Elena Rodriguez",
+          "role": "Presidenta",
+          "bio": "Experta en catequesis hispana con más de 20 años de experiencia académica."
+        },
+        {
+          "name": "Rev. Michael Thorne",
+          "role": "Asesor estratégico",
+          "bio": "Dedicado a fomentar el crecimiento administrativo y las asociaciones diocesanas."
+        },
+        {
+          "name": "Sarah Jenkins",
+          "role": "Directora de enlace comunitario",
+          "bio": "Se enfoca en el compromiso comunitario y las iniciativas educativas basadas en la fe."
+        }
+      ]
+    },
+    "objectives": {
+      "title": "OBJETIVOS DE\nCOLABORACIÓN",
+      "items": [
+        {
+          "title": "Mejorar la misión",
+          "description": "Trabajando junto a la Iglesia para profundizar su impacto en las comunidades hispanas."
+        },
+        {
+          "title": "Construir puentes",
+          "description": "Fomentando la colaboración entre diversas organizaciones nacionales y locales."
+        },
+        {
+          "title": "Compartir recursos",
+          "description": "Creando un centro neurálgico para materiales catequéticos bilingües e investigación."
+        },
+        {
+          "title": "Promover la inclusión",
+          "description": "Asegurando que las voces hispanas estén representadas en todos los niveles de liderazgo."
+        }
+      ]
+    },
+    "connect": {
+      "title": "Conéctese con nosotros",
+      "description": "¿Tiene preguntas o desea colaborar? Nuestro liderazgo está listo para escucharle.",
+      "button": "Contáctenos"
+    }
+  },
+
+  "membership": {
+    "hero": {
+      "title": "Únase a una Comunidad Comprometida\ncon la Fe, la Formación y el Servicio",
+      "description": "Únase a FCH y forme parte de una comunidad llena de fe que trabaja unida para apoyar la catequesis, el liderazgo y la formación dentro de las comunidades católicas hispanas."
+    },
+    "whyJoin": {
+      "subtitle": "Fundación",
+      "title": "¿POR QUÉ UNIRSE A FCH CATEQUESIS?",
+      "features": {
+        "community": {
+          "title": "Impacto Comunitario",
+          "desc": "Conéctese con una red nacional de profesionales de la salud dedicados a integrar una atención basada en la fe en la práctica clínica moderna."
+        },
+        "ethical": {
+          "title": "Crecimiento Ético",
+          "desc": "Acceda a recursos exclusivos sobre ética clínica, guiando su trayectoria profesional a través de los complejos escenarios de la atención médica con claridad moral."
+        },
+        "spiritual": {
+          "title": "Apoyo Espiritual",
+          "desc": "Reciba reflexiones espirituales diarias y únase a grupos de oración adaptados a los desafíos y logros únicos de la profesión médica."
+        },
+        "resources": {
+          "title": "Recursos y Redes de Contacto",
+          "desc": "Acceda a recursos valiosos, información del sector y oportunidades de networking para conectar, colaborar, crecer profesionalmente y alcanzar sus objetivos."
+        }
+      }
+    },
+    "packages": {
+      "plan": "Plan de Membresía",
+      "title": "Seleccione Su Nivel de Acceso al Espacio de Trabajo",
+      "monthly": "Mensual",
+      "yearly": "Anual",
+      "recommended": "Recomendado",
+      "monthSuffix": "mes",
+      "yearSuffix": "año",
+      "select": "Seleccionar Plan",
+      "items": {
+        "general": {
+          "title": "Área General",
+          "description": "Acceso a herramientas comunitarias fundamentales, actualizaciones de contenido estándar y seminarios web básicos de la red.",
+          "features": [
+            "Acceso al Inicio del Panel",
+            "Canal de Anuncios",
+            "Calendario de Eventos para Miembros",
+            "Acceso a Seminarios Web Estándar"
+          ]
+        },
+        "pastoral": {
+          "title": "Recursos Pastorales",
+          "description": "Herramientas avanzadas diseñadas específicamente para la administración parroquial, la enseñanza catequética y el liderazgo regional.",
+          "features": [
+            "Todo lo incluido en el Área General",
+            "Biblioteca de Aprendizaje y Herramientas Catequéticas",
+            "Herramientas para el Liderazgo Pastoral y Ministerial",
+            "Recursos Compartidos para Parroquias y Diócesis",
+            "Seminarios Web Avanzados y Contenido Especial"
+          ]
+        }
+      }
+    },
+    "checkout": {
+      "back": "Volver al Registro de Precios",
+      "selectedPackage": "Paquete de Configuración Seleccionado",
+      "includedFeatures": "Características Principales Incluidas:",
+      "pricePerMonth": "mes",
+      "pricePerYear": "año",
+      "disclaimer": "Se está suscribiendo al plan {cycle}. Una vez realizado el pago, las reglas de control de acceso se aplicarán a su cuenta.",
+      "gateway": "Integración de Pasarela de Pago",
+      "cardholder": "Nombre del Titular de la Tarjeta",
+      "cardNumber": "Número de Tarjeta",
+      "expiration": "Fecha de Expiración",
+      "cvc": "CVC",
+      "baseTier": "Acceso al Nivel Base:",
+      "processingFee": "Tarifa de Procesamiento / Configuración:",
+      "totalBillable": "Monto Total a Facturar:",
+      "completeCheckout": "Completar Pago: ${amount}",
+      "secureToken": "Validación Segura del Nodo de Suscripción con Tokenización.",
+      "successTitle": "¡Pago Exitoso!",
+      "successDesc": "Ha desbloqueado correctamente el acceso al entorno de trabajo del nivel {packageName}.",
+      "goToDashboard": "Ir al Panel del Espacio de Trabajo"
+    }
+  },
+  "sponsorship": {
+    "hero": {
+      "title": "Asóciese con Nosotros en la Misión",
+      "description": "Apoye la labor de FCH en el fortalecimiento de la catequesis, la formación en la fe y la participación comunitaria dentro de las comunidades católicas hispanas. Su patrocinio hace posibles nuestros programas, eventos y recursos.",
+      "buttonSponsor": "Ver Niveles de Patrocinio",
+      "buttonInquire": "Solicite Información Hoy"
+    },
+    "tiers": {
+      "sectionTitle": "Patrocinios y\nBeneficios para los Patrocinadores",
+      "cta": "Conviértase en Patrocinador",
+      "items": [
+        {
+          "id": "diamond",
+          "tierLabel": "Nivel Uno",
+          "title": "Patrocinio Diamante",
+          "price": "$3,000",
+          "period": "/1 Año",
+          "isFeatured": true,
+          "features": [
+            "Ubicación prioritaria en la lista de miembros asociados",
+            "Logotipo con enlace directo al sitio web",
+            "Patrocinio de 3 seminarios web con presentación de productos",
+            "Beca de $500 para la educación de jóvenes adultos",
+            "Espacio de exhibición gratuito en las Conferencias Regionales",
+            "Logotipo destacado en la página principal con enlace"
+          ]
+        },
+        {
+          "id": "platinum",
+          "tierLabel": "Nivel Dos",
+          "title": "Patrocinio Platino",
+          "price": "$2,500",
+          "period": "/1 Año",
+          "features": [
+            "Inclusión en la lista de miembros asociados",
+            "Logotipo con enlace directo al sitio web",
+            "Patrocinio de 2 seminarios web con presentación de productos",
+            "Beca de $500 para la educación de jóvenes adultos",
+            "Espacio de exhibición gratuito en las Conferencias Regionales"
+          ]
+        },
+        {
+          "id": "gold",
+          "tierLabel": "Nivel Tres",
+          "title": "Oro",
+          "price": "$2,000",
+          "period": "/1 Año",
+          "features": [
+            "Listado del logotipo con enlace",
+            "Patrocinio de 2 seminarios web",
+            "50% de descuento en el espacio de exhibición"
+          ]
+        },
+        {
+          "id": "silver",
+          "tierLabel": "Nivel Cuatro",
+          "title": "Plata",
+          "price": "$1,000",
+          "period": "/1 Año",
+          "features": [
+            "Inclusión en la lista de miembros asociados",
+            "Patrocinio de 1 seminario web por año"
+          ]
+        },
+        {
+          "id": "bronze",
+          "tierLabel": "Nivel Cinco",
+          "title": "Bronce",
+          "price": "$500",
+          "period": "/1 Año",
+          "features": ["Inclusión en nuestra lista de miembros asociados"]
+        }
+      ]
+    },
+    "whyPartner": {
+      "title": "¿Por Qué Asociarse con Nosotros?",
+      "description": "FCH está comprometida con la excelencia en la evangelización y la catequesis. Su patrocinio impacta directamente a la próxima generación de líderes en la fe y nos ayuda a proporcionar recursos educativos de alta calidad a toda nuestra red.",
+      "stats": [
+        {
+          "value": 5000,
+          "label": "Miembros de la Comunidad"
+        },
+        {
+          "value": 20,
+          "label": "Seminarios Web Anuales"
+        }
+      ]
+    },
+    "haveQuestions": {
+      "title": "¿TIENE PREGUNTAS\nSOBRE EL PATROCINIO?",
+      "description": "Envíenos sus preguntas, necesidades o temas que le gustaría conversar. Estamos aquí para ayudarle a encontrar el nivel de colaboración adecuado para su organización.",
+      "button": "Contáctenos"
+    }
+  },
+  "newsPage": {
+    "hero": {
+      "title": "Mantente conectado con la comunidad de FCH",
+      "description": "Explora las últimas actualizaciones de FCH, historias de la comunidad, momentos destacados del ministerio y reflexiones que celebran nuestra misión compartida de fe, formación y servicio."
+    }
+  },
+
+  "eventsPage": {
+    "hero": {
+      "title": "Reúnase. Aprenda. Celebre. Crezca en la Fe.",
+      "description": "Los eventos de FCH reúnen a las personas para aprender, celebrar y crecer en nuestra misión compartida de catequesis y ministerio. Explore próximos encuentros, seminarios web y oportunidades para conectarse con otros que sirven a las comunidades católicas hispanas."
+    },
+    "sectionTitle": "Eventos y Encuentros",
+    "mainEvent": {
+      "title": "Próximos Seminarios Web",
+      "date": "15 de julio de 2026",
+      "time": "7:00 PM EST",
+      "location": "En línea / Zoom",
+      "button": "Regístrese Ahora"
+    },
+    "subEvents": [
+      {
+        "title": "Taller de Ética Clínica",
+        "date": "02 de agosto de 2026"
+      },
+      {
+        "title": "Seminario sobre Atención Basada en la Fe",
+        "date": "10 de agosto de 2026"
+      },
+      {
+        "title": "Encuentro de Liderazgo Espiritual",
+        "date": "22 de agosto de 2026"
+      },
+      {
+        "title": "Conferencia de Salud Comunitaria",
+        "date": "01 de septiembre de 2026"
+      }
+    ],
+    "subEventDesc": "Aprenda de expertos y participe en eventos de liderazgo a nivel mundial.",
+    "viewDetails": "Ver detalles"
+  },
+
+  "webinarsPage": {
+    "hero": {
+      "title": "Únase a Nuestros Seminarios Web",
+      "description": "Los seminarios web de FCH brindan oportunidades de formación virtual para catequistas, líderes ministeriales y comunidades pastorales que sirven a los católicos hispanos. A través de seminarios en vivo y recursos bajo demanda, FCH está construyendo una Biblioteca de Aprendizaje en crecimiento para apoyar la formación en la fe, el desarrollo de liderazgo y el servicio ministerial en toda nuestra comunidad."
+    },
+    "upcoming": {
+      "heading": "PRÓXIMOS EVENTOS",
+      "text": "Participe en seminarios web en vivo y sesiones de formación diseñadas para profesionales de la salud y líderes ministeriales.",
+      "features": [
+        "Sesiones de formación en vivo dirigidas por expertos",
+        "Discusiones interactivas de preguntas y respuestas",
+        "Herramientas prácticas para el ministerio"
+      ],
+      "button": "Unirse al Seminario Web",
+      "bannerTitle": "Serie de Seminarios Web en Vivo 2026",
+      "bannerSubtitle": "Formación • Liderazgo • Crecimiento"
+    },
+    "past": {
+      "heading": "SEMINARIOS WEB ANTERIORES",
+      "items": [
+        {
+          "title": "Integración de Fe y Salud",
+          "image": "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "title": "Ética en el Ministerio Clínico",
+          "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "title": "Liderazgo Espiritual Comunitario",
+          "image": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "title": "Taller de Crecimiento Ministerial",
+          "image": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    },
+
+    "footer": {
+      "text": "¿Quiere acceso a todos los seminarios web y contenido exclusivo?",
+      "button": "Conviértase en Miembro"
+    }
+  },
+  "donateCard": {
+    "title": "Donar",
+    "prompt": "¿Cuánto te gustaría donar hoy?",
+    "customPlaceholder": "Otro",
+    "button": "Siguiente",
+    "amounts": [10, 20, 30, 40, 50]
+  },
   "footer": {
     "nav": {
       "about": "Sobre nosotros",

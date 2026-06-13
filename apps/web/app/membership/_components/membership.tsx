@@ -6,10 +6,12 @@ import { Check } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { usePackageStore } from "@/store/use-membership-store"
 import { MEMBERSHIP_REGISTRY } from "@/constants/membership"
+import { useTranslations } from "next-intl"
 
 export default function MembershipPackages() {
   const router = useRouter()
   const { selectPackage, billingCycle, setBillingCycle } = usePackageStore()
+  const t = useTranslations("membership.packages")
 
   const handleSelection = (tier: any) => {
     selectPackage(tier)
@@ -21,6 +23,19 @@ export default function MembershipPackages() {
     return Math.round(price * 10) // 2 months free calculation
   }
 
+  const registryItems = Object.values(MEMBERSHIP_REGISTRY).map((pkg) => {
+    const localizedTitle = t(`items.${pkg.id}.title`)
+    const localizedDescription = t(`items.${pkg.id}.description`)
+    const localizedFeatures = t.raw(`items.${pkg.id}.features`) as string[]
+
+    return {
+      ...pkg,
+      title: localizedTitle,
+      description: localizedDescription,
+      features: localizedFeatures,
+    }
+  })
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#F6F4F2] px-4 py-20">
       <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-[#E5DCD5]/40 blur-[130px]" />
@@ -28,10 +43,10 @@ export default function MembershipPackages() {
       <div className="relative z-10 mx-auto max-w-4xl">
         <div className="mb-16 text-center">
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold tracking-widest text-primary uppercase">
-            Membership Plan
+            {t("plan")}
           </span>
           <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-[#2C2927] sm:text-5xl">
-            Select Your Workspace Access Level
+            {t("title")}
           </h1>
 
           <div className="mt-8 inline-flex items-center rounded-full border border-border bg-white p-1 shadow-sm">
@@ -43,7 +58,7 @@ export default function MembershipPackages() {
                   : "text-muted-foreground"
               }`}
             >
-              Monthly
+              {t("monthly")}
             </button>
             <button
               onClick={() => setBillingCycle("yearly")}
@@ -53,13 +68,13 @@ export default function MembershipPackages() {
                   : "text-muted-foreground"
               }`}
             >
-              Yearly
+              {t("yearly")}
             </button>
           </div>
         </div>
 
         <div className="mx-auto grid max-w-3xl items-stretch gap-8 md:grid-cols-2">
-          {Object.values(MEMBERSHIP_REGISTRY).map((item) => {
+          {registryItems.map((item) => {
             const isPastoral = item.id === "pastoral"
 
             return (
@@ -73,7 +88,7 @@ export default function MembershipPackages() {
               >
                 {isPastoral && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold tracking-wider text-primary-foreground uppercase">
-                    Recommended
+                    {t("recommended")}
                   </span>
                 )}
 
@@ -92,7 +107,7 @@ export default function MembershipPackages() {
                       ${getPrice(item.price)}
                     </span>
                     <span className="ml-1.5 text-xs text-muted-foreground">
-                      / {billingCycle === "monthly" ? "month" : "year"}
+                      / {billingCycle === "monthly" ? t("monthSuffix") : t("yearSuffix")}
                     </span>
                   </div>
 
@@ -115,7 +130,7 @@ export default function MembershipPackages() {
                   variant={isPastoral ? "default" : "secondary"}
                   className="h-11 w-full font-semibold"
                 >
-                  Select Package
+                  {t("select")}
                 </Button>
               </div>
             )

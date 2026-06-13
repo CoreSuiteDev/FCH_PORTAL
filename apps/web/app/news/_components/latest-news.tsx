@@ -58,11 +58,11 @@ export function LatestNewsSection() {
                 </div>
               </div>
 
-              <div className="px-6 pb-6">
+              <Link href={`/news/${news.id}`}>
                 <Button className="w-full bg-[#b91c1c] py-5 text-white hover:bg-[#991b1b]">
                   {t("readMore")}
                 </Button>
-              </div>
+              </Link>
             </div>
           ))}
         </div>

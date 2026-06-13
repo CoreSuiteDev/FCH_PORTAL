@@ -1,12 +1,15 @@
 "use client"
 
 import { ReactLenis } from "@studio-freight/react-lenis"
+import { useTranslations } from "next-intl"
 
 import DynamicHero from "@/components/shared/dynamic-hero"
 import WhyJoin from "./_components/why-join"
 import MembershipPackages from "./_components/membership"
 
 export default function Membership() {
+  const t = useTranslations("membership.hero")
+
   return (
     <ReactLenis
       root
@@ -24,14 +27,12 @@ export default function Membership() {
       <main className="relative">
         <DynamicHero>
           <div className="relative z-10">
-            <h2 className="mb-4 font-serif text-4xl font-bold text-white md:text-6xl">
-              Join a Community Committed <br /> to Faith, Formation, and Service
+            <h2 className="mb-4 font-serif text-4xl font-bold text-white md:text-6xl whitespace-pre-line">
+              {t("title")}
             </h2>
 
             <p className="mb-8 max-w-2xl text-white md:text-lg">
-              Join FCH and become part of a faith-filled community working
-              together to support catechesis, leadership, and formation within
-              Hispanic Catholic communities.
+              {t("description")}
             </p>
           </div>
         </DynamicHero>
