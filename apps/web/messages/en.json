@@ -458,6 +458,23 @@
     }
   },
 
+  "eventsList": {
+    "hero": {
+      "featured": "Featured Event",
+      "register": "Register Now"
+    },
+    "tabs": {
+      "Upcoming": "Upcoming",
+      "Ongoing": "Ongoing",
+      "Ended": "Ended"
+    },
+    "card": {
+      "datePrefix": "📅",
+      "locationPrefix": "📍",
+      "capacityPrefix": "👥 Capacity:",
+      "viewDetails": "View Details"
+    }
+  },
   "webinarsPage": {
     "hero": {
       "title": "Join Our Webinars",

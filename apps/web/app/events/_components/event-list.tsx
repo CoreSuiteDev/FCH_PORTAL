@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useTranslations } from "next-intl" // Import this
 import { Card } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -15,6 +16,7 @@ import { events, EventStatus } from "@/constants/upcoming-events-data"
 import Container from "@/components/shared/container"
 
 export default function EventsList() {
+  const t = useTranslations("eventsList") // Hook to access your JSON
   const [activeTab, setActiveTab] = useState<EventStatus>("Upcoming")
 
   const upcomingEvents = events.filter((e) => e.status === "Upcoming")
@@ -35,7 +37,7 @@ export default function EventsList() {
             />
             <div className="relative z-10">
               <span className="mb-2 inline-block rounded-full bg-white/20 px-4 py-1 text-xs font-semibold backdrop-blur-md">
-                Featured Event
+                {t("hero.featured")}
               </span>
               <h1 className="text-5xl font-bold">{heroEvent.title}</h1>
               <p className="mt-2 max-w-xl text-lg text-gray-200">
@@ -43,14 +45,14 @@ export default function EventsList() {
               </p>
               <Link href={`/events/${heroEvent.id}`}>
                 <Button className="mt-6 w-fit rounded-full bg-white px-8 text-black hover:bg-gray-200">
-                  Register Now
+                  {t("hero.register")}
                 </Button>
               </Link>
             </div>
           </section>
         )}
 
-        {/* Premium Pill-Shaped Tabs */}
+        {/* Tabs */}
         <Tabs
           defaultValue="Upcoming"
           onValueChange={(v) => setActiveTab(v as EventStatus)}
@@ -65,7 +67,7 @@ export default function EventsList() {
                     value={status}
                     className="h-full flex-1 rounded-full px-3 py-2.5 text-sm font-semibold transition-all data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
                   >
-                    {status}
+                    {t(`tabs.${status}`)}
                   </TabsTrigger>
                 )
               )}
@@ -100,17 +102,21 @@ export default function EventsList() {
                       </h3>
                       <div className="mt-4 flex-1 space-y-3 text-sm text-gray-600">
                         <p>
-                          📅 {item.date} • {item.time}
+                          {t("card.datePrefix")} {item.date} • {item.time}
                         </p>
-                        <p>📍 {item.location}</p>
-                        <p>👥 Capacity: {item.capacity}</p>
+                        <p>
+                          {t("card.locationPrefix")} {item.location}
+                        </p>
+                        <p>
+                          {t("card.capacityPrefix")} {item.capacity}
+                        </p>
                       </div>
                       <Link href={`/events/${item.id}`} className="mt-6">
                         <Button
                           variant="outline"
                           className="w-full rounded-xl border-primary text-primary hover:bg-primary hover:text-white"
                         >
-                          View Details
+                          {t("card.viewDetails")}
                         </Button>
                       </Link>
                     </div>
