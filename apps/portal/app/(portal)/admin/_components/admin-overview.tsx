@@ -209,22 +209,34 @@ export default function AdminDashboard() {
       </Card>
 
       {/* LOWER SECTION */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {/* Recent Board Members */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <ShieldCheck className="h-4 w-4 text-purple-600" /> Recent
-              Appointments
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Recent Appointments */}
+        <Card className="overflow-hidden rounded-2xl border-slate-200 bg-white/50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] backdrop-blur-sm">
+          <CardHeader className="border-b border-slate-100/60 px-6 py-5">
+            <CardTitle className="flex items-center gap-3 text-sm font-bold tracking-tight text-slate-800">
+              <div className="rounded-lg bg-purple-100 p-1.5">
+                <ShieldCheck className="h-4 w-4 text-purple-600" />
+              </div>
+              RECENT APPOINTMENTS
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 p-6">
             {recentBoardMembers.slice(0, 3).map((m) => (
-              <div key={m.id} className="flex items-center justify-between">
-                <span className="text-sm font-medium">{m.name}</span>
+              <div
+                key={m.id}
+                className="group flex items-center justify-between rounded-xl p-3 transition-all duration-200 hover:bg-slate-50"
+              >
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-slate-900">
+                    {m.name}
+                  </span>
+                  <span className="text-[11px] font-medium text-slate-400 uppercase">
+                    New Member
+                  </span>
+                </div>
                 <Badge
-                  variant="outline"
-                  className="border-purple-200 bg-purple-50 text-purple-700"
+                  variant="secondary"
+                  className="rounded-md border-none bg-purple-50 px-2.5 py-0.5 font-medium text-purple-600"
                 >
                   {m.role}
                 </Badge>
@@ -233,44 +245,53 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Pending Tasks */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <AlertCircle className="h-4 w-4 text-rose-600" /> Urgent Tasks
+        {/* Urgent Tasks */}
+        <Card className="overflow-hidden rounded-2xl border-slate-200 bg-white/50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] backdrop-blur-sm">
+          <CardHeader className="border-b border-slate-100/60 px-6 py-5">
+            <CardTitle className="flex items-center gap-3 text-sm font-bold tracking-tight text-slate-800">
+              <div className="rounded-lg bg-rose-100 p-1.5">
+                <AlertCircle className="h-4 w-4 text-rose-600" />
+              </div>
+              URGENT TASKS
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 p-6">
             {pendingTasks.slice(0, 3).map((t) => (
               <div
                 key={t.id}
-                className="flex items-center justify-between text-sm"
+                className="group flex items-center justify-between rounded-xl border border-slate-100 p-3 transition-all hover:border-rose-200"
               >
-                {t.title}
-                <Badge
-                  className={
-                    t.priority === "High" ? "bg-rose-500" : "bg-sky-500"
-                  }
-                >
-                  {t.priority}
-                </Badge>
+                <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">
+                  {t.title}
+                </span>
+                <div
+                  className={`h-2 w-2 rounded-full ${t.priority === "High" ? "bg-rose-500" : "bg-sky-500"}`}
+                />
               </div>
             ))}
           </CardContent>
         </Card>
 
-        {/* Infrastructure */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Activity className="h-4 w-4 text-emerald-600" /> System Status
+        {/* System Status */}
+        <Card className="overflow-hidden rounded-2xl border-slate-200 bg-white/50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] backdrop-blur-sm">
+          <CardHeader className="border-b border-slate-100/60 px-6 py-5">
+            <CardTitle className="flex items-center gap-3 text-sm font-bold tracking-tight text-slate-800">
+              <div className="rounded-lg bg-emerald-100 p-1.5">
+                <Activity className="h-4 w-4 text-emerald-600" />
+              </div>
+              SYSTEM STATUS
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="grid grid-cols-2 gap-4 p-6">
             {platformUpkeepMetrics.map((m) => (
-              <div key={m.id} className="flex justify-between text-sm">
-                <span className="text-slate-600">{m.label}</span>
-                <span className="font-bold text-emerald-600">{m.value}</span>
+              <div
+                key={m.id}
+                className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4"
+              >
+                <p className="mb-1 text-[10px] font-bold text-slate-400 uppercase">
+                  {m.label}
+                </p>
+                <p className="text-lg font-black text-slate-800">{m.value}</p>
               </div>
             ))}
           </CardContent>
