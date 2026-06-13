@@ -175,6 +175,383 @@
       }
     }
   },
+
+  "about": {
+    "hero": {
+      "title": "PARTNER WITH US IN MISSION",
+      "description": "Support FCH's work in advancing catechesis, faith formation, and community engagement within Hispanic Catholic communities. Your sponsorship helps make our programs, events, and resources possible.",
+      "buttonSponsor": "View Sponsorship Tiers",
+      "buttonInquire": "Inquire Today"
+    },
+    "fch": {
+      "title": "About FCH",
+      "description1": "The Federation for Catechesis with Hispanics is a national organization that promotes evangelization and catechesis for those who serve in catechetical ministry at every level.",
+      "description2": "FCH mentors and supports leaders who serve Hispanic/Latino communities by developing leaders, promoting new leadership, and identifying resources that strengthen catechists and catechetical ministry.",
+      "historyTitle": "Overview of the Federation for Catechesis with Hispanics (FCH) History",
+      "historyDescription": "The Federation for Catechesis with Hispanics (FCH) started as a Forum for Catechesis with Hispanics within NCCL, and later became the Federation for Catechesis with Hispanics (FCH). In 2022, FCH became an independent not-for-profit national organization."
+    },
+    "mission": {
+      "missionTitle": "Our Mission",
+      "missionText": "TO SERVE THOSE WHO MINISTER IN CATECHESIS WITH HISPANICS.",
+      "serveTitle": "Who We Serve",
+      "serveText1": "FCH is here for those who serve, lead, and accompany Hispanic/Latino communities in faith formation and evangelization.",
+      "serveText2": "We support diocesan leaders, parish catechists, ministry volunteers, educators, organizations, and pastoral leaders at every level. Whether you are experienced in catechetical ministry or just beginning your journey, FCH provides support, guidance, resources, and a community committed to walking with you."
+    },
+    "journey": {
+      "title": "Our Journey",
+      "description1": "Originally established as a collaborative Forum, FaithCommunity evolved through a shared vision of national unity. Recognizing the growing need for a dedicated, autonomous voice for Hispanic catechesis, we transitioned into an independent national organization.",
+      "description2": "This transition allowed us to expand our reach, formalize our leadership structures, and create more impactful partnerships with dioceses and educational institutions across the country.",
+      "years": "20+",
+      "yearsLabel": "Years of Service",
+      "partners": "50",
+      "partnersLabel": "Diocesan Partners"
+    },
+    "approach": {
+      "title": "Our Professional Approach",
+      "subtitle": "A holistic methodology combining tradition with modern professional standards.",
+      "cards": [
+        {
+          "title": "Theological Foundations",
+          "description": "We ground our work in sound theological study, ensuring that all catechetical leaders are well-equipped with the intellectual tools required for teaching the faith."
+        },
+        {
+          "title": "Cultural Competency",
+          "description": "Bridging languages and traditions with grace."
+        },
+        {
+          "title": "Leadership Development",
+          "description": "Fostering administrative skills and strategic planning for church organizations."
+        },
+        {
+          "title": "Spiritual Growth",
+          "description": "Formation isn't just professional; it's personal. We provide retreats and spiritual direction tailored for the needs of those in high-intensity ministry roles."
+        }
+      ]
+    },
+    "board": {
+      "title": "Board Members",
+      "members": [
+        {
+          "name": "Dr. Elena Rodriguez",
+          "role": "Chairperson",
+          "bio": "Expert in Hispanic catechesis with over 20 years of academic experience."
+        },
+        {
+          "name": "Rev. Michael Thorne",
+          "role": "Strategic Advisor",
+          "bio": "Dedicated to fostering administrative growth and diocesan partnerships."
+        },
+        {
+          "name": "Sarah Jenkins",
+          "role": "Director of Outreach",
+          "bio": "Focuses on community engagement and faith-based educational initiatives."
+        }
+      ]
+    },
+    "objectives": {
+      "title": "COLLABORATION\nOBJECTIVES",
+      "items": [
+        {
+          "title": "Enhance Mission",
+          "description": "Working alongside the Church to deepen its impact in Hispanic communities."
+        },
+        {
+          "title": "Build Bridges",
+          "description": "Fostering collaboration between various national and local organizations."
+        },
+        {
+          "title": "Share Resources",
+          "description": "Creating a central hub for bilingual catechetical materials and research."
+        },
+        {
+          "title": "Advocate Inclusion",
+          "description": "Ensuring Hispanic voices are represented at all levels of leadership."
+        }
+      ]
+    },
+    "connect": {
+      "title": "Connect With Us",
+      "description": "Have questions or want to partner? Our leadership is ready to hear from you.",
+      "button": "Contact Us"
+    }
+  },
+  "membership": {
+    "hero": {
+      "title": "Join a Community Committed\nto Faith, Formation, and Service",
+      "description": "Join FCH and become part of a faith-filled community working together to support catechesis, leadership, and formation within Hispanic Catholic communities."
+    },
+    "whyJoin": {
+      "subtitle": "Foundation",
+      "title": "WHY JOIN FCH CATECHESIS?",
+      "features": {
+        "community": {
+          "title": "Community Impact",
+          "desc": "Connect with a nationwide network of healthcare professionals dedicated to integrating faith-based care into modern clinical practice."
+        },
+        "ethical": {
+          "title": "Ethical Growth",
+          "desc": "Access exclusive resources on clinical ethics, guiding your professional journey through complex healthcare landscapes with moral clarity."
+        },
+        "spiritual": {
+          "title": "Spiritual Support",
+          "desc": "Receive daily spiritual briefs and join prayer groups tailored for the unique challenges and triumphs of the medical profession."
+        },
+        "resources": {
+          "title": "Resources and networking",
+          "desc": "Access valuable resources, industry insights, and networking opportunities to connect, collaborate, grow professionally, and achieve your goals."
+        }
+      }
+    },
+    "packages": {
+      "plan": "Membership Plan",
+      "title": "Select Your Workspace Access Level",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "recommended": "Recommended",
+      "monthSuffix": "month",
+      "yearSuffix": "year",
+      "select": "Select Package",
+      "items": {
+        "general": {
+          "title": "General Area",
+          "description": "Access to fundamental community tools, standard content updates, and basic network webinars.",
+          "features": [
+            "Dashboard Home access",
+            "Announcements Feed",
+            "Member Events Calendar",
+            "Standard Webinars Access"
+          ]
+        },
+        "pastoral": {
+          "title": "Pastoral Resources",
+          "description": "Advanced toolkits explicitly engineered for comprehensive parish administration, catechetical teaching, and regional leadership.",
+          "features": [
+            "Everything in General Area",
+            "Learning Library & Catechetical Tools",
+            "Pastoral Leadership & Ministry Toolkits",
+            "Parish & Diocese Shared Resources",
+            "Advanced Webinars & Special Content"
+          ]
+        }
+      }
+    },
+    "checkout": {
+      "back": "Back to Pricing Registry",
+      "selectedPackage": "Selected Configuration Package",
+      "includedFeatures": "Included Core Features:",
+      "pricePerMonth": "month",
+      "pricePerYear": "year",
+      "disclaimer": "You are subscribing to the {cycle} plan. Upon payment, access control rules will be applied to your account.",
+      "gateway": "Payment Gateway Integration",
+      "cardholder": "Cardholder Name",
+      "cardNumber": "Card Number",
+      "expiration": "Expiration",
+      "cvc": "CVC",
+      "baseTier": "Base Tier Access:",
+      "processingFee": "Processing / Setup Fee:",
+      "totalBillable": "Total Billable Amount:",
+      "completeCheckout": "Complete Checkout: ${amount}",
+      "secureToken": "Secure Tokenized Subscription Node Validation.",
+      "successTitle": "Payment Successful!",
+      "successDesc": "You have successfully unlocked access to the {packageName} tier workspace environment.",
+      "goToDashboard": "Go to Workspace Dashboard"
+    }
+  },
+  "sponsorship": {
+    "hero": {
+      "title": "Partner With Us in Mission",
+      "description": "Support FCH’s work in advancing catechesis, faith formation, and community engagement within Hispanic Catholic communities. Your sponsorship helps make our programs, events, and resources possible.",
+      "buttonSponsor": "View Sponsorship Tiers",
+      "buttonInquire": "Inquire Today"
+    },
+    "tiers": {
+      "sectionTitle": "Sponsorships and\nSponsors Benefits",
+      "cta": "Become a Sponsor",
+      "items": [
+        {
+          "id": "diamond",
+          "tierLabel": "Tier One",
+          "title": "Diamond Sponsorship",
+          "price": "$3,000",
+          "period": "/1 Year",
+          "isFeatured": true,
+          "features": [
+            "Priority listing on Partner Membership List",
+            "Logo with direct website link",
+            "Sponsor 3 webinars with product presentation",
+            "$500 scholarship for young adult education",
+            "Free exhibit space at Regional Conferences",
+            "Logo featured on home page with link"
+          ]
+        },
+        {
+          "id": "platinum",
+          "tierLabel": "Tier Two",
+          "title": "Platinum Sponsorship",
+          "price": "$2,500",
+          "period": "/1 Year",
+          "features": [
+            "Listing on Partner Membership List",
+            "Logo with direct website link",
+            "Sponsor 2 webinars with product presentation",
+            "$500 scholarship for young adult education",
+            "Free exhibit space at Regional Conferences"
+          ]
+        },
+        {
+          "id": "gold",
+          "tierLabel": "Tier Three",
+          "title": "Gold",
+          "price": "$2,000",
+          "period": "/1 Year",
+          "features": [
+            "Logo listing with link",
+            "Sponsor 2 webinars",
+            "Half-off booth exhibit space"
+          ]
+        },
+        {
+          "id": "silver",
+          "tierLabel": "Tier Four",
+          "title": "Silver",
+          "price": "$1,000",
+          "period": "/1 Year",
+          "features": [
+            "Partner Membership Listing",
+            "Sponsor 1 webinar per year"
+          ]
+        },
+        {
+          "id": "bronze",
+          "tierLabel": "Tier Five",
+          "title": "Bronze",
+          "price": "$500",
+          "period": "/1 Year",
+          "features": ["Listing on our Partner Membership List"]
+        }
+      ]
+    },
+    "whyPartner": {
+      "title": "Why Partner With Us?",
+      "description": "FCH is dedicated to providing excellence in evangelization and catechesis. Your sponsorship directly impacts the next generation of faith leaders and helps us provide high-quality educational resources across our network.",
+      "stats": [
+        {
+          "value": 5000,
+          "label": "Community Members"
+        },
+        {
+          "value": 20,
+          "label": "Annual Webinars"
+        }
+      ]
+    },
+    "haveQuestions": {
+      "title": "HAVE QUESTIONS\nABOUT SPONSORSHIP?",
+      "description": "Send us your questions, needs, or subjects you would like to discuss. We are here to help find the right partnership level for your organization.",
+      "button": "Contact Us"
+    }
+  },
+  "newsPage": {
+    "hero": {
+      "title": "Stay Connected to the FCH Community",
+      "description": "Explore the latest FCH updates, community stories, ministry highlights, and reflections that celebrate our shared mission of faith, formation, and service."
+    }
+  },
+
+  "eventsList": {
+    "hero": {
+      "featured": "Featured Event",
+      "register": "Register Now"
+    },
+    "tabs": {
+      "Upcoming": "Upcoming",
+      "Ongoing": "Ongoing",
+      "Ended": "Ended"
+    },
+    "card": {
+      "datePrefix": "📅",
+      "locationPrefix": "📍",
+      "capacityPrefix": "👥 Capacity:",
+      "viewDetails": "View Details"
+    },
+    "detail": {
+      "form": {
+        "title": "Register Now",
+        "subtitle": "Please provide your details below.",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email Address",
+        "phone": "Phone Number",
+        "attendees": "Number of Attendees",
+        "submit": "Confirm Registration",
+        "placeholders": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john@example.com",
+          "phone": "+880 1XXX-XXXXXX"
+        }
+      },
+      "closed": {
+        "title": "Registration Closed",
+        "statusLabel": "Current status:"
+      },
+      "labels": {
+        "capacity": "Capacity",
+        "seats": "seats"
+      }
+    }
+  },
+  "webinarsPage": {
+    "hero": {
+      "title": "Join Our Webinars",
+      "description": "FCH webinars provide virtual formation opportunities for catechists, ministry leaders, and pastoral communities serving Hispanic Catholics. Through live webinars and on-demand resources, FCH is building a growing Learning Library to support faith formation, leadership development, and ministry service across our community."
+    },
+    "upcoming": {
+      "heading": "UPCOMING EVENTS",
+      "text": "Join live webinars and formation sessions designed for healthcare professionals and ministry leaders.",
+      "features": [
+        "Live expert-led formation sessions",
+        "Interactive Q&A discussions",
+        "Practical ministry tools"
+      ],
+      "button": "Join Webinar",
+      "bannerTitle": "Live Webinar Series 2026",
+      "bannerSubtitle": "Formation • Leadership • Growth"
+    },
+    "past": {
+      "heading": "PAST WEBINARS",
+      "items": [
+        {
+          "title": "Faith & Healthcare Integration",
+          "image": "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "title": "Ethics in Clinical Ministry",
+          "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "title": "Community Spiritual Leadership",
+          "image": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "title": "Ministry Growth Workshop",
+          "image": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    },
+    "footer": {
+      "text": "Want access to all webinars and exclusive content?",
+      "button": "Become a Member"
+    }
+  },
+
+  "donateCard": {
+    "title": "Donate",
+    "prompt": "How much would you like to donate today?",
+    "customPlaceholder": "Custom",
+    "button": "Next"
+  },
+
   "footer": {
     "nav": {
       "about": "About",
@@ -187,5 +564,62 @@
       "linkedin": "LinkedIn"
     },
     "copyright": "All Rights Reserved."
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Enter your credentials to access your account",
+      "emailLabel": "Email Address",
+      "passwordLabel": "Password",
+      "forgotPassword": "Forgot password?",
+      "rememberMe": "Remember me for 30 days",
+      "signIn": "Sign In",
+      "orContinueWith": "Or continue with",
+      "continueWithGoogle": "Continue with Google",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign Up"
+    },
+    "register": {
+      "title": "Create an account",
+      "subtitle": "Get started with your free account setup today",
+      "nameLabel": "Full Name",
+      "emailLabel": "Email Address",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "agreeTerms": "I agree to the",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "mustAcceptTerms": "Must accept terms and conditions",
+      "createAccount": "Create Account",
+      "orSignUpWith": "Or sign up with",
+      "signUpWithGoogle": "Sign up with Google",
+      "alreadyHaveAccount": "Already have an account?",
+      "signInHere": "Sign in here"
+    },
+    "forgotPassword": {
+      "step1Title": "Forgot Password?",
+      "step1Subtitle": "Enter your email address to receive a 6-digit verification code.",
+      "emailLabel": "Email Address",
+      "sendCode": "Send Code",
+      "step2Title": "Enter Security Code",
+      "step2Subtitle": "Please enter the 6-digit verification code sent to your email.",
+      "codeLabel": "Verification Code",
+      "verifyCode": "Verify Code",
+      "step3Title": "Identity Verified",
+      "step3Subtitle": "Your security code matches. Click below to proceed and update your current password credentials safely.",
+      "resetPasswordNow": "Reset Password Now",
+      "backToSignIn": "Back to Sign In"
+    },
+    "resetPassword": {
+      "title": "Set New Password",
+      "subtitle": "Please construct a secure and completely unique password for your account protection.",
+      "newPasswordLabel": "New Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "resetPassword": "Reset Password",
+      "successTitle": "Password Reset Complete",
+      "successSubtitle": "Your password has been successfully updated. You can now use your new security credentials to sign in.",
+      "signIn": "Sign In"
+    }
   }
 }

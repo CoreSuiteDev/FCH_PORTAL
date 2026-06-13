@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react"
 import Image from "next/image"
 import { motion, useSpring, useTransform, useInView } from "framer-motion"
+import { useTranslations } from "next-intl"
 import Container from "@/components/shared/container"
 
 function Counter({ value }: { value: number }) {
@@ -24,6 +25,9 @@ function Counter({ value }: { value: number }) {
 }
 
 export default function SponsorshipPartner() {
+  const t = useTranslations("sponsorship.whyPartner")
+  const stats = t.raw("stats") as { value: number; label: string }[]
+
   return (
     <div className="bg-white">
       <section className="bg-[#FBF9F8] px-4 py-16">
@@ -53,41 +57,29 @@ export default function SponsorshipPartner() {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <h2 className="mb-6 font-serif text-4xl font-bold text-red-900">
-                Why Partner With Us?
+                {t("title")}
               </h2>
               <p className="mb-8 leading-relaxed text-gray-700">
-                FCH is dedicated to providing excellence in evangelization and
-                catechesis. Your sponsorship directly impacts the next
-                generation of faith leaders and helps us provide high-quality
-                educational resources across our network.
+                {t("description")}
               </p>
             </motion.div>
 
             <div className="flex gap-4">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="flex min-w-[140px] flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
-              >
-                <span className="text-3xl font-bold text-red-800">
-                  <Counter value={5000} />+
-                </span>
-                <span className="text-sm text-gray-600">Community Members</span>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-                className="flex min-w-[140px] flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
-              >
-                <span className="text-3xl font-bold text-red-800">
-                  <Counter value={20} />+
-                </span>
-                <span className="text-sm text-gray-600">Annual Webinars</span>
-              </motion.div>
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.4 + index * 0.2 }}
+                  className="flex min-w-[140px] flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+                >
+                  <span className="text-3xl font-bold text-red-800">
+                    <Counter value={stat.value} />+
+                  </span>
+                  <span className="text-sm text-gray-600">{stat.label}</span>
+                </motion.div>
+              ))}
             </div>
           </div>
         </Container>

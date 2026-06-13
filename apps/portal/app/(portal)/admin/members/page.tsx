@@ -1,9 +1,17 @@
-import ManageUsers from "./_components/manage-users"
+import React from "react"
+import ManageUsers from "./_components/manage-user"
+import UserMatrics from "./_components/user-matrics"
+import MembershipStatus from "./_components/membership-status"
+import UserTable from "./_components/user-table"
 
-export default function AdminMembersPage() {
+const page = () => {
   return (
-    <div>
-      <ManageUsers />
+    <div className="p-6">
+      <UserMatrics />
+      <MembershipStatus />
+      <UserTable />
     </div>
   )
 }
+
+export default page

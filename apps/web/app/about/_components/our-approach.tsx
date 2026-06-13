@@ -4,10 +4,18 @@ import React, { useState } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import Container from "@/components/shared/container"
+import { useTranslations } from "next-intl"
+
+interface ApproachCard {
+  title: string
+  description: string
+}
 
 const OurProfessionalApproach: React.FC = () => {
   const [row1Active, setRow1Active] = useState<number | null>(null)
   const [row2Active, setRow2Active] = useState<number | null>(null)
+  const t = useTranslations("about.approach")
+  const cards: ApproachCard[] = t.raw("cards")
 
   const transitionConfig = {
     type: "spring" as const,
@@ -20,12 +28,11 @@ const OurProfessionalApproach: React.FC = () => {
       <Container>
         <div className="mb-16 text-center">
           <h2 className="mb-4 text-4xl font-semibold text-red-700">
-            Our Professional Approach
+            {t("title")}
           </h2>
           <div className="mx-auto mb-6 h-1 w-20 bg-[#f5a623]" />
           <p className="font-semisemibold text-[14px]">
-            A holistic methodology combining tradition with modern professional
-            standards.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -49,12 +56,10 @@ const OurProfessionalApproach: React.FC = () => {
                   {" "}
                   {/* Added max-w-2xl */}
                   <h3 className="mb-4 text-2xl font-semibold text-red-700">
-                    Theological Foundations
+                    {cards[0]?.title}
                   </h3>
                   <p className="leading-relaxed opacity-90">
-                    We ground our work in sound theological study, ensuring that
-                    all catechetical leaders are well-equipped with the
-                    intellectual tools required for teaching the faith.
+                    {cards[0]?.description}
                   </p>
                 </CardContent>
               </Card>
@@ -72,10 +77,10 @@ const OurProfessionalApproach: React.FC = () => {
                   {" "}
                   {/* Added max-w-2xl */}
                   <h3 className="mb-4 text-2xl font-semibold text-red-700">
-                    Cultural Competency
+                    {cards[1]?.title}
                   </h3>
                   <p className="leading-relaxed opacity-90">
-                    Bridging languages and traditions with grace.
+                    {cards[1]?.description}
                   </p>
                 </CardContent>
               </Card>
@@ -99,11 +104,10 @@ const OurProfessionalApproach: React.FC = () => {
                   {" "}
                   {/* Added max-w-2xl */}
                   <h3 className="mb-4 text-2xl font-semibold text-red-700">
-                    Leadership Development
+                    {cards[2]?.title}
                   </h3>
                   <p className="leading-relaxed opacity-90">
-                    Fostering administrative skills and strategic planning for
-                    church organizations.
+                    {cards[2]?.description}
                   </p>
                 </CardContent>
               </Card>
@@ -123,12 +127,10 @@ const OurProfessionalApproach: React.FC = () => {
                   {" "}
                   {/* Added max-w-2xl */}
                   <h3 className="mb-4 text-2xl font-semibold text-white">
-                    Spiritual Growth
+                    {cards[3]?.title}
                   </h3>
                   <p className="leading-relaxed text-white opacity-90">
-                    Formation isn't just professional; it's personal. We provide
-                    retreats and spiritual direction tailored for the needs of
-                    those in high-intensity ministry roles.
+                    {cards[3]?.description}
                   </p>
                 </CardContent>
               </Card>

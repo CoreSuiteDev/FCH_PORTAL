@@ -4,41 +4,33 @@ import React from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import Container from "@/components/shared/container"
+import { useTranslations } from "next-intl"
 
-const boardMembers = [
-  {
-    name: "Dr. Elena Rodriguez",
-    role: "Chairperson",
-    bio: "Expert in Hispanic catechesis with over 20 years of academic experience.",
-    image:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    name: "Rev. Michael Thorne",
-    role: "Strategic Advisor",
-    bio: "Dedicated to fostering administrative growth and diocesan partnerships.",
-    image:
-      "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=600&auto=format&fit=crop",
-  },
-  {
-    name: "Sarah Jenkins",
-    role: "Director of Outreach",
-    bio: "Focuses on community engagement and faith-based educational initiatives.",
-    image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=600&auto=format&fit=crop",
-  },
+const memberImages = [
+  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=600&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=600&auto=format&fit=crop",
 ]
 
+interface BoardMember {
+  name: string
+  role: string
+  bio: string
+}
+
 const BoardMembers: React.FC = () => {
+  const t = useTranslations("about.board")
+  const members: BoardMember[] = t.raw("members")
+
   return (
     <section className="bg-[#FBF9F8] py-24">
       <Container>
         <div className="mb-16 text-center">
-          <h2 className="text-4xl font-bold text-primary">Board Members</h2>
+          <h2 className="text-4xl font-bold text-primary">{t("title")}</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          {boardMembers.map((member, index) => (
+          {members.map((member, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
@@ -53,7 +45,7 @@ const BoardMembers: React.FC = () => {
                   {/* Image container - full cover */}
                   <div className="relative h-96 w-full overflow-hidden">
                     <img
-                      src={member.image}
+                      src={memberImages[index] || ""}
                       alt={member.name}
                       className="top-center h-[400px] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
