@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { router, publicProcedure } from "../../../server/trpc.js";
+import { router, publicProcedure, adminProcedure } from "../../../server/trpc.js";
 import { PaymentController } from "./payment.controller.js";
 import { PaginationInputSchema, ZCIPaginatedPaymentsSchema } from "@workspace/types";
 import { getPaginationMeta } from "../../../utils/pagination.js";
 
 export const paymentRouter = router({
-  history: publicProcedure
+  history: adminProcedure
     .meta({
       openapi: {
         method: "GET",

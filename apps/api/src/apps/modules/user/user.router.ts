@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { router, publicProcedure } from "../../../server/trpc.js"
+import { router, publicProcedure, protectedProcedure, adminProcedure } from "../../../server/trpc.js"
 import { UserController } from "./user.controller.js"
 import { ZCIUserOutputSchema, PaginationInputSchema, ZCIPaginatedUsersSchema } from "@workspace/types"
 import { getPaginationMeta } from "../../../utils/pagination.js"
@@ -35,7 +35,7 @@ const mapUser = (user: any) => ({
 })
 
 export const userRouter = router({
-  getProfile: publicProcedure
+  getProfile: protectedProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -52,7 +52,7 @@ export const userRouter = router({
       return mapUser(user)
     }),
 
-  listMembers: publicProcedure
+  listMembers: adminProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -74,7 +74,7 @@ export const userRouter = router({
       }
     }),
 
-  updateStatus: publicProcedure
+  updateStatus: adminProcedure
     .meta({
       openapi: {
         method: "PATCH",
@@ -103,7 +103,7 @@ export const userRouter = router({
       })
     }),
 
-  deleteUser: publicProcedure
+  deleteUser: adminProcedure
     .meta({
       openapi: {
         method: "DELETE",
@@ -119,7 +119,7 @@ export const userRouter = router({
       return UserController.deleteUser({ userId: input.userId })
     }),
 
-  createMember: publicProcedure
+  createMember: adminProcedure
     .meta({
       openapi: {
         method: "POST",

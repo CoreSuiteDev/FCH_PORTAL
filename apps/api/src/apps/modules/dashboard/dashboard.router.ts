@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { router, publicProcedure } from "../../../server/trpc.js";
+import { router, publicProcedure, adminProcedure } from "../../../server/trpc.js";
 import { DashboardController } from "./dashboard.controller.js";
 
 export const dashboardRouter = router({
-  metrics: publicProcedure
+  metrics: adminProcedure
     .meta({
       openapi: {
         method: "GET",
