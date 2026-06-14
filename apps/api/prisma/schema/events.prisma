@@ -11,8 +11,9 @@ model Event {
   
   location    String
   coverImage  String?
-  maxCapacity Int?   
-  meetingLink String?   
+  maxCapacity  Int?   
+  currentCount Int    @default(0)  // tracks live registration count atomically
+  meetingLink  String?   
 
   eventRegistrations EventRegistration[]
 
@@ -24,6 +25,9 @@ model Event {
   eventType EventType @default(EVENT)
 
   webinar Webinar?
+
+  categories  EventCategory[]
+  materials   EventMaterial[]
 
   @@index([visibility])
   @@index([isActive])
@@ -37,6 +41,7 @@ model EventRegistration {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+
   eventId String
   event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
@@ -44,6 +49,7 @@ model EventRegistration {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   status RegistrationStatus @default(CONFIRMED)
+  checkedIn Boolean            @default(false)
 
   @@unique([eventId, userId])
   @@index([userId])
@@ -55,11 +61,41 @@ model Webinar {
   id            String @id @default(cuid())
 
   eventId       String @unique
-  event         Event @relation(fields:[eventId], references:[id])
+  event         Event @relation(fields:[eventId], references:[id], onDelete: Cascade)
 
-  speakerName   String
-  recordingUrl  String?
-  category      String?
+  speakers      String[]
 
   createdAt     DateTime @default(now())
 }
+
+model EventCategory {
+  id            String @id @default(cuid())
+
+  name          String @unique
+  description   String?
+
+  events        Event[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("event_categories")
+  @@index([createdAt])
+}
+
+model EventMaterial {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  title       String
+  fileUrl     String
+  fileType    String
+
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@map("event_material")
+}
+

@@ -1,5 +1,9 @@
+import {
+  EventStatus,
+  EventType,
+  EventVisibility,
+} from "../../../generated/prisma/client.js"
 import { prisma } from "../../../infrastructure/database/prisma.js"
-import { EventVisibility, EventType, EventStatus } from "../../../generated/prisma/client.js"
 
 export class EventsService {
   /**
@@ -28,7 +32,7 @@ export class EventsService {
         where: whereClause,
         skip,
         take: limit,
-        include: { webinar: true },
+        include: { webinar: true, categories: true, materials: true },
         orderBy: { startDate: "asc" },
       }),
     ])
@@ -42,7 +46,7 @@ export class EventsService {
   static async findEventById(id: string) {
     return prisma.event.findUnique({
       where: { id },
-      include: { webinar: true },
+      include: { webinar: true, categories: true, materials: true },
     })
   }
 
@@ -60,37 +64,113 @@ export class EventsService {
     meetingLink?: string
     visibility: EventVisibility
     eventType: EventType
-    speakerName?: string
-    recordingUrl?: string
-    category?: string
+    speakers?: string[]
+    categoryIds?: string[]
   }) {
-    return prisma.event.create({
-      data: {
-        title: data.title,
-        description: data.description,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        location: data.location,
-        coverImage: data.coverImage,
-        maxCapacity: data.maxCapacity,
-        meetingLink: data.meetingLink,
-        visibility: data.visibility,
-        eventType: data.eventType,
-        status: "UPCOMING" as EventStatus,
-        isActive: true,
-        ...(data.eventType === "WEBINAR"
-          ? {
-              webinar: {
-                create: {
-                  speakerName: data.speakerName || "TBD",
-                  recordingUrl: data.recordingUrl,
-                  category: data.category,
-                },
+    const { categoryIds, speakers, ...eventData } = data
+
+    const title = eventData.title?.trim()
+    const location = eventData.location.trim();
+
+    if (!title) {
+      throw new Error("Event title is required")
+    }
+
+    if(!location) {
+      throw new Error("Event location is required")
+    }
+
+    if (!eventData.startDate) {
+      throw new Error("Start date is required")
+    }
+
+    const startDate = new Date(eventData.startDate)
+
+    if (Number.isNaN(startDate.getTime())) {
+      throw new Error("Invalid start date")
+    }
+
+    if (eventData.endDate) {
+      const endDate = new Date(eventData.endDate)
+
+      if (Number.isNaN(endDate.getTime())) {
+        throw new Error("Invalid end date")
+      }
+
+      if (endDate <= startDate) {
+        throw new Error("End date must be greater than start date")
+      }
+    }
+
+    if (eventData.maxCapacity && eventData.maxCapacity < 1) {
+      throw new Error("Max capacity must be greater than 0")
+    }
+
+    // Webinar validation
+    if (eventData.eventType === EventType.WEBINAR) {
+      if (!eventData.meetingLink?.trim()) {
+        throw new Error("Meeting link is required for webinars")
+      }
+
+      try {
+        new URL(eventData.meetingLink)
+      } catch {
+        throw new Error("Invalid meeting link URL")
+      }
+    }
+
+    // Non-webinar validation
+    if (eventData.eventType !== EventType.WEBINAR && eventData.meetingLink) {
+      throw new Error("Meeting link is only allowed for webinars")
+    }
+
+    // Category validation — guard against undefined before accessing .length
+    if (categoryIds && categoryIds.length > 0) {
+      const categories = await prisma.eventCategory.findMany({
+        where: { id: { in: categoryIds } },
+        select: { id: true },
+      })
+
+      if (categories.length !== categoryIds.length) {
+        throw new Error("One or more categories do not exist")
+      }
+    }
+
+    return prisma.$transaction(async (tx) => {
+      const event = await tx.event.create({
+        data: {
+          title,
+          description: eventData.description?.trim(),
+          startDate,
+          endDate: eventData.endDate,
+          location,
+          coverImage: eventData.coverImage,
+          maxCapacity: eventData.maxCapacity,
+          meetingLink: eventData.meetingLink,
+          visibility: eventData.visibility,
+          eventType: eventData.eventType,
+          status: "UPCOMING" as EventStatus,
+          isActive: true,
+          // connect expects { id: string }[], not string[]
+          ...(categoryIds &&
+            categoryIds.length > 0 && {
+              categories: {
+                connect: categoryIds.map((id) => ({ id })),
               },
-            }
-          : {}),
-      },
-      include: { webinar: true },
+            }),
+          // speakers is optional — fall back to [] to satisfy the non-nullable DB column
+          ...(eventData.eventType === EventType.WEBINAR && {
+            webinar: {
+              create: {
+                speakers: speakers ?? [],
+              },
+            },
+          }),
+        },
+        include: { webinar: true, categories: true, materials: true },
+      })
+
+      return event
     })
   }
 
@@ -98,57 +178,453 @@ export class EventsService {
    * Register a user for an event with capacity limit validation
    */
   static async registerUser(eventId: string, userId: string) {
+    if (!eventId || !userId) {
+      throw new Error("EventId and UserId are required")
+    }
+
+    return prisma.$transaction(async (tx) => {
+      // 1. Fetch event — no _count needed; we use currentCount column instead
+      const event = await tx.event.findUnique({
+        where: { id: eventId },
+      })
+
+      if (!event) throw new Error("Event not found")
+      if (!event.isActive) throw new Error("Event is not active")
+
+      if (event.status !== "UPCOMING") {
+        throw new Error("Registration is closed for this event")
+      }
+
+      // 2. Prevent duplicate registration (fast fail before touching capacity)
+      const existing = await tx.eventRegistration.findFirst({
+        where: { eventId, userId },
+      })
+
+      if (existing) {
+        throw new Error("User already registered for this event")
+      }
+
+      const updatedEvent = await tx.event.updateMany({
+        where: {
+          id: eventId,
+          ...(event.maxCapacity
+            ? { currentCount: { lt: event.maxCapacity } }
+            : {}),
+        },
+        data: {
+          currentCount: { increment: 1 },
+        },
+      })
+
+      if (updatedEvent.count === 0 && event.maxCapacity !== null) {
+        throw new Error("Event capacity limit has been reached")
+      }
+
+      // 4. Create the registration
+      return tx.eventRegistration.create({
+        data: {
+          eventId,
+          userId,
+          status: "CONFIRMED",
+        },
+      })
+    })
+  }
+
+  /**
+   * Update an event and its optional webinar details
+   */
+  static async updateEvent(
+    id: string,
+    data: {
+      title?: string
+      description?: string
+      startDate?: Date
+      endDate?: Date
+      location?: string
+      coverImage?: string
+      maxCapacity?: number
+      meetingLink?: string
+      visibility?: EventVisibility
+      eventType?: EventType
+      speakers?: string[]
+      categoryIds?: string[]
+      isActive?: boolean
+      status?: EventStatus
+    }
+  ) {
+    const { categoryIds, speakers, ...eventData } = data
+
+    return prisma.$transaction(async (tx) => {
+      const event = await tx.event.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          webinar: true,
+          _count: { select: { eventRegistrations: true } },
+        },
+      })
+
+      if (!event) {
+        throw new Error("Event not found")
+      }
+
+      if (
+        typeof eventData.maxCapacity === "number" &&
+        eventData.maxCapacity < event._count.eventRegistrations
+      ) {
+        throw new Error(
+          "Max capacity cannot be less than current registrations"
+        )
+      }
+
+      const newEventType = eventData.eventType ?? event.eventType
+
+      // Validate meeting link when switching to WEBINAR type
+      if (newEventType === "WEBINAR") {
+        if (event.eventType !== "WEBINAR" && !eventData.meetingLink?.trim()) {
+          throw new Error("Meeting link is required when converting to a webinar")
+        }
+        if (eventData.meetingLink) {
+          try {
+            new URL(eventData.meetingLink)
+          } catch {
+            throw new Error("Invalid meeting link URL")
+          }
+        }
+      }
+
+      if (event.eventType === "WEBINAR" && newEventType !== "WEBINAR") {
+        await tx.webinar.deleteMany({
+          where: { eventId: id },
+        })
+      }
+
+      const updateEvent = await tx.event.update({
+        where: { id },
+        data: {
+          ...eventData,
+
+          ...(categoryIds && {
+            categories: { set: categoryIds.map((cid) => ({ id: cid })) },
+          }),
+
+          ...(newEventType === "WEBINAR" && {
+            webinar: {
+              upsert: {
+                create: {
+                  speakers: speakers || [],
+                },
+                update: {
+                  speakers: speakers || [],
+                },
+              },
+            },
+          }),
+        },
+        include: {
+          webinar: true,
+          categories: true,
+          materials: true,
+        },
+      })
+
+      return updateEvent
+    })
+  }
+
+  /**
+   * Delete an event by ID (and cascadingly delete webinars & registrations)
+   */
+  static async deleteEvent(id: string) {
+    return prisma.$transaction(async (tx) => {
+      const event = await tx.event.findUnique({
+        where: { id },
+        include: {
+          _count: {
+            select: { eventRegistrations: true },
+          },
+        },
+      })
+
+      if (!event) {
+        throw new Error("Event not found")
+      }
+
+      if (event._count.eventRegistrations > 0) {
+        throw new Error("Cannot delete event with existing registrations")
+      }
+
+      // Webinar and materials cascade automatically via onDelete: Cascade in schema
+      return tx.event.delete({ where: { id } })
+    })
+  }
+
+  /**
+   * Mark an event registration as checked-in
+   */
+  static async checkInUser(eventId: string, userId: string) {
+    if (!eventId || !userId) {
+      throw new Error("EventId and UserId are required")
+    }
+
+    return prisma.$transaction(async (tx) => {
+      const event = await tx.event.findUnique({
+        where: { id: eventId },
+      })
+
+      if (!event) {
+        throw new Error("Event not found")
+      }
+
+      if (!event.isActive) {
+        throw new Error("Event is inactive")
+      }
+
+      const registration = await tx.eventRegistration.findUnique({
+        where: {
+          eventId_userId: {
+            eventId,
+            userId,
+          },
+        },
+      })
+
+      if (!registration) {
+        throw new Error("Registration not found for this event")
+      }
+
+      if (registration.status !== "CONFIRMED") {
+        throw new Error("Only confirmed registrations can check in")
+      }
+
+      if (registration.checkedIn) {
+        throw new Error("User has already checked in")
+      }
+
+      return tx.eventRegistration.update({
+        where: {
+          eventId_userId: {
+            eventId,
+            userId,
+          },
+        },
+        data: {
+          checkedIn: true,
+        },
+      })
+    })
+  }
+
+  /**
+   * Fetch all event categories
+   */
+  static async getAllCategories() {
+    return prisma.eventCategory.findMany({
+      orderBy: { name: "asc" },
+    })
+  }
+
+  /**
+   * Create a new event category
+   */
+  static async createCategory(data: { name: string; description?: string }) {
+
+    const name = data.name?.trim();
+
+    if(!name) {
+      throw new Error("Category name is required")
+    }
+
+    try {
+      return await prisma.eventCategory.create({
+        data: {
+          name,
+          description: data.description?.trim()
+        }
+      })
+    } catch (error:any) {
+     if (error.code === "P2002") {
+      throw new Error(
+        "Category name already exists"
+      )
+    }
+    throw error
+    }
+  }
+
+  /**
+   * Update an event category details
+   */
+  static async updateCategory(
+    id: string,
+    data: { name?: string; description?: string }
+  ) {
+    const category = await prisma.eventCategory.findUnique({
+      where: { id },
+    })
+
+    if (!category) {
+      throw new Error("Category not found")
+    }
+
+    if (data.name && data.name !== category.name) {
+      const existing = await prisma.eventCategory.findUnique({
+        where: { name: data.name },
+      })
+      if (existing) {
+        throw new Error("Category name already exists")
+      }
+    }
+
+    try {
+      return await prisma.eventCategory.update({
+        where: { id },
+        data,
+      })
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        throw new Error("Category name already exists")
+      }
+      throw error
+    }
+  }
+
+  /**
+   * Delete an event category
+   */
+  static async deleteCategory(id: string) {
+    const category = await prisma.eventCategory.findUnique({
+      where: { id },
+    })
+
+    if (!category) {
+      throw new Error("Category not found")
+    }
+
+    return prisma.eventCategory.delete({
+      where: { id },
+    })
+  }
+
+  /**
+   * Add a material to an event
+   */
+  static async addMaterial(
+    eventId: string,
+    data: { title: string; fileUrl: string; fileType: string }
+  ) {
     const event = await prisma.event.findUnique({
       where: { id: eventId },
-      include: {
-        _count: {
-          select: { eventRegistrations: true },
-        },
-      },
     })
 
     if (!event) {
       throw new Error("Event not found")
     }
 
-    if (event.maxCapacity && event._count.eventRegistrations >= event.maxCapacity) {
-      throw new Error("Event capacity limit has been reached")
-    }
-
-    return prisma.eventRegistration.create({
+    return prisma.eventMaterial.create({
       data: {
+        title: data.title,
+        fileUrl: data.fileUrl,
+        fileType: data.fileType,
         eventId,
-        userId,
-        status: "CONFIRMED",
       },
     })
   }
 
   /**
-   * Add or update recording URL of a webinar event
+   * Fetch all materials of an event
    */
-  static async updateWebinarRecording(eventId: string, recordingUrl: string) {
+  static async getMaterials(eventId: string) {
+    return prisma.eventMaterial.findMany({
+      where: { eventId },
+      orderBy: { createdAt: "desc" },
+    })
+  }
+
+  /**
+   * Delete a material from an event
+   */
+  static async deleteMaterial(eventId: string, materialId: string) {
+    const material = await prisma.eventMaterial.findUnique({
+      where: { id: materialId },
+    })
+
+    if (!material) {
+      throw new Error("Material not found")
+    }
+
+    if (material.eventId !== eventId) {
+      throw new Error("Material does not belong to this event")
+    }
+
+    return prisma.eventMaterial.delete({
+      where: { id: materialId },
+    })
+  }
+
+  /**
+   * Fetch analytics metrics for a specific event
+   */
+  static async getEventAnalytics(eventId: string) {
     const event = await prisma.event.findUnique({
       where: { id: eventId },
-      include: { webinar: true },
+      select: {
+        id: true,
+        title: true,
+        maxCapacity: true,
+      },
     })
 
     if (!event) {
       throw new Error("Event not found")
     }
 
-    if (event.eventType !== "WEBINAR") {
-      throw new Error("Only Webinar events can have a recording URL")
-    }
+    const [
+      totalRegistrations,
+      totalCheckedIn,
+      confirmedCount,
+      pendingCount,
+      cancelledCount,
+      totalMaterials,
+    ] = await Promise.all([
+      prisma.eventRegistration.count({ where: { eventId } }),
+      prisma.eventRegistration.count({ where: { eventId, checkedIn: true } }),
+      prisma.eventRegistration.count({
+        where: { eventId, status: "CONFIRMED" },
+      }),
+      prisma.eventRegistration.count({ where: { eventId, status: "PENDING" } }),
+      prisma.eventRegistration.count({
+        where: { eventId, status: "CANCELLED" },
+      }),
+      prisma.eventMaterial.count({ where: { eventId } }),
+    ])
 
-    return prisma.webinar.upsert({
-      where: { eventId },
-      update: { recordingUrl },
-      create: {
-        eventId,
-        speakerName: "TBD",
-        recordingUrl,
+    const attendanceRate =
+      totalRegistrations > 0
+        ? Number(((totalCheckedIn / totalRegistrations) * 100).toFixed(2))
+        : 0
+
+    const capacityUtilization =
+      event.maxCapacity && event.maxCapacity > 0
+        ? Number(((totalRegistrations / event.maxCapacity) * 100).toFixed(2))
+        : 0
+
+    return {
+      eventId: event.id,
+      title: event.title,
+      maxCapacity: event.maxCapacity,
+      totalRegistrations,
+      totalCheckedIn,
+      attendanceRate,
+      capacityUtilization,
+      statusBreakdown: {
+        CONFIRMED: confirmedCount,
+        PENDING: pendingCount,
+        CANCELLED: cancelledCount,
       },
-    })
+      totalMaterials,
+    }
   }
 }
