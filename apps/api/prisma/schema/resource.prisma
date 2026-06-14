@@ -1,0 +1,35 @@
+model Resource {
+  id            String @id @default(cuid())
+
+  title         String
+  description   String?
+
+  fileUrl       String
+  fileType      String
+
+  category      ResourceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId    String
+
+  visibility    ResourceVisibility
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("resources")
+  @@index([createdAt])
+}
+
+model ResourceCategory {
+  id            String @id @default(cuid())
+
+  name          String
+  description   String?
+
+  resources     Resource[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("resource_categories")
+  @@index([createdAt])
+}

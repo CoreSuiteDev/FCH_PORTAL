@@ -80,3 +80,13 @@ enum EventType {
   EVENT
   WEBINAR
 }
+
+
+enum ResourceVisibility {
+  MEMBER
+  PASTORAL
+  BOARD
+  ADMIN
+  COMMITTEE
+  SUPER_ADMIN
+}
