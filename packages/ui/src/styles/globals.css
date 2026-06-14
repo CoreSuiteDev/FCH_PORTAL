@@ -4,13 +4,16 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* 1. Define your local font */
 @font-face {
   font-family: "Trajan Pro";
-  src: url("/fonts/TrajanPro-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+  src: url("/fonts/TrajanPro-Regular.woff") format("woff");
+  font-weight: 100 500;
+}
+
+@font-face {
+  font-family: "Trajan Pro";
+  src: url("/fonts/TrajanPro-Bold.woff") format("woff");
+  font-weight: 600 900;
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -108,7 +111,7 @@
   --card-foreground: oklch(0.2178 0 0);
   --popover: oklch(0.9779 0.0042 56.3756);
   --popover-foreground: oklch(0.2178 0 0);
-  --primary: oklch(0.465 0.147 24.9381);
+  --primary: rgb(189, 31, 45);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.9625 0.0385 89.0943);
   --secondary-foreground: oklch(0.4847 0.1022 75.1153);

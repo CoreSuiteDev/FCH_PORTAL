@@ -37,9 +37,11 @@ export default async function RootLayout({
       <body cz-shortcut-listen="true">
         <TooltipProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
-            <Navbar />
-            {children}
-            <Footer />
+            <div className="overflow-hidden">
+              <Navbar />
+              {children}
+              <Footer />
+            </div>
           </NextIntlClientProvider>
         </TooltipProvider>
       </body>

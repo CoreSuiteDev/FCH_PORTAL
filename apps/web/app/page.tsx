@@ -11,7 +11,7 @@ import { SupportSection } from "@/components/home/support-section"
 import { NewsSection } from "@/components/home/news-section"
 import { NewsletterSection } from "@/components/home/news-latter"
 
-export default function Page() {
+export default function Home() {
   return (
     <ReactLenis
       root

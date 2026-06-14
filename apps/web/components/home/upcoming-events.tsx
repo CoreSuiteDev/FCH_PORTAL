@@ -1,57 +1,37 @@
 "use client"
+
 import { Card, CardContent } from "@workspace/ui/components/card"
 import Image from "next/image"
 import Container from "@/components/shared/container"
 import { motion } from "framer-motion"
+import { useTranslations } from "next-intl"
 
 interface Event {
-  id: number
+  id: string
   date: string
   title: string
   description: string
   location: string
-  image: string
 }
-
-const events: Event[] = [
-  {
-    id: 1,
-    date: "November 15, 2025",
-    title: "USCCB JUBILEE CELEBRATION",
-    description:
-      "Join us for a national gathering celebrating Hispanic catechetical.",
-    location: "Washington, D.C",
-    image: "/assets/upcoming-event.jpg",
-  },
-  {
-    id: 2,
-    date: "November 15, 2025",
-    title: "USCCB JUBILEE CELEBRATION",
-    description:
-      "Join us for a national gathering celebrating Hispanic catechetical.",
-    location: "Washington, D.C",
-    image: "/assets/upcoming-event.jpg",
-  },
-]
-
 export function UpcomingEvents() {
+  const t = useTranslations("home.events")
+  const events: Event[] = t.raw("items")
+
   return (
     <section className="bg-white">
       <Container className="py-20">
-        {/* Section Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="mb-16 text-center md:text-left"
         >
-          <h2 className="font-trajan text-5xl tracking-wide text-[#8b1a1a]">
-            UPCOMING EVENTS
+          <h2 className="font-trajan text-2xl font-extrabold text-primary md:text-5xl">
+            {t("sectionTitle")}
           </h2>
           <div className="mx-auto mt-4 h-1 w-20 bg-green-700 md:mx-0" />
         </motion.div>
 
-        {/* Grid Container */}
         <div className="grid gap-10 md:grid-cols-2">
           {events.map((event, index) => (
             <motion.div
@@ -60,22 +40,20 @@ export function UpcomingEvents() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.2 }}
-              whileHover={{ y: -8 }} // Lift effect
+              whileHover={{ y: -8 }}
               className="group"
             >
               <Card className="overflow-hidden border border-primary bg-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 hover:shadow-[0_20px_50px_rgba(139,26,26,0.15)]">
                 <CardContent className="flex flex-col items-center gap-8 p-6 sm:flex-row">
-                  {/* Image Container with zoom effect */}
                   <div className="relative h-56 w-full flex-shrink-0 overflow-hidden rounded-xl sm:w-56">
                     <Image
-                      src={event.image}
+                      src={`/assets/event-1.jpg`}
                       alt={event.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>
 
-                  {/* Content Container */}
                   <div className="flex flex-col gap-3">
                     <span className="w-fit font-montserrat text-xs font-bold tracking-widest text-[#8b1a1a]/70 uppercase">
                       {event.date}
