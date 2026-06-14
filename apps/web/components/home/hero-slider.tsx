@@ -54,7 +54,7 @@ export function HeroCarousel() {
             <h3 className="mb-4 font-montserrat text-sm font-medium tracking-[0.2em] uppercase">
               {t("hero.label")}
             </h3>
-            <h1 className="mb-8 font-trajan text-3xl leading-tight whitespace-pre-line md:text-5xl">
+            <h1 className="landing-titgh mb-8 font-trajan text-3xl font-semibold whitespace-pre-line uppercase md:text-5xl">
               {t("hero.title")}
             </h1>
             <p className="text-md mb-10 max-w-xl font-montserrat font-light md:text-lg">
