@@ -13,7 +13,7 @@ export default function AboutFCH() {
         {/* LEFT CONTENT */}
         <div className="flex flex-col justify-center">
           <div>
-            <h2 className="text-3xl font-bold text-red-700 uppercase md:text-4xl">
+            <h2 className="font-trajan text-3xl font-bold text-primary uppercase md:text-4xl">
               {t("title")}
             </h2>
 

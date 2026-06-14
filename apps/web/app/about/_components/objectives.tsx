@@ -17,7 +17,7 @@ export default function CollaborationObjectives() {
     <section className="bg-white px-6 py-16">
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-start gap-8 md:grid-cols-3">
         {/* Title Section */}
-        <h2 className="text-3xl font-bold text-primary md:text-4xl whitespace-pre-line">
+        <h2 className="font-trajan text-3xl font-bold whitespace-pre-line text-primary md:text-4xl">
           {t("title")}
         </h2>
 

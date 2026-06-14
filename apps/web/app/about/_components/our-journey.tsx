@@ -13,7 +13,9 @@ const OurJourney: React.FC = () => {
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
           {/* Left Content */}
           <div className="space-y-6">
-            <h2 className="text-4xl text-[#800000]">{t("title")}</h2>
+            <h2 className="font-trajan text-4xl font-bold text-primary">
+              {t("title")}
+            </h2>
             <p className="leading-relaxed text-gray-700">{t("description1")}</p>
             <p className="leading-relaxed text-gray-700">{t("description2")}</p>
           </div>

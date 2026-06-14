@@ -36,7 +36,7 @@ export function AboutLeader() {
             viewport={{ once: true }}
             className="flex flex-col gap-6"
           >
-            <h2 className="font-trajan text-4xl text-[#8b1a1a]">
+            <h2 className="font-trajan text-4xl font-bold text-primary">
               {t("title")}
             </h2>
             <p className="font-montserrat text-[18px] leading-relaxed text-gray-800">

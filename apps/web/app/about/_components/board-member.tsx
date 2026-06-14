@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import Container from "@/components/shared/container"
 import { useTranslations } from "next-intl"
+import Image from "next/image"
 
 const memberImages = [
   "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop",
@@ -26,7 +27,9 @@ const BoardMembers: React.FC = () => {
     <section className="bg-[#FBF9F8] py-24">
       <Container>
         <div className="mb-16 text-center">
-          <h2 className="text-4xl font-bold text-primary">{t("title")}</h2>
+          <h2 className="font-trajan text-3xl font-extrabold text-primary md:text-5xl">
+            {t("title")}
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
@@ -44,7 +47,9 @@ const BoardMembers: React.FC = () => {
                 <CardContent className="p-0">
                   {/* Image container - full cover */}
                   <div className="relative h-96 w-full overflow-hidden">
-                    <img
+                    <Image
+                      width={400}
+                      height={400}
                       src={memberImages[index] || ""}
                       alt={member.name}
                       className="top-center h-[400px] w-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -55,10 +60,10 @@ const BoardMembers: React.FC = () => {
 
                   {/* Text details area */}
                   <div className="p-6 text-center">
-                    <h3 className="mb-1 text-xl font-bold text-primary">
+                    <h3 className="mb-1 font-trajan text-xl font-extrabold text-primary">
                       {member.name}
                     </h3>
-                    <p className="mb-4 text-xs font-bold tracking-[0.2em] text-[#f5a623] uppercase">
+                    <p className="mb-4 font-montserrat text-xs font-semibold tracking-[0.2em] text-[#f5a623] uppercase">
                       {member.role}
                     </p>
                     <p className="text-[14px] leading-relaxed text-gray-500">

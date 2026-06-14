@@ -27,13 +27,11 @@ const OurProfessionalApproach: React.FC = () => {
     <section className="overflow-hidden bg-[#FBF9F8] py-8 md:py-16">
       <Container>
         <div className="mb-16 text-center">
-          <h2 className="mb-4 text-4xl font-semibold text-red-700">
+          <h2 className="mb-4 font-trajan text-3xl font-extrabold text-primary md:text-5xl">
             {t("title")}
           </h2>
           <div className="mx-auto mb-6 h-1 w-20 bg-[#f5a623]" />
-          <p className="font-semisemibold text-[14px]">
-            {t("subtitle")}
-          </p>
+          <p className="font-semisemibold text-[14px]">{t("subtitle")}</p>
         </div>
 
         <div className="flex flex-col gap-6">
@@ -55,7 +53,7 @@ const OurProfessionalApproach: React.FC = () => {
                 <CardContent className="max-w-2xl p-0">
                   {" "}
                   {/* Added max-w-2xl */}
-                  <h3 className="mb-4 text-2xl font-semibold text-red-700">
+                  <h3 className="mb-4 font-trajan text-2xl font-bold text-primary">
                     {cards[0]?.title}
                   </h3>
                   <p className="leading-relaxed opacity-90">
@@ -76,7 +74,7 @@ const OurProfessionalApproach: React.FC = () => {
                 <CardContent className="max-w-2xl p-0">
                   {" "}
                   {/* Added max-w-2xl */}
-                  <h3 className="mb-4 text-2xl font-semibold text-red-700">
+                  <h3 className="mb-4 font-trajan text-2xl font-bold text-primary">
                     {cards[1]?.title}
                   </h3>
                   <p className="leading-relaxed opacity-90">
@@ -103,7 +101,7 @@ const OurProfessionalApproach: React.FC = () => {
                 <CardContent className="max-w-2xl p-0">
                   {" "}
                   {/* Added max-w-2xl */}
-                  <h3 className="mb-4 text-2xl font-semibold text-red-700">
+                  <h3 className="mb-4 font-trajan text-2xl font-bold text-primary">
                     {cards[2]?.title}
                   </h3>
                   <p className="leading-relaxed opacity-90">
@@ -126,7 +124,7 @@ const OurProfessionalApproach: React.FC = () => {
                 <CardContent className="max-w-2xl p-0">
                   {" "}
                   {/* Added max-w-2xl */}
-                  <h3 className="mb-4 text-2xl font-semibold text-white">
+                  <h3 className="mb-4 font-trajan text-2xl font-bold text-white">
                     {cards[3]?.title}
                   </h3>
                   <p className="leading-relaxed text-white opacity-90">

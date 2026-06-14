@@ -13,7 +13,9 @@ const MissionSection: React.FC = () => {
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-24">
           {/* Left: Mission Statement */}
           <div className="space-y-4">
-            <h2 className="text-lg text-red-700 uppercase">{t("missionTitle")}</h2>
+            <h2 className="font-trajan text-xl font-bold text-primary">
+              {t("missionTitle")}
+            </h2>
             <p className="font-serif text-5xl leading-tight text-green-800 italic">
               {t("missionText")}
             </p>
@@ -21,7 +23,9 @@ const MissionSection: React.FC = () => {
 
           {/* Right: Who We Serve */}
           <div className="space-y-4">
-            <h2 className="text-lg text-red-700 uppercase">{t("serveTitle")}</h2>
+            <h2 className="font-trajan text-xl font-bold text-primary">
+              {t("serveTitle")}
+            </h2>
             <p className="text-lg leading-relaxed text-gray-900">
               {t("serveText1")}
             </p>
