@@ -15,11 +15,11 @@ export function NewsSection() {
     <section className="bg-white py-20">
       <Container className="px-6">
         <div className="mb-12 flex items-end justify-between">
-          <h2 className="font-trajan text-2xl font-bold text-[#8b0000] md:text-4xl">
+          <h2 className="font-trajan text-2xl font-extrabold text-primary md:text-5xl">
             {t("title")}
           </h2>
           <Link href="/news">
-            <Button className="rounded-md bg-[#b91c1c] px-6 text-white hover:bg-[#991b1b]">
+            <Button className="rounded-md bg-primary px-6 text-white hover:bg-[#991b1b]">
               {t("button")}
             </Button>
           </Link>
@@ -58,7 +58,7 @@ export function NewsSection() {
               </div>
 
               <div className="px-6 pb-6">
-                <Button className="w-full bg-[#b91c1c] py-5 text-white hover:bg-[#991b1b]">
+                <Button className="w-full bg-primary py-5 text-white hover:bg-[#991b1b]">
                   {t("readMore")}
                 </Button>
               </div>

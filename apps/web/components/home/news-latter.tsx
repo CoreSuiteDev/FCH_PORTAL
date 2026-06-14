@@ -22,7 +22,7 @@ export function NewsletterSection() {
       />
 
       <div className="relative z-10 mx-auto max-w-2xl rounded-3xl bg-white p-10 shadow-2xl md:p-16">
-        <h2 className="mb-10 text-center text-3xl font-extrabold text-[#c42028]">
+        <h2 className="mb-10 text-center font-trajan text-3xl font-extrabold text-[#c42028]">
           {t("title")}
         </h2>
 

@@ -30,15 +30,20 @@ export function TestimonialSection() {
           opts={{
             loop: true,
             align: "start",
+
+            containScroll: "trimSnaps",
           }}
           plugins={[
             Autoplay({
-              delay: 3000, // 3 seconds por por slide hobe
+              delay: 3000,
+              stopOnInteraction: false,
+
+              playOnInit: true,
             }),
           ]}
         >
           <div className="mb-10 flex items-center justify-between">
-            <h2 className="font-trajan text-3xl text-[#8b0000] md:text-4xl">
+            <h2 className="font-trajan text-3xl font-extrabold text-primary md:text-5xl">
               {t("title")}
             </h2>
 

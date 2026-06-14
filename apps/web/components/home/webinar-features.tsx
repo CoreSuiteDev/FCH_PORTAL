@@ -30,7 +30,7 @@ export function WebinarFeatures() {
           viewport={{ once: true }}
           className="mb-16 text-center"
         >
-          <h2 className="font-trajan text-3xl leading-[1.2] tracking-normal whitespace-pre-line text-[#8b1a1a] md:text-5xl">
+          <h2 className="font-trajan text-3xl leading-[1.1] font-bold tracking-normal whitespace-pre-line text-primary md:text-5xl">
             {t("title")}
           </h2>
           <p className="mx-auto mt-6 max-w-2xl font-montserrat text-base leading-relaxed text-gray-700">
@@ -55,7 +55,7 @@ export function WebinarFeatures() {
                     <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-[#8b1a1a] text-white shadow-md">
                       <Icon className="h-8 w-8" strokeWidth={1.5} />
                     </div>
-                    <h3 className="mb-4 font-trajan text-[15px] font-bold tracking-wider text-[#8b1a1a] uppercase">
+                    <h3 className="mb-4 font-trajan text-[15px] font-bold tracking-wider text-primary uppercase">
                       {feature.title}
                     </h3>
                     <p className="font-montserrat text-sm leading-relaxed text-gray-600">

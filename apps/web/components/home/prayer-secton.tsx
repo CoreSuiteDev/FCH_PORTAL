@@ -8,15 +8,15 @@ export function PrayerSection() {
   const lines = t.raw("lines") as string[]
 
   return (
-    <section className="relative max-h-[500px] w-full bg-cover bg-fixed bg-center py-16 md:py-22">
+    <section className="relative max-h-[550px] w-full bg-cover bg-fixed bg-center py-16 md:py-22">
       <div className="absolute inset-0 bg-black/60" />
 
       <Container className="relative z-10 flex flex-col items-center justify-center px-4 text-center text-white">
-        <h2 className="mb-8 font-trajan text-3xl tracking-wide md:text-5xl">
+        <h2 className="mb-8 font-trajan text-3xl font-extrabold tracking-wide md:text-5xl">
           {t("title")}
         </h2>
 
-        <div className="max-w-3xl space-y-4 font-montserrat text-base leading-relaxed italic md:space-y-3 md:text-lg md:text-xl">
+        <div className="max-w-3xl space-y-1 font-montserrat text-base leading-relaxed italic md:space-y-1 md:text-lg">
           {lines.map((line, index) => (
             <p key={index}>{line}</p>
           ))}
