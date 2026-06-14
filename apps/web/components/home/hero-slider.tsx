@@ -47,8 +47,8 @@ export function HeroCarousel() {
       <div className="pointer-events-none absolute inset-0 z-10 bg-black/60" />
 
       {/* Hero content overlay */}
-      <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-start px-12">
-        <Container className="pointer-events-auto">
+      <div className="pointer-events-none absolute inset-0 z-20 mx-auto flex max-w-7xl items-center justify-start px-4">
+        <div className="pointer-events-auto">
           <div className="max-w-2xl text-left text-white">
             {/* Accessing data via hero object */}
             <h3 className="mb-4 font-montserrat text-sm font-medium tracking-[0.2em] uppercase">
@@ -77,7 +77,7 @@ export function HeroCarousel() {
               </Link>
             </div>
           </div>
-        </Container>
+        </div>
       </div>
     </div>
   )

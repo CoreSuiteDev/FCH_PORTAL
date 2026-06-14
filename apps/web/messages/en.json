@@ -21,8 +21,8 @@
 
   "home": {
     "hero": {
-      "label": "FEDERATION FOR CATECHESIS WITH HISPANICS",
-      "title": "TO SERVE THOSE WHO\nMINISTER IN CATECHESIS\nWITH HISPANICS.",
+      "label": "Federation For Catechesis With Hispanics",
+      "title": "To Serve Those Who\nMinister In Catechesis\nWith Hispanics.",
       "description": "Empowering Catholic leaders, teachers, organizations, and groups through resource curation and community advocacy.",
       "buttons": {
         "membership": "Become a Member",
@@ -30,7 +30,7 @@
       }
     },
     "events": {
-      "sectionTitle": "UPCOMING EVENTS",
+      "sectionTitle": "Upcoming Events",
       "items": [
         {
           "id": "1",
@@ -49,13 +49,13 @@
       ]
     },
     "about": {
-      "title": "ABOUT FCH CATECHESIS",
+      "title": "About Fch Catechesis",
       "description1": "FCH is a national organization committed to advancing evangelization and catechesis among individuals and communities involved in ministry, leadership, and faith formation at every level. Through mentorship, collaboration, education, and advocacy, we strive to strengthen and support those who dedicate themselves to sharing the Gospel and nurturing lifelong faith development.",
       "description2": "Rooted in the richness and diversity of the Hispanic/Latino community, FCH works to empower leaders, catechists, ministers, and families by providing guidance, resources, and opportunities for formation that respond to the cultural and spiritual needs of the people they serve.",
       "button": "More About Us"
     },
     "webinar": {
-      "title": "CONNECT ANYWHERE WITH\nOUR WEBINARS",
+      "title": "Connect Anywhere With\nOur Webinars",
       "subtitle": "Bringing world-class catechetical formation directly to your home or parish office through our accessible digital platform",
       "features": [
         {
@@ -81,7 +81,7 @@
       ]
     },
     "prayer": {
-      "title": "PRAYER OF THE ROMAN MISSAL",
+      "title": "Prayer Of The Roman Missal",
       "lines": [
         "O God, shepherd and ruler of all the faithful,",
         "look favorably upon your servant, Leo XIV,",
@@ -94,43 +94,43 @@
       "closing": "Through our Lord Jesus Christ, your Son,\nwho lives and reigns with you in the unity of the Holy Spirit,\none God, for ever and ever. Amen."
     },
     "testimonials": {
-      "title": "WHAT PEOPLE SAY",
+      "title": "What People Say",
       "items": [
         {
           "id": "1",
           "text": "The Church in the United States must have a space where religious educators and other pastoral leaders come together on a regular basis to reflect about how catechesis takes place in light of the Hispanic Catholic Experience.",
-          "name": "HOSFFMAN OSPINO, PHD",
+          "name": "Hosffman Ospino, Phd",
           "role": "Boston college"
         },
         {
           "id": "2",
           "text": "Hispanic catechists need an organization to be able to share. What can we share? Well, our goals, achievements, successes, challenges and how we learn along the way.",
-          "name": "IUPITA VITAL",
+          "name": "Iupita Vital",
           "role": "Director to the Hispanic Apostolate, San Jose Diócesis, CA"
         },
         {
           "id": "3",
           "text": "FCH is a place to go and find a network of people with whom we can share what I do in catechism sessions.",
-          "name": "MARIA GARCIA",
+          "name": "Maria Garcia",
           "role": "Catechist, Diocese of Austin"
         },
         {
           "id": "4",
           "text": "An incredible resource that has transformed how we approach pastoral leadership in our parish community.",
-          "name": "REV. ANTHONY SMITH",
+          "name": "Rev. Anthony Smith",
           "role": "Pastor, St. Jude Parish"
         }
       ]
     },
     "support": {
-      "title": "BECOME A PROUD FCH MEMBER",
+      "title": "Become A Proud Fch Member",
       "description": "Together we can help each other be better catechists, 'a Christian who receives a particular calling from God that, when accepted in faith, empowers him for the service of transmission of the faith and for the task of initiating others into the Christian life' as describe by The Directory for Catechesis.",
-      "supportTitle": "SUPPORT US",
+      "supportTitle": "Support Us",
       "supportText": "We are more than an organization or a website. We are a group of catechists like you who believe that when we share our teaching/evangelization best practices, we are stronger.",
       "buttonText": "Donate Now"
     },
     "news": {
-      "title": "LATEST NEWS",
+      "title": "Latest News",
       "button": "More News",
       "readMore": "Read More",
       "meta": {
@@ -140,21 +140,21 @@
       "items": [
         {
           "id": "1",
-          "title": "AUGUSTINE INSTITUTE SPONSORS FCH AT THE LA CONFERENCE",
+          "title": "Augustine Institute Sponsors Fch At The La Conference",
           "description": "A big thank you to the Augustine Institute for sponsoring Rev. Yojaneider Garcia, FCH Theologian, to attend the Los Angeles.",
           "author": "Luke Admin",
           "date": "May 20, 2026"
         },
         {
           "id": "2",
-          "title": "FCH JOINS NUEVO MOMENTO INITIATIVE AT BOSTON COLLEGE",
+          "title": "Fch Joins Nuevo Momento Initiative At Boston College",
           "description": "FCH becomes part of the Nuevo Momento, a Boston College Initiative under the direction of Dr. Hoffman Ospino to empower.",
           "author": "Luke Admin",
           "date": "May 22, 2026"
         },
         {
           "id": "3",
-          "title": "POPE FRANCIS 1936-2025",
+          "title": "Pope Francis 1936-2025",
           "description": "May God's love and peace be a comfort to all those who knew, loved and were blessed by the ministry.",
           "author": "Luke Admin",
           "date": "May 25, 2026"
@@ -162,7 +162,7 @@
       ]
     },
     "newsletter": {
-      "title": "SIGN UP FOR OUR NEWSLETTER",
+      "title": "Sign Up For Our Newsletter",
       "firstNameLabel": "Name",
       "firstNamePlaceholder": "First Name",
       "lastNamePlaceholder": "Last Name",
@@ -178,7 +178,7 @@
 
   "about": {
     "hero": {
-      "title": "PARTNER WITH US IN MISSION",
+      "title": "Partner With Us In Mission",
       "description": "Support FCH's work in advancing catechesis, faith formation, and community engagement within Hispanic Catholic communities. Your sponsorship helps make our programs, events, and resources possible.",
       "buttonSponsor": "View Sponsorship Tiers",
       "buttonInquire": "Inquire Today"
@@ -192,7 +192,7 @@
     },
     "mission": {
       "missionTitle": "Our Mission",
-      "missionText": "TO SERVE THOSE WHO MINISTER IN CATECHESIS WITH HISPANICS.",
+      "missionText": "To Serve Those Who Minister In Catechesis With Hispanics.",
       "serveTitle": "Who We Serve",
       "serveText1": "FCH is here for those who serve, lead, and accompany Hispanic/Latino communities in faith formation and evangelization.",
       "serveText2": "We support diocesan leaders, parish catechists, ministry volunteers, educators, organizations, and pastoral leaders at every level. Whether you are experienced in catechetical ministry or just beginning your journey, FCH provides support, guidance, resources, and a community committed to walking with you."
@@ -249,7 +249,7 @@
       ]
     },
     "objectives": {
-      "title": "COLLABORATION\nOBJECTIVES",
+      "title": "Collaboration\nObjectives",
       "items": [
         {
           "title": "Enhance Mission",
@@ -282,7 +282,7 @@
     },
     "whyJoin": {
       "subtitle": "Foundation",
-      "title": "WHY JOIN FCH CATECHESIS?",
+      "title": "Why Join Fch Catechesis?",
       "features": {
         "community": {
           "title": "Community Impact",
@@ -360,7 +360,7 @@
   "sponsorship": {
     "hero": {
       "title": "Partner With Us in Mission",
-      "description": "Support FCH’s work in advancing catechesis, faith formation, and community engagement within Hispanic Catholic communities. Your sponsorship helps make our programs, events, and resources possible.",
+      "description": "Support FCH's work in advancing catechesis, faith formation, and community engagement within Hispanic Catholic communities. Your sponsorship helps make our programs, events, and resources possible.",
       "buttonSponsor": "View Sponsorship Tiers",
       "buttonInquire": "Inquire Today"
     },
@@ -446,7 +446,7 @@
       ]
     },
     "haveQuestions": {
-      "title": "HAVE QUESTIONS\nABOUT SPONSORSHIP?",
+      "title": "Have Questions\nAbout Sponsorship?",
       "description": "Send us your questions, needs, or subjects you would like to discuss. We are here to help find the right partnership level for your organization.",
       "button": "Contact Us"
     }
@@ -507,7 +507,7 @@
       "description": "FCH webinars provide virtual formation opportunities for catechists, ministry leaders, and pastoral communities serving Hispanic Catholics. Through live webinars and on-demand resources, FCH is building a growing Learning Library to support faith formation, leadership development, and ministry service across our community."
     },
     "upcoming": {
-      "heading": "UPCOMING EVENTS",
+      "heading": "Upcoming Events",
       "text": "Join live webinars and formation sessions designed for healthcare professionals and ministry leaders.",
       "features": [
         "Live expert-led formation sessions",
@@ -519,7 +519,7 @@
       "bannerSubtitle": "Formation • Leadership • Growth"
     },
     "past": {
-      "heading": "PAST WEBINARS",
+      "heading": "Past Webinars",
       "items": [
         {
           "title": "Faith & Healthcare Integration",
