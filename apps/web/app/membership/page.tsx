@@ -27,7 +27,7 @@ export default function Membership() {
       <main className="relative">
         <DynamicHero>
           <div className="relative z-10">
-            <h2 className="mb-4 font-serif text-4xl font-bold text-white md:text-6xl whitespace-pre-line">
+            <h2 className="mb-4 font-trajan text-4xl font-bold whitespace-pre-line text-white md:text-5xl">
               {t("title")}
             </h2>
 

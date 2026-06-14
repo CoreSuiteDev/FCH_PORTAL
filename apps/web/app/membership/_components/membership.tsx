@@ -45,7 +45,7 @@ export default function MembershipPackages() {
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold tracking-widest text-primary uppercase">
             {t("plan")}
           </span>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-[#2C2927] sm:text-5xl">
+          <h1 className="mt-3 pt-4 font-trajan text-4xl font-extrabold tracking-tight whitespace-pre-line text-[#2C2927] sm:text-5xl">
             {t("title")}
           </h1>
 
@@ -94,7 +94,7 @@ export default function MembershipPackages() {
 
                 <div>
                   <div className="mb-5">
-                    <h3 className="text-xl font-bold text-[#2C2927]">
+                    <h3 className="font-trajan text-xl font-extrabold text-[#2C2927]">
                       {item.title}
                     </h3>
                     <p className="mt-2 text-xs text-muted-foreground">
@@ -107,7 +107,10 @@ export default function MembershipPackages() {
                       ${getPrice(item.price)}
                     </span>
                     <span className="ml-1.5 text-xs text-muted-foreground">
-                      / {billingCycle === "monthly" ? t("monthSuffix") : t("yearSuffix")}
+                      /{" "}
+                      {billingCycle === "monthly"
+                        ? t("monthSuffix")
+                        : t("yearSuffix")}
                     </span>
                   </div>
 

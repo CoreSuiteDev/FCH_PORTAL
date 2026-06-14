@@ -38,7 +38,7 @@ export default function WhyJoin() {
           <p className="mb-2 text-sm font-medium tracking-[0.2em] text-primary uppercase">
             {t("subtitle")}
           </p>
-          <h2 className="mb-16 text-4xl font-semibold text-primary md:text-5xl">
+          <h2 className="mb-16 font-trajan text-2xl font-bold text-primary md:text-5xl">
             {t("title")}
           </h2>
         </motion.div>

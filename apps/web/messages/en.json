@@ -304,7 +304,7 @@
     },
     "packages": {
       "plan": "Membership Plan",
-      "title": "Select Your Workspace Access Level",
+      "title": "Select Your Workspace \n Access Level",
       "monthly": "Monthly",
       "yearly": "Yearly",
       "recommended": "Recommended",
