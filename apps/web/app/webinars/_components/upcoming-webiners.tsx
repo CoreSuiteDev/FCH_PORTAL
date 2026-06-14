@@ -22,8 +22,8 @@ export default function UpcomingWebinars() {
   const footer = t.raw("footer")
 
   return (
-    <section className="bg-white py-24">
-      <Container className="mx-auto px-6">
+    <section className="bg-white py-16 md:py-20">
+      <Container className="mx-auto">
         {/* TOP SECTION */}
         <div className="mb-14 grid items-center gap-14 lg:grid-cols-2">
           <div className="space-y-6">

@@ -16,6 +16,7 @@ import {
   SheetTrigger,
 } from "@workspace/ui/components/sheet"
 import { LanguageSwitcher } from "../LanguageSwitcher"
+import Container from "../shared/container"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -76,7 +77,7 @@ export default function Navbar() {
     >
       {/* Top Bar */}
       <div className="hidden border-b bg-gray-50 md:block">
-        <div className="container mx-auto flex items-center justify-between px-4 py-1 text-xs text-gray-500">
+        <Container className="mx-auto flex items-center justify-between px-4 py-1 text-xs text-gray-500">
           <LanguageSwitcher />
           <div className="flex items-center gap-6">
             <span className="flex cursor-pointer items-center gap-1 hover:text-red-600">
@@ -88,11 +89,11 @@ export default function Navbar() {
               </span>
             </Link>
           </div>
-        </div>
+        </Container>
       </div>
 
       {/* Main Nav */}
-      <div className="container mx-auto flex items-center justify-between px-4 py-3">
+      <Container className="mx-auto flex items-center justify-between px-4 py-3">
         <Link href="/" className="relative block h-[50px] w-[120px]">
           <Image
             src="/assets/fch-logo-new-xp-scaled.png"
@@ -179,7 +180,7 @@ export default function Navbar() {
             </SheetContent>
           </Sheet>
         </div>
-      </div>
+      </Container>
     </header>
   )
 }

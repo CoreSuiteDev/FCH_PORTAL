@@ -10,7 +10,7 @@ export default function Sponsorship() {
   const tiers = t.raw("items") as any[]
 
   return (
-    <div className="bg-white px-4 py-16">
+    <div className="bg-white py-16">
       <Container className="mx-auto">
         <h2 className="mb-12 text-center font-serif text-4xl tracking-wide whitespace-pre-line text-red-900 uppercase">
           {t("sectionTitle")}

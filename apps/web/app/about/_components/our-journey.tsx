@@ -14,12 +14,8 @@ const OurJourney: React.FC = () => {
           {/* Left Content */}
           <div className="space-y-6">
             <h2 className="text-4xl text-[#800000]">{t("title")}</h2>
-            <p className="leading-relaxed text-gray-700">
-              {t("description1")}
-            </p>
-            <p className="leading-relaxed text-gray-700">
-              {t("description2")}
-            </p>
+            <p className="leading-relaxed text-gray-700">{t("description1")}</p>
+            <p className="leading-relaxed text-gray-700">{t("description2")}</p>
           </div>
 
           {/* Right Stats Block */}
@@ -27,15 +23,15 @@ const OurJourney: React.FC = () => {
           <div className="bg-[#FBF9F8] p-8 md:p-14">
             <div className="grid grid-cols-2 overflow-hidden bg-[#F3F3F3]">
               {/* Stat 1: 20+ Years */}
-              <div className="flex h-190 flex-col items-center justify-center md:h-[260px]">
+              <div className="flex h-[190px] flex-col items-center justify-center md:h-[255px]">
                 <span className="text-5xl text-red-800">{t("years")}</span>
-                <span className="mt-2 text-sm font-semibold text-gray-666">
+                <span className="text-gray-666 mt-2 text-sm font-semibold">
                   {t("yearsLabel")}
                 </span>
               </div>
 
               {/* Stat 2: 50 Partners */}
-              <div className="flex flex-col items-center justify-center bg-[#B82A32] py-12 text-white">
+              <div className="flex h-[190px] flex-col items-center justify-center bg-[#B82A32] py-12 text-white md:h-[255px]">
                 <span className="text-5xl">{t("partners")}</span>
                 <span className="mt-2 text-sm font-medium text-white">
                   {t("partnersLabel")}
