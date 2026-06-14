@@ -21,20 +21,30 @@ export class UserService {
   }
 
   /**
-   * Fetch all registered users, including roles, memberships, and payments
+   * Fetch all registered users, including roles, memberships, and payments (paginated)
    */
-  static async findAllUsers() {
-    return prisma.user.findMany({
-      include: {
-        userRoles: {
-          include: {
-            role: true,
+  static async findAllUsers(params: { page: number; limit: number }) {
+    const { page, limit } = params
+    const skip = (page - 1) * limit
+
+    const [totalCount, data] = await prisma.$transaction([
+      prisma.user.count(),
+      prisma.user.findMany({
+        skip,
+        take: limit,
+        include: {
+          userRoles: {
+            include: {
+              role: true,
+            },
           },
+          memberships: true,
+          payments: true,
         },
-        memberships: true,
-        payments: true,
-      },
-    })
+      }),
+    ])
+
+    return { totalCount, data }
   }
 
   /**

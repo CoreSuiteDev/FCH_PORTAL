@@ -3,14 +3,37 @@ import { EventVisibility, EventType, EventStatus } from "../../../generated/pris
 
 export class EventsService {
   /**
-   * Fetch all registered events that are active
+   * Fetch registered events that are active and visible (paginated)
    */
-  static async getAllEvents() {
-    return prisma.event.findMany({
-      where: { isActive: true },
-      include: { webinar: true },
-      orderBy: { startDate: "asc" },
-    })
+  static async getAllEvents(params: {
+    allowedVisibilities: EventVisibility[]
+    page: number
+    limit: number
+  }) {
+    const { allowedVisibilities, page, limit } = params
+    const skip = (page - 1) * limit
+
+    const whereClause = {
+      isActive: true,
+      visibility: {
+        in: allowedVisibilities,
+      },
+    }
+
+    const [totalCount, data] = await prisma.$transaction([
+      prisma.event.count({
+        where: whereClause,
+      }),
+      prisma.event.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        include: { webinar: true },
+        orderBy: { startDate: "asc" },
+      }),
+    ])
+
+    return { totalCount, data }
   }
 
   /**

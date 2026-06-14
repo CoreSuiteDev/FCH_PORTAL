@@ -42,7 +42,7 @@ const MoreNewsSection = () => {
 
   return (
     <section className="bg-slate-50 py-20">
-      <Container className="mx-auto px-6">
+      <Container className="mx-auto">
         <div className="mb-12 border-b border-gray-200 pb-8">
           <h2 className="font-trajan text-4xl font-bold text-[#8b0000]">
             More news

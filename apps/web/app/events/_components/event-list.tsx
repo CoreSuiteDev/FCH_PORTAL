@@ -24,7 +24,7 @@ export default function EventsList() {
 
   return (
     <section className="bg-white">
-      <Container className="p-8">
+      <Container className="py-8">
         {/* Hero Banner */}
         {heroEvent && (
           <section className="relative mb-12 flex h-[400px] flex-col justify-end overflow-hidden rounded-3xl p-12 text-white">

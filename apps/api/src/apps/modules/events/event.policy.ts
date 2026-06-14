@@ -18,6 +18,20 @@ export const VISIBILITY_LEVEL: Record<EventVisibility, number> = {
 
 export class EventPolicy {
   /**
+   * Returns a list of all visibility settings the user's role can view
+   */
+  static getAllowedVisibilities(userRole: string | undefined): EventVisibility[] {
+    const role = userRole ? userRole.toUpperCase() : "GUEST"
+    if (role === "SUPER_ADMIN") {
+      return ["PUBLIC", "FREE_WEBINAR", "MEMBER_ONLY", "PASTORAL_ONLY", "BOARD_ONLY"]
+    }
+    const userScore = ROLE_HIERARCHY[role] ?? 0
+    return Object.entries(VISIBILITY_LEVEL)
+      .filter(([_, level]) => level <= userScore)
+      .map(([vis]) => vis as EventVisibility)
+  }
+
+  /**
    * Evaluates if a given role can view an event
    */
   static canView(userRole: string | undefined, eventVisibility: EventVisibility): boolean {

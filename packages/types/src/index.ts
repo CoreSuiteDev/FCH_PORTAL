@@ -212,4 +212,81 @@ export const ZCICreateEventSchema = z.object({
 });
 export type ZTCCreateEvent = z.infer<typeof ZCICreateEventSchema>;
 
+// --- PAGINATION SCHEMAS ---
+
+export const PaginationInputSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+export type ZTPaginationInput = z.infer<typeof PaginationInputSchema>;
+
+export const PaginationMetaSchema = z.object({
+  totalCount: z.number(),
+  page: z.number(),
+  limit: z.number(),
+  totalPages: z.number(),
+  hasNextPage: z.boolean(),
+  hasPreviousPage: z.boolean(),
+});
+export type ZTPaginationMeta = z.infer<typeof PaginationMetaSchema>;
+
+export const ZCIPaginatedUsersSchema = z.object({
+  data: z.array(ZCIUserOutputSchema),
+  meta: PaginationMetaSchema,
+});
+export type ZTPaginatedUsers = z.infer<typeof ZCIPaginatedUsersSchema>;
+
+export const ZCIPaginatedPaymentsSchema = z.object({
+  data: z.array(
+    z.object({
+      id: z.string(),
+      amount: z.number(),
+      status: z.string(),
+      date: z.coerce.date(),
+    })
+  ),
+  meta: PaginationMetaSchema,
+});
+export type ZTPaginatedPayments = z.infer<typeof ZCIPaginatedPaymentsSchema>;
+
+export const ZCIPaginatedEventsSchema = z.object({
+  data: z.array(ZCIEventSchema),
+  meta: PaginationMetaSchema,
+});
+export type ZTPaginatedEvents = z.infer<typeof ZCIPaginatedEventsSchema>;
+
+// --- CONTACT INQUERY SCHEMAS ---
+
+export const ZCIContactInquerySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().email("Invalid email address"),
+  phone: z.string(),
+  message: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+export type ZTContactInquery = z.infer<typeof ZCIContactInquerySchema>;
+
+export const ZCICreateInquerySchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(1, "Phone number is required"),
+  message: z.string().min(1, "Message is required"),
+});
+export type ZTCreateInquery = z.infer<typeof ZCICreateInquerySchema>;
+
+export const ZCIUpdateInquerySchema = z.object({
+  name: z.string().optional(),
+  email: z.string().email("Invalid email address").optional(),
+  phone: z.string().optional(),
+  message: z.string().optional(),
+});
+export type ZTUpdateInquery = z.infer<typeof ZCIUpdateInquerySchema>;
+
+export const ZCIPaginatedInqueriesSchema = z.object({
+  data: z.array(ZCIContactInquerySchema),
+  meta: PaginationMetaSchema,
+});
+export type ZTPaginatedInqueries = z.infer<typeof ZCIPaginatedInqueriesSchema>;
 

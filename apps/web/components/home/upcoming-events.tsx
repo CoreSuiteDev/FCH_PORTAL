@@ -26,7 +26,7 @@ export function UpcomingEvents() {
           viewport={{ once: true }}
           className="mb-16 text-center md:text-left"
         >
-          <h2 className="font-trajan text-5xl tracking-wide text-[#8b1a1a]">
+          <h2 className="font-trajan text-2xl font-extrabold text-primary md:text-5xl">
             {t("sectionTitle")}
           </h2>
           <div className="mx-auto mt-4 h-1 w-20 bg-green-700 md:mx-0" />

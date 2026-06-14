@@ -30,7 +30,7 @@ export default function SponsorshipPartner() {
 
   return (
     <div className="bg-white">
-      <section className="bg-[#FBF9F8] px-4 py-16">
+      <section className="bg-[#FBF9F8] py-16">
         <Container className="mx-auto flex flex-col items-center gap-12 lg:flex-row lg:gap-16">
           <motion.div
             initial={{ opacity: 0, x: -50 }}

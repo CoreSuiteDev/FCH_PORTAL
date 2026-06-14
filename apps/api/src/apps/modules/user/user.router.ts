@@ -1,7 +1,8 @@
 import { z } from "zod"
-import { router, publicProcedure } from "../../../server/trpc.js"
+import { router, publicProcedure, protectedProcedure, adminProcedure } from "../../../server/trpc.js"
 import { UserController } from "./user.controller.js"
-import { ZCIUserOutputSchema } from "@workspace/types"
+import { ZCIUserOutputSchema, PaginationInputSchema, ZCIPaginatedUsersSchema } from "@workspace/types"
+import { getPaginationMeta } from "../../../utils/pagination.js"
 
 // Helper to map DB relations to Zod output schema format
 const mapUser = (user: any) => ({
@@ -34,7 +35,7 @@ const mapUser = (user: any) => ({
 })
 
 export const userRouter = router({
-  getProfile: publicProcedure
+  getProfile: protectedProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -51,24 +52,29 @@ export const userRouter = router({
       return mapUser(user)
     }),
 
-  listMembers: publicProcedure
+  listMembers: adminProcedure
     .meta({
       openapi: {
         method: "GET",
         path: "/users/list",
         tags: ["users"],
         summary: "List all registered members",
-        description: "Returns an array of all members"
+        description: "Returns a paginated list of all members",
       },
     })
-    .input(z.void())
-    .output(z.array(ZCIUserOutputSchema))
-    .query(async () => {
-      const users = await UserController.listAllMembers()
-      return users.map(mapUser)
+    .input(PaginationInputSchema.optional())
+    .output(ZCIPaginatedUsersSchema)
+    .query(async ({ input }) => {
+      const page = input?.page ?? 1
+      const limit = input?.limit ?? 10
+      const { totalCount, data } = await UserController.listAllMembers({ page, limit })
+      return {
+        data: data.map(mapUser),
+        meta: getPaginationMeta(totalCount, page, limit),
+      }
     }),
 
-  updateStatus: publicProcedure
+  updateStatus: adminProcedure
     .meta({
       openapi: {
         method: "PATCH",
@@ -97,7 +103,7 @@ export const userRouter = router({
       })
     }),
 
-  deleteUser: publicProcedure
+  deleteUser: adminProcedure
     .meta({
       openapi: {
         method: "DELETE",
@@ -113,7 +119,7 @@ export const userRouter = router({
       return UserController.deleteUser({ userId: input.userId })
     }),
 
-  createMember: publicProcedure
+  createMember: adminProcedure
     .meta({
       openapi: {
         method: "POST",

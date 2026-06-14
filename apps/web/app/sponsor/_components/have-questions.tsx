@@ -8,7 +8,7 @@ export default function HaveQuestions() {
 
   return (
     <section
-      className="relative flex min-h-[400px] w-full items-center justify-center bg-cover bg-center px-6 py-20"
+      className="relative flex min-h-[400px] w-full items-center justify-center bg-cover bg-center py-20"
       style={{ backgroundImage: "url('/assets/Have.webp')" }}
     >
       {/* Dark Overlay for readability */}

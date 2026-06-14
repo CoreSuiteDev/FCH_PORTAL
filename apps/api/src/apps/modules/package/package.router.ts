@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { router, publicProcedure } from "../../../server/trpc.js"
+import { router, publicProcedure, adminProcedure } from "../../../server/trpc.js"
 import { PackageController } from "./package.controller.js"
 import {
   ZCIMembershipPackageSchema,
@@ -41,7 +41,7 @@ export const packageRouter = router({
       return packages.map(mapPackage)
     }),
 
-  create: publicProcedure
+  create: adminProcedure
     .meta({
       openapi: {
         method: "POST",
@@ -58,7 +58,7 @@ export const packageRouter = router({
       return mapPackage(pkg)
     }),
 
-  update: publicProcedure
+  update: adminProcedure
     .meta({
       openapi: {
         method: "PATCH",
@@ -80,7 +80,7 @@ export const packageRouter = router({
       return mapPackage(pkg)
     }),
 
-  delete: publicProcedure
+  delete: adminProcedure
     .meta({
       openapi: {
         method: "DELETE",

@@ -21,8 +21,9 @@ model User {
 
   auditLogs AuditLog[]
 
+  eventRegistrations EventRegistration[]
 
-   eventRegistrations EventRegistration[]
+  committeeMembers CommitteeMember[]
 
   @@unique([email])
   @@index([status])

@@ -15,7 +15,7 @@ export function NewsSection() {
     <section className="bg-white py-20">
       <Container className="px-6">
         <div className="mb-12 flex items-end justify-between">
-          <h2 className="font-trajan text-4xl font-bold text-[#8b0000]">
+          <h2 className="font-trajan text-2xl font-bold text-[#8b0000] md:text-4xl">
             {t("title")}
           </h2>
           <Link href="/news">

@@ -19,7 +19,7 @@ const featureKeys = [
 
 export default function WhyJoin() {
   const t = useTranslations("membership.whyJoin")
-  
+
   const features = featureKeys.map((item) => ({
     title: t(`features.${item.key}.title`),
     desc: t(`features.${item.key}.desc`),
@@ -27,7 +27,7 @@ export default function WhyJoin() {
   }))
 
   return (
-    <section className="bg-white px-6 py-20">
+    <section className="bg-white py-16 md:py-20">
       <div className="mx-auto max-w-7xl text-center">
         {/* Title Section */}
         <motion.div
