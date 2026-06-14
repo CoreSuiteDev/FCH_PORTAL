@@ -16,7 +16,7 @@ export function LatestNewsSection() {
     <section className="bg-white py-20">
       <Container className="">
         <div className="mb-12 flex items-end justify-between">
-          <h2 className="font-trajan text-2xl font-bold text-[#8b0000] md:text-4xl">
+          <h2 className="font-trajan text-2xl font-bold text-primary md:text-4xl">
             {t("title")}
           </h2>
           <Link href="/news">
@@ -43,7 +43,7 @@ export function LatestNewsSection() {
               </div>
 
               <div className="flex-grow p-6">
-                <h3 className="mb-3 cursor-pointer text-lg font-bold text-gray-900 underline transition-colors hover:text-[#8b0000]">
+                <h3 className="mb-3 cursor-pointer text-lg font-bold text-gray-900 underline transition-colors hover:text-primary">
                   {news.title}
                 </h3>
                 <p className="mb-4 text-sm leading-relaxed text-gray-600">

@@ -39,7 +39,9 @@ export default function EventsList() {
               <span className="mb-2 inline-block rounded-full bg-white/20 px-4 py-1 text-xs font-semibold backdrop-blur-md">
                 {t("hero.featured")}
               </span>
-              <h1 className="text-5xl font-bold">{heroEvent.title}</h1>
+              <h1 className="font-trajan text-2xl font-bold md:text-5xl">
+                {heroEvent.title}
+              </h1>
               <p className="mt-2 max-w-xl text-lg text-gray-200">
                 {heroEvent.description}
               </p>
@@ -97,7 +99,7 @@ export default function EventsList() {
                       />
                     </div>
                     <div className="flex flex-1 flex-col p-6">
-                      <h3 className="text-xl leading-tight font-bold">
+                      <h3 className="font-trajan text-xl leading-tight font-bold">
                         {item.title}
                       </h3>
                       <div className="mt-4 flex-1 space-y-3 text-sm text-gray-600">

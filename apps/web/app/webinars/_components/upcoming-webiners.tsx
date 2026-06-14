@@ -27,7 +27,7 @@ export default function UpcomingWebinars() {
         {/* TOP SECTION */}
         <div className="mb-14 grid items-center gap-14 lg:grid-cols-2">
           <div className="space-y-6">
-            <h2 className="text-4xl font-bold text-[#8B0000]">
+            <h2 className="font-trajan text-4xl font-bold text-primary">
               {upcoming.heading}
             </h2>
             <p className="leading-relaxed text-gray-600">{upcoming.text}</p>
@@ -36,7 +36,7 @@ export default function UpcomingWebinars() {
                 <li key={i}>{f}</li>
               ))}
             </ul>
-            <Button className="bg-[#8B0000] hover:bg-[#6d0000]">
+            <Button className="bg-primary hover:bg-[#6d0000]">
               {upcoming.button}
             </Button>
           </div>
@@ -53,7 +53,9 @@ export default function UpcomingWebinars() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
             <div className="absolute bottom-0 p-8 text-white">
-              <h3 className="text-2xl font-bold">{upcoming.bannerTitle}</h3>
+              <h3 className="font-trajan text-2xl font-bold">
+                {upcoming.bannerTitle}
+              </h3>
               <p className="mt-2 text-sm text-white/80">
                 {upcoming.bannerSubtitle}
               </p>
@@ -62,7 +64,7 @@ export default function UpcomingWebinars() {
         </div>
 
         {/* PAST WEBINARS */}
-        <h2 className="mb-6 text-4xl font-bold text-[#8B0000]">
+        <h2 className="mb-6 font-trajan text-4xl font-bold text-primary">
           {past.heading}
         </h2>
         <Carousel opts={{ align: "start", loop: true }} className="w-full">
@@ -83,7 +85,9 @@ export default function UpcomingWebinars() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                       <div className="absolute bottom-0 p-5 text-white">
-                        <h3 className="text-lg font-bold">{item.title}</h3>
+                        <h3 className="font-trajan text-lg font-bold">
+                          {item.title}
+                        </h3>
                       </div>
                     </div>
                   </Card>
@@ -98,7 +102,7 @@ export default function UpcomingWebinars() {
         {/* CTA */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t pt-8 sm:flex-row">
           <p className="text-gray-600">{footer.text}</p>
-          <Button className="bg-[#8B0000] hover:bg-[#6d0000]">
+          <Button className="bg-primary hover:bg-[#6d0000]">
             {footer.button}
           </Button>
         </div>

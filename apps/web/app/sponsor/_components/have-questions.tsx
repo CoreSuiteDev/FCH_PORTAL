@@ -16,7 +16,7 @@ export default function HaveQuestions() {
 
       {/* Content Container */}
       <div className="relative z-10 max-w-2xl px-4 text-center text-white">
-        <h2 className="mb-6 text-2xl font-semibold tracking-tight whitespace-pre-line md:text-3xl lg:text-5xl">
+        <h2 className="mb-6 font-trajan text-2xl font-extrabold tracking-tight whitespace-pre-line md:text-3xl lg:text-5xl">
           {t("title")}
         </h2>
         <p className="mb-8 text-lg leading-relaxed text-gray-200 md:text-lg">

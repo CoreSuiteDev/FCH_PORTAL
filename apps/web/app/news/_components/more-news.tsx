@@ -44,7 +44,7 @@ const MoreNewsSection = () => {
     <section className="bg-slate-50 py-20">
       <Container className="mx-auto">
         <div className="mb-12 border-b border-gray-200 pb-8">
-          <h2 className="font-trajan text-4xl font-bold text-[#8b0000]">
+          <h2 className="font-trajan text-2xl font-bold text-primary md:text-5xl">
             More news
           </h2>
 
@@ -126,7 +126,7 @@ const MoreNewsSection = () => {
             }}
             className="flex flex-col gap-4"
           >
-            <button className="flex-1 rounded-2xl border-2 border-[#8b0000] bg-white p-6 font-semibold tracking-wider text-[#8b0000] uppercase transition-colors hover:bg-[#8b0000] hover:text-white">
+            <button className="flex-1 rounded-2xl border-2 border-primary bg-white p-6 font-semibold tracking-wider text-primary uppercase transition-colors hover:bg-primary hover:text-white">
               Vatican RSS
             </button>
 

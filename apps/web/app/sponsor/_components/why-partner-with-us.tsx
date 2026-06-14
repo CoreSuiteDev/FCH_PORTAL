@@ -56,7 +56,7 @@ export default function SponsorshipPartner() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <h2 className="mb-6 font-serif text-4xl font-bold text-red-900">
+              <h2 className="mb-6 font-trajan text-4xl font-bold text-primary">
                 {t("title")}
               </h2>
               <p className="mb-8 leading-relaxed text-gray-700">
@@ -74,7 +74,7 @@ export default function SponsorshipPartner() {
                   transition={{ duration: 0.5, delay: 0.4 + index * 0.2 }}
                   className="flex min-w-[140px] flex-col items-center justify-center rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
                 >
-                  <span className="text-3xl font-bold text-red-800">
+                  <span className="text-3xl font-bold text-primary">
                     <Counter value={stat.value} />+
                   </span>
                   <span className="text-sm text-gray-600">{stat.label}</span>

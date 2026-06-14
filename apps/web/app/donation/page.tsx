@@ -15,13 +15,13 @@ export default function DonateCard() {
   return (
     <div className="flex min-h-screen items-start justify-center bg-gray-50 pt-30">
       <div className="w-full max-w-xl rounded-3xl border border-gray-100 bg-white p-8 shadow-xl shadow-gray-200/50">
-        <h2 className="mb-2 text-center text-3xl font-bold text-red-900">
+        <h2 className="mb-2 text-center font-trajan text-3xl font-bold text-primary">
           {t("title")}
         </h2>
-        <div className="mx-auto mb-8 h-1 w-16 rounded-full bg-linear-to-r from-red-400 to-red-600" />
+        <div className="mx-auto mb-8 h-1 w-16 rounded-full bg-linear-to-r from-red-400 to-primary" />
 
         <div className="mb-6 flex items-center gap-2 text-gray-700">
-          <HandHeart className="h-5 w-5 text-red-600" />
+          <HandHeart className="h-5 w-5 text-primary" />
           <span className="font-semibold">{t("prompt")}</span>
         </div>
 
@@ -45,7 +45,7 @@ export default function DonateCard() {
           ))}
 
           <div className="relative col-span-1">
-            <div className="flex h-full items-center rounded-xl border bg-gray-50 px-3 focus-within:border-red-600 focus-within:ring-1 focus-within:ring-red-600">
+            <div className="flex h-full items-center rounded-xl border bg-gray-50 px-3 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
               <DollarSign className="h-4 w-4 text-gray-400" />
               <input
                 type="number"
@@ -61,7 +61,7 @@ export default function DonateCard() {
           </div>
         </div>
 
-        <Button className="mt-8 w-full rounded-xl bg-red-800 py-6 text-lg font-semibold transition-colors hover:bg-red-900">
+        <Button className="mt-8 w-full rounded-xl bg-red-800 py-6 text-lg font-semibold transition-colors hover:bg-primary">
           {t("button")} <ChevronRight className="ml-2 h-5 w-5" />
         </Button>
       </div>

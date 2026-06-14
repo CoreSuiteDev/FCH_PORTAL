@@ -12,7 +12,7 @@ export default function Sponsorship() {
   return (
     <div className="bg-white py-16">
       <Container className="mx-auto">
-        <h2 className="mb-12 text-center font-serif text-4xl tracking-wide whitespace-pre-line text-red-900 uppercase">
+        <h2 className="mb-12 text-center font-trajan text-4xl font-extrabold tracking-wide whitespace-pre-line text-primary">
           {t("sectionTitle")}
         </h2>
 
@@ -21,20 +21,20 @@ export default function Sponsorship() {
           {tiers.slice(0, 2).map((tier) => (
             <div
               key={tier.id}
-              className="relative flex flex-col rounded-lg border-2 border-red-900 p-8"
+              className="relative flex flex-col rounded-lg border-2 border-primary p-8"
             >
               {tier.isFeatured && (
-                <span className="absolute top-0 right-0 bg-red-800 px-3 py-1 text-xs text-white uppercase">
+                <span className="absolute top-0 right-0 bg-primary px-3 py-1 text-xs text-white uppercase">
                   Most Impactful
                 </span>
               )}
-              <p className="mb-2 text-sm font-bold text-red-800 uppercase">
+              <p className="mb-2 text-sm font-bold text-primary uppercase">
                 {tier.tierLabel}
               </p>
-              <h3 className="mb-1 font-serif text-3xl font-bold">
+              <h3 className="mb-1 font-trajan text-3xl font-bold">
                 {tier.title}
               </h3>
-              <p className="mb-6 text-2xl font-bold text-red-800">
+              <p className="mb-6 text-2xl font-bold text-primary">
                 {tier.price}{" "}
                 <span className="text-sm font-normal text-gray-600">
                   {tier.period}
@@ -48,7 +48,7 @@ export default function Sponsorship() {
                 ))}
               </ul>
               <Button
-                className={`w-full py-5 text-white ${tier.id === "diamond" ? "bg-red-700 hover:bg-red-800" : "bg-black hover:bg-gray-800"}`}
+                className={`w-full py-5 font-semibold text-white ${tier.id === "diamond" ? "bg-red-700 hover:bg-primary" : "bg-black hover:bg-gray-800"}`}
               >
                 {t("cta")}
               </Button>
@@ -61,15 +61,15 @@ export default function Sponsorship() {
           {tiers.slice(2).map((tier) => (
             <div
               key={tier.id}
-              className="flex flex-col rounded-lg border-2 border-red-900 p-6"
+              className="flex flex-col rounded-lg border-2 border-primary p-6"
             >
-              <p className="mb-2 text-sm font-bold text-red-800 uppercase">
+              <p className="mb-2 text-sm font-bold text-primary uppercase">
                 {tier.tierLabel}
               </p>
-              <h3 className="mb-1 font-serif text-2xl font-bold">
+              <h3 className="mb-1 font-trajan text-2xl font-bold">
                 {tier.title}
               </h3>
-              <p className="mb-6 text-xl font-bold text-red-800">
+              <p className="mb-6 text-xl font-bold text-primary">
                 {tier.price}{" "}
                 <span className="text-sm font-normal text-gray-600">
                   {tier.period}
@@ -84,7 +84,7 @@ export default function Sponsorship() {
               </ul>
               <Button
                 variant="outline"
-                className="w-full border-red-900 py-5 text-red-900"
+                className="w-full border-primary py-5 font-semibold text-primary"
               >
                 {t("cta")}
               </Button>
