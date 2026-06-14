@@ -106,4 +106,20 @@ export const boardMembersAccessData: BoardMemberAccess[] = [
     lastActive: "Just Now",
     clearanceLevel: "Pastoral",
   },
+  {
+    id: "BRD-013",
+    name: "Diana Prince",
+    role: "External Auditor",
+    mfaStatus: "Enabled",
+    lastActive: "Just Now",
+    clearanceLevel: "Pastoral",
+  },
+  {
+    id: "BRD-014",
+    name: "Diana Prince",
+    role: "External Auditor",
+    mfaStatus: "Enabled",
+    lastActive: "Just Now",
+    clearanceLevel: "Pastoral",
+  },
 ]
