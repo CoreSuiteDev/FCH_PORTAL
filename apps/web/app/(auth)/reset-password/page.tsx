@@ -43,7 +43,7 @@ export default function ResetPasswordForm() {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 shadow-md">
               <CheckCircle2 size={24} />
             </div>
-            <h2 className="text-4xl font-bold tracking-tight text-foreground">
+            <h2 className="font-trajan text-3xl font-extrabold tracking-tight text-foreground">
               {t("successTitle")}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">

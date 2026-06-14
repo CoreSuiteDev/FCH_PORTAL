@@ -42,7 +42,7 @@ export default function ForgotPasswordForm() {
         {currentStep === "ENTER_EMAIL" && (
           <div className="animate-in duration-300 fade-in">
             <div className="mb-8 flex flex-col items-center text-center">
-              <h2 className="text-4xl font-bold tracking-tight text-foreground">
+              <h2 className="font-trajan text-3xl font-extrabold tracking-tight text-foreground">
                 {t("step1Title")}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -99,7 +99,7 @@ export default function ForgotPasswordForm() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-md shadow-primary/20">
                 <KeyRound size={20} className="text-primary-foreground" />
               </div>
-              <h2 className="text-3xl font-bold tracking-tight text-foreground">
+              <h2 className="font-trajan text-3xl font-extrabold tracking-tight text-foreground">
                 {t("step2Title")}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">

@@ -35,7 +35,7 @@ export default function LoginForm() {
 
       <div className="relative z-10 w-full max-w-[500px] rounded-2xl border border-border/60 bg-card p-8 text-card-foreground shadow-xl backdrop-blur-md">
         <div className="mb-8 flex flex-col items-center text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground">
+          <h2 className="font-trajan text-3xl font-extrabold tracking-tight text-foreground">
             {t("title")}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">{t("subtitle")}</p>
