@@ -183,9 +183,15 @@ export class EventsService {
     }
 
     return prisma.$transaction(async (tx) => {
-      // 1. Fetch event — no _count needed; we use currentCount column instead
+      
       const event = await tx.event.findUnique({
         where: { id: eventId },
+        select: {
+          id: true,
+          isActive: true,
+          status: true,
+          maxCapacity: true,
+        }
       })
 
       if (!event) throw new Error("Event not found")
@@ -195,39 +201,37 @@ export class EventsService {
         throw new Error("Registration is closed for this event")
       }
 
-      // 2. Prevent duplicate registration (fast fail before touching capacity)
-      const existing = await tx.eventRegistration.findFirst({
-        where: { eventId, userId },
-      })
-
-      if (existing) {
-        throw new Error("User already registered for this event")
-      }
-
-      const updatedEvent = await tx.event.updateMany({
-        where: {
-          id: eventId,
-          ...(event.maxCapacity
-            ? { currentCount: { lt: event.maxCapacity } }
-            : {}),
-        },
-        data: {
-          currentCount: { increment: 1 },
-        },
-      })
-
-      if (updatedEvent.count === 0 && event.maxCapacity !== null) {
-        throw new Error("Event capacity limit has been reached")
-      }
-
-      // 4. Create the registration
-      return tx.eventRegistration.create({
+      const registration = await tx.eventRegistration.create({
         data: {
           eventId,
           userId,
           status: "CONFIRMED",
-        },
+        }
       })
+
+      if(event.maxCapacity === null) {
+        return registration
+      }
+
+
+      const result = await tx.event.updateMany({
+        where: {
+          id: eventId,
+          currentCount: {
+            lt: event.maxCapacity,
+          }
+        }, data: {
+          currentCount: {
+            increment: 1,
+          }
+        }
+      })
+
+      if(result.count === 0) {
+        throw new Error("Event capacity limit has been reached")
+      }
+
+      return registration
     })
   }
 

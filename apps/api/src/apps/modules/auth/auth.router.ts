@@ -213,6 +213,24 @@ export const authRouter = router({
         res: ctx.res,
       });
     }),
+  
+  logout: publicProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/auth/logout",
+        tags: ["auth"],
+        summary: "User logout",
+        description: "Logs out the currently authenticated user"
+      },
+    })
+    .input(z.object({}))
+    .output(z.object({ success: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      return AuthController.signOut({
+        req: ctx.req,
+      });
+    }),
 
   me: publicProcedure
     .meta({

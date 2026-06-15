@@ -1,4 +1,4 @@
-import type { Request } from "express"
+import type { Request, Response } from "express"
 import { prisma } from "../../../infrastructure/database/prisma.js"
 import { auth } from "../../../lib/auth.js"
 
@@ -17,29 +17,63 @@ export class AuthService {
         },
       },
     })
-    const roleName = user?.userRoles?.[0]?.role?.name || (user ? "MEMBER" : "GUEST")
+
+    if (!user) {
+      return {
+        authenticated: false,
+        userId: "",
+        role: "GUEST",
+        roles: [],
+      }
+    }
+
+    const ROLE_PRIORITY: Record<string, number> = {
+      SUPER_ADMIN: 100,
+      ADMIN: 90,
+      BOARD: 80,
+      PASTORAL: 70,
+      MEMBER: 60,
+      GUEST: 50,
+    }
+
+    const roles = user.userRoles.map((u) => u.role.name)
+
+    const highestRole = roles.reduce(
+      (highest, current) =>
+        (ROLE_PRIORITY[current] ?? 0) > (ROLE_PRIORITY[highest] ?? 0)
+          ? current
+          : highest,
+      "MEMBER"
+    )
+
     return {
       authenticated: !!user,
       userId,
-      role: roleName,
+      role: highestRole,
+      roles,
     }
   }
 
   private static getHeaders(req: Request): Headers {
-    const headers = new Headers();
+    const headers = new Headers()
     for (const [key, value] of Object.entries(req.headers)) {
       if (value) {
         if (Array.isArray(value)) {
-          value.forEach((v) => headers.append(key, v));
+          value.forEach((v) => headers.append(key, v))
         } else {
-          headers.set(key, value);
+          headers.set(key, value)
         }
       }
     }
-    return headers;
+    return headers
   }
 
-  static async signUp(input: { name: string; email: string; password: string; req: Request }) {
+  static async signUp(input: {
+    name: string
+    email: string
+    password: string
+    req: Request
+  }) {
     return auth.api.signUpEmail({
       body: {
         email: input.email,
@@ -51,7 +85,11 @@ export class AuthService {
     })
   }
 
-  static async signIn(input: { email: string; password: string; req: Request }) {
+  static async signIn(input: {
+    email: string
+    password: string
+    req: Request
+  }) {
     return auth.api.signInEmail({
       body: {
         email: input.email,
@@ -62,7 +100,11 @@ export class AuthService {
     })
   }
 
-  static async forgetPassword(input: { email: string; redirectTo?: string; req: Request }) {
+  static async forgetPassword(input: {
+    email: string
+    redirectTo?: string
+    req: Request
+  }) {
     return auth.api.requestPasswordReset({
       body: {
         email: input.email,
@@ -73,7 +115,11 @@ export class AuthService {
     })
   }
 
-  static async resetPassword(input: { newPassword: string; token: string; req: Request }) {
+  static async resetPassword(input: {
+    newPassword: string
+    token: string
+    req: Request
+  }) {
     return auth.api.resetPassword({
       body: {
         newPassword: input.newPassword,
@@ -84,7 +130,11 @@ export class AuthService {
     })
   }
 
-  static async sendVerificationOTP(input: { email: string; type: "sign-in" | "email-verification" | "forget-password"; req: Request }) {
+  static async sendVerificationOTP(input: {
+    email: string
+    type: "sign-in" | "email-verification" | "forget-password"
+    req: Request
+  }) {
     return auth.api.sendVerificationOTP({
       body: {
         email: input.email,
@@ -95,7 +145,11 @@ export class AuthService {
     })
   }
 
-  static async signInEmailOTP(input: { email: string; otp: string; req: Request }) {
+  static async signInEmailOTP(input: {
+    email: string
+    otp: string
+    req: Request
+  }) {
     return auth.api.signInEmailOTP({
       body: {
         email: input.email,
@@ -106,7 +160,11 @@ export class AuthService {
     })
   }
 
-  static async verifyEmailOTP(input: { email: string; otp: string; req: Request }) {
+  static async verifyEmailOTP(input: {
+    email: string
+    otp: string
+    req: Request
+  }) {
     return auth.api.verifyEmailOTP({
       body: {
         email: input.email,
@@ -117,7 +175,12 @@ export class AuthService {
     })
   }
 
-  static async checkVerificationOTP(input: { email: string; otp: string; type: "sign-in" | "email-verification" | "forget-password"; req: Request }) {
+  static async checkVerificationOTP(input: {
+    email: string
+    otp: string
+    type: "sign-in" | "email-verification" | "forget-password"
+    req: Request
+  }) {
     return auth.api.checkVerificationOTP({
       body: {
         email: input.email,
@@ -129,7 +192,12 @@ export class AuthService {
     })
   }
 
-  static async resetPasswordEmailOTP(input: { email: string; otp: string; newPassword: string; req: Request }) {
+  static async resetPasswordEmailOTP(input: {
+    email: string
+    otp: string
+    newPassword: string
+    req: Request
+  }) {
     return auth.api.resetPasswordEmailOTP({
       body: {
         email: input.email,
@@ -141,10 +209,16 @@ export class AuthService {
     })
   }
 
+  static async signOut(input: { req: Request;}) {
+    return auth.api.signOut({
+      headers: AuthService.getHeaders(input.req),
+      asResponse: true,
+    })
+  }
+
   static async getCurrentSession(input: { req: Request }) {
     return auth.api.getSession({
       headers: AuthService.getHeaders(input.req),
     })
   }
 }
-
