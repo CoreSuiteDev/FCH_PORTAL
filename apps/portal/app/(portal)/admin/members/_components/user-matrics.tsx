@@ -1,60 +1,92 @@
 import { tierSummaries, TierSummary } from "@/constants/manage-users-data"
 import { Badge } from "@workspace/ui/components/badge"
-import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Progress } from "@workspace/ui/components/progress"
-import { UserPlus } from "lucide-react"
+import { ShieldAlert, UserCheck, UserX, Clock } from "lucide-react"
 import React from "react"
 
 const UserMatrics = () => {
-  return (
-    <div className="py-4">
-      {/* HEADER ACTION CONTROL */}
-      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-            Manage Users
-          </h1>
-          <p className="pt-2 pb-4 text-sm text-slate-500 dark:text-slate-400">
-            Monitor, modify roles, and oversee all automated tier accounts and
-            status states.
-          </p>
-        </div>
-        <Button
-          size="sm"
-          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto"
-        >
-          <UserPlus className="mr-2 h-4 w-4" /> Add New Provision
-        </Button>
-      </div>
+  const statusStats = [
+    {
+      name: "Active Accounts",
+      count: 24,
+      description: "Currently operational",
+      color: "bg-emerald-500",
+      icon: <UserCheck className="h-5 w-5" />,
+    },
+    {
+      name: "Expired Accounts",
+      count: 5,
+      description: "Membership period ended",
+      color: "bg-amber-500",
+      icon: <Clock className="h-5 w-5" />,
+    },
+    {
+      name: "Suspended Accounts",
+      count: 1,
+      description: "Restricted by admin",
+      color: "bg-red-500",
+      icon: <UserX className="h-5 w-5" />,
+    },
+  ]
 
-      {/* QUICK METRICS TIER BREAKDOWN */}
+  return (
+    <div className="space-y-6 py-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {tierSummaries.map((summary: TierSummary, index: number) => (
-          <Card key={index} className="shadow-sm">
-            <CardContent className="space-y-3 p-5">
+          <Card
+            key={index}
+            className={`border-l-4 shadow-sm ${summary.color.replace("bg-", "border-l-")}`}
+          >
+            <CardContent className="space-y-4 p-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className={`h-3 w-3 rounded-full ${summary.color}`} />
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  <span className="text-sm font-semibold text-slate-700">
                     {summary.name}
                   </span>
                 </div>
-                <Badge variant="secondary" className="font-mono">
-                  {summary.count} Users
+                <Badge variant="secondary" className="font-mono font-bold">
+                  {summary.count}
                 </Badge>
               </div>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-slate-500">
-                  <span>Distribution Ratio</span>
-                  <span className="font-medium text-slate-800 dark:text-slate-200">
-                    {summary.percentage}%
-                  </span>
+                  <span>Distribution</span>
+                  <span className="font-medium">{summary.percentage}%</span>
                 </div>
                 <Progress
                   value={summary.percentage}
-                  className="h-1.5 [&>div]:bg-green-600"
+                  className={`h-2 ${summary.color.replace("bg-", "[&>div]:bg-")}`}
                 />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {statusStats.map((stat, index) => (
+          <Card
+            key={index}
+            className="overflow-hidden shadow-sm transition-all hover:shadow-md"
+          >
+            <CardContent className="flex items-start gap-4 p-5">
+              <div className={`rounded-lg p-3 text-white ${stat.color}`}>
+                {stat.icon}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    {stat.name}
+                  </h3>
+                  <span className="text-2xl font-bold text-slate-900">
+                    {stat.count}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-slate-500">
+                  {stat.description}
+                </p>
               </div>
             </CardContent>
           </Card>

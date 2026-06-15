@@ -8,7 +8,7 @@ const page = () => {
   return (
     <div className="p-6">
       <UserMatrics />
-      <MembershipStatus />
+      {/* <MembershipStatus /> */}
       <UserTable />
     </div>
   )
