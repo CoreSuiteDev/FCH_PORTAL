@@ -1,12 +1,9 @@
 "use client"
 
-import React from "react"
-import { useForm } from "react-hook-form"
 import { Button } from "@workspace/ui/components/button"
 import { Card } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { Textarea } from "@workspace/ui/components/textarea"
 import {
   Select,
   SelectContent,
@@ -14,7 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
+import { Textarea } from "@workspace/ui/components/textarea"
 import { Video } from "lucide-react"
+import { useForm } from "react-hook-form"
 
 export default function AddWebinarForm() {
   const { register, handleSubmit, setValue, reset } = useForm()
@@ -29,7 +28,7 @@ export default function AddWebinarForm() {
       {/* Outer wrapper for depth */}
       <Card className="relative overflow-hidden rounded-lg border border-slate-100 bg-white/80 p-8 shadow-2xl shadow-slate-200/40 backdrop-blur-xl">
         {/* Accent bar at the top */}
-        <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-red-600 via-primary to-red-900" />
+        <div className="absolute top-0 left-0 h-1 w-full bg-linear-to-r from-red-600 via-primary to-red-900" />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex items-center gap-4">

@@ -52,26 +52,9 @@ export default function Navbar() {
     }
   }, [setOpen])
 
-  const LanguageToggle = () => (
-    <div className="flex gap-1 rounded-full border p-0.5 text-[10px]">
-      <button
-        onClick={() => setActiveLang("en")}
-        className={`rounded-full px-2 py-1 transition-colors ${activeLang === "en" ? "bg-red-600 text-white" : ""}`}
-      >
-        EN
-      </button>
-      <button
-        onClick={() => setActiveLang("es")}
-        className={`rounded-full px-2 py-1 transition-colors ${activeLang === "es" ? "bg-red-600 text-white" : ""}`}
-      >
-        ES
-      </button>
-    </div>
-  )
-
   return (
     <header
-      className={`sticky top-0 z-[1000] w-full bg-white transition-shadow duration-500 ease-in-out ${
+      className={`sticky top-0 z-1000 w-full bg-white transition-shadow duration-500 ease-in-out ${
         isSticky ? "shadow-md" : "shadow-none"
       }`}
     >
@@ -131,7 +114,10 @@ export default function Navbar() {
 
         {/* Mobile Trigger */}
         <div className="flex items-center gap-3 md:hidden">
-          <LanguageToggle />
+          <LanguageToggle
+            activeLang={activeLang}
+            setActiveLang={setActiveLang}
+          />
           <Sheet open={isOpen} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -140,7 +126,7 @@ export default function Navbar() {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="z-[1001] flex w-[300px] flex-col p-0"
+              className="z-1001 flex w-[300px] flex-col p-0"
             >
               <div className="flex items-center justify-between border-b bg-gray-50 px-5 py-4">
                 <Link href="/" className="relative block h-[20px] w-[80px]">
@@ -184,3 +170,25 @@ export default function Navbar() {
     </header>
   )
 }
+
+interface LanguageToggleProps {
+  activeLang: "en" | "es"
+  setActiveLang: (lang: "en" | "es") => void
+}
+
+const LanguageToggle = ({ activeLang, setActiveLang }: LanguageToggleProps) => (
+  <div className="flex gap-1 rounded-full border p-0.5 text-[10px]">
+    <button
+      onClick={() => setActiveLang("en")}
+      className={`rounded-full px-2 py-1 transition-colors ${activeLang === "en" ? "bg-red-600 text-white" : ""}`}
+    >
+      EN
+    </button>
+    <button
+      onClick={() => setActiveLang("es")}
+      className={`rounded-full px-2 py-1 transition-colors ${activeLang === "es" ? "bg-red-600 text-white" : ""}`}
+    >
+      ES
+    </button>
+  </div>
+)

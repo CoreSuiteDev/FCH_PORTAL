@@ -24,12 +24,6 @@ export function TestimonialSection() {
   const t = useTranslations("home.testimonials")
   const testimonials: Testimonial[] = t.raw("items")
 
-  // Plugin instance created outside the component or with useMemo
-  // to prevent re-initialization issues during re-renders
-  const plugin = React.useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: false })
-  )
-
   return (
     <section className="bg-white py-20">
       <Container>
@@ -39,10 +33,11 @@ export function TestimonialSection() {
             loop: true,
             align: "start",
           }}
-          plugins={[plugin.current]}
-          // Ensure the carousel doesn't reset on interaction
-          onMouseEnter={plugin.current.stop}
-          onMouseLeave={plugin.current.reset}
+          plugins={[
+            Autoplay({
+              delay: 4000,
+            }),
+          ]}
         >
           <div className="mb-10 flex items-center justify-between">
             <h2 className="font-trajan text-3xl font-extrabold text-primary md:text-5xl">

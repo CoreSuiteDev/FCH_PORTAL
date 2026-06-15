@@ -49,6 +49,7 @@ import { userMembersData } from "@/constants/manage-users-data"
 import { useCommunicationStore } from "@/store/use-communication-store"
 
 // Component for table pagination controls
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PaginationControls = ({ table }: { table: any }) => (
   <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-6 py-4">
     <div className="text-xs text-slate-500">

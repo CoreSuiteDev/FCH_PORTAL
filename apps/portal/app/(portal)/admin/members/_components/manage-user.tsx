@@ -4,7 +4,6 @@ import React, { useMemo } from "react"
 import {
   Search,
   Filter,
-  UserPlus,
   ShieldAlert,
   SlidersHorizontal,
   Mail,
@@ -29,7 +28,6 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
-import { Progress } from "@workspace/ui/components/progress"
 import { Input } from "@workspace/ui/components/input"
 import {
   Table,
@@ -50,11 +48,7 @@ import {
   AlertDialogTitle,
 } from "@workspace/ui/components/alert-dialog"
 
-import {
-  tierSummaries,
-  TierSummary,
-  UserMember,
-} from "@/constants/manage-users-data"
+import { UserMember } from "@/constants/manage-users-data"
 import { useManageUserStore } from "@/store/use-manage-user-store"
 
 export default function ManageUsers() {

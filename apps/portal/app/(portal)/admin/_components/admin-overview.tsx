@@ -1,26 +1,6 @@
 "use client"
 
-import React from "react"
-import {
-  Users,
-  CreditCard,
-  RefreshCw,
-  TrendingUp,
-  FileText,
-  AlertCircle,
-  Activity,
-  ShieldCheck,
-} from "lucide-react"
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts"
+import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
 import {
   Card,
@@ -28,15 +8,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
-import { Badge } from "@workspace/ui/components/badge"
+import { Activity, AlertCircle, RefreshCw, ShieldCheck } from "lucide-react"
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
 
 // Note: Ensure membershipTrends data includes keys: general, pastoral, board
 import {
   membershipTrends,
-  recentBoardMembers,
-  recentFormSubmissions,
   pendingTasks,
   platformUpkeepMetrics,
+  recentBoardMembers,
 } from "@/constants/admin-overview"
 
 export default function AdminDashboard() {

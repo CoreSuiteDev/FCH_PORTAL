@@ -28,8 +28,7 @@ const MembershipStatus = () => {
   const {
     users,
     globalFilter,
-    selectedTier,
-    selectedStatus,
+
     setGlobalFilter,
     toggleUserStatus,
     openDeleteDialog,

@@ -96,7 +96,8 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
     )
   }
 
-  const cycleText = billingCycle === "monthly" ? t("pricePerMonth") : t("pricePerYear")
+  const cycleText =
+    billingCycle === "monthly" ? t("pricePerMonth") : t("pricePerYear")
 
   return (
     <div className="min-h-screen bg-[#F6F4F2] px-4 py-16 font-sans text-[#1C1A19]">
@@ -262,7 +263,9 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                     {isProcessing ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      t("completeCheckout", { amount: totalInvoiceAmount.toFixed(2) })
+                      t("completeCheckout", {
+                        amount: totalInvoiceAmount.toFixed(2),
+                      })
                     )}
                   </Button>
                 </form>
@@ -288,7 +291,9 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                 {t("successTitle")}
               </CardTitle>
               <CardDescription className="mt-2 px-2 text-sm leading-relaxed text-muted-foreground">
-                {t("successDesc", { packageName: localizedActivePackage.title })}
+                {t("successDesc", {
+                  packageName: localizedActivePackage.title,
+                })}
               </CardDescription>
             </CardHeader>
 
