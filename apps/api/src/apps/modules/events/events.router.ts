@@ -4,8 +4,15 @@ import { EventsController } from "./events.controller.js"
 import {
   ZCIEventSchema,
   ZCICreateEventSchema,
+  ZCIUpdateEventSchema,
   PaginationInputSchema,
   ZCIPaginatedEventsSchema,
+  ZCIEventCategorySchema,
+  ZCICreateEventCategorySchema,
+  ZCIUpdateEventCategorySchema,
+  ZCIEventMaterialSchema,
+  ZCICreateMaterialSchema,
+  ZCIEventAnalyticsSchema,
 } from "@workspace/types"
 import { getPaginationMeta } from "../../../utils/pagination.js"
 
@@ -26,16 +33,34 @@ const mapEvent = (event: any) => ({
   isActive: event.isActive,
   status: event.status,
   eventType: event.eventType,
+  categories: event.categories
+    ? event.categories.map((c: any) => ({
+        id: c.id,
+        name: c.name,
+        description: c.description,
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+      }))
+    : [],
   webinar: event.webinar
     ? {
         id: event.webinar.id,
         eventId: event.webinar.eventId,
-        speakerName: event.webinar.speakerName,
-        recordingUrl: event.webinar.recordingUrl,
-        category: event.webinar.category,
+        speakers: event.webinar.speakers,
         createdAt: event.webinar.createdAt,
       }
     : null,
+  materials: event.materials
+    ? event.materials.map((m: any) => ({
+        id: m.id,
+        createdAt: m.createdAt,
+        updatedAt: m.updatedAt,
+        title: m.title,
+        fileUrl: m.fileUrl,
+        fileType: m.fileType,
+        eventId: m.eventId,
+      }))
+    : [],
 })
 
 export const eventsRouter = router({
@@ -116,25 +141,213 @@ export const eventsRouter = router({
       return { success: true, message: "Successfully registered for event" }
     }),
 
-  updateRecording: adminProcedure
+
+  update: adminProcedure
+    .meta({
+      openapi: {
+        method: "PATCH",
+        path: "/events/{id}",
+        tags: ["events"],
+        summary: "Update event details",
+        description: "Updates an existing event's details (Super Admin only)",
+      },
+    })
+    .input(
+      ZCIUpdateEventSchema.extend({
+        id: z.string(),
+      })
+    )
+    .output(ZCIEventSchema)
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input
+      const event = await EventsController.updateEvent(id, data)
+      return mapEvent(event)
+    }),
+
+  delete: adminProcedure
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/events/{id}",
+        tags: ["events"],
+        summary: "Delete event",
+        description: "Permanently deletes an event record (Super Admin only)",
+      },
+    })
+    .input(z.object({ id: z.string() }))
+    .output(z.object({ success: z.boolean() }))
+    .mutation(async ({ input }) => {
+      return EventsController.deleteEvent(input.id)
+    }),
+
+  checkin: protectedProcedure
     .meta({
       openapi: {
         method: "POST",
-        path: "/events/{id}/recording",
+        path: "/events/{id}/checkin",
         tags: ["events"],
-        summary: "Add/update webinar recording",
-        description: "Sets the recording URL for a webinar event (Super Admin only)",
+        summary: "Check in to an event",
+        description: "Marks a user's event registration as checked-in (Admin can check in others)",
       },
     })
     .input(
       z.object({
         id: z.string(),
-        recordingUrl: z.string().url("Must be a valid URL"),
+        userId: z.string().optional(),
+      })
+    )
+    .output(z.object({ success: z.boolean(), message: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const targetUserId = input.userId || ctx.user.id
+      await EventsController.checkInUser({
+        eventId: input.id,
+        targetUserId,
+        requestUserId: ctx.user.id,
+        requestUserRole: ctx.role,
+      })
+      return { success: true, message: "Successfully checked in user to event" }
+    }),
+
+  listCategories: publicProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/event-categories",
+        tags: ["events"],
+        summary: "List all event categories",
+        description: "Returns an array of all defined event categories",
+      },
+    })
+    .input(z.void())
+    .output(z.array(ZCIEventCategorySchema))
+    .query(async () => {
+      return EventsController.getAllCategories()
+    }),
+
+  createCategory: adminProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/event-categories",
+        tags: ["events"],
+        summary: "Create a new event category",
+        description: "Provisions a new event category (Super Admin only)",
+      },
+    })
+    .input(ZCICreateEventCategorySchema)
+    .output(ZCIEventCategorySchema)
+    .mutation(async ({ input }) => {
+      return EventsController.createCategory(input)
+    }),
+
+  updateCategory: adminProcedure
+    .meta({
+      openapi: {
+        method: "PATCH",
+        path: "/event-categories/{id}",
+        tags: ["events"],
+        summary: "Update event category details",
+        description: "Updates an existing event category's details (Super Admin only)",
+      },
+    })
+    .input(
+      ZCIUpdateEventCategorySchema.extend({
+        id: z.string(),
+      })
+    )
+    .output(ZCIEventCategorySchema)
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input
+      return EventsController.updateCategory(id, data)
+    }),
+
+  deleteCategory: adminProcedure
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/event-categories/{id}",
+        tags: ["events"],
+        summary: "Delete event category",
+        description: "Permanently deletes an event category from the database (Super Admin only)",
+      },
+    })
+    .input(z.object({ id: z.string() }))
+    .output(z.object({ success: z.boolean() }))
+    .mutation(async ({ input }) => {
+      return EventsController.deleteCategory(input.id)
+    }),
+
+  addMaterial: adminProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/events/{id}/materials",
+        tags: ["events"],
+        summary: "Add a material to an event",
+        description: "Uploads/registers a material (recording, PDF, docx, etc.) for an event (Super Admin only)",
+      },
+    })
+    .input(
+      ZCICreateMaterialSchema.extend({
+        id: z.string(),
+      })
+    )
+    .output(ZCIEventMaterialSchema)
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input
+      return EventsController.addMaterial(id, data)
+    }),
+
+  listMaterials: publicProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/events/{id}/materials",
+        tags: ["events"],
+        summary: "List all materials of an event",
+        description: "Returns an array of all materials for a given event",
+      },
+    })
+    .input(z.object({ id: z.string() }))
+    .output(z.array(ZCIEventMaterialSchema))
+    .query(async ({ input, ctx }) => {
+      return EventsController.getMaterials(input.id, ctx.role)
+    }),
+
+  deleteMaterial: adminProcedure
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/events/{id}/materials/{materialId}",
+        tags: ["events"],
+        summary: "Delete an event material",
+        description: "Permanently deletes a material from an event (Super Admin only)",
+      },
+    })
+    .input(
+      z.object({
+        id: z.string(),
+        materialId: z.string(),
       })
     )
     .output(z.object({ success: z.boolean() }))
     .mutation(async ({ input }) => {
-      await EventsController.updateWebinarRecording(input.id, input.recordingUrl)
-      return { success: true }
+      return EventsController.deleteMaterial(input.id, input.materialId)
+    }),
+
+  getAnalytics: adminProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/events/{id}/analytics",
+        tags: ["events"],
+        summary: "Get event analytics",
+        description: "Fetch analytics and registration breakdowns for a specific event (Admin and Super Admin only)",
+      },
+    })
+    .input(z.object({ id: z.string() }))
+    .output(ZCIEventAnalyticsSchema)
+    .query(async ({ input }) => {
+      return EventsController.getEventAnalytics(input.id)
     }),
 })

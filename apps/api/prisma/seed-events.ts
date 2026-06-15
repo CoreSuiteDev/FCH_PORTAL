@@ -143,8 +143,7 @@ async function main() {
           ? {
               webinar: {
                 create: {
-                  speakerName: webinarSpeaker || "TBD",
-                  category: webinarCategory,
+                  speakers: webinarSpeaker ? [webinarSpeaker] : [],
                 },
               },
             }
