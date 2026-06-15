@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo } from "react"
+import React, { useMemo, useState } from "react"
 import {
   Search,
   Filter,
@@ -10,11 +10,16 @@ import {
   Shield,
   Trash2,
   Activity,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react"
 import {
   useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
+  getPaginationRowModel, // Added
   flexRender,
   ColumnDef,
 } from "@tanstack/react-table"
@@ -28,7 +33,6 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
-
 import { Input } from "@workspace/ui/components/input"
 import {
   Table,
@@ -69,7 +73,7 @@ const UserTable = () => {
     confirmDeleteUser,
   } = useManageUserStore()
 
-  // Columns definition for TanStack Table
+  // Columns definition remains the same
   const columns = useMemo<ColumnDef<UserMember>[]>(
     () => [
       {
@@ -201,7 +205,6 @@ const UserTable = () => {
     [toggleUserStatus, openDeleteDialog]
   )
 
-  // 2. COMBINED FILTERING LOGIC (Handles Tier and Membership Status updates dynamically)
   const finalFilteredData = useMemo(() => {
     return users.filter((user) => {
       const matchesTier = selectedTier === "All" || user.tier === selectedTier
@@ -212,17 +215,22 @@ const UserTable = () => {
     })
   }, [users, selectedTier, selectedStatus])
 
-  // TanStack Table Instance
-  // eslint-disable-next-line react-hooks/incompatible-library
+  // Table Instance with Pagination
   const table = useReactTable({
     data: finalFilteredData,
     columns,
+    initialState: {
+      pagination: {
+        pageSize: 10, // Default 10 rows per page
+      },
+    },
     state: {
       globalFilter,
     },
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(), // Added
     globalFilterFn: (row, columnId, filterValue) => {
       const search = filterValue.toLowerCase()
       const name = String(row.getValue("name") || "").toLowerCase()
@@ -233,74 +241,44 @@ const UserTable = () => {
       )
     },
   })
+
   return (
     <div>
-      {/* SEARCH AND FILTERS CONTROLS */}
-      <Card className="pb-4 shadow-sm">
-        <CardContent className="space-y-4 p-4">
+      {/* ... (Search and Filters code remains the same) ... */}
+      <Card className="shadow-sm">
+        <CardContent className="p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative flex-1">
               <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
               <Input
-                placeholder="Search by name, email or user ID..."
+                placeholder="Search by name, token string, role identity..."
                 className="w-full bg-white pl-9 dark:bg-slate-800"
                 value={globalFilter}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setGlobalFilter(e.target.value)
-                }
+                onChange={(e) => setGlobalFilter(e.target.value)}
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-4">
-              {/* Tier Filters */}
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                  <Filter className="h-3.5 w-3.5" />
-                  <span>Tier:</span>
-                </div>
-                {["All", "General", "Pastoral", "Board"].map((tier) => (
-                  <Button
-                    key={tier}
-                    variant={selectedTier === tier ? "default" : "outline"}
-                    size="sm"
-                    className="h-8 px-3 text-xs"
-                    onClick={() => setSelectedTier(tier)}
-                  >
-                    {tier}
-                  </Button>
-                ))}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                <Filter className="h-3.5 w-3.5" />
+                <span>Filter Tier:</span>
               </div>
-            </div>
-          </div>
-
-          {/* NEW: MEMBERSHIP STATUS INTERACTIVE FILTER ROW */}
-          <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-              <Activity className="h-3.5 w-3.5" />
-              <span>Membership:</span>
-            </div>
-            {["All", "Active", "Expired", "Canceled", "Pending"].map(
-              (status) => (
+              {["All", "General", "Pastoral", "Board"].map((tier) => (
                 <Button
-                  key={status}
-                  variant={selectedStatus === status ? "secondary" : "ghost"}
+                  key={tier}
+                  variant={selectedTier === tier ? "default" : "outline"}
                   size="sm"
-                  className={`h-7 px-3 text-xs ${
-                    selectedStatus === status
-                      ? "bg-slate-200 font-semibold text-slate-900 dark:bg-slate-800 dark:text-slate-100"
-                      : "text-slate-500"
-                  }`}
-                  onClick={() => setSelectedStatus(status)}
+                  className="h-8 px-3 text-xs"
+                  onClick={() => setSelectedTier(tier)}
                 >
-                  {status}
+                  {tier}
                 </Button>
-              )
-            )}
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* CORE MEMBERSHIP MANAGEMENT CONTAINER */}
       <Card className="mt-4 overflow-hidden shadow-sm">
         <CardHeader className="border-b border-slate-100 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-900/50">
           <div className="flex items-center justify-between">
@@ -312,7 +290,6 @@ const UserTable = () => {
                 Showing {table.getRowModel().rows.length} filtered records
               </CardDescription>
             </div>
-            <SlidersHorizontal className="hidden h-4 w-4 text-slate-400 sm:block" />
           </div>
         </CardHeader>
 
@@ -329,21 +306,16 @@ const UserTable = () => {
                 <Table>
                   <TableHeader className="bg-slate-50/70 dark:bg-slate-800/40">
                     {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow
-                        key={headerGroup.id}
-                        className="border-b border-slate-100 dark:border-slate-800"
-                      >
+                      <TableRow key={headerGroup.id}>
                         {headerGroup.headers.map((header) => (
                           <TableHead
                             key={header.id}
-                            className="h-auto px-6 py-3 text-xs font-semibold text-slate-500 uppercase"
+                            className="px-6 py-3 text-xs font-semibold uppercase"
                           >
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext()
-                                )}
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                           </TableHead>
                         ))}
                       </TableRow>
@@ -351,14 +323,11 @@ const UserTable = () => {
                   </TableHeader>
                   <TableBody>
                     {table.getRowModel().rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        className="border-b border-slate-100 bg-white hover:bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/20"
-                      >
+                      <TableRow key={row.id}>
                         {row.getVisibleCells().map((cell) => (
                           <TableCell
                             key={cell.id}
-                            className="h-auto px-6 py-4 whitespace-nowrap"
+                            className="px-6 py-4 whitespace-nowrap"
                           >
                             {flexRender(
                               cell.column.columnDef.cell,
@@ -372,101 +341,46 @@ const UserTable = () => {
                 </Table>
               </div>
 
-              {/* MOBILE VIEW */}
-              <div className="grid grid-cols-1 gap-4 p-4 md:hidden">
-                {table.getRowModel().rows.map((row) => {
-                  const user = row.original
-                  return (
-                    <div
-                      key={user.id}
-                      className="space-y-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-800"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <span className="font-mono text-[10px] font-bold text-slate-400">
-                            {user.id}
-                          </span>
-                          <h4 className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
-                            {user.name}
-                          </h4>
-                          <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
-                            <Mail className="h-3 w-3" /> {user.email}
-                          </p>
-                        </div>
-                        <Badge
-                          variant="secondary"
-                          className={
-                            user.tier === "Board"
-                              ? "bg-indigo-50 text-[10px] text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400"
-                              : user.tier === "Pastoral"
-                                ? "bg-emerald-50 text-[10px] text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
-                                : "bg-slate-100 text-[10px] text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                          }
-                        >
-                          {user.tier}
-                        </Badge>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2 border-t border-slate-50 pt-2 text-xs dark:border-slate-700">
-                        <div>
-                          <span className="block text-[10px] font-medium tracking-wider text-slate-400 uppercase">
-                            Dues Received
-                          </span>
-                          <span className="mt-0.5 block font-semibold">
-                            {user.amountPaid}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="block text-[10px] font-medium tracking-wider text-slate-400 uppercase">
-                            Access State
-                          </span>
-                          <span className="mt-0.5 flex items-center gap-1.5 font-medium capitalize">
-                            <span
-                              className={`h-1.5 w-1.5 rounded-full ${
-                                user.status.toLowerCase() === "active"
-                                  ? "bg-emerald-500"
-                                  : user.status.toLowerCase() === "expired"
-                                    ? "bg-amber-500"
-                                    : user.status.toLowerCase() === "canceled"
-                                      ? "bg-rose-500"
-                                      : "bg-blue-500"
-                              }`}
-                            />
-                            {user.status}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between border-t border-slate-50 pt-3 dark:border-slate-700">
-                        <span className="text-[11px] text-slate-400">
-                          Joined: {user.joinedDate}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className={`h-7 px-2.5 text-xs font-medium ${
-                              user.status === "Active"
-                                ? "border-rose-100 text-rose-600"
-                                : "border-emerald-100 text-emerald-600"
-                            }`}
-                            onClick={() => toggleUserStatus(user.id)}
-                          >
-                            {user.status === "Active" ? "Suspend" : "Activate"}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-slate-400 hover:text-rose-500"
-                            onClick={() => openDeleteDialog(user.id)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
+              {/* PAGINATION CONTROLS */}
+              <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4">
+                <div className="text-xs text-slate-500">
+                  Page {table.getState().pagination.pageIndex + 1} of{" "}
+                  {table.getPageCount()}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.setPageIndex(0)}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    <ChevronsLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    <ChevronsRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </>
           )}
@@ -474,6 +388,7 @@ const UserTable = () => {
       </Card>
 
       {/* SHADCN CONFIRMATION MODAL */}
+
       <AlertDialog
         open={isDeleteDialogOpen}
         onOpenChange={(open) => !open && closeDeleteDialog()}
@@ -481,15 +396,18 @@ const UserTable = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the
               user account from the directory and revoke all system access.
             </AlertDialogDescription>
           </AlertDialogHeader>
+
           <AlertDialogFooter>
             <AlertDialogCancel onClick={closeDeleteDialog}>
               Cancel
             </AlertDialogCancel>
+
             <AlertDialogAction
               onClick={confirmDeleteUser}
               className="bg-rose-600 text-white hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-800"

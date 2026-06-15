@@ -12,15 +12,23 @@ import {
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 import Autoplay from "embla-carousel-autoplay"
+
 interface Testimonial {
   id: string
   text: string
   name: string
   role: string
 }
+
 export function TestimonialSection() {
   const t = useTranslations("home.testimonials")
   const testimonials: Testimonial[] = t.raw("items")
+
+  // Plugin instance created outside the component or with useMemo
+  // to prevent re-initialization issues during re-renders
+  const plugin = React.useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: false })
+  )
 
   return (
     <section className="bg-white py-20">
@@ -30,17 +38,11 @@ export function TestimonialSection() {
           opts={{
             loop: true,
             align: "start",
-
-            containScroll: "trimSnaps",
           }}
-          plugins={[
-            Autoplay({
-              delay: 3000,
-              stopOnInteraction: false,
-
-              playOnInit: true,
-            }),
-          ]}
+          plugins={[plugin.current]}
+          // Ensure the carousel doesn't reset on interaction
+          onMouseEnter={plugin.current.stop}
+          onMouseLeave={plugin.current.reset}
         >
           <div className="mb-10 flex items-center justify-between">
             <h2 className="font-trajan text-3xl font-extrabold text-primary md:text-5xl">
