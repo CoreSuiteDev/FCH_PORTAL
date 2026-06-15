@@ -2,21 +2,30 @@
 
 import React, { useState, useEffect } from "react"
 import { Lock, Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react"
-import { useTranslations } from "next-intl" // Import useTranslations
+import { useTranslations } from "next-intl"
 import { Button } from "@workspace/ui/components/button"
 import {
-  useResetPasswordStore,
   useResetPasswordForm,
   ResetPasswordFormValues,
 } from "@/store/auth/use-reset-password-store"
+import { useMutation } from "@tanstack/react-query"
+import Link from "next/link"
 
 export default function ResetPasswordForm() {
-  const t = useTranslations("auth.resetPassword") // Initialize translations
-  const { updatePassword, isLoading, isSuccess, resetStatus } =
-    useResetPasswordStore()
-
+  const t = useTranslations("auth.resetPassword")
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
+  const [apiError, setApiError] = useState<string | null>(null)
+  const [isSuccess, setIsSuccess] = useState<boolean>(false)
+
+  const [email, setEmail] = useState<string>("")
+  const [otp, setOtp] = useState<string>("")
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    setEmail(params.get("email") || "")
+    setOtp(params.get("otp") || "")
+  }, [])
 
   const {
     register,
@@ -24,13 +33,42 @@ export default function ResetPasswordForm() {
     formState: { errors },
   } = useResetPasswordForm()
 
-  useEffect(() => {
-    return () => resetStatus()
-  }, [resetStatus])
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (data: ResetPasswordFormValues) => {
+      setApiError(null)
+      if (!email || !otp) {
+        throw new Error("Missing email or OTP verification code. Please request a new password reset link.")
+      }
+      
+      const res = await fetch("http://localhost:5000/api/v1/auth/reset-password-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          otp,
+          newPassword: data.password,
+        }),
+      })
+      
+      const result = await res.json()
+      if (!res.ok) {
+        throw new Error(result.message || "Failed to reset password")
+      }
+      return result
+    },
+    onSuccess: () => {
+      setIsSuccess(true)
+    },
+    onError: (error: any) => {
+      setApiError(error.message || "Something went wrong. Please try again.")
+    },
+  })
 
   const onSubmit = (data: ResetPasswordFormValues) => {
-    updatePassword(data)
+    resetPasswordMutation.mutate(data)
   }
+
+  const isLoading = resetPasswordMutation.isPending
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 font-sans text-foreground transition-colors duration-300">
@@ -50,13 +88,14 @@ export default function ResetPasswordForm() {
               {t("successSubtitle")}
             </p>
 
-            <Button
-              type="button"
-              className="mt-6 h-11 w-full font-medium shadow-md shadow-primary/20"
-              onClick={() => (window.location.href = "/login")}
-            >
-              {t("signIn")}
-            </Button>
+            <Link href="/login" className="w-full mt-6">
+              <Button
+                type="button"
+                className="h-11 w-full font-medium shadow-md shadow-primary/20"
+              >
+                {t("signIn")}
+              </Button>
+            </Link>
           </div>
         ) : (
           <>
@@ -72,6 +111,12 @@ export default function ResetPasswordForm() {
               </p>
             </div>
 
+            {(!email || !otp) && (
+              <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-center text-xs font-medium text-destructive">
+                Warning: Missing verification data. Please request password reset from the forgot password page.
+              </div>
+            )}
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* New Password */}
               <div className="space-y-1.5">
@@ -85,12 +130,13 @@ export default function ResetPasswordForm() {
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    disabled={isLoading}
-                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
+                    disabled={isLoading || !email || !otp}
+                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none disabled:opacity-50"
                     {...register("password")}
                   />
                   <button
                     type="button"
+                    disabled={!email || !otp}
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
@@ -116,12 +162,13 @@ export default function ResetPasswordForm() {
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    disabled={isLoading}
-                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
+                    disabled={isLoading || !email || !otp}
+                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none disabled:opacity-50"
                     {...register("confirmPassword")}
                   />
                   <button
                     type="button"
+                    disabled={!email || !otp}
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
@@ -139,10 +186,16 @@ export default function ResetPasswordForm() {
                 )}
               </div>
 
+              {apiError && (
+                <p className="text-center text-xs font-medium text-destructive">
+                  {apiError}
+                </p>
+              )}
+
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="mt-2 h-11 w-full font-medium shadow-md shadow-primary/20 transition-all"
+                disabled={isLoading || !email || !otp}
+                className="mt-2 h-11 w-full font-medium shadow-md shadow-primary/20 transition-all disabled:opacity-50"
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

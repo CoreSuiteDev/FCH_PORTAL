@@ -1,36 +1,91 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useState } from "react"
 import { Mail, Loader2, ArrowLeft, CheckCircle2, KeyRound } from "lucide-react"
-import { useTranslations } from "next-intl" // Import useTranslations
+import { useTranslations } from "next-intl"
 import { Button } from "@workspace/ui/components/button"
 import {
   CodeFormValues,
   EmailFormValues,
   useCodeForm,
   useEmailForm,
-  useForgotPasswordStore,
 } from "@/store/auth/use-forget-password-store"
+import { useMutation } from "@tanstack/react-query"
+import Link from "next/link"
+
+type ForgotPasswordStep = "ENTER_EMAIL" | "VERIFY_CODE" | "SUCCESS"
 
 export default function ForgotPasswordForm() {
-  const t = useTranslations("auth.forgotPassword") // Initialize translations
-  const { currentStep, isLoading, sendOtpCode, verifyOtpCode, resetStatus } =
-    useForgotPasswordStore()
+  const t = useTranslations("auth.forgotPassword")
+  const [currentStep, setCurrentStep] = useState<ForgotPasswordStep>("ENTER_EMAIL")
+  const [userEmail, setUserEmail] = useState<string>("")
+  const [otpCode, setOtpCode] = useState<string>("")
+  const [apiError, setApiError] = useState<string | null>(null)
 
   const emailForm = useEmailForm()
   const codeForm = useCodeForm()
 
-  useEffect(() => {
-    return () => resetStatus()
-  }, [resetStatus])
+  const sendOtpMutation = useMutation({
+    mutationFn: async (data: EmailFormValues) => {
+      setApiError(null)
+      const res = await fetch("http://localhost:5000/api/v1/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, type: "forget-password" }),
+      })
+      
+      const result = await res.json()
+      if (!res.ok) {
+        throw new Error(result.message || "Failed to send OTP code")
+      }
+      return result
+    },
+    onSuccess: (_, variables) => {
+      setUserEmail(variables.email)
+      setCurrentStep("VERIFY_CODE")
+    },
+    onError: (error: any) => {
+      setApiError(error.message || "Could not send verification code. Please check your email.")
+    },
+  })
+
+  const verifyOtpMutation = useMutation({
+    mutationFn: async (data: CodeFormValues) => {
+      setApiError(null)
+      const res = await fetch("http://localhost:5000/api/v1/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userEmail,
+          otp: data.code,
+          type: "forget-password",
+        }),
+      })
+      
+      const result = await res.json()
+      if (!res.ok) {
+        throw new Error(result.message || "Invalid or expired OTP code")
+      }
+      return result
+    },
+    onSuccess: (_, variables) => {
+      setOtpCode(variables.code)
+      setCurrentStep("SUCCESS")
+    },
+    onError: (error: any) => {
+      setApiError(error.message || "Invalid OTP code. Please try again.")
+    },
+  })
 
   const onEmailSubmit = (data: EmailFormValues) => {
-    sendOtpCode(data)
+    sendOtpMutation.mutate(data)
   }
 
   const onCodeSubmit = (data: CodeFormValues) => {
-    verifyOtpCode(data)
+    verifyOtpMutation.mutate(data)
   }
+
+  const isLoading = sendOtpMutation.isPending || verifyOtpMutation.isPending
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 font-sans text-foreground transition-colors duration-300">
@@ -76,6 +131,12 @@ export default function ForgotPasswordForm() {
                   </p>
                 )}
               </div>
+
+              {apiError && (
+                <p className="text-center text-xs font-medium text-destructive">
+                  {apiError}
+                </p>
+              )}
 
               <Button
                 type="submit"
@@ -135,6 +196,12 @@ export default function ForgotPasswordForm() {
                 )}
               </div>
 
+              {apiError && (
+                <p className="text-center text-xs font-medium text-destructive">
+                  {apiError}
+                </p>
+              )}
+
               <Button
                 type="submit"
                 disabled={isLoading}
@@ -166,7 +233,9 @@ export default function ForgotPasswordForm() {
             <Button
               type="button"
               className="mt-6 h-11 w-full font-medium shadow-md"
-              onClick={() => (window.location.href = "/reset-password")}
+              onClick={() => {
+                window.location.href = `/reset-password?email=${encodeURIComponent(userEmail)}&otp=${encodeURIComponent(otpCode)}`
+              }}
             >
               {t("resetPasswordNow")}
             </Button>
@@ -176,7 +245,7 @@ export default function ForgotPasswordForm() {
         {/* Footer */}
         {currentStep !== "SUCCESS" && (
           <div className="mt-8 text-center text-sm">
-            <a
+            <Link
               href="/login"
               className="group inline-flex items-center gap-1.5 font-semibold text-muted-foreground transition-colors hover:text-foreground"
             >
@@ -185,7 +254,7 @@ export default function ForgotPasswordForm() {
                 className="transition-transform group-hover:-translate-x-0.5"
               />
               {t("backToSignIn")}
-            </a>
+            </Link>
           </div>
         )}
       </div>

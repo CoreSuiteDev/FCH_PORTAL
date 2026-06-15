@@ -2,21 +2,20 @@
 
 import React, { useState } from "react"
 import { Eye, EyeOff, Mail, Lock, User, Loader2 } from "lucide-react"
-import { useTranslations } from "next-intl" // Import useTranslations
+import { useTranslations } from "next-intl"
 import { Button } from "@workspace/ui/components/button"
-import {
-  RegisterFormValues,
-  useRegisterForm,
-  useRegisterStore,
-} from "@/store/auth/use-register-store"
+import { RegisterFormValues, useRegisterForm } from "@/store/auth/use-register-store"
+import { useMutation } from "@tanstack/react-query"
+import { authClient } from "@/lib/auth"
+import Link from "next/link"
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
+  const [apiError, setApiError] = useState<string | null>(null)
+  const [isSuccess, setIsSuccess] = useState<boolean>(false)
 
-  const t = useTranslations("auth.register") // Initialize translations
-
-  const { registerUser, registerWithGoogle, isLoading } = useRegisterStore()
+  const t = useTranslations("auth.register")
 
   const {
     register,
@@ -24,8 +23,78 @@ export default function RegisterForm() {
     formState: { errors },
   } = useRegisterForm()
 
+  const registerMutation = useMutation({
+    mutationFn: async (data: RegisterFormValues) => {
+      setApiError(null)
+      const { data: resData, error } = await authClient.signUp.email({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+      })
+
+      if (error) {
+        throw new Error(error.message || "Registration failed")
+      }
+      return resData
+    },
+    onSuccess: () => {
+      setIsSuccess(true)
+    },
+    onError: (error: any) => {
+      setApiError(error.message || "Something went wrong. Please try again.")
+    },
+  })
+
+  const googleSignupMutation = useMutation({
+    mutationFn: async () => {
+      setApiError(null)
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "http://localhost:3001/",
+      })
+      if (error) {
+        throw new Error(error.message || "Google registration failed")
+      }
+    },
+    onError: (error: any) => {
+      setApiError(error.message || "Google registration failed")
+    },
+  })
+
   const onSubmit = (data: RegisterFormValues): void => {
-    registerUser(data)
+    registerMutation.mutate(data)
+  }
+
+  const isLoading = registerMutation.isPending || googleSignupMutation.isPending
+
+  if (isSuccess) {
+    return (
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 font-sans text-foreground transition-colors duration-300">
+        <div className="pointer-events-none absolute top-[-20%] left-[-10%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
+        <div className="pointer-events-none absolute right-[-10%] bottom-[-20%] h-[500px] w-[500px] rounded-full bg-accent/20 blur-[120px]" />
+
+        <div className="relative z-10 w-full max-w-[500px] rounded-2xl border border-border/60 bg-card p-8 text-card-foreground shadow-xl backdrop-blur-md text-center">
+          <div className="mb-6 flex flex-col items-center">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 shadow-md">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="font-trajan text-3xl font-extrabold tracking-tight text-foreground">
+              Registration Successful!
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Your account has been created successfully. You can now sign in to your account.
+            </p>
+          </div>
+          <Link href="/login" className="w-full block">
+            <Button className="w-full h-11 font-medium">
+              Go to Sign In
+            </Button>
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -102,6 +171,7 @@ export default function RegisterForm() {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
+                disabled={isLoading}
                 className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
                 {...register("password")}
               />
@@ -132,6 +202,7 @@ export default function RegisterForm() {
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="••••••••"
+                disabled={isLoading}
                 className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
                 {...register("confirmPassword")}
               />
@@ -155,6 +226,7 @@ export default function RegisterForm() {
             <input
               type="checkbox"
               id="acceptTerms"
+              disabled={isLoading}
               className="mt-0.5 h-4 w-4 cursor-pointer rounded border-input"
               {...register("acceptTerms")}
             />
@@ -184,6 +256,12 @@ export default function RegisterForm() {
             </p>
           )}
 
+          {apiError && (
+            <p className="mt-1 px-1 text-center text-xs font-medium text-destructive">
+              {apiError}
+            </p>
+          )}
+
           <Button
             type="submit"
             disabled={isLoading}
@@ -209,21 +287,21 @@ export default function RegisterForm() {
         <Button
           type="button"
           variant="secondary"
-          onClick={registerWithGoogle}
+          onClick={() => googleSignupMutation.mutate()}
+          disabled={isLoading}
           className="h-11 w-full gap-2 border border-border/40 font-medium"
         >
-          {/* Google Icon SVG... */}
           {t("signUpWithGoogle")}
         </Button>
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
           {t("alreadyHaveAccount")}{" "}
-          <a
+          <Link
             href="/login"
             className="font-semibold text-primary hover:underline"
           >
             {t("signInHere")}
-          </a>
+          </Link>
         </div>
       </div>
     </div>

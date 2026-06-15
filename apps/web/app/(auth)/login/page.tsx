@@ -2,20 +2,17 @@
 
 import React, { useState } from "react"
 import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react"
-import { useTranslations } from "next-intl" // Import useTranslations
+import { useTranslations } from "next-intl"
 import { Button } from "@workspace/ui/components/button"
-import {
-  useAuthStore,
-  useLoginForm,
-  LoginFormValues,
-} from "@/store/auth/use-auth-store"
+import { useLoginForm, LoginFormValues } from "@/store/auth/use-auth-store"
 import Link from "next/link"
+import { useMutation } from "@tanstack/react-query"
+import { authClient } from "@/lib/auth"
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
-  const t = useTranslations("auth.login") // Initialize translations
-
-  const { login, loginWithGoogle, isLoading } = useAuthStore()
+  const [apiError, setApiError] = useState<string | null>(null)
+  const t = useTranslations("auth.login")
 
   const {
     register,
@@ -23,13 +20,53 @@ export default function LoginForm() {
     formState: { errors },
   } = useLoginForm()
 
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginFormValues) => {
+      setApiError(null)
+      const { data: sessionData, error } = await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+      })
+      
+      if (error) {
+        throw new Error(error.message || "Failed to sign in")
+      }
+      return sessionData
+    },
+    onSuccess: () => {
+      // Redirect to the portal dashboard on success
+      window.location.href = "http://localhost:3001/"
+    },
+    onError: (error: any) => {
+      setApiError(error.message || "Invalid email or password")
+    },
+  })
+
+  const googleLoginMutation = useMutation({
+    mutationFn: async () => {
+      setApiError(null)
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "http://localhost:3001/",
+      })
+      if (error) {
+        throw new Error(error.message || "Google sign-in failed")
+      }
+    },
+    onError: (error: any) => {
+      setApiError(error.message || "Google sign-in failed")
+    },
+  })
+
   const onSubmit = (data: LoginFormValues) => {
-    login(data)
+    loginMutation.mutate(data)
   }
+
+  const isLoading = loginMutation.isPending || googleLoginMutation.isPending
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 font-sans text-foreground transition-colors duration-300">
-      {/* Background Decorations... */}
+      {/* Background Decorations */}
       <div className="pointer-events-none absolute top-[-20%] left-[-10%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
       <div className="pointer-events-none absolute right-[-10%] bottom-[-20%] h-[500px] w-[500px] rounded-full bg-accent/20 blur-[120px]" />
 
@@ -70,12 +107,12 @@ export default function LoginForm() {
               <label className="text-sm font-medium tracking-wide text-foreground/90">
                 {t("passwordLabel")}
               </label>
-              <a
+              <Link
                 href="/forgot-password"
                 className="text-xs font-semibold text-secondary-foreground transition-colors hover:underline"
               >
                 {t("forgotPassword")}
-              </a>
+              </Link>
             </div>
             <div className="group relative">
               <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
@@ -119,6 +156,12 @@ export default function LoginForm() {
             </label>
           </div>
 
+          {apiError && (
+            <p className="mt-1 px-1 text-center text-xs font-medium text-destructive">
+              {apiError}
+            </p>
+          )}
+
           <Button
             type="submit"
             disabled={isLoading}
@@ -159,11 +202,10 @@ export default function LoginForm() {
         <Button
           type="button"
           variant="secondary"
-          onClick={loginWithGoogle}
+          onClick={() => googleLoginMutation.mutate()}
           disabled={isLoading}
           className="h-11 w-full cursor-pointer gap-2 border border-border/40 font-medium transition-all hover:bg-secondary/80"
         >
-          {/* Google Icon... */}
           Continue with Google
         </Button>
 

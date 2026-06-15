@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 import { Footer } from "@/components/layout/footer"
 import Navbar from "@/components/layout/navbar"
+import QueryProvider from "@/providers/query-provider"
 import { TooltipProvider } from "@workspace/ui/components/tooltip"
 import "@workspace/ui/globals.css"
 import { cn } from "@workspace/ui/lib/utils"
@@ -35,15 +36,17 @@ export default async function RootLayout({
       )}
     >
       <body cz-shortcut-listen="true">
-        <TooltipProvider>
-          <NextIntlClientProvider locale={locale} messages={messages}>
-            <div className="overflow-hidden">
-              <Navbar />
-              {children}
-              <Footer />
-            </div>
-          </NextIntlClientProvider>
-        </TooltipProvider>
+        <QueryProvider>
+          <TooltipProvider>
+            <NextIntlClientProvider locale={locale} messages={messages}>
+              <div className="overflow-hidden">
+                <Navbar />
+                {children}
+                <Footer />
+              </div>
+            </NextIntlClientProvider>
+          </TooltipProvider>
+        </QueryProvider>
       </body>
     </html>
   )
