@@ -2,45 +2,36 @@ import { create } from "zustand"
 import { UserMember, userMembersData } from "@/constants/manage-users-data"
 
 interface ManageUserStore {
-  // State
   users: UserMember[]
   globalFilter: string
   selectedTier: string
-  selectedStatus: string // <-- Added status filter state
-
-  // Dialog State
+  selectedStatus: string
   isDeleteDialogOpen: boolean
   userToDeleteId: string | null
 
-  // Actions
   setGlobalFilter: (filter: string) => void
   setSelectedTier: (tier: string) => void
-  setSelectedStatus: (status: string) => void // <-- Added status setter action
+  setSelectedStatus: (status: string) => void
   toggleUserStatus: (id: string) => void
-
-  // Dialog Actions
   openDeleteDialog: (id: string) => void
   closeDeleteDialog: () => void
   confirmDeleteUser: () => void
 }
 
 export const useManageUserStore = create<ManageUserStore>((set) => ({
-  // Initial State
   users: userMembersData,
   globalFilter: "",
   selectedTier: "All",
-  selectedStatus: "All", // <-- Defaulting to show all statuses
+  selectedStatus: "All",
   isDeleteDialogOpen: false,
   userToDeleteId: null,
 
-  // Actions
   setGlobalFilter: (filter) => set({ globalFilter: filter }),
   setSelectedTier: (tier) => set({ selectedTier: tier }),
-  setSelectedStatus: (status) => set({ selectedStatus: status }), // <-- Added logic
+  setSelectedStatus: (status) => set({ selectedStatus: status }),
 
   toggleUserStatus: (id) =>
     set((state) => ({
-      // Note: mapping logic accepts "Active" toggling to "Suspended" or customizable membership keys
       users: state.users.map((user) =>
         user.id === id
           ? {
@@ -58,7 +49,7 @@ export const useManageUserStore = create<ManageUserStore>((set) => ({
 
   confirmDeleteUser: () =>
     set((state) => {
-      if (!state.userToDeleteId) return {}
+      if (!state.userToDeleteId) return state
       return {
         users: state.users.filter((user) => user.id !== state.userToDeleteId),
         isDeleteDialogOpen: false,

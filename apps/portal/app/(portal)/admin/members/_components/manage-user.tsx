@@ -68,50 +68,6 @@ export default function ManageUsers() {
     confirmDeleteUser,
   } = useManageUserStore()
 
-  // 1. DYNAMIC STATUS METRICS CALCULATION (Will not shift when table updates)
-  const statusStats = useMemo(() => {
-    const totalUsers = users.length || 1
-    const activeCount = users.filter(
-      (u) => u.status.toLowerCase() === "active"
-    ).length
-    const expiredCount = users.filter(
-      (u) => u.status.toLowerCase() === "expired"
-    ).length
-    const canceledCount = users.filter(
-      (u) => u.status.toLowerCase() === "canceled"
-    ).length
-    const pendingCount = users.filter(
-      (u) => u.status.toLowerCase() === "pending"
-    ).length
-
-    return [
-      {
-        name: "Active",
-        count: activeCount,
-        pct: Math.round((activeCount / totalUsers) * 100),
-        color: "bg-emerald-500",
-      },
-      {
-        name: "Expired",
-        count: expiredCount,
-        pct: Math.round((expiredCount / totalUsers) * 100),
-        color: "bg-amber-500",
-      },
-      {
-        name: "Canceled",
-        count: canceledCount,
-        pct: Math.round((canceledCount / totalUsers) * 100),
-        color: "bg-rose-500",
-      },
-      {
-        name: "Pending",
-        count: pendingCount,
-        pct: Math.round((pendingCount / totalUsers) * 100),
-        color: "bg-blue-500",
-      },
-    ]
-  }, [users])
-
   // Columns definition for TanStack Table
   const columns = useMemo<ColumnDef<UserMember>[]>(
     () => [

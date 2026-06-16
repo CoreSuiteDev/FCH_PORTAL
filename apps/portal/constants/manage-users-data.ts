@@ -5,7 +5,7 @@ export interface UserMember {
   name: string
   email: string
   tier: "General" | "Pastoral" | "Board"
-  status: "Active" | "Expired" | "Canceled" | "Pending" | "Suspended" // <-- নতুন স্ট্যাটাসগুলো টাইপে যোগ করা হয়েছে
+  status: "Active" | "Expired" | "Canceled" | "Pending" | "Suspended"
   joinedDate: string
   amountPaid: string
 }

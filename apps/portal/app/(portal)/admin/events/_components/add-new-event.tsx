@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { useForm } from "react-hook-form"
+import { SubmitHandler, useForm } from "react-hook-form"
 import { Button } from "@workspace/ui/components/button"
 import { Card } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
@@ -14,13 +14,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
-import { Sparkles, Calendar, Tag, FileText } from "lucide-react"
+import { Sparkles, Calendar } from "lucide-react"
+type EventFormData = {
+  name: string
+  date: string
+  minClearance: string
+  description: string
+}
 
 export default function AddEventForm() {
-  const { register, handleSubmit, setValue, reset } = useForm()
+  const { register, handleSubmit, setValue, reset } = useForm<EventFormData>()
 
-  const onSubmit = (data: any) => {
-    console.log("Premium Event Submission:", data)
+  const onSubmit: SubmitHandler<EventFormData> = (data) => {
+    console.log(data)
     reset()
   }
 
@@ -29,7 +35,7 @@ export default function AddEventForm() {
       {/* Container with a subtle ring and high-end shadow */}
       <Card className="relative overflow-hidden rounded-lg border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/50">
         {/* Decorative subtle header line */}
-        <div className="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-primary/60 to-primary" />
+        <div className="absolute top-0 left-0 h-1.5 w-full bg-linear-to-r from-primary/60 to-primary" />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex items-center gap-3">

@@ -22,6 +22,7 @@ import {
   Info,
   Tag,
 } from "lucide-react"
+import { ClearanceLevel, EventStatus } from "@/constants/manage-event"
 
 export default function EventsManager() {
   const {
@@ -70,7 +71,7 @@ export default function EventsManager() {
         </div>
         <div className="flex gap-3">
           <Select
-            onValueChange={(v: any) => {
+            onValueChange={(v: ClearanceLevel | "All") => {
               setUserRole(v)
               setCurrentPage(1)
             }}
@@ -86,7 +87,7 @@ export default function EventsManager() {
             </SelectContent>
           </Select>
           <Select
-            onValueChange={(v: any) => {
+            onValueChange={(v: EventStatus) => {
               setFilterStatus(v)
               setCurrentPage(1)
             }}
@@ -189,7 +190,7 @@ export default function EventsManager() {
       >
         <DialogContent className="max-w-sm overflow-hidden rounded-[2rem] border-0 bg-white/95 p-0 shadow-2xl backdrop-blur-2xl">
           <div className="relative bg-primary px-8 pt-10 pb-8 text-center text-white">
-            <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-b from-black/10 to-transparent" />
             <h2 className="relative text-2xl font-black tracking-tight text-white">
               {selectedEvent?.name}
             </h2>

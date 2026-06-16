@@ -2,7 +2,7 @@ import { tierSummaries, TierSummary } from "@/constants/manage-users-data"
 import { Badge } from "@workspace/ui/components/badge"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Progress } from "@workspace/ui/components/progress"
-import { ShieldAlert, UserCheck, UserX, Clock } from "lucide-react"
+import { UserCheck, UserX, Clock } from "lucide-react"
 import React from "react"
 
 const UserMatrics = () => {

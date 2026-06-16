@@ -1,15 +1,13 @@
 "use client"
 
-import React, { useMemo, useState } from "react"
+import React, { useMemo } from "react"
 import {
   Search,
   Filter,
   ShieldAlert,
-  SlidersHorizontal,
   Mail,
   Shield,
   Trash2,
-  Activity,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -66,7 +64,7 @@ const UserTable = () => {
     isDeleteDialogOpen,
     setGlobalFilter,
     setSelectedTier,
-    setSelectedStatus,
+
     toggleUserStatus,
     openDeleteDialog,
     closeDeleteDialog,
