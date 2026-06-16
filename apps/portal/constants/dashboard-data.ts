@@ -49,6 +49,16 @@ export const data = {
       icon: IconCreditCard,
     },
     {
+      title: "Donation & Payments ",
+      url: "/admin/donation",
+      icon: IconCreditCard,
+    },
+    {
+      title: "sponsorship  & Payments ",
+      url: "/admin/sopnsor",
+      icon: IconCreditCard,
+    },
+    {
       title: "Events Manager",
       url: "/admin/events",
       icon: IconCalendarEvent,
