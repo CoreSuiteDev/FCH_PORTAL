@@ -6,7 +6,6 @@ const Event = () => {
   return (
     <div>
       <EventsManager />
-      <AddEventForm />
     </div>
   )
 }
