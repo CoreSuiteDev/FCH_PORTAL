@@ -107,7 +107,7 @@ export const eventsRouter = router({
       return mapEvent(event)
     }),
 
-  create: adminProcedure
+  create: publicProcedure
     .meta({
       openapi: {
         method: "POST",
@@ -142,7 +142,7 @@ export const eventsRouter = router({
     }),
 
 
-  update: adminProcedure
+  update: publicProcedure
     .meta({
       openapi: {
         method: "PATCH",
@@ -164,7 +164,7 @@ export const eventsRouter = router({
       return mapEvent(event)
     }),
 
-  delete: adminProcedure
+  delete: publicProcedure
     .meta({
       openapi: {
         method: "DELETE",
@@ -224,7 +224,7 @@ export const eventsRouter = router({
       return EventsController.getAllCategories()
     }),
 
-  createCategory: adminProcedure
+  createCategory: publicProcedure
     .meta({
       openapi: {
         method: "POST",
@@ -240,7 +240,7 @@ export const eventsRouter = router({
       return EventsController.createCategory(input)
     }),
 
-  updateCategory: adminProcedure
+  updateCategory: publicProcedure
     .meta({
       openapi: {
         method: "PATCH",
@@ -261,7 +261,7 @@ export const eventsRouter = router({
       return EventsController.updateCategory(id, data)
     }),
 
-  deleteCategory: adminProcedure
+  deleteCategory: publicProcedure
     .meta({
       openapi: {
         method: "DELETE",
@@ -277,7 +277,7 @@ export const eventsRouter = router({
       return EventsController.deleteCategory(input.id)
     }),
 
-  addMaterial: adminProcedure
+  addMaterial: publicProcedure
     .meta({
       openapi: {
         method: "POST",
@@ -314,7 +314,7 @@ export const eventsRouter = router({
       return EventsController.getMaterials(input.id, ctx.role)
     }),
 
-  deleteMaterial: adminProcedure
+  deleteMaterial: publicProcedure
     .meta({
       openapi: {
         method: "DELETE",

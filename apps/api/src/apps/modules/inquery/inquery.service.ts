@@ -1,9 +1,7 @@
 import { prisma } from "../../../infrastructure/database/prisma.js";
 
 export class InqueryService {
-  /**
-   * Create a new contact inquiry
-   */
+
   static async createInquery(data: {
     name: string;
     email: string;
@@ -20,18 +18,14 @@ export class InqueryService {
     });
   }
 
-  /**
-   * Fetch a single contact inquiry by ID
-   */
+
   static async findInqueryById(id: string) {
     return prisma.contactInquery.findUnique({
       where: { id },
     });
   }
 
-  /**
-   * Fetch all contact inquiries (paginated)
-   */
+
   static async findAllInqueries(params: { page: number; limit: number }) {
     const { page, limit } = params;
     const skip = (page - 1) * limit;
@@ -50,9 +44,7 @@ export class InqueryService {
     return { totalCount, data };
   }
 
-  /**
-   * Update details of an existing inquiry
-   */
+
   static async updateInquery(
     id: string,
     data: {
@@ -68,13 +60,10 @@ export class InqueryService {
     });
   }
 
-  /**
-   * Delete an inquiry from the database
-   */
   static async deleteInquery(id: string) {
     await prisma.contactInquery.delete({
       where: { id },
     });
     return { success: true };
   }
-}
+}

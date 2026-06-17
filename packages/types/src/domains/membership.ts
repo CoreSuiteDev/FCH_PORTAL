@@ -21,7 +21,6 @@ export const ZCIMembershipPackageSchema = z.object({
   billingCycle: BillingCycleEnum,
   price: z.number(),
   currency: CurrencyEnum.default("USD"),
-  oktaGroup: z.string(),
   description: z.string().nullable().optional(),
   isActive: z.boolean().default(true),
   createdAt: z.coerce.date(),

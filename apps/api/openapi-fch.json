@@ -5371,9 +5371,6 @@
                           "EUR"
                         ]
                       },
-                      "oktaGroup": {
-                        "type": "string"
-                      },
                       "description": {
                         "anyOf": [
                           {
@@ -5403,7 +5400,6 @@
                       "billingCycle",
                       "price",
                       "currency",
-                      "oktaGroup",
                       "isActive",
                       "createdAt",
                       "updatedAt"
@@ -5566,9 +5562,6 @@
                         "EUR"
                       ]
                     },
-                    "oktaGroup": {
-                      "type": "string"
-                    },
                     "description": {
                       "anyOf": [
                         {
@@ -5598,7 +5591,6 @@
                     "billingCycle",
                     "price",
                     "currency",
-                    "oktaGroup",
                     "isActive",
                     "createdAt",
                     "updatedAt"
@@ -5776,9 +5768,6 @@
                         "EUR"
                       ]
                     },
-                    "oktaGroup": {
-                      "type": "string"
-                    },
                     "description": {
                       "anyOf": [
                         {
@@ -5808,7 +5797,6 @@
                     "billingCycle",
                     "price",
                     "currency",
-                    "oktaGroup",
                     "isActive",
                     "createdAt",
                     "updatedAt"
