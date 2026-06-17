@@ -1,40 +1,7 @@
+import { DonationData } from "@/constants/donation-data"
 import { Card, CardContent } from "@workspace/ui/components/card"
 
 const DonationStats = () => {
-  // Data for the 3 individual tiers
-  const tierStats = [
-    {
-      title: "GENERAL TIER",
-      mainValue: "$185k",
-      mainColor: "text-blue-600",
-      subItems: [
-        { label: "LIFETIME", value: "$185k" },
-        { label: "YEARLY", value: "$45k" },
-        { label: "MONTHLY", value: "$4.2k" },
-      ],
-    },
-    {
-      title: "PASTORAL TIER",
-      mainValue: "$48k",
-      mainColor: "text-emerald-600",
-      subItems: [
-        { label: "LIFETIME", value: "$48k" },
-        { label: "YEARLY", value: "$12k" },
-        { label: "MONTHLY", value: "$1.1k" },
-      ],
-    },
-    {
-      title: "BOARD MEMBERS",
-      mainValue: "$24k",
-      mainColor: "text-purple-600",
-      subItems: [
-        { label: "LIFETIME", value: "$24k" },
-        { label: "YEARLY", value: "$8k" },
-        { label: "MONTHLY", value: "$2.0k" },
-      ],
-    },
-  ]
-
   // Data for the summary card
   const totalSummary = {
     title: "TOTAL REVENUE",
@@ -81,7 +48,7 @@ const DonationStats = () => {
 
       {/* Tier Cards Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {tierStats.map((stat, i) => (
+        {DonationData.map((stat, i) => (
           <Card key={i} className="rounded-xl border-slate-200 shadow-sm">
             <CardContent className="p-6">
               <div className="mb-6">

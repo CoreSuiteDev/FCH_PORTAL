@@ -26,6 +26,7 @@ import {
 
 import { useSponsorStore } from "@/store/use-sponsor-store"
 import { cn } from "@workspace/ui/lib/utils"
+import { sponsorships } from "@/constants/sponsor-data"
 
 export function SponsorFilter() {
   const {
@@ -48,14 +49,6 @@ export function SponsorFilter() {
   const [openDate, setOpenDate] = useState(false)
 
   const tiers = ["All", "General", "Pastoral", "Board"]
-  const sponsorships = [
-    "All",
-    "Diamond",
-    "Platinum",
-    "Gold",
-    "Silver",
-    "Bronze",
-  ]
 
   return (
     <section>
@@ -145,7 +138,7 @@ export function SponsorFilter() {
                   <Command>
                     <CommandList>
                       <CommandGroup>
-                        {sponsorships.map((s) => (
+                        {sponsorships.data.map((s) => (
                           <CommandItem
                             key={s}
                             onSelect={() => {

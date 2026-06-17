@@ -1,57 +1,7 @@
+import { sponsorPackages, totalSummary } from "@/constants/sponsor-data"
 import { Card, CardContent } from "@workspace/ui/components/card"
 
 const SponsorStats = () => {
-  const sponsorPackages = [
-    {
-      title: "DIAMOND",
-      total: "$36k",
-      yearly: "$9k",
-      monthly: "$750",
-      color: "text-red-600",
-      light: "text-red-500",
-    },
-    {
-      title: "PLATINUM",
-      total: "$60k",
-      yearly: "$15k",
-      monthly: "$1.2k",
-      color: "text-slate-900",
-      light: "text-slate-600",
-    },
-    {
-      title: "GOLD",
-      total: "$90k",
-      yearly: "$20k",
-      monthly: "$1.6k",
-      color: "text-amber-600",
-      light: "text-amber-500",
-    },
-    {
-      title: "SILVER",
-      total: "$31k",
-      yearly: "$7k",
-      monthly: "$600",
-      color: "text-blue-600",
-      light: "text-blue-500",
-    },
-    {
-      title: "BRONZE",
-      total: "$12k",
-      yearly: "$3k",
-      monthly: "$250",
-      color: "text-orange-600",
-      light: "text-orange-500",
-    },
-  ]
-
-  const totalSummary = {
-    title: "TOTAL SPONSORSHIP REVENUE",
-    mainValue: "$229k",
-    lifetime: "$229k",
-    yearly: "$54k",
-    monthly: "$4.3k",
-  }
-
   return (
     <div className="space-y-6 pb-6">
       <div className="mb-8">
