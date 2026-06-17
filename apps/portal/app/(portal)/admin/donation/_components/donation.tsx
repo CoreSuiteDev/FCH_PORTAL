@@ -3,12 +3,7 @@
 import React, { useMemo, useState } from "react"
 import { useDonationStore } from "@/store/use-donation-store"
 import { Badge } from "@workspace/ui/components/badge"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card"
+
 import {
   Table,
   TableBody,
@@ -20,6 +15,7 @@ import {
 import { Button } from "@workspace/ui/components/button"
 import { DonationFilter } from "./filter-donation"
 import { mockData } from "@/constants/donation"
+import DonationStats from "./donation-stats"
 
 export const Donation = () => {
   const { searchQuery, selectedTier, selectedDate, minAmount, maxAmount } =
@@ -71,34 +67,15 @@ export const Donation = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
+    <div className="min-h-screen bg-slate-50 p-6">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Manage Payments</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Donation Payments</h1>
         <p className="text-slate-500">
           Monitor dues capture, review status, and filter transaction records.
         </p>
       </div>
 
-      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-        {["General Tier Dues", "Pastoral Tier Dues", "Board Members Dues"].map(
-          (tier, i) => (
-            <Card key={i} className="border-slate-200 shadow-none">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600">
-                  {tier}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-slate-900">$100</div>
-                <div className="mt-4 h-2 w-full rounded-full bg-slate-100">
-                  <div className="h-full w-[30%] rounded-full bg-red-500" />
-                </div>
-              </CardContent>
-            </Card>
-          )
-        )}
-      </div>
-
+      <DonationStats />
       <div className="mb-6">
         <DonationFilter />
       </div>

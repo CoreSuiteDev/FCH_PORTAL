@@ -1,47 +1,64 @@
 import { create } from "zustand"
-import {
-  EVENTS,
-  EventItem,
-  ClearanceLevel,
-  EventStatus,
-} from "@/constants/manage-event"
+import { EVENTS, EventItem } from "@/constants/event-data"
 
-interface EventState {
+interface EventStore {
   events: EventItem[]
-  userRole: ClearanceLevel | "All"
-  filterStatus: EventStatus | "All"
-  selectedEvent: EventItem | null
-
-  setUserRole: (role: ClearanceLevel | "All") => void
-  setFilterStatus: (status: EventStatus | "All") => void
-  setSelectedEvent: (event: EventItem | null) => void
-  getFilteredEvents: () => EventItem[]
+  search: string
+  filter: string
+  selectedDate: string
+  currentPage: number
+  setSearch: (search: string) => void
+  setFilter: (filter: string) => void
+  setSelectedDate: (date: string) => void
+  setCurrentPage: (page: number) => void
+  filteredEvents: () => EventItem[]
 }
 
-export const useEventStore = create<EventState>((set, get) => ({
-  events: EVENTS,
-  userRole: "All",
-  filterStatus: "All",
-  selectedEvent: null,
+// এই ফাংশনটি এখন একই ফাইলে থাকল, তাই আর এরর দিবে না
+const generateDummyEvents = (): EventItem[] => {
+  return Array.from({ length: 10 }).map((_, i) => ({
+    id: `extra-${i + 1}`,
+    name: `Dummy Event ${i + 1}`,
+    imageUrl: "assets/event-1.jpg",
+    date: i % 2 === 0 ? "July 15, 2026" : "August 20, 2026",
+    time: "10:00 AM",
+    location: "Grand Ballroom",
+    description: "।",
+    speaker: "Unknown Speaker",
+    registrationLink: "#",
+    capacity: 50,
+    status: "Upcoming",
+    minClearance: i % 3 === 0 ? "Board" : "General",
+    attendees: 0,
+    registeredMembers: [],
+    category: "Workshop",
+  }))
+}
 
-  setUserRole: (role) => set({ userRole: role }),
-  setFilterStatus: (status) => set({ filterStatus: status }),
-  setSelectedEvent: (event) => set({ selectedEvent: event }),
+export const useEventStore = create<EventStore>((set, get) => ({
+  events: [...EVENTS, ...generateDummyEvents()],
+  search: "",
+  filter: "All",
+  selectedDate: "",
+  currentPage: 1,
 
-  getFilteredEvents: () => {
-    const { events, userRole, filterStatus } = get()
-    const hierarchy: Record<ClearanceLevel, number> = {
-      General: 1,
-      Pastoral: 2,
-      Board: 3,
-    }
+  setSearch: (search) => set({ search, currentPage: 1 }),
+  setFilter: (filter) => set({ filter, currentPage: 1 }),
+  setSelectedDate: (selectedDate) => set({ selectedDate, currentPage: 1 }),
+  setCurrentPage: (currentPage) => set({ currentPage }),
 
-    return events.filter((e) => {
-      const hasAccess =
-        userRole === "All" ||
-        hierarchy[e.minClearance] <= hierarchy[userRole as ClearanceLevel]
-      const matchesStatus = filterStatus === "All" || e.status === filterStatus
-      return hasAccess && matchesStatus
+  filteredEvents: () => {
+    const { events, search, filter, selectedDate } = get()
+    return events.filter((event) => {
+      const matchesSearch = event.name
+        .toLowerCase()
+        .includes(search.toLowerCase())
+      const matchesCategory = filter === "All" || event.minClearance === filter
+      const matchesDate =
+        selectedDate === "" ||
+        event.date.toLowerCase().includes(selectedDate.toLowerCase())
+
+      return matchesSearch && matchesCategory && matchesDate
     })
   },
 }))

@@ -14,6 +14,7 @@ import { Button } from "@workspace/ui/components/button"
 
 import { useSponsorStore } from "@/store/use-sponsor-store"
 import { SponsorFilter } from "./sopncer-filter"
+import SopnsorStats from "./sponsor-stats"
 
 const mockData = [
   {
@@ -186,6 +187,9 @@ export default function Sponsor() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
+      <div>
+        <SopnsorStats />
+      </div>
       <SponsorFilter />
       <div className="mt-6 overflow-hidden rounded-xl border bg-white shadow-sm">
         <Table>

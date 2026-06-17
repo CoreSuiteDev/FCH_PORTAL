@@ -160,3 +160,79 @@ export const sponsorData: SponsorData[] = [
     status: "Success",
   },
 ]
+
+interface SponsorShipData {
+  data: string[]
+}
+
+export const sponsorships: SponsorShipData = {
+  data: ["All", "Diamond", "Platinum", "Gold", "Silver", "Bronze"],
+}
+
+interface SponsorPackages {
+  title: string
+  total: string
+  yearly: string
+  monthly: string
+  color: string
+  light: string
+}
+
+export const sponsorPackages: SponsorPackages[] = [
+  {
+    title: "DIAMOND",
+    total: "$36k",
+    yearly: "$9k",
+    monthly: "$750",
+    color: "text-red-600",
+    light: "text-red-500",
+  },
+  {
+    title: "PLATINUM",
+    total: "$60k",
+    yearly: "$15k",
+    monthly: "$1.2k",
+    color: "text-slate-900",
+    light: "text-slate-600",
+  },
+  {
+    title: "GOLD",
+    total: "$90k",
+    yearly: "$20k",
+    monthly: "$1.6k",
+    color: "text-amber-600",
+    light: "text-amber-500",
+  },
+  {
+    title: "SILVER",
+    total: "$31k",
+    yearly: "$7k",
+    monthly: "$600",
+    color: "text-blue-600",
+    light: "text-blue-500",
+  },
+  {
+    title: "BRONZE",
+    total: "$12k",
+    yearly: "$3k",
+    monthly: "$250",
+    color: "text-orange-600",
+    light: "text-orange-500",
+  },
+]
+
+interface TOTALSUMMARY {
+  title: string
+  mainValue: string
+  lifetime: string
+  yearly: string
+  monthly: string
+}
+
+export const totalSummary: TOTALSUMMARY = {
+  title: "TOTAL SPONSORSHIP REVENUE",
+  mainValue: "$229k",
+  lifetime: "$229k",
+  yearly: "$54k",
+  monthly: "$4.3k",
+}
