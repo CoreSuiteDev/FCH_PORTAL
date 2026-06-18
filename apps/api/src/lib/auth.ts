@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { emailOTP } from "better-auth/plugins"
 import { prisma } from "../infrastructure/database/prisma.js"
+import config from "../utils/config.js"
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -16,8 +17,9 @@ export const auth = betterAuth({
       },
     },
   },
-  secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL,
+  secret: config.betterAuth.secret,
+  baseURL: config.betterAuth.url,
+  trustedOrigins: config.betterAuth.trustedOrigins,
   session: {
     cookieCache: {
       enabled: true,
@@ -33,12 +35,12 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID || "placeholder-google-client-id",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "placeholder-google-client-secret",
+      clientId: config.betterAuth.google.clientId || "placeholder-google-client-id",
+      clientSecret: config.betterAuth.google.clientSecret || "placeholder-google-client-secret",
     },
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID || "placeholder-github-client-id",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || "placeholder-github-client-secret",
+      clientId: config.betterAuth.github.clientId || "placeholder-github-client-id",
+      clientSecret: config.betterAuth.github.clientSecret || "placeholder-github-client-secret",
     },
   },
   plugins: [

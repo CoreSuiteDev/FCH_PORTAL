@@ -4,6 +4,9 @@ services:
     build: 
       context: .
       target: web
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXT_PUBLIC_PORTAL_URL=${NEXT_PUBLIC_PORTAL_URL}
     container_name: web
     restart: always
     expose:
@@ -22,6 +25,9 @@ services:
     build: 
       context: .
       target: portal
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXT_PUBLIC_PORTAL_URL=${NEXT_PUBLIC_PORTAL_URL}
     container_name: portal
     restart: always
     expose:
@@ -47,11 +53,24 @@ services:
       - "5000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/fch_portal?sslmode=disable}
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fch_portal?sslmode=disable
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - JWT_SECRET=${JWT_SECRET:-Vy1TL6YqQ2xvnRXpV3ZmmatPfod40UnP}
-      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-Vy1TL6YqQ2xvnRXpV3ZmmatPfod40UnP}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - PORTAL_URL=${PORTAL_URL}
+      - TRUSTED_ORIGINS=${TRUSTED_ORIGINS}
+      - CORS_ORIGIN=${CORS_ORIGIN}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS}
+      - LOG_FORMAT=${LOG_FORMAT}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
     depends_on:
       - postgres
       - redis
@@ -78,7 +97,7 @@ services:
       - postgres_data:/var/lib/postgresql
 
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - app-network
     logging:
