@@ -161,3 +161,18 @@ export const EVENTS: EventItem[] = [
     category: "Workshop",
   },
 ]
+
+export interface EventData {
+  title: string
+  startDate: string
+  location: string
+  description: string
+  endDate: string
+  coverImage: string
+  maxCapacity: number
+  meetingLink: string
+  visibility: string
+  eventType: string
+  speakers: string
+  categoryIds: string[]
+}

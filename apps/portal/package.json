@@ -22,6 +22,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@workspace/types": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "axios": "^1.18.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.17.0",

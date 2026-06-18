@@ -29,6 +29,7 @@ import {
 import { useEventStore } from "@/store/use-event-store"
 import { ClearanceLevel, EventItem } from "@/constants/event-data"
 import EventsFilter from "./event-filter"
+import AddNewEvent from "./add-event"
 
 export default function EventsManager() {
   const { filteredEvents, currentPage, setCurrentPage } = useEventStore()
@@ -87,7 +88,7 @@ export default function EventsManager() {
         </div>
 
         {/* ADD NEW EVENT DIALOG */}
-        <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        {/* <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <DialogTrigger asChild>
             <Button className="gap-2">
               <Plus className="h-4 w-4" /> Add New Event
@@ -152,7 +153,8 @@ export default function EventsManager() {
               Create Event
             </Button>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
+        <AddNewEvent />
       </div>
 
       <EventsFilter />
