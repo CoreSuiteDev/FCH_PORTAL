@@ -13,6 +13,8 @@ services:
       - "3000"
     environment:
       - NODE_ENV=production
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
     networks:
       - app-network
     logging:
@@ -34,6 +36,8 @@ services:
       - "3001"
     environment:
       - NODE_ENV=production
+      - HOSTNAME=0.0.0.0
+      - PORT=3001
     networks:
       - app-network
     logging:
