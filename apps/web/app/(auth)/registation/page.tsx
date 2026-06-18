@@ -4,7 +4,10 @@ import React, { useState } from "react"
 import { Eye, EyeOff, Mail, Lock, User, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@workspace/ui/components/button"
-import { RegisterFormValues, useRegisterForm } from "@/store/auth/use-register-store"
+import {
+  RegisterFormValues,
+  useRegisterForm,
+} from "@/store/auth/use-register-store"
 import { useMutation } from "@tanstack/react-query"
 import { authClient } from "@/lib/auth"
 import Link from "next/link"
@@ -50,7 +53,8 @@ export default function RegisterForm() {
       setApiError(null)
       const { error } = await authClient.signIn.social({
         provider: "google",
-        callbackURL: process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/",
+        callbackURL:
+          process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/",
       })
       if (error) {
         throw new Error(error.message || "Google registration failed")
@@ -73,24 +77,33 @@ export default function RegisterForm() {
         <div className="pointer-events-none absolute top-[-20%] left-[-10%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
         <div className="pointer-events-none absolute right-[-10%] bottom-[-20%] h-[500px] w-[500px] rounded-full bg-accent/20 blur-[120px]" />
 
-        <div className="relative z-10 w-full max-w-[500px] rounded-2xl border border-border/60 bg-card p-8 text-card-foreground shadow-xl backdrop-blur-md text-center">
+        <div className="relative z-10 w-full max-w-[500px] rounded-2xl border border-border/60 bg-card p-8 text-center text-card-foreground shadow-xl backdrop-blur-md">
           <div className="mb-6 flex flex-col items-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 shadow-md">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <h2 className="font-trajan text-3xl font-extrabold tracking-tight text-foreground">
               Registration Successful!
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Your account has been created successfully. You can now sign in to your account.
+              Your account has been created successfully. You can now sign in to
+              your account.
             </p>
           </div>
-          <Link href="/login" className="w-full block">
-            <Button className="w-full h-11 font-medium">
-              Go to Sign In
-            </Button>
+          <Link href="/login" className="block w-full">
+            <Button className="h-11 w-full font-medium">Go to Sign In</Button>
           </Link>
         </div>
       </div>

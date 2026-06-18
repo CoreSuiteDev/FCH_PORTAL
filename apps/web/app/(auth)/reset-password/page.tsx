@@ -37,7 +37,9 @@ export default function ResetPasswordForm() {
     mutationFn: async (data: ResetPasswordFormValues) => {
       setApiError(null)
       if (!email || !otp) {
-        throw new Error("Missing email or OTP verification code. Please request a new password reset link.")
+        throw new Error(
+          "Missing email or OTP verification code. Please request a new password reset link."
+        )
       }
       const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
       const res = await fetch(`${apiBase}/api/v1/auth/reset-password-otp`, {
@@ -49,7 +51,7 @@ export default function ResetPasswordForm() {
           newPassword: data.password,
         }),
       })
-      
+
       const result = await res.json()
       if (!res.ok) {
         throw new Error(result.message || "Failed to reset password")
@@ -88,7 +90,7 @@ export default function ResetPasswordForm() {
               {t("successSubtitle")}
             </p>
 
-            <Link href="/login" className="w-full mt-6">
+            <Link href="/login" className="mt-6 w-full">
               <Button
                 type="button"
                 className="h-11 w-full font-medium shadow-md shadow-primary/20"
@@ -113,7 +115,8 @@ export default function ResetPasswordForm() {
 
             {(!email || !otp) && (
               <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-center text-xs font-medium text-destructive">
-                Warning: Missing verification data. Please request password reset from the forgot password page.
+                Warning: Missing verification data. Please request password
+                reset from the forgot password page.
               </div>
             )}
 

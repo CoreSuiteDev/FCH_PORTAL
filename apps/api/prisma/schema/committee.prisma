@@ -7,7 +7,6 @@ model Committee {
 
     members CommitteeMember[]
 
-
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
