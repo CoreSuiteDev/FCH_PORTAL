@@ -39,8 +39,8 @@ export default function ResetPasswordForm() {
       if (!email || !otp) {
         throw new Error("Missing email or OTP verification code. Please request a new password reset link.")
       }
-      
-      const res = await fetch("http://localhost:5000/api/v1/auth/reset-password-otp", {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+      const res = await fetch(`${apiBase}/api/v1/auth/reset-password-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

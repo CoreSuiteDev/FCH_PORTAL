@@ -50,7 +50,7 @@ export default function RegisterForm() {
       setApiError(null)
       const { error } = await authClient.signIn.social({
         provider: "google",
-        callbackURL: "http://localhost:3001/",
+        callbackURL: process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/",
       })
       if (error) {
         throw new Error(error.message || "Google registration failed")

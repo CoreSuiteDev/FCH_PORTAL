@@ -35,7 +35,7 @@ export default function LoginForm() {
     },
     onSuccess: () => {
       // Redirect to the portal dashboard on success
-      window.location.href = "http://localhost:3001/"
+      window.location.href = process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
     },
     onError: (error: any) => {
       setApiError(error.message || "Invalid email or password")
@@ -47,7 +47,7 @@ export default function LoginForm() {
       setApiError(null)
       const { error } = await authClient.signIn.social({
         provider: "google",
-        callbackURL: "http://localhost:3001/",
+        callbackURL: process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/",
       })
       if (error) {
         throw new Error(error.message || "Google sign-in failed")

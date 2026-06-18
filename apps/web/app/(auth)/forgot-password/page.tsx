@@ -28,7 +28,8 @@ export default function ForgotPasswordForm() {
   const sendOtpMutation = useMutation({
     mutationFn: async (data: EmailFormValues) => {
       setApiError(null)
-      const res = await fetch("http://localhost:5000/api/v1/auth/send-otp", {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+      const res = await fetch(`${apiBase}/api/v1/auth/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.email, type: "forget-password" }),
@@ -52,7 +53,8 @@ export default function ForgotPasswordForm() {
   const verifyOtpMutation = useMutation({
     mutationFn: async (data: CodeFormValues) => {
       setApiError(null)
-      const res = await fetch("http://localhost:5000/api/v1/auth/verify-otp", {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+      const res = await fetch(`${apiBase}/api/v1/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

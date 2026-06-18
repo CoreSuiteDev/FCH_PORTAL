@@ -1,7 +1,16 @@
 import dotenv from "dotenv";
 import { z } from "zod";
+import path from "node:path";
+import fs from "node:fs";
 
-dotenv.config();
+// Load .env from current directory or project root
+if (fs.existsSync(path.join(process.cwd(), ".env"))) {
+  dotenv.config({ path: path.join(process.cwd(), ".env") });
+} else if (fs.existsSync(path.join(process.cwd(), "../../.env"))) {
+  dotenv.config({ path: path.join(process.cwd(), "../../.env") });
+} else {
+  dotenv.config();
+}
 
 const envSchema = z.object({
   NODE_ENV: z
@@ -36,13 +45,23 @@ const envSchema = z.object({
   AWS_SECRET_ACCESS_KEY: z.string().optional(),
   AWS_S3_BUCKET: z.string().optional(),
 
-  // MinIO
-
   // Socket.IO
   SOCKET_CORS_ORIGIN: z.string().optional(),
 
-  // Frontend URL
+  // Frontend & Portal URLs
   FRONTEND_URL: z.string().default("http://localhost:3000"),
+  PORTAL_URL: z.string().default("http://localhost:3001"),
+
+  // Better Auth
+  BETTER_AUTH_SECRET: z.string().min(1),
+  BETTER_AUTH_URL: z.string().url(),
+  TRUSTED_ORIGINS: z.string().optional(),
+
+  // OAuth Credentials
+  GOOGLE_CLIENT_ID: z.string().optional().default(""),
+  GOOGLE_CLIENT_SECRET: z.string().optional().default(""),
+  GITHUB_CLIENT_ID: z.string().optional().default(""),
+  GITHUB_CLIENT_SECRET: z.string().optional().default(""),
 
   // Email
   EMAIL_HOST: z.string().default("smtp.gmail.com"),
@@ -61,6 +80,9 @@ const envSchema = z.object({
 
   // CORS
   CORS_ORIGIN: z.string().default("*"),
+
+  // Logging
+  LOG_FORMAT: z.string().default("dev"),
 });
 
 const env = envSchema.parse(process.env);
@@ -68,6 +90,7 @@ const env = envSchema.parse(process.env);
 const config = {
   nodeEnv: env.NODE_ENV,
   port: env.PORT,
+  logFormat: env.LOG_FORMAT,
 
   database: {
     url: env.DATABASE_URL,
@@ -91,6 +114,20 @@ const config = {
     refreshExpiresIn: env.JWT_REFRESH_EXPIRES_IN,
   },
 
+  betterAuth: {
+    secret: env.BETTER_AUTH_SECRET,
+    url: env.BETTER_AUTH_URL,
+    trustedOrigins: env.TRUSTED_ORIGINS ? env.TRUSTED_ORIGINS.split(",") : [],
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    },
+    github: {
+      clientId: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
+    },
+  },
+
   aws: {
     region: env.AWS_REGION,
     accessKeyId: env.AWS_ACCESS_KEY_ID,
@@ -99,6 +136,7 @@ const config = {
   },
 
   frontendUrl: env.FRONTEND_URL,
+  portalUrl: env.PORTAL_URL,
 
   email: {
     host: env.EMAIL_HOST,

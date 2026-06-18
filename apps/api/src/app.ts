@@ -14,6 +14,7 @@ import { writeFileSync } from "fs";
 import { AppError } from "./utils/AppError.js";
 import { appRouter } from "./server/index.js";
 import { createContext } from "./server/context.js";
+import config from "./utils/config.js";
 
 const app:Application = express();
 
@@ -32,22 +33,22 @@ writeFileSync("./openapi-fch.json", JSON.stringify(openapiDocument, null, 2))
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
+    origin: config.cors.origin,
+    methods: config.cors.methods as any,
+    credentials: config.cors.credentials,
   }),
 );
 
 // Logging
-app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+app.use(morgan(config.logFormat));
 
 // 3. Auth Routes - PRIORITY 1: Custom Handlers
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 // 5. Rate Limiting
 const limiter = rateLimit({
-  max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  max: config.rateLimit.maxRequests,
+  windowMs: config.rateLimit.windowMs,
   message: "Too many requests from this IP, please try again later!",
 });
 app.use("/api", limiter);

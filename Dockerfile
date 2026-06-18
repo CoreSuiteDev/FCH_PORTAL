@@ -2,6 +2,11 @@ FROM oven/bun:1.3.13-alpine AS builder
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_PORTAL_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_PORTAL_URL=$NEXT_PUBLIC_PORTAL_URL
+
 COPY package.json bun.lock turbo.json ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
@@ -19,9 +24,8 @@ COPY . .
 RUN bun install --frozen-lockfile
 
 
-RUN cd apps/api && bunx --bun prisma db push
-
 RUN cd apps/api && bunx --bun prisma generate
+
 
 RUN bun run build
 
@@ -70,4 +74,4 @@ ENV PORT=5000
 ENV NODE_ENV=production
 EXPOSE 5000
 
-CMD ["sh", "-c", "cd apps/api && bun src/server.ts"]
+CMD ["sh", "-c", "cd apps/api && bunx --bun prisma db push && bun src/server.ts"]
