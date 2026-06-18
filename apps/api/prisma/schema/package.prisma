@@ -12,8 +12,6 @@ model MembershipPackage {
   price    Decimal  @db.Decimal(10, 2)
   currency Currency @default(USD)
 
-  oktaGroup String
-
   description String?
 
   isActive Boolean @default(true)

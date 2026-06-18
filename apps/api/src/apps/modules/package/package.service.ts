@@ -2,9 +2,7 @@ import { prisma } from "../../../infrastructure/database/prisma.js"
 import { MembershipType, BillingCycle, Currency } from "../../../generated/prisma/client.js"
 
 export class PackageService {
-  /**
-   * Fetch all membership packages
-   */
+
   static async getPackages() {
     return prisma.membershipPackage.findMany({
       orderBy: {
@@ -13,18 +11,12 @@ export class PackageService {
     })
   }
 
-  /**
-   * Find a package by its ID
-   */
   static async findPackageById(id: string) {
     return prisma.membershipPackage.findUnique({
       where: { id },
     })
   }
 
-  /**
-   * Create a new membership package
-   */
   static async createPackage(data: {
     name: string
     slug: string
@@ -32,7 +24,6 @@ export class PackageService {
     billingCycle: BillingCycle
     price: number
     currency: Currency
-    oktaGroup: string
     description?: string
     isActive?: boolean
   }) {
@@ -44,16 +35,12 @@ export class PackageService {
         billingCycle: data.billingCycle,
         price: data.price,
         currency: data.currency,
-        oktaGroup: data.oktaGroup,
         description: data.description,
         isActive: data.isActive ?? true,
       },
     })
   }
 
-  /**
-   * Update an existing membership package
-   */
   static async updatePackage(
     id: string,
     data: {
@@ -63,7 +50,6 @@ export class PackageService {
       billingCycle?: BillingCycle
       price?: number
       currency?: Currency
-      oktaGroup?: string
       description?: string
       isActive?: boolean
     }
@@ -77,16 +63,12 @@ export class PackageService {
         billingCycle: data.billingCycle,
         price: data.price,
         currency: data.currency,
-        oktaGroup: data.oktaGroup,
         description: data.description,
         isActive: data.isActive,
       },
     })
   }
 
-  /**
-   * Delete a membership package by ID
-   */
   static async deletePackage(id: string) {
     await prisma.membershipPackage.delete({
       where: { id },
