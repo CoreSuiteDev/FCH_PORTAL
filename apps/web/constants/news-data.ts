@@ -1,32 +1,51 @@
-export const newsData = [
+interface NewsItem {
+  id: number
+  img: string
+  categoryKey: string
+  titleKey: string
+  descKey: string
+  link: string
+}
+
+export const newsData: NewsItem[] = [
   {
     id: 1,
-    image: "/assets/news1.jpg",
-    title: "AUGUSTINE INSTITUTE SPONSORS FCH AT THE LA CONFERENCE",
-    description:
-      "A big thank you to the Augustine Institute for sponsoring Rev. Yojaneider Garcia, FCH Theologian, to attend the Los Angeles.",
-    author: "Luke Admin",
-    role: "Board Member",
-    date: "May 20, 2026",
+    img: "/assets/feature-news.jpeg",
+    titleKey: "featuredNews.title",
+    descKey: "featuredNews.description",
+    categoryKey: "categories.world",
+    link: "https://www.vaticannews.va/en/pope/news/2026-06/pope-leo-xiv-hebrew-university-jerusalem-israel.html",
   },
   {
     id: 2,
-    image: "/assets/news2.jpg",
-    title: "FCH JOINS NUEVO MOMENTO INITIATIVE AT BOSTON COLLEGE",
-    description:
-      "FCH becomes part of the Nuevo Momento, a Boston College Initiative under the direction of Dr. Hoffman Ospino to empower.",
-    author: "Luke Admin",
-    role: "Board Member",
-    date: "May 22, 2026",
+    img: "https://picsum.photos/seed/readings/800/600",
+    categoryKey: "categories.vatican",
+    titleKey: "newsItems.0.title",
+    descKey: "newsItems.0.description",
+    link: "https://www.vaticannews.va/en.html",
   },
   {
     id: 3,
-    image: "/assets/news2.jpg",
-    title: "POPE FRANCIS 1936-2025",
-    description:
-      "May God's love and peace be a comfort to all those who knew, loved and were blessed by the ministry.",
-    author: "Luke Admin",
-    role: "Board Member",
-    date: "May 25, 2026",
+    img: "https://picsum.photos/seed/saint/800/600",
+    categoryKey: "categories.vatican",
+    titleKey: "newsItems.1.title",
+    descKey: "newsItems.1.description",
+    link: "https://www.vaticannews.va/en.html",
+  },
+  {
+    id: 4,
+    img: "https://picsum.photos/seed/evangel/800/600",
+    categoryKey: "categories.usccb",
+    titleKey: "newsItems.2.title",
+    descKey: "newsItems.2.description",
+    link: "https://www.usccb.org/committees/evangelization-catechesis",
+  },
+  {
+    id: 5,
+    img: "https://picsum.photos/seed/usccb/800/600",
+    categoryKey: "categories.usccb",
+    titleKey: "newsItems.3.title",
+    descKey: "newsItems.3.description",
+    link: "https://www.usccb.org/",
   },
 ]

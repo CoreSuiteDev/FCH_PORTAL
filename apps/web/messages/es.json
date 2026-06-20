@@ -462,11 +462,51 @@
   },
   "newsPage": {
     "hero": {
-      "title": "Mantente conectado con la comunidad de FCH",
+      "title": "Mantente Conectado con la Comunidad FCH",
       "description": "Explora las últimas actualizaciones de FCH, historias de la comunidad, momentos destacados del ministerio y reflexiones que celebran nuestra misión compartida de fe, formación y servicio."
-    }
-  },
+    },
 
+    "categories": {
+      "vatican": "Noticias del Vaticano",
+      "usccb": "Conferencia de Obispos Católicos de EE. UU.",
+      "world": "Mundo",
+      "education": "Educación",
+      "local": "Local",
+      "technology": "Tecnología"
+    },
+
+    "featuredNews": {
+      "title": "Lanzamiento de la Iniciativa de Unidad Global",
+      "description": "Una importante iniciativa global que promueve la unidad y la colaboración entre comunidades."
+    },
+
+    "newsItems": [
+      {
+        "id": 1,
+        "title": "Lecturas Diarias",
+        "description": "Lecturas y reflexiones espirituales diarias de fuentes del Vaticano.",
+        "category": "vatican"
+      },
+      {
+        "id": 2,
+        "title": "Santo del Día",
+        "description": "Aprende sobre el santo del día y sus enseñanzas.",
+        "category": "vatican"
+      },
+      {
+        "id": 3,
+        "title": "Evangelización y Catequesis",
+        "description": "Recursos de la USCCB sobre evangelización y catequesis.",
+        "category": "usccb"
+      },
+      {
+        "id": 4,
+        "title": "Actualizaciones de la USCCB",
+        "description": "Actualizaciones y anuncios oficiales de la USCCB.",
+        "category": "usccb"
+      }
+    ]
+  },
   "eventsList": {
     "hero": {
       "featured": "Evento Destacado",

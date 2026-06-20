@@ -461,11 +461,53 @@
       "button": "Contact Us"
     }
   },
+
   "newsPage": {
     "hero": {
       "title": "Stay Connected to the FCH Community",
       "description": "Explore the latest FCH updates, community stories, ministry highlights, and reflections that celebrate our shared mission of faith, formation, and service."
-    }
+    },
+
+    "categories": {
+      "vatican": "Vatican News",
+      "usccb": "USCCB",
+      "world": "World",
+      "education": "Education",
+      "local": "Local",
+      "technology": "Technology"
+    },
+
+    "featuredNews": {
+      "title": "Global Unity Initiative Launched",
+      "description": "A major global initiative promoting unity and collaboration across communities."
+    },
+
+    "newsItems": [
+      {
+        "id": 1,
+        "title": "Daily Readings",
+        "description": "Daily spiritual readings and reflections from Vatican sources.",
+        "category": "vatican"
+      },
+      {
+        "id": 2,
+        "title": "Saint of the Day",
+        "description": "Learn about the saint of the day and their teachings.",
+        "category": "vatican"
+      },
+      {
+        "id": 3,
+        "title": "Evangelization & Catechesis",
+        "description": "USCCB resources on evangelization and catechesis.",
+        "category": "usccb"
+      },
+      {
+        "id": 4,
+        "title": "USCCB Updates",
+        "description": "Official updates and announcements from USCCB.",
+        "category": "usccb"
+      }
+    ]
   },
 
   "eventsList": {
