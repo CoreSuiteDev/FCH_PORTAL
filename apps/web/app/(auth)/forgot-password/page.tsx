@@ -17,7 +17,8 @@ type ForgotPasswordStep = "ENTER_EMAIL" | "VERIFY_CODE" | "SUCCESS"
 
 export default function ForgotPasswordForm() {
   const t = useTranslations("auth.forgotPassword")
-  const [currentStep, setCurrentStep] = useState<ForgotPasswordStep>("ENTER_EMAIL")
+  const [currentStep, setCurrentStep] =
+    useState<ForgotPasswordStep>("ENTER_EMAIL")
   const [userEmail, setUserEmail] = useState<string>("")
   const [otpCode, setOtpCode] = useState<string>("")
   const [apiError, setApiError] = useState<string | null>(null)
@@ -34,7 +35,7 @@ export default function ForgotPasswordForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.email, type: "forget-password" }),
       })
-      
+
       const result = await res.json()
       if (!res.ok) {
         throw new Error(result.message || "Failed to send OTP code")
@@ -46,7 +47,10 @@ export default function ForgotPasswordForm() {
       setCurrentStep("VERIFY_CODE")
     },
     onError: (error: any) => {
-      setApiError(error.message || "Could not send verification code. Please check your email.")
+      setApiError(
+        error.message ||
+          "Could not send verification code. Please check your email."
+      )
     },
   })
 
@@ -63,7 +67,7 @@ export default function ForgotPasswordForm() {
           type: "forget-password",
         }),
       })
-      
+
       const result = await res.json()
       if (!res.ok) {
         throw new Error(result.message || "Invalid or expired OTP code")
