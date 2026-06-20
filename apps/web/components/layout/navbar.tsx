@@ -54,7 +54,7 @@ export default function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-1000 w-full bg-white transition-shadow duration-500 ease-in-out ${
+      className={`fixed top-0 z-1000 w-full bg-white transition-shadow duration-500 ease-in-out ${
         isSticky ? "shadow-md" : "shadow-none"
       }`}
     >
@@ -63,9 +63,12 @@ export default function Navbar() {
         <Container className="mx-auto flex items-center justify-between px-4 py-1 text-xs text-gray-500">
           <LanguageSwitcher />
           <div className="flex items-center gap-6">
-            <span className="flex cursor-pointer items-center gap-1 hover:text-red-600">
+            <Link
+              href="/contact"
+              className="flex cursor-pointer items-center gap-1 hover:text-red-600"
+            >
               <Phone className="h-3 w-3" /> {t("topBar.contact")}
-            </span>
+            </Link>
             <Link href="/login">
               <span className="flex cursor-pointer items-center gap-1 hover:text-red-600">
                 <LogIn className="h-3 w-3" /> {t("topBar.login")}
@@ -101,7 +104,7 @@ export default function Navbar() {
             )
           })}
           <Link href="/donation">
-            <Button className="w-full bg-green-700">
+            <Button size="lg" className="w-full bg-green-700">
               {t("buttons.donate")}
             </Button>
           </Link>

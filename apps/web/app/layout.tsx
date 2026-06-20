@@ -41,7 +41,7 @@ export default async function RootLayout({
             <NextIntlClientProvider locale={locale} messages={messages}>
               <div className="overflow-hidden">
                 <Navbar />
-                {children}
+                <div className="mt-20">{children}</div>
                 <Footer />
               </div>
             </NextIntlClientProvider>
