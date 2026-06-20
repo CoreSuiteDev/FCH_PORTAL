@@ -4,6 +4,7 @@ import React from "react"
 import { useTranslations } from "next-intl"
 import { Button } from "@workspace/ui/components/button"
 import Container from "@/components/shared/container"
+import Link from "next/link"
 
 export default function Sponsorship() {
   const t = useTranslations("sponsorship.tiers")
@@ -47,11 +48,13 @@ export default function Sponsorship() {
                   </li>
                 ))}
               </ul>
-              <Button
-                className={`w-full py-5 font-semibold text-white ${tier.id === "diamond" ? "bg-red-700 hover:bg-primary" : "bg-black hover:bg-gray-800"}`}
-              >
-                {t("cta")}
-              </Button>
+              <Link href={`/sponsor/${tier.id}`}>
+                <Button
+                  className={`w-full py-5 font-semibold text-white ${tier.id === "diamond" ? "bg-red-700 hover:bg-primary" : "bg-black hover:bg-gray-800"}`}
+                >
+                  {t("cta")}
+                </Button>
+              </Link>
             </div>
           ))}
         </div>
@@ -82,12 +85,14 @@ export default function Sponsorship() {
                   </li>
                 ))}
               </ul>
-              <Button
-                variant="outline"
-                className="w-full border-primary py-5 font-semibold text-primary"
-              >
-                {t("cta")}
-              </Button>
+              <Link href={`/sponsor/${tier.id}`}>
+                <Button
+                  variant="outline"
+                  className="w-full border-primary py-5 font-semibold text-primary"
+                >
+                  {t("cta")}
+                </Button>
+              </Link>
             </div>
           ))}
         </div>

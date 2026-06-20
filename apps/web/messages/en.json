@@ -363,6 +363,7 @@
       "goToDashboard": "Go to Workspace Dashboard"
     }
   },
+
   "sponsorship": {
     "hero": {
       "title": "Partner With Us in Mission",
@@ -437,7 +438,25 @@
         }
       ]
     },
-
+    "paymentForm": {
+      "gatewayTitle": "Payment Gateway Integration",
+      "labelCardholder": "CARDHOLDER NAME",
+      "placeholderCardholder": "John Doe",
+      "labelCardNumber": "CARD NUMBER",
+      "placeholderCardNumber": "4111 2222 3333 4444",
+      "labelExpiration": "EXPIRATION",
+      "placeholderExpiration": "MM / YY",
+      "labelCvc": "CVC",
+      "placeholderCvc": "...",
+      "baseAccess": "Base Tier Access:",
+      "processingFee": "Processing / Setup Fee:",
+      "totalBillable": "Total Billable Amount:",
+      "completeCheckout": "Complete Checkout:",
+      "secureValidation": "Secure Tokenized Subscription Node Validation.",
+      "successTitle": "Thank You!",
+      "successDesc": "Thanks for sponsoring us! We will contact you very soon.",
+      "close": "Close"
+    },
     "whyPartner": {
       "title": "Why Partner With Us?",
       "description": "FCH is dedicated to providing excellence in evangelization and catechesis. Your sponsorship directly impacts the next generation of faith leaders and helps us provide high-quality educational resources across our network.",
