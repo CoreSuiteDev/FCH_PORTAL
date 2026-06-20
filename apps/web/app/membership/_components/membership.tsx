@@ -97,6 +97,10 @@ export default function MembershipPackages() {
                     <h3 className="font-trajan text-xl font-extrabold text-[#2C2927]">
                       {item.title}
                     </h3>
+                    <h3 className="mt-3 text-xs font-semibold">
+                      {item.subtitle}
+                    </h3>
+
                     <p className="mt-2 text-xs text-muted-foreground">
                       {item.description}
                     </p>

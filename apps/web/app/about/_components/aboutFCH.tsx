@@ -3,6 +3,8 @@
 import Container from "@/components/shared/container"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
+import Link from "next/link"
+import { Button } from "@workspace/ui/components/button"
 
 export default function AboutFCH() {
   const t = useTranslations("about.fch")
@@ -32,6 +34,14 @@ export default function AboutFCH() {
             <p className="mt-4 text-sm leading-relaxed text-gray-700 md:text-base">
               {t("historyDescription")}
             </p>
+
+            <div className="mt-2">
+              <Link href="/history">
+                <Button className="h-auto rounded-sm bg-[#e6a84d] px-8 py-3 font-montserrat font-semibold text-black transition-colors hover:bg-[#d6983d]">
+                  {t("buttonFchHistory")}
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 

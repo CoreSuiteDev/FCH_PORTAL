@@ -187,7 +187,8 @@
       "description1": "La Federación para la Catequesis con Hispanos es una organización nacional que promueve la evangelización y la catequesis para quienes sirven en el ministerio catequético en todos los niveles.",
       "description2": "FCH asesora y apoya a los líderes que sirven a las comunidades hispanas/latinas mediante el desarrollo de líderes, la promoción de nuevos liderazgos y la identificación de recursos que fortalecen a los catequistas y al ministerio catequético.",
       "historyTitle": "Resumen de la historia de la Federación para la Catequesis con Hispanos (FCH)",
-      "historyDescription": "La Federación para la Catequesis con Hispanos (FCH) comenzó como un Foro para la Catequesis con Hispanos dentro de la NCCL, y más tarde se convirtió en la Federación para la Catequesis con Hispanos (FCH). In 2022, FCH se convirtió en una organización nacional independiente sin fines de lucro."
+      "historyDescription": "La Federación para la Catequesis con Hispanos (FCH) comenzó como un Foro para la Catequesis con Hispanos dentro de la NCCL, y más tarde se convirtió en la Federación para la Catequesis con Hispanos (FCH). In 2022, FCH se convirtió en una organización nacional independiente sin fines de lucro.",
+      "buttonFchHistory": "Más Historia de FCH"
     },
     "mission": {
       "missionTitle": "Nuestra misión",
@@ -304,7 +305,7 @@
     },
     "packages": {
       "plan": "Plan de Membresía",
-      "title": "Seleccione Su Nivel de Acceso al Espacio de Trabajo",
+      "title": "Selecciona tu \n plan de membresía",
       "monthly": "Mensual",
       "yearly": "Anual",
       "recommended": "Recomendado",
@@ -313,24 +314,29 @@
       "select": "Seleccionar Plan",
       "items": {
         "general": {
-          "title": "Área General",
-          "description": "Acceso a herramientas comunitarias fundamentales, actualizaciones de contenido estándar y seminarios web básicos de la red.",
+          "title": "Membresía General",
+          "subtitle": "Acceso a la comunidad, actualizaciones para miembros, eventos y seminarios web estándar.",
+          "description": "Diseñado para personas que desean mantenerse conectadas con la red de FCH, participar en eventos para miembros, recibir actualizaciones importantes y acceder a seminarios web estándar y recursos comunitarios.",
           "features": [
-            "Acceso al Inicio del Panel",
-            "Canal de Anuncios",
+            "Acceso al Panel de Miembros",
+            "Boletín informativo y actualizaciones de comunicación",
             "Calendario de Eventos para Miembros",
-            "Acceso a Seminarios Web Estándar"
+            "Acceso a los seminarios web estándar de FCH",
+            "Recursos básicos para miembros"
           ]
         },
+
         "pastoral": {
-          "title": "Recursos Pastorales",
-          "description": "Herramientas avanzadas diseñadas específicamente para la administración parroquial, la enseñanza catequética y el liderazgo regional.",
+          "title": "Membresía Pastoral",
+          "subtitle": "Formación avanzada, recursos pastorales, herramientas ministeriales y apoyo al liderazgo.",
+          "description": "Diseñado para líderes catequéticos, equipos parroquiales, personal diocesano, coordinadores de ministerios, educadores y organizaciones que sirven a las comunidades católicas hispanas.",
           "features": [
-            "Todo lo incluido en el Área General",
-            "Biblioteca de Aprendizaje y Herramientas Catequéticas",
-            "Herramientas para el Liderazgo Pastoral y Ministerial",
-            "Recursos Compartidos para Parroquias y Diócesis",
-            "Seminarios Web Avanzados y Contenido Especial"
+            "Todo lo incluido en la Membresía General",
+            "Acceso a seminarios web avanzados",
+            "Biblioteca de Recursos Pastorales",
+            "Recursos catequéticos",
+            "Recursos para parroquias y diócesis",
+            "Acceso a documentos generales y archivos de FCH"
           ]
         }
       }
@@ -551,6 +557,12 @@
     "button": "Siguiente",
     "amounts": [10, 20, 30, 40, 50]
   },
+
+  "history": {
+    "pageTitle": "Nuestra Historia",
+    "pageDescription": "Desde nuestra creación, FCH se ha dedicado a servir a aquellos que ejercen el ministerio de la catequesis con los hispanos. Nuestra línea de tiempo refleja años de compromiso, fe y crecimiento comunitario, mientras continuamos empoderando a líderes y catequistas en toda la nación."
+  },
+
   "footer": {
     "nav": {
       "about": "Sobre nosotros",

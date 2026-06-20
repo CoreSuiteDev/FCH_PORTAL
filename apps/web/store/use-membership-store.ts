@@ -5,6 +5,7 @@ export type PackageTier = "general" | "pastoral"
 export interface PackageMetadata {
   id: PackageTier
   title: string
+  subtitle: string
   price: number
   billingPeriod: string
   description: string

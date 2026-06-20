@@ -3,31 +3,38 @@ import { PackageMetadata, PackageTier } from "@/store/use-membership-store"
 export const MEMBERSHIP_REGISTRY: Record<PackageTier, PackageMetadata> = {
   general: {
     id: "general",
-    title: "General Area",
+    title: "General Membership",
+    subtitle:
+      "Community access, member updates, events, and standard webinars.",
     price: 19,
     billingPeriod: "per month",
     description:
-      "Access to fundamental community tools, standard content updates, and basic network webinars.",
+      "Designed for individuals who want to stay connected with the FCH network, participate in member events, receive important updates, and access standard webinars and community resources.",
     features: [
-      "Dashboard Home access",
-      "Announcements Feed",
+      "Member Dashboard access",
+      "Newsletter and communication updates",
       "Member Events Calendar",
-      "Standard Webinars Access",
+      "Access to standard FCH webinars",
+      "Basic member resources",
     ],
   },
+
   pastoral: {
     id: "pastoral",
-    title: "Pastoral Resources",
+    title: "Pastoral Membership",
+    subtitle:
+      "Advanced formation, pastoral resources, ministry tools, and leadership support.",
     price: 49,
     billingPeriod: "per month",
     description:
-      "Advanced toolkits explicitly engineered for comprehensive parish administration, catechetical teaching, and regional leadership.",
+      "Designed for catechetical leaders, parish teams, diocesan staff, ministry coordinators, educators, and organizations serving Hispanic Catholic communities.",
     features: [
-      "Everything in General Area",
-      "Learning Library & Catechetical Tools",
-      "Pastoral Leadership & Ministry Toolkits",
-      "Parish & Diocese Shared Resources",
-      "Advanced Webinars & Special Content",
+      "Everything in General Membership",
+      "Advanced webinar access",
+      "Pastoral Resources Library",
+      "Catechetical resources",
+      "Parish and Diocese resources",
+      "Access to general FCH documents and archives",
     ],
   },
 }

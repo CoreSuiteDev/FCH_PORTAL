@@ -188,7 +188,8 @@
       "description1": "The Federation for Catechesis with Hispanics is a national organization that promotes evangelization and catechesis for those who serve in catechetical ministry at every level.",
       "description2": "FCH mentors and supports leaders who serve Hispanic/Latino communities by developing leaders, promoting new leadership, and identifying resources that strengthen catechists and catechetical ministry.",
       "historyTitle": "Overview of the Federation for Catechesis with Hispanics (FCH) History",
-      "historyDescription": "The Federation for Catechesis with Hispanics (FCH) started as a Forum for Catechesis with Hispanics within NCCL, and later became the Federation for Catechesis with Hispanics (FCH). In 2022, FCH became an independent not-for-profit national organization."
+      "historyDescription": "The Federation for Catechesis with Hispanics (FCH) started as a Forum for Catechesis with Hispanics within NCCL, and later became the Federation for Catechesis with Hispanics (FCH). In 2022, FCH became an independent not-for-profit national organization.",
+      "buttonFchHistory": "More FCH History"
     },
     "mission": {
       "missionTitle": "Our Mission",
@@ -304,7 +305,7 @@
     },
     "packages": {
       "plan": "Membership Plan",
-      "title": "Select Your Workspace \n Access Level",
+      "title": "Select Your \n Membership Plan",
       "monthly": "Monthly",
       "yearly": "Yearly",
       "recommended": "Recommended",
@@ -313,24 +314,29 @@
       "select": "Select Package",
       "items": {
         "general": {
-          "title": "General Area",
-          "description": "Access to fundamental community tools, standard content updates, and basic network webinars.",
+          "title": "General Membership",
+          "subtitle": "Community access, member updates, events, and standard webinars.",
+          "description": "Designed for individuals who want to stay connected with the FCH network, participate in member events, receive important updates, and access standard webinars and community resources.",
           "features": [
-            "Dashboard Home access",
-            "Announcements Feed",
+            "Member Dashboard access",
+            "Newsletter and communication updates",
             "Member Events Calendar",
-            "Standard Webinars Access"
+            "Access to standard FCH webinars",
+            "Basic member resources"
           ]
         },
+
         "pastoral": {
-          "title": "Pastoral Resources",
-          "description": "Advanced toolkits explicitly engineered for comprehensive parish administration, catechetical teaching, and regional leadership.",
+          "title": "Pastoral Membership",
+          "subtitle": "Advanced formation, pastoral resources, ministry tools, and leadership support.",
+          "description": "Designed for catechetical leaders, parish teams, diocesan staff, ministry coordinators, educators, and organizations serving Hispanic Catholic communities.",
           "features": [
-            "Everything in General Area",
-            "Learning Library & Catechetical Tools",
-            "Pastoral Leadership & Ministry Toolkits",
-            "Parish & Diocese Shared Resources",
-            "Advanced Webinars & Special Content"
+            "Everything in General Membership",
+            "Advanced webinar access",
+            "Pastoral Resources Library",
+            "Catechetical resources",
+            "Parish and Diocese resources",
+            "Access to general FCH documents and archives"
           ]
         }
       }
@@ -550,6 +556,11 @@
     "prompt": "How much would you like to donate today?",
     "customPlaceholder": "Custom",
     "button": "Next"
+  },
+
+  "history": {
+    "pageTitle": "Our History",
+    "pageDescription": "Since our inception, FCH has been dedicated to serving those who minister in catechesis with Hispanics. Our timeline reflects years of commitment, faith, and community growth as we continue to empower leaders and catechists across the nation."
   },
 
   "footer": {
