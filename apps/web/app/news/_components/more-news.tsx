@@ -15,7 +15,7 @@ const newsData: NewsData[] = [
     id: 1,
     title: "Global Unity Initiative Launched",
     category: "World",
-    img: "https://picsum.photos/id/1011/1200/800",
+    img: "/assets/feature-news.jpeg",
   },
   {
     id: 2,

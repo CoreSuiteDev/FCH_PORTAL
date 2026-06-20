@@ -236,3 +236,36 @@ export const totalSummary: TOTALSUMMARY = {
   yearly: "$54k",
   monthly: "$4.3k",
 }
+
+interface SopnsorsLogos {
+  id: number
+  name: string
+  src: string
+}
+export const sponsorslogos: SopnsorsLogos[] = [
+  {
+    id: 1,
+    name: "JS",
+    src: "https://cdn-icons-png.flaticon.com/128/5968/5968292.png",
+  },
+  {
+    id: 2,
+    name: "Bootstrap",
+    src: "https://cdn-icons-png.flaticon.com/128/5968/5968672.png",
+  },
+  {
+    id: 3,
+    name: "Gmail",
+    src: "https://cdn-icons-png.flaticon.com/128/5968/5968534.png",
+  },
+  {
+    id: 4,
+    name: "Figma",
+    src: "https://cdn-icons-png.flaticon.com/128/5968/5968705.png",
+  },
+  {
+    id: 5,
+    name: "Python",
+    src: "https://cdn-icons-png.flaticon.com/128/5968/5968350.png",
+  },
+]

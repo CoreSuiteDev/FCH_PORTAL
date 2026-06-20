@@ -128,6 +128,9 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                 <CardTitle className="text-3xl font-extrabold text-[#2C2927]">
                   {localizedActivePackage.title}
                 </CardTitle>
+                <CardDescription className="mt-3 text-xs text-[14px] font-semibold">
+                  {localizedActivePackage.subtitle}
+                </CardDescription>
                 <CardDescription className="mt-3 text-xs leading-relaxed text-muted-foreground">
                   {localizedActivePackage.description}
                 </CardDescription>

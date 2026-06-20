@@ -371,7 +371,7 @@
       "buttonInquire": "Inquire Today"
     },
     "tiers": {
-      "sectionTitle": "Sponsorships and\nSponsors Benefits",
+      "sectionTitle": "Sponsor Tiers & Benefits",
       "cta": "Become a Sponsor",
       "items": [
         {
@@ -437,6 +437,7 @@
         }
       ]
     },
+
     "whyPartner": {
       "title": "Why Partner With Us?",
       "description": "FCH is dedicated to providing excellence in evangelization and catechesis. Your sponsorship directly impacts the next generation of faith leaders and helps us provide high-quality educational resources across our network.",
@@ -450,6 +451,9 @@
           "label": "Annual Webinars"
         }
       ]
+    },
+    "ourSponsors": {
+      "title": "Our Sponsors"
     },
     "haveQuestions": {
       "title": "Have Questions\nAbout Sponsorship?",

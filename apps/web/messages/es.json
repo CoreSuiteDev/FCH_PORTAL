@@ -371,7 +371,7 @@
       "buttonInquire": "Solicite Información Hoy"
     },
     "tiers": {
-      "sectionTitle": "Patrocinios y\nBeneficios para los Patrocinadores",
+      "sectionTitle": "Categorías de Patrocinio y Beneficios",
       "cta": "Conviértase en Patrocinador",
       "items": [
         {
@@ -450,6 +450,9 @@
           "label": "Seminarios Web Anuales"
         }
       ]
+    },
+    "ourSponsors": {
+      "title": "Nuestros Patrocinadores"
     },
     "haveQuestions": {
       "title": "¿Tiene Preguntas\nSobre El Patrocinio?",

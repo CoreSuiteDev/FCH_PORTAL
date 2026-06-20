@@ -3,8 +3,6 @@
 import { ReactLenis } from "@studio-freight/react-lenis"
 import { useTranslations } from "next-intl"
 
-import { AboutSection } from "@/components/home/about-section"
-
 import DynamicHero from "@/components/shared/dynamic-hero"
 import AboutFCH from "./_components/aboutFCH"
 import MissionSection from "./_components/mission"

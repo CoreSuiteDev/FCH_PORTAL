@@ -7,6 +7,7 @@ import DynamicHero from "@/components/shared/dynamic-hero"
 import Sponsorship from "./_components/sopnsor-ship"
 import WhyPartnerWithUs from "./_components/why-partner-with-us"
 import HaveQuestions from "./_components/have-questions"
+import { SponsorLogos } from "./_components/sponsor-logos"
 
 export default function SponsorshipPage() {
   const t = useTranslations("sponsorship.hero")
@@ -50,6 +51,7 @@ export default function SponsorshipPage() {
 
         {/* Components rendered in the Sponsorship Page */}
         <Sponsorship />
+        <SponsorLogos />
         <WhyPartnerWithUs />
         <HaveQuestions />
       </main>
