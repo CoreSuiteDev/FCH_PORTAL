@@ -18,13 +18,13 @@ export const events: RegistryEvent[] = [
     id: 1,
     date: "July 15, 2026",
     time: "10:00 AM",
-    title: "Community Meetup",
-    description: "Local gathering.",
+    title: "Catechetical Sunday 2026",
+    description:
+      "The United States Conference of Catholic Bishops designated the third Sunday in September as Catechetical Sunday.",
     location: "Community Center",
     status: "Upcoming",
     capacity: 50,
-    image:
-      "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&q=80",
+    image: "/assets/feature-event.png",
   },
   {
     id: 2,
