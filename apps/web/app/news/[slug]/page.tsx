@@ -6,14 +6,11 @@ import { newsData } from "@/constants/news-data"
 
 interface NewsItem {
   id: number
-  slug: string
-  image: string
-  title: string
-  description: string
-  content: string
-  author: string
-  role: string
-  date: string
+  img: string
+  categoryKey: string
+  titleKey: string
+  descKey: string
+  link: string
 }
 
 export default async function NewsDetailsPage({
@@ -23,15 +20,15 @@ export default async function NewsDetailsPage({
 }) {
   const { slug } = await params
 
-  // Find current news item and its index for navigation
-  const currentIndex = newsData.findIndex((item) => item.id.toString() === slug)
-  const news = newsData[currentIndex] as NewsItem
+  // Data find করা
+  const news = newsData.find((item) => item.id.toString() === slug)
 
   if (!news) {
     notFound()
   }
 
   // Navigation Logic
+  const currentIndex = newsData.findIndex((item) => item.id.toString() === slug)
   const prevNews = currentIndex > 0 ? newsData[currentIndex - 1] : null
   const nextNews =
     currentIndex < newsData.length - 1 ? newsData[currentIndex + 1] : null
@@ -41,17 +38,17 @@ export default async function NewsDetailsPage({
       <Container className="max-w-4xl px-6">
         {/* Header Section */}
         <h1 className="mb-4 text-4xl font-extrabold text-[#8b0000]">
-          {news.title}
+          {news.titleKey}
         </h1>
         <p className="mb-6 text-sm text-gray-500">
-          By {news.author} | {news.date}
+          Category: {news.categoryKey}
         </p>
 
         {/* Featured Image */}
         <div className="relative mb-8 h-96 w-full overflow-hidden rounded-lg shadow-lg">
           <Image
-            src={news.image}
-            alt={news.title}
+            src={news.img}
+            alt={news.titleKey}
             fill
             className="object-cover"
             priority
@@ -60,10 +57,17 @@ export default async function NewsDetailsPage({
 
         {/* Article Content */}
         <article className="prose prose-lg mb-16 max-w-none text-gray-700">
-          <p className="text-xl font-medium text-gray-900">
-            {news.description}
-          </p>
-          <div className="mt-4">{news.content}</div>
+          <p className="text-xl font-medium text-gray-900">{news.descKey}</p>
+          <div className="mt-4">
+            <a
+              href={news.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#0073aa] hover:underline"
+            >
+              Read original article
+            </a>
+          </div>
         </article>
 
         {/* Previous/Next Navigation */}
@@ -74,7 +78,7 @@ export default async function NewsDetailsPage({
                 ← Previous
               </span>
               <span className="mt-1 font-semibold text-[#8b0000] group-hover:underline">
-                {prevNews.title}
+                {prevNews.titleKey}
               </span>
             </Link>
           ) : (
@@ -90,7 +94,7 @@ export default async function NewsDetailsPage({
                 Next →
               </span>
               <span className="mt-1 font-semibold text-[#8b0000] group-hover:underline">
-                {nextNews.title}
+                {nextNews.titleKey}
               </span>
             </Link>
           ) : (
