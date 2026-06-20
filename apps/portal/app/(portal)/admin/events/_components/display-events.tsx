@@ -24,7 +24,7 @@ const DisplayEvents = () => {
 
     fetchEvents()
   }, [])
-
+  console.log("dattttta", events)
   if (loading) return <div>Loading...</div>
   if (error) return <div>{error}</div>
 
@@ -33,7 +33,7 @@ const DisplayEvents = () => {
       <h1 className="mb-4 text-2xl font-bold">Upcoming Events</h1>
       <div className="grid gap-4">
         {events.map((event: any) => (
-          <div key={event._id} className="rounded-lg border p-4 shadow">
+          <div key={event.id} className="rounded-lg border p-4 shadow">
             <h2 className="text-xl font-semibold">{event.title}</h2>
             <p className="text-gray-600">{event.description}</p>
             <div className="mt-2 text-sm">

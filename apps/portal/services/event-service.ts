@@ -3,10 +3,10 @@ import { API_BASE_URL } from "./api-client"
 
 export const getEvents = async () => {
   const { data } = await API_BASE_URL.get("/events")
-  return data
+  return data.data
 }
 
 export const createEvent = async (eventData: EventData) => {
   const { data } = await API_BASE_URL.post("/events", eventData)
-  return data
+  return data.data
 }
