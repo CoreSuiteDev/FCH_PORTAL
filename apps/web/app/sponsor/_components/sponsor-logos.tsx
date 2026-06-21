@@ -1,9 +1,9 @@
 import Image from "next/image"
 import React from "react"
-
 import { Marquee } from "@workspace/ui/components/marquee"
 import { useTranslations } from "next-intl"
-interface SopnsorsLogos {
+
+interface Sponsor {
   id: number
   name: string
   src: string
@@ -11,7 +11,8 @@ interface SopnsorsLogos {
 
 export function SponsorLogos() {
   const t = useTranslations("sponsorship.ourSponsors")
-  const sponsors: SopnsorsLogos[] = [
+
+  const sponsors: Sponsor[] = [
     {
       id: 1,
       name: "JS",
@@ -38,13 +39,17 @@ export function SponsorLogos() {
       src: "https://cdn-icons-png.flaticon.com/128/5968/5968350.png",
     },
   ]
+
   return (
-    <div className="relative flex w-full flex-col items-center justify-center bg-white py-14">
+    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-white py-14">
       <h2 className="mb-12 text-center font-trajan text-4xl font-extrabold tracking-wide whitespace-pre-line text-primary">
         {t("title")}
       </h2>
 
-      <Marquee pauseOnHover className="[--duration:20s]">
+      <Marquee
+        pauseOnHover
+        className="flex flex-row [--duration:20s] [--gap:2rem]"
+      >
         {sponsors.map((sponsor) => (
           <div
             key={sponsor.id}
@@ -62,8 +67,8 @@ export function SponsorLogos() {
       </Marquee>
 
       {/* Gradient Fades */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-white to-transparent"></div>
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-white to-transparent"></div>
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-1/4 bg-gradient-to-r from-white to-transparent"></div>
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-1/4 bg-gradient-to-l from-white to-transparent"></div>
     </div>
   )
 }
