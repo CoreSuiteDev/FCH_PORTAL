@@ -365,99 +365,118 @@
   },
   "sponsorship": {
     "hero": {
-      "title": "Asóciese con Nosotros en la Misión",
-      "description": "Apoye la labor de FCH en el fortalecimiento de la catequesis, la formación en la fe y la participación comunitaria dentro de las comunidades católicas hispanas. Su patrocinio hace posibles nuestros programas, eventos y recursos.",
-      "buttonSponsor": "Ver Niveles de Patrocinio",
-      "buttonInquire": "Solicite Información Hoy"
+      "title": "Asóciate con nosotros en la misión",
+      "description": "Apoya el trabajo de FCH en el avance de la catequesis, la formación en la fe y el compromiso comunitario dentro de las comunidades católicas hispanas. Tu patrocinio ayuda a hacer posibles nuestros programas, eventos y recursos.",
+      "buttonSponsor": "Ver niveles de patrocinio",
+      "buttonInquire": "Consultar ahora"
     },
     "tiers": {
-      "sectionTitle": "Categorías de Patrocinio y Beneficios",
-      "cta": "Conviértase en Patrocinador",
+      "sectionTitle": "Niveles de patrocinio y beneficios",
+      "cta": "Conviértete en patrocinador",
       "items": [
         {
           "id": "diamond",
-          "tierLabel": "Nivel Uno",
+          "tierLabel": "Nivel uno",
           "title": "Patrocinio Diamante",
           "price": "$3,000",
-          "period": "/1 Año",
+          "period": "/1 año",
           "isFeatured": true,
           "features": [
-            "Ubicación prioritaria en la lista de miembros asociados",
+            "Listado prioritario en la lista de miembros asociados",
             "Logotipo con enlace directo al sitio web",
-            "Patrocinio de 3 seminarios web con presentación de productos",
-            "Beca de $500 para la educación de jóvenes adultos",
-            "Espacio de exhibición gratuito en las Conferencias Regionales",
+            "Patrocina 3 seminarios web con presentación de producto",
+            "Beca de $500 para educación de jóvenes adultos",
+            "Espacio gratuito de exhibición en conferencias regionales",
             "Logotipo destacado en la página principal con enlace"
           ]
         },
         {
           "id": "platinum",
-          "tierLabel": "Nivel Dos",
+          "tierLabel": "Nivel dos",
           "title": "Patrocinio Platino",
           "price": "$2,500",
-          "period": "/1 Año",
+          "period": "/1 año",
           "features": [
-            "Inclusión en la lista de miembros asociados",
+            "Listado en la lista de miembros asociados",
             "Logotipo con enlace directo al sitio web",
-            "Patrocinio de 2 seminarios web con presentación de productos",
-            "Beca de $500 para la educación de jóvenes adultos",
-            "Espacio de exhibición gratuito en las Conferencias Regionales"
+            "Patrocina 2 seminarios web con presentación de producto",
+            "Beca de $500 para educación de jóvenes adultos",
+            "Espacio gratuito de exhibición en conferencias regionales"
           ]
         },
         {
           "id": "gold",
-          "tierLabel": "Nivel Tres",
+          "tierLabel": "Nivel tres",
           "title": "Oro",
           "price": "$2,000",
-          "period": "/1 Año",
+          "period": "/1 año",
           "features": [
-            "Listado del logotipo con enlace",
-            "Patrocinio de 2 seminarios web",
-            "50% de descuento en el espacio de exhibición"
+            "Listado con logotipo y enlace",
+            "Patrocina 2 seminarios web",
+            "50% de descuento en espacio de exhibición"
           ]
         },
         {
           "id": "silver",
-          "tierLabel": "Nivel Cuatro",
+          "tierLabel": "Nivel cuatro",
           "title": "Plata",
           "price": "$1,000",
-          "period": "/1 Año",
+          "period": "/1 año",
           "features": [
-            "Inclusión en la lista de miembros asociados",
-            "Patrocinio de 1 seminario web por año"
+            "Listado en la membresía de socios",
+            "Patrocina 1 seminario web por año"
           ]
         },
         {
           "id": "bronze",
-          "tierLabel": "Nivel Cinco",
+          "tierLabel": "Nivel cinco",
           "title": "Bronce",
           "price": "$500",
-          "period": "/1 Año",
-          "features": ["Inclusión en nuestra lista de miembros asociados"]
+          "period": "/1 año",
+          "features": ["Listado en nuestra lista de miembros asociados"]
         }
       ]
     },
+    "paymentForm": {
+      "gatewayTitle": "Integración de pasarela de pago",
+      "labelCardholder": "NOMBRE DEL TITULAR",
+      "placeholderCardholder": "Juan Pérez",
+      "labelCardNumber": "NÚMERO DE TARJETA",
+      "placeholderCardNumber": "4111 2222 3333 4444",
+      "labelExpiration": "VENCIMIENTO",
+      "placeholderExpiration": "MM / AA",
+      "labelCvc": "CVC",
+      "placeholderCvc": "...",
+      "baseAccess": "Acceso básico del nivel:",
+      "processingFee": "Tarifa de procesamiento / configuración:",
+      "totalBillable": "Total a pagar:",
+      "completeCheckout": "Completar pago:",
+      "secureValidation": "Validación segura de suscripción tokenizada.",
+      "successTitle": "¡Gracias!",
+      "successDesc": "¡Gracias por patrocinarnos! Nos pondremos en contacto contigo muy pronto.",
+      "close": "Cerrar"
+    },
     "whyPartner": {
-      "title": "¿Por Qué Asociarse con Nosotros?",
-      "description": "FCH está comprometida con la excelencia en la evangelización y la catequesis. Su patrocinio impacta directamente a la próxima generación de líderes en la fe y nos ayuda a proporcionar recursos educativos de alta calidad a toda nuestra red.",
+      "title": "¿Por qué asociarte con nosotros?",
+      "description": "FCH está dedicada a brindar excelencia en la evangelización y la catequesis. Tu patrocinio impacta directamente a la próxima generación de líderes de fe y nos ayuda a ofrecer recursos educativos de alta calidad en toda nuestra red.",
       "stats": [
         {
           "value": 5000,
-          "label": "Miembros de la Comunidad"
+          "label": "Miembros de la comunidad"
         },
         {
           "value": 20,
-          "label": "Seminarios Web Anuales"
+          "label": "Seminarios web anuales"
         }
       ]
     },
     "ourSponsors": {
-      "title": "Nuestros Patrocinadores"
+      "title": "Nuestros patrocinadores"
     },
     "haveQuestions": {
-      "title": "¿Tiene Preguntas\nSobre El Patrocinio?",
-      "description": "Envíenos sus preguntas, necesidades o temas que le gustaría conversar. Estamos aquí para ayudarle a encontrar el nivel de colaboración adecuado para su organización.",
-      "button": "Contáctenos"
+      "title": "¿Tienes preguntas\nsobre el patrocinio?",
+      "description": "Envíanos tus preguntas, necesidades o temas que te gustaría discutir. Estamos aquí para ayudarte a encontrar el nivel de asociación adecuado para tu organización.",
+      "button": "Contáctanos"
     }
   },
   "newsPage": {
