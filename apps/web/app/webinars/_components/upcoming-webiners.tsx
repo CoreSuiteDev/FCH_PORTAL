@@ -1,12 +1,12 @@
 "use client"
-
 import React from "react"
 import Image from "next/image"
-import { motion } from "framer-motion"
+import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { Card } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import Container from "@/components/shared/container"
+import { Calendar, MapPin, Users } from "lucide-react"
 import {
   Carousel,
   CarouselContent,
@@ -14,6 +14,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@workspace/ui/components/carousel"
+import { Webinar } from "../[slug]/page"
 
 export default function UpcomingWebinars() {
   const t = useTranslations("webinarsPage")
@@ -21,77 +22,111 @@ export default function UpcomingWebinars() {
   const past = t.raw("past")
   const footer = t.raw("footer")
 
-  return (
-    <section className="bg-white py-16 md:py-20">
-      <Container className="mx-auto">
-        {/* TOP SECTION */}
-        <div className="mb-14 grid items-center gap-14 lg:grid-cols-2">
-          <div className="space-y-6">
-            <h2 className="font-trajan text-4xl font-bold text-primary">
-              {upcoming.heading}
-            </h2>
-            <p className="leading-relaxed text-gray-600">{upcoming.text}</p>
-            <ul className="list-inside list-disc space-y-2 text-gray-600">
-              {upcoming.features.map((f: string, i: number) => (
-                <li key={i}>{f}</li>
-              ))}
-            </ul>
-            <Button className="bg-primary hover:bg-[#6d0000]">
-              {upcoming.button}
-            </Button>
-          </div>
+  const [featured, ...restItems] = upcoming.items
 
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="relative h-[420px] overflow-hidden rounded-3xl shadow-2xl"
-          >
+  return (
+    <section className="bg-white py-16">
+      <Container>
+        <h2 className="mb-10 font-trajan text-2xl font-extrabold text-primary md:text-4xl">
+          {upcoming.heading}
+        </h2>
+
+        {/* FEATURED BANNER SECTION */}
+        {featured && (
+          <div className="relative mb-12 h-[400px] w-full overflow-hidden rounded-3xl">
             <Image
-              src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
-              alt="Webinar"
+              src={featured.image}
+              alt={featured.title}
               fill
               className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
             <div className="absolute bottom-0 p-8 text-white">
-              <h3 className="font-trajan text-2xl font-bold">
-                {upcoming.bannerTitle}
-              </h3>
-              <p className="mt-2 text-sm text-white/80">
-                {upcoming.bannerSubtitle}
-              </p>
+              <h1 className="font-trajan text-4xl font-bold uppercase">
+                {featured.title}
+              </h1>
+              <p className="mt-2 text-white/90">{featured.description}</p>
+              <Link href={`/webinars/${featured.id}`}>
+                <Button className="mt-4 bg-primary px-5 py-5 font-semibold text-white hover:bg-gray-200">
+                  Register Now
+                </Button>
+              </Link>
             </div>
-          </motion.div>
+          </div>
+        )}
+
+        {/* UPCOMING GRID SECTION */}
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {restItems.map((item: Webinar, index: number) => (
+            <Card
+              key={index}
+              className="overflow-hidden rounded-2xl border border-gray-100 p-0 shadow-sm"
+            >
+              <div className="relative h-56 w-full">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="mb-4 font-trajan text-lg font-bold">
+                  {item.title}
+                </h3>
+                <div className="mb-6 space-y-2 text-sm text-gray-600">
+                  <p className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" /> {item.date}
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" /> {item.location}
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Users className="h-4 w-4" /> Capacity: {item.capacity}
+                  </p>
+                </div>
+                <Link href={`/webinars/${item.id}`}>
+                  <Button
+                    variant="outline"
+                    className="w-full border-red-800 text-red-800 hover:bg-red-800 hover:text-white"
+                  >
+                    {upcoming.viewDetails}
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+          ))}
         </div>
 
-        {/* PAST WEBINARS */}
-        <h2 className="mb-6 font-trajan text-4xl font-bold text-primary">
+        {/* VIEW MORE BUTTON (UPCOMING এর নিচে যোগ করা হয়েছে) */}
+        <div className="mt-10 flex justify-center">
+          <Link href="/membership">
+            <Button className="bg-primary px-10 py-6 text-lg text-white hover:opacity-90">
+              View More
+            </Button>
+          </Link>
+        </div>
+
+        {/* PAST WEBINARS CAROUSEL */}
+        <h2 className="mr-10 mb-8 font-trajan text-2xl font-bold text-primary md:mt-16 md:text-4xl">
           {past.heading}
         </h2>
-        <Carousel opts={{ align: "start", loop: true }} className="w-full">
-          <CarouselContent className="-ml-2 md:-ml-4">
+        <Carousel className="w-full">
+          <CarouselContent>
             {past.items.map((item: any, index: number) => (
-              <CarouselItem
-                key={index}
-                className="basis-full pl-2 md:basis-1/2 md:pl-4 lg:basis-1/3"
-              >
-                <motion.div whileHover={{ y: -6 }}>
-                  <Card className="overflow-hidden rounded-2xl border-0 p-0 shadow-md transition hover:shadow-2xl">
-                    <div className="relative h-56">
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                      <div className="absolute bottom-0 p-5 text-white">
-                        <h3 className="font-trajan text-lg font-bold">
-                          {item.title}
-                        </h3>
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
+              <CarouselItem key={index} className="md:basis-1/3">
+                <Card className="relative h-56 overflow-hidden rounded-2xl">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40" />
+                  <div className="absolute bottom-5 left-5 font-bold text-white">
+                    {item.title}
+                  </div>
+                </Card>
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -99,12 +134,12 @@ export default function UpcomingWebinars() {
           <CarouselNext />
         </Carousel>
 
-        {/* CTA */}
+        {/* FOOTER CTA */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t pt-8 sm:flex-row">
           <p className="text-gray-600">{footer.text}</p>
-          <Button className="bg-primary hover:bg-[#6d0000]">
-            {footer.button}
-          </Button>
+          <Link href="/membership">
+            <Button className="bg-primary">{footer.button}</Button>
+          </Link>
         </div>
       </Container>
     </section>

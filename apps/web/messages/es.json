@@ -531,15 +531,16 @@
       "featured": "Evento Destacado",
       "register": "Regístrese Ahora"
     },
+    "title": "Próximos Eventos",
     "tabs": {
       "Upcoming": "Próximos",
       "Ongoing": "En Curso",
       "Ended": "Finalizados"
     },
     "card": {
-      "datePrefix": "📅",
-      "locationPrefix": "📍",
-      "capacityPrefix": "👥 Capacidad:",
+      "datePrefix": "",
+      "locationPrefix": "",
+      "capacityPrefix": " Capacidad:",
       "viewDetails": "Ver Detalles"
     },
     "detail": {

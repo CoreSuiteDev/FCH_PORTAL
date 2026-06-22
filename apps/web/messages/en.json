@@ -534,15 +534,16 @@
       "featured": "Featured Event",
       "register": "Register Now"
     },
+    "title": "Upcoming Events",
     "tabs": {
       "Upcoming": "Upcoming",
       "Ongoing": "Ongoing",
       "Ended": "Ended"
     },
     "card": {
-      "datePrefix": "📅",
-      "locationPrefix": "📍",
-      "capacityPrefix": "👥 Capacity:",
+      "datePrefix": "",
+      "locationPrefix": "",
+      "capacityPrefix": " Capacity:",
       "viewDetails": "View Details"
     },
     "detail": {
@@ -578,16 +579,43 @@
       "description": "FCH webinars provide virtual formation opportunities for catechists, ministry leaders, and pastoral communities serving Hispanic Catholics. Through live webinars and on-demand resources, FCH is building a growing Learning Library to support faith formation, leadership development, and ministry service across our community."
     },
     "upcoming": {
-      "heading": "Upcoming Webinar",
-      "text": "Join live webinars and formation sessions designed for healthcare professionals and ministry leaders.",
-      "features": [
-        "Live expert-led formation sessions",
-        "Interactive Q&A discussions",
-        "Practical ministry tools"
+      "heading": "Upcoming Webinars",
+      "items": [
+        {
+          "id": "catechetical-sunday-2026",
+          "title": "Catechetical Sunday 2026",
+          "date": "July 15, 2026 • 10:00 AM",
+          "location": "Community Center",
+          "capacity": "50",
+          "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "id": "youth-ministry-summit",
+          "title": "Youth Ministry Summit",
+          "date": "July 20, 2026 • 11:00 AM",
+          "location": "Creative Lab",
+          "capacity": "40",
+          "image": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "id": "clinical-ethics-ministry",
+          "title": "Ethics In Clinical Ministry",
+          "date": "July 25, 2026 • 09:00 AM",
+          "location": "Main Hall",
+          "capacity": "100",
+          "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "id": "spiritual-leadership-growth",
+          "title": "Community Spiritual Leadership",
+          "date": "August 05, 2026 • 02:00 PM",
+          "location": "Virtual Room A",
+          "capacity": "75",
+          "image": "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80"
+        }
       ],
-      "button": "Join Webinar",
-      "bannerTitle": "Live Webinar Series 2026",
-      "bannerSubtitle": "Formation • Leadership • Growth"
+      "viewDetails": "View Details",
+      "registerNow": "Register Now"
     },
     "past": {
       "heading": "Past Webinars",
@@ -615,7 +643,6 @@
       "button": "Become a Member"
     }
   },
-
   "donateCard": {
     "title": "Donate",
     "prompt": "How much would you like to donate today?",

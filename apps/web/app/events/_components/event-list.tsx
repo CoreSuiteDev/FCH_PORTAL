@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { useTranslations } from "next-intl" // Import this
+import { useTranslations } from "next-intl"
 import { Card } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -14,9 +14,10 @@ import {
 } from "@workspace/ui/components/tabs"
 import { events, EventStatus } from "@/constants/upcoming-events-data"
 import Container from "@/components/shared/container"
+import { Calendar, MapPin, Users } from "lucide-react" // আইকন ইমপোর্ট
 
 export default function EventsList() {
-  const t = useTranslations("eventsList") // Hook to access your JSON
+  const t = useTranslations("eventsList")
   const [activeTab, setActiveTab] = useState<EventStatus>("Upcoming")
 
   const upcomingEvents = events.filter((e) => e.status === "Upcoming")
@@ -25,6 +26,9 @@ export default function EventsList() {
   return (
     <section className="bg-white">
       <Container className="py-8">
+        <h2 className="mt-8 mb-8 font-trajan text-2xl font-extrabold text-primary md:mt-12 md:text-4xl">
+          {t("title")}
+        </h2>
         {/* Hero Banner */}
         {heroEvent && (
           <section className="relative mb-12 flex h-[400px] flex-col justify-end overflow-hidden rounded-3xl p-12 text-white">
@@ -46,7 +50,7 @@ export default function EventsList() {
                 {heroEvent.description}
               </p>
               <Link href={`/events/${heroEvent.id}`}>
-                <Button className="mt-6 w-fit rounded-full bg-white px-8 text-black hover:bg-gray-200">
+                <Button className="mt-6 w-fit rounded-lg bg-primary px-8 py-5 font-bold text-white">
                   {t("hero.register")}
                 </Button>
               </Link>
@@ -103,13 +107,16 @@ export default function EventsList() {
                         {item.title}
                       </h3>
                       <div className="mt-4 flex-1 space-y-3 text-sm text-gray-600">
-                        <p>
+                        <p className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-primary" />{" "}
                           {t("card.datePrefix")} {item.date} • {item.time}
                         </p>
-                        <p>
+                        <p className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-primary" />{" "}
                           {t("card.locationPrefix")} {item.location}
                         </p>
-                        <p>
+                        <p className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-primary" />{" "}
                           {t("card.capacityPrefix")} {item.capacity}
                         </p>
                       </div>
@@ -127,6 +134,15 @@ export default function EventsList() {
             </TabsContent>
           ))}
         </Tabs>
+
+        {/* VIEW MORE BUTTON */}
+        <div className="mt-12 flex justify-center">
+          <Link href="/membership">
+            <Button className="bg-primary px-10 py-6 text-lg text-white hover:opacity-90">
+              View More
+            </Button>
+          </Link>
+        </div>
       </Container>
     </section>
   )
