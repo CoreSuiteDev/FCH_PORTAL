@@ -570,28 +570,56 @@
       }
     }
   },
+
   "webinarsPage": {
     "hero": {
-      "title": "Únase a Nuestros Seminarios Web",
-      "description": "Los seminarios web de FCH brindan oportunidades de formación virtual para catequistas, líderes ministeriales y comunidades pastorales que sirven a los católicos hispanos. A través de seminarios en vivo y recursos bajo demanda, FCH está construyendo una Biblioteca de Aprendizaje en crecimiento para apoyar la formación en la fe, el desarrollo de liderazgo y el servicio ministerial en toda nuestra comunidad."
+      "title": "Únase a nuestros seminarios web",
+      "description": "Los seminarios web de FCH brindan oportunidades de formación virtual para catequistas, líderes de ministerio y comunidades pastorales que sirven a los católicos hispanos. A través de seminarios web en vivo y recursos bajo demanda, FCH está construyendo una Biblioteca de Aprendizaje en crecimiento para apoyar la formación en la fe, el desarrollo de liderazgo y el servicio ministerial en toda nuestra comunidad."
     },
     "upcoming": {
-      "heading": "Próximos Eventos",
-      "text": "Participe en seminarios web en vivo y sesiones de formación diseñadas para profesionales de la salud y líderes ministeriales.",
-      "features": [
-        "Sesiones de formación en vivo dirigidas por expertos",
-        "Discusiones interactivas de preguntas y respuestas",
-        "Herramientas prácticas para el ministerio"
-      ],
-      "button": "Unirse al Seminario Web",
-      "bannerTitle": "Serie de Seminarios Web en Vivo 2026",
-      "bannerSubtitle": "Formación • Liderazgo • Crecimiento"
-    },
-    "past": {
-      "heading": "Seminarios Web Anteriores",
+      "heading": "Próximos seminarios web",
       "items": [
         {
-          "title": "Integración de Fe y Salud",
+          "id": "catechetical-sunday-2026",
+          "title": "Domingo Catequético 2026",
+          "date": "15 de julio de 2026 • 10:00 AM",
+          "location": "Centro Comunitario",
+          "capacity": "50",
+          "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "id": "youth-ministry-summit",
+          "title": "Cumbre de Pastoral Juvenil",
+          "date": "20 de julio de 2026 • 11:00 AM",
+          "location": "Laboratorio Creativo",
+          "capacity": "40",
+          "image": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "id": "clinical-ethics-ministry",
+          "title": "Ética en el Ministerio Clínico",
+          "date": "25 de julio de 2026 • 09:00 AM",
+          "location": "Salón Principal",
+          "capacity": "100",
+          "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80"
+        },
+        {
+          "id": "spiritual-leadership-growth",
+          "title": "Liderazgo Espiritual Comunitario",
+          "date": "05 de agosto de 2026 • 02:00 PM",
+          "location": "Sala Virtual A",
+          "capacity": "75",
+          "image": "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80"
+        }
+      ],
+      "viewDetails": "Ver detalles",
+      "registerNow": "Registrarse ahora"
+    },
+    "past": {
+      "heading": "Seminarios web anteriores",
+      "items": [
+        {
+          "title": "Integración de fe y salud",
           "image": "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=1600&q=80"
         },
         {
@@ -603,14 +631,14 @@
           "image": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
         },
         {
-          "title": "Taller de Crecimiento Ministerial",
+          "title": "Taller de crecimiento ministerial",
           "image": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1600&q=80"
         }
       ]
     },
     "footer": {
-      "text": "¿Quiere acceso a todos los seminarios web y contenido exclusivo?",
-      "button": "Conviértase en Miembro"
+      "text": "¿Quieres acceso a todos los seminarios web y contenido exclusivo?",
+      "button": "Hazte miembro"
     }
   },
   "donateCard": {
