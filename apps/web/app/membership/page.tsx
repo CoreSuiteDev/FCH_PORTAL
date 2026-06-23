@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl"
 import DynamicHero from "@/components/shared/dynamic-hero"
 import WhyJoin from "./_components/why-join"
 import MembershipPackages from "./_components/membership"
+import Guideline from "./_components/user-gideline"
 
 export default function Membership() {
   const t = useTranslations("membership.hero")
@@ -37,6 +38,7 @@ export default function Membership() {
           </div>
         </DynamicHero>
         <WhyJoin />
+        <Guideline />
         <MembershipPackages />
       </main>
     </ReactLenis>

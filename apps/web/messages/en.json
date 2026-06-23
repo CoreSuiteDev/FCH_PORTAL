@@ -303,6 +303,28 @@
         }
       }
     },
+    "guideline": {
+      "subtitle": "Steps to Follow",
+      "title": "How it Works",
+      "steps": {
+        "registration": {
+          "title": "Registration",
+          "desc": "Create your account first to get started with our platform."
+        },
+        "login": {
+          "title": "Login",
+          "desc": "Use your registered credentials to log in securely."
+        },
+        "membership": {
+          "title": "Membership",
+          "desc": "Select and purchase your desired membership plan."
+        },
+        "access": {
+          "title": "Access Portal",
+          "desc": "Unlock and enjoy full access to the admin portal."
+        }
+      }
+    },
     "packages": {
       "plan": "Membership Plan",
       "title": "Select Your \n Membership Plan",

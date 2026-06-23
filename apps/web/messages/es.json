@@ -303,6 +303,28 @@
         }
       }
     },
+    "guideline": {
+      "subtitle": "Pasos a seguir",
+      "title": "Cómo funciona",
+      "steps": {
+        "registration": {
+          "title": "Registro",
+          "desc": "Cree su cuenta primero para comenzar en nuestra plataforma."
+        },
+        "login": {
+          "title": "Iniciar sesión",
+          "desc": "Utilice sus credenciales registradas para iniciar sesión de forma segura."
+        },
+        "membership": {
+          "title": "Membresía",
+          "desc": "Seleccione y compre su plan de membresía deseado."
+        },
+        "access": {
+          "title": "Acceso al Portal",
+          "desc": "Desbloquee y disfrute de acceso completo al portal administrativo."
+        }
+      }
+    },
     "packages": {
       "plan": "Plan de Membresía",
       "title": "Selecciona tu \n plan de membresía",

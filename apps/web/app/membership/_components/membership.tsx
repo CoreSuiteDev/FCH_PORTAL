@@ -37,7 +37,7 @@ export default function MembershipPackages() {
   })
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#F6F4F2] px-4 py-20">
+    <div className="relative min-h-screen overflow-hidden bg-white px-4 py-20">
       <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-[#E5DCD5]/40 blur-[130px]" />
 
       <div className="relative z-10 mx-auto max-w-4xl">
