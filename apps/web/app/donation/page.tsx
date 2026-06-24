@@ -4,20 +4,26 @@ import { useState } from "react"
 import { DollarSign, HandHeart, ChevronRight } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@workspace/ui/components/button"
+import { useRouter } from "next/navigation"
 
 const amounts = [10, 20, 30, 40, 50]
 
 export default function DonateCard() {
-  const t = useTranslations("donateCard")
+  const t = useTranslations("donatePage")
+  const router = useRouter()
+
   const [selected, setSelected] = useState<number | null>(20)
   const [customAmount, setCustomAmount] = useState("")
 
+  const finalAmount = selected ?? (customAmount ? Number(customAmount) : null)
+
   return (
     <div className="flex min-h-screen items-start justify-center bg-gray-50 pt-30">
-      <div className="w-full max-w-xl rounded-3xl border border-gray-100 bg-white p-8 shadow-xl shadow-gray-200/50">
+      <div className="w-full max-w-xl rounded-3xl border border-gray-100 bg-white p-8 shadow-xl">
         <h2 className="mb-2 text-center font-trajan text-3xl font-bold text-primary">
-          {t("title")}
+          {t("card.title")}
         </h2>
+
         <div className="mx-auto mb-8 h-1 w-16 rounded-full bg-linear-to-r from-red-400 to-primary" />
 
         <div className="mb-6 flex items-center gap-2 text-gray-700">
@@ -33,36 +39,37 @@ export default function DonateCard() {
                 setSelected(amt)
                 setCustomAmount("")
               }}
-              className={`flex items-center justify-center gap-2 rounded-xl border py-4 font-medium transition-all ${
+              className={`rounded-xl border py-4 ${
                 selected === amt
-                  ? "bg-red-700 text-white shadow-lg ring-2 shadow-red-200 ring-red-300"
-                  : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                  ? "bg-red-700 text-white"
+                  : "bg-gray-50 hover:bg-gray-100"
               }`}
             >
-              <DollarSign className="h-4 w-4" />
-              {amt}
+              ${amt}
             </button>
           ))}
 
-          <div className="relative col-span-1">
-            <div className="flex h-full items-center rounded-xl border bg-gray-50 px-3 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
-              <DollarSign className="h-4 w-4 text-gray-400" />
-              <input
-                type="number"
-                placeholder={t("customPlaceholder")}
-                value={customAmount}
-                onChange={(e) => {
-                  setCustomAmount(e.target.value)
-                  setSelected(null)
-                }}
-                className="w-full bg-transparent p-2 text-sm outline-none placeholder:text-gray-400"
-              />
-            </div>
+          <div className="col-span-1">
+            <input
+              type="number"
+              placeholder={t("card.customPlaceholder")}
+              value={customAmount}
+              onChange={(e) => {
+                setCustomAmount(e.target.value)
+                setSelected(null)
+              }}
+              className="w-full rounded-xl border p-4"
+            />
           </div>
         </div>
 
-        <Button className="mt-8 w-full rounded-xl bg-red-800 py-6 text-lg font-semibold transition-colors hover:bg-primary">
-          {t("button")} <ChevronRight className="ml-2 h-5 w-5" />
+        <Button
+          disabled={!finalAmount}
+          onClick={() => router.push(`/donation/${finalAmount}`)}
+          className="mt-8 w-full rounded-xl py-6"
+        >
+          {t("card.button")}
+          <ChevronRight className="ml-2 h-5 w-5" />
         </Button>
       </div>
     </div>

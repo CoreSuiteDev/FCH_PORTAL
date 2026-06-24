@@ -229,22 +229,37 @@
       ]
     },
     "board": {
-      "title": "Miembros de la junta",
+      "title": "Miembros de la Junta Directiva",
       "members": [
         {
-          "name": "Dr. Elena Rodriguez",
-          "role": "Presidenta",
-          "bio": "Experta en catequesis hispana con más de 20 años de experiencia académica."
+          "name": "Erin Mone",
+          "role": "Miembro de la Junta - Secretaria",
+          "bio": "",
+          "image": "/assets/erin mone.jpg"
         },
         {
-          "name": "Rev. Michael Thorne",
-          "role": "Asesor estratégico",
-          "bio": "Dedicado a fomentar el crecimiento administrativo y las asociaciones diocesanas."
+          "name": "Valerie Sanchez Caro",
+          "role": "Miembro de la Junta - Tesorera",
+          "bio": "",
+          "image": "/assets/Valerie Sanchez Caro (1).jpeg"
         },
         {
-          "name": "Sarah Jenkins",
-          "role": "Directora de enlace comunitario",
-          "bio": "Se enfoca en el compromiso comunitario y las iniciativas educativas basadas en la fe."
+          "name": "Miguel Vences",
+          "role": "Miembro de la Junta - Formación",
+          "bio": "",
+          "image": "/assets/Miguel Vences (1).jpg"
+        },
+        {
+          "name": "Yojan Garcia",
+          "role": "Miembro de la Junta - Capellán",
+          "bio": "",
+          "image": "/assets/Fr Yojan.jpg"
+        },
+        {
+          "name": "Marilyn Santos",
+          "role": "Miembro de la Junta - Ex Officio",
+          "bio": "",
+          "image": "/assets/Marilyn Santos.jpg"
         }
       ]
     },
@@ -663,12 +678,42 @@
       "button": "Hazte miembro"
     }
   },
-  "donateCard": {
-    "title": "Donar",
-    "prompt": "¿Cuánto te gustaría donar hoy?",
-    "customPlaceholder": "Otro",
-    "button": "Siguiente",
-    "amounts": [10, 20, 30, 40, 50]
+  "donatePage": {
+    "card": {
+      "title": "Donar",
+      "prompt": "¿Cuánto te gustaría donar hoy?",
+      "customPlaceholder": "Personalizado",
+      "button": "Siguiente"
+    },
+    "DonateDetailsPage": {
+      "back": "← Volver al registro de donaciones",
+      "selectedPackage": "Paquete de donación seleccionado",
+      "title": "Donación estándar",
+      "oneTime": "/ donación única",
+      "includedImpact": "IMPACTO INCLUIDO:",
+      "impact": {
+        "mission": "Apoyo a la misión",
+        "education": "Programas educativos",
+        "community": "Alcance comunitario"
+      },
+      "payment": {
+        "title": "Integración de pasarela de pago",
+        "cardholder": "Nombre del titular de la tarjeta",
+        "cardNumber": "Número de tarjeta",
+        "expiry": "Expiración",
+        "cvc": "CVC",
+        "amount": "Cantidad de donación:",
+        "fee": "Tarifa de procesamiento:",
+        "total": "Contribución total:",
+        "button": "Completar donación",
+        "processing": "Procesando...",
+        "secure": "Validación segura de donación con tokenización."
+      },
+      "success": {
+        "title": "¡Gracias por tu donación!",
+        "description": "Tu contribución nos ayuda a continuar con nuestra misión."
+      }
+    }
   },
 
   "history": {

@@ -233,19 +233,34 @@
       "title": "Board Members",
       "members": [
         {
-          "name": "Dr. Elena Rodriguez",
-          "role": "Chairperson",
-          "bio": "Expert in Hispanic catechesis with over 20 years of academic experience."
+          "name": "Erin Mone",
+          "role": "Secretary Board Member",
+          "bio": "",
+          "image": "/assets/erin mone.jpg"
         },
         {
-          "name": "Rev. Michael Thorne",
-          "role": "Strategic Advisor",
-          "bio": "Dedicated to fostering administrative growth and diocesan partnerships."
+          "name": "Valerie Sanchez Caro",
+          "role": "Treasurer Board Member",
+          "bio": "",
+          "image": "/assets/Valerie Sanchez Caro (1).jpeg"
         },
         {
-          "name": "Sarah Jenkins",
-          "role": "Director of Outreach",
-          "bio": "Focuses on community engagement and faith-based educational initiatives."
+          "name": "Miguel Vences",
+          "role": "Formation Board Member",
+          "bio": "",
+          "image": "/assets/Miguel Vences (1).jpg"
+        },
+        {
+          "name": "Yojan Garcia",
+          "role": "Chaplain Board Member",
+          "bio": "",
+          "image": "/assets/Fr Yojan.jpg"
+        },
+        {
+          "name": "Marilyn Santos",
+          "role": "Ex-Officio Board Member",
+          "bio": "",
+          "image": "/assets/Marilyn Santos.jpg"
         }
       ]
     },
@@ -665,11 +680,42 @@
       "button": "Become a Member"
     }
   },
-  "donateCard": {
-    "title": "Donate",
-    "prompt": "How much would you like to donate today?",
-    "customPlaceholder": "Custom",
-    "button": "Next"
+  "donatePage": {
+    "card": {
+      "title": "Donate",
+      "prompt": "How much would you like to donate today?",
+      "customPlaceholder": "Custom",
+      "button": "Next"
+    },
+    "DonateDetailsPage": {
+      "back": "← Back to Donation Registry",
+      "selectedPackage": "Selected Donation Package",
+      "title": "Standard Donation",
+      "oneTime": "/ one-time",
+      "includedImpact": "INCLUDED IMPACT:",
+      "impact": {
+        "mission": "Mission support",
+        "education": "Educational programs",
+        "community": "Community outreach"
+      },
+      "payment": {
+        "title": "Payment Gateway Integration",
+        "cardholder": "Cardholder Name",
+        "cardNumber": "Card Number",
+        "expiry": "Expiration",
+        "cvc": "CVC",
+        "amount": "Donation Amount:",
+        "fee": "Processing Fee:",
+        "total": "Total Contribution:",
+        "button": "Complete Donation ",
+        "processing": "Processing...",
+        "secure": "Secure Tokenized Donation Validation."
+      },
+      "success": {
+        "title": "Thank you for your donation!",
+        "description": "Your contribution helps us continue our mission."
+      }
+    }
   },
 
   "history": {
