@@ -37,13 +37,13 @@ export default function About() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <button className="rounded-xl bg-[#f5a623] px-8 py-4 font-semibold text-black hover:bg-[#e29100]">
+              {/* <button className="rounded-xl bg-[#f5a623] px-8 py-4 font-semibold text-black hover:bg-[#e29100]">
                 {t("DonateNow")}
               </button>
 
               <button className="rounded-xl bg-white px-8 py-4 font-semibold text-black hover:bg-gray-100">
                 {t("MakeaGiftToday")}
-              </button>
+              </button> */}
             </div>
           </div>
         </DynamicHero>
