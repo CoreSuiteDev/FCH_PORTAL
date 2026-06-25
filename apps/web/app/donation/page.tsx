@@ -1,77 +1,57 @@
 "use client"
 
-import { useState } from "react"
-import { DollarSign, HandHeart, ChevronRight } from "lucide-react"
+import { ReactLenis } from "@studio-freight/react-lenis"
 import { useTranslations } from "next-intl"
-import { Button } from "@workspace/ui/components/button"
-import { useRouter } from "next/navigation"
 
-const amounts = [10, 20, 30, 40, 50]
+import DynamicHero from "@/components/shared/dynamic-hero"
+import DonateCard from "./_components/donation-card"
+import WhySupportSection from "./_components/why-donation"
+import ImpactSection from "./_components/donation-impact"
 
-export default function DonateCard() {
-  const t = useTranslations("donatePage")
-  const router = useRouter()
-
-  const [selected, setSelected] = useState<number | null>(20)
-  const [customAmount, setCustomAmount] = useState("")
-
-  const finalAmount = selected ?? (customAmount ? Number(customAmount) : null)
+export default function About() {
+  const t = useTranslations("donatePage.hero")
 
   return (
-    <div className="flex min-h-screen items-start justify-center bg-gray-50 pt-30">
-      <div className="w-full max-w-xl rounded-3xl border border-gray-100 bg-white p-8 shadow-xl">
-        <h2 className="mb-2 text-center font-trajan text-3xl font-bold text-primary">
-          {t("card.title")}
-        </h2>
+    <ReactLenis
+      root
+      options={{
+        lerp: 0.05,
+        duration: 1.2,
+        smoothWheel: true,
+        syncTouch: true,
+        wheelMultiplier: 2.0,
+      }}
+    >
+      {/* Background Layer: Fixed position to prevent rendering issues */}
+      <div className="fixed inset-0 -z-10 bg-[url('/assets/about-baner.jpg')] bg-cover bg-center bg-no-repeat" />
 
-        <div className="mx-auto mb-8 h-1 w-16 rounded-full bg-linear-to-r from-red-400 to-primary" />
+      <main className="relative">
+        <DynamicHero>
+          <div className="relative z-10">
+            <h2 className="mb-4 font-trajan text-4xl font-extrabold text-white md:text-5xl">
+              {t("title")}
+            </h2>
 
-        <div className="mb-6 flex items-center gap-2 text-gray-700">
-          <HandHeart className="h-5 w-5 text-primary" />
-          <span className="font-semibold">{t("prompt")}</span>
-        </div>
+            <p className="mb-8 max-w-2xl text-white md:text-lg">
+              {t("description")}
+            </p>
 
-        <div className="grid grid-cols-3 gap-3">
-          {amounts.map((amt) => (
-            <button
-              key={amt}
-              onClick={() => {
-                setSelected(amt)
-                setCustomAmount("")
-              }}
-              className={`rounded-xl border py-4 ${
-                selected === amt
-                  ? "bg-red-700 text-white"
-                  : "bg-gray-50 hover:bg-gray-100"
-              }`}
-            >
-              ${amt}
-            </button>
-          ))}
+            <div className="flex flex-wrap gap-4">
+              <button className="rounded-xl bg-[#f5a623] px-8 py-4 font-semibold text-black hover:bg-[#e29100]">
+                {t("DonateNow")}
+              </button>
 
-          <div className="col-span-1">
-            <input
-              type="number"
-              placeholder={t("card.customPlaceholder")}
-              value={customAmount}
-              onChange={(e) => {
-                setCustomAmount(e.target.value)
-                setSelected(null)
-              }}
-              className="w-full rounded-xl border p-4"
-            />
+              <button className="rounded-xl bg-white px-8 py-4 font-semibold text-black hover:bg-gray-100">
+                {t("MakeaGiftToday")}
+              </button>
+            </div>
           </div>
-        </div>
+        </DynamicHero>
+        <WhySupportSection />
 
-        <Button
-          disabled={!finalAmount}
-          onClick={() => router.push(`/donation/${finalAmount}`)}
-          className="mt-8 w-full rounded-xl py-6"
-        >
-          {t("card.button")}
-          <ChevronRight className="ml-2 h-5 w-5" />
-        </Button>
-      </div>
-    </div>
+        <ImpactSection />
+        <DonateCard />
+      </main>
+    </ReactLenis>
   )
 }

@@ -236,7 +236,7 @@
           "name": "Erin Mone",
           "role": "Secretary Board Member",
           "bio": "",
-          "image": "/assets/erin mone.jpg"
+          "image": "/assets/erin.png"
         },
         {
           "name": "Valerie Sanchez Caro",
@@ -680,13 +680,92 @@
       "button": "Become a Member"
     }
   },
+
   "donatePage": {
+    "hero": {
+      "title": "Support the Mission of FCH-Catechesis",
+      "description": "Your donation helps the Federation for Catechesis with Hispanics continue its mission of supporting, forming, and accompanying leaders who serve Hispanic Catholic communities across the country.",
+      "DonateNow": "Donate Now",
+      "MakeaGiftToday": "Make a Gift Today"
+    },
+
+    "whySupport": {
+      "title": "Why Your Support Matters",
+      "description": "Through your generosity, FCH is able to provide resources, formation opportunities, webinars, leadership tools, and spaces for collaboration that strengthen catechesis, evangelization, and pastoral ministry.",
+
+      "reasons": [
+        {
+          "title": "Formation Resources",
+          "description": "Provide resources and training for leaders.",
+          "icon": "BookOpen"
+        },
+        {
+          "title": "Webinars & Events",
+          "description": "Support educational webinars and conferences.",
+          "icon": "Video"
+        },
+        {
+          "title": "Leadership Development",
+          "description": "Equip leaders with practical ministry tools.",
+          "icon": "Award"
+        },
+        {
+          "title": "Community Collaboration",
+          "description": "Create spaces for networking and collaboration.",
+          "icon": "Users"
+        }
+      ]
+    },
+    "impact": {
+      "title": "Your Gift Makes an Impact",
+      "description": "When you donate to FCH, you help us create meaningful change:",
+      "points": [
+        "Provide formation and resources for catechetical and pastoral leaders",
+        "Support webinars, conferences, and leadership development opportunities",
+        "Expand access to tools for dioceses, parishes, schools, and ministry organizations",
+        "Strengthen our digital platform and member resources",
+        "Continue building a national network committed to serving Hispanic Catholic communities"
+      ],
+      "card": {
+        "title": "Help Us Continue the Work",
+        "quote": "FCH serves those who are forming faith, building community, and accompanying families in their journey with Christ.",
+        "description": "Your support allows us to reach more leaders, create more resources, and continue responding to the needs of Hispanic ministry today.",
+        "footer": "Whether you give once or become a recurring supporter, every contribution helps advance this important mission."
+      }
+    },
+    "donationSection": {
+      "title": "Suggested Giving Options",
+      "options": [
+        {
+          "amount": 25,
+          "label": "Helps support access to digital resources and ministry tools"
+        },
+        {
+          "amount": 50,
+          "label": "Helps provide webinar and formation opportunities"
+        },
+        {
+          "amount": 100,
+          "label": "Helps expand resources for catechetical and pastoral leaders"
+        },
+        {
+          "amount": 250,
+          "label": "Helps strengthen FCH’s national mission and long-term impact"
+        }
+      ],
+      "customLabel": "Make a Gift Special Today",
+      "customPlaceholder": "Enter custom amount",
+      "footer": "Your generosity helps form leaders, strengthen communities, and support the future of Hispanic catechesis.",
+      "button": "Donate today and be part of the mission."
+    },
+
     "card": {
       "title": "Donate",
       "prompt": "How much would you like to donate today?",
       "customPlaceholder": "Custom",
       "button": "Next"
     },
+
     "DonateDetailsPage": {
       "back": "← Back to Donation Registry",
       "selectedPackage": "Selected Donation Package",
@@ -707,7 +786,7 @@
         "amount": "Donation Amount:",
         "fee": "Processing Fee:",
         "total": "Total Contribution:",
-        "button": "Complete Donation ",
+        "button": "Complete Donation",
         "processing": "Processing...",
         "secure": "Secure Tokenized Donation Validation."
       },
@@ -717,7 +796,6 @@
       }
     }
   },
-
   "history": {
     "pageTitle": "Our History",
     "pageDescription": "Since our inception, FCH has been dedicated to serving those who minister in catechesis with Hispanics. Our timeline reflects years of commitment, faith, and community growth as we continue to empower leaders and catechists across the nation."

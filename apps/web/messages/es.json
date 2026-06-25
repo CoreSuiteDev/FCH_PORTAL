@@ -235,7 +235,7 @@
           "name": "Erin Mone",
           "role": "Miembro de la Junta - Secretaria",
           "bio": "",
-          "image": "/assets/erin mone.jpg"
+          "image": "/assets/erin.png"
         },
         {
           "name": "Valerie Sanchez Caro",
@@ -678,18 +678,97 @@
       "button": "Hazte miembro"
     }
   },
+
   "donatePage": {
+    "hero": {
+      "title": "Apoye la misión de FCH-Catequesis",
+      "description": "Su donación ayuda a la Federación para la Catequesis con Hispanos a continuar su misión de apoyar, formar y acompañar a los líderes que sirven a las comunidades católicas hispanas en todo el país.",
+      "DonateNow": "Donar ahora",
+      "MakeaGiftToday": "Haga su donativo hoy"
+    },
+
+    "whySupport": {
+      "title": "Por qué su apoyo es importante",
+      "description": "Gracias a su generosidad, FCH puede proporcionar recursos, oportunidades de formación, seminarios web, herramientas de liderazgo y espacios de colaboración que fortalecen la catequesis, la evangelización y el ministerio pastoral.",
+
+      "reasons": [
+        {
+          "title": "Recursos de formación",
+          "description": "Proporcionar recursos y capacitación para los líderes.",
+          "icon": "BookOpen"
+        },
+        {
+          "title": "Seminarios web y eventos",
+          "description": "Apoyar seminarios web educativos y conferencias.",
+          "icon": "Video"
+        },
+        {
+          "title": "Desarrollo de liderazgo",
+          "description": "Equipar a los líderes con herramientas ministeriales prácticas.",
+          "icon": "Award"
+        },
+        {
+          "title": "Colaboración comunitaria",
+          "description": "Crear espacios para la conexión y la colaboración.",
+          "icon": "Users"
+        }
+      ]
+    },
+    "impact": {
+      "title": "Su donativo genera un impacto",
+      "description": "Al donar a FCH, usted nos ayuda a crear un cambio significativo:",
+      "points": [
+        "Proporcionar formación y recursos para líderes catequéticos y pastorales",
+        "Apoyar seminarios web, conferencias y oportunidades de desarrollo de liderazgo",
+        "Ampliar el acceso a herramientas para diócesis, parroquias, escuelas y organizaciones ministeriales",
+        "Fortalecer nuestra plataforma digital y los recursos para miembros",
+        "Continuar construyendo una red nacional comprometida con el servicio a las comunidades católicas hispanas"
+      ],
+      "card": {
+        "title": "Ayúdenos a continuar la obra",
+        "quote": "FCH sirve a aquellos que forman en la fe, construyen comunidad y acompañan a las familias en su camino con Cristo.",
+        "description": "Su apoyo nos permite llegar a más líderes, crear más recursos y seguir respondiendo a las necesidades del ministerio hispano actual.",
+        "footer": "Ya sea que done una vez o se convierta en un colaborador recurrente, cada contribución ayuda a avanzar en esta importante misión."
+      }
+    },
+    "donationSection": {
+      "title": "Opciones de donación sugeridas",
+      "options": [
+        {
+          "amount": 25,
+          "label": "Ayuda a apoyar el acceso a recursos digitales y herramientas ministeriales"
+        },
+        {
+          "amount": 50,
+          "label": "Ayuda a proporcionar seminarios web y oportunidades de formación"
+        },
+        {
+          "amount": 100,
+          "label": "Ayuda a expandir los recursos para líderes catequéticos y pastorales"
+        },
+        {
+          "amount": 250,
+          "label": "Ayuda a fortalecer la misión nacional de FCH y su impacto a largo plazo"
+        }
+      ],
+      "customLabel": "Haga un donativo especial hoy",
+      "customPlaceholder": "Ingrese un monto personalizado",
+      "footer": "Su generosidad ayuda a formar líderes, fortalecer comunidades y apoyar el futuro de la catequesis hispana.",
+      "button": "Done hoy y sea parte de la misión."
+    },
+
     "card": {
       "title": "Donar",
-      "prompt": "¿Cuánto te gustaría donar hoy?",
+      "prompt": "¿Cuánto le gustaría donar hoy?",
       "customPlaceholder": "Personalizado",
       "button": "Siguiente"
     },
+
     "DonateDetailsPage": {
       "back": "← Volver al registro de donaciones",
       "selectedPackage": "Paquete de donación seleccionado",
       "title": "Donación estándar",
-      "oneTime": "/ donación única",
+      "oneTime": "/ pago único",
       "includedImpact": "IMPACTO INCLUIDO:",
       "impact": {
         "mission": "Apoyo a la misión",
@@ -698,24 +777,23 @@
       },
       "payment": {
         "title": "Integración de pasarela de pago",
-        "cardholder": "Nombre del titular de la tarjeta",
+        "cardholder": "Nombre del titular",
         "cardNumber": "Número de tarjeta",
         "expiry": "Expiración",
         "cvc": "CVC",
-        "amount": "Cantidad de donación:",
+        "amount": "Monto de la donación:",
         "fee": "Tarifa de procesamiento:",
         "total": "Contribución total:",
         "button": "Completar donación",
         "processing": "Procesando...",
-        "secure": "Validación segura de donación con tokenización."
+        "secure": "Validación de donación tokenizada segura."
       },
       "success": {
-        "title": "¡Gracias por tu donación!",
-        "description": "Tu contribución nos ayuda a continuar con nuestra misión."
+        "title": "¡Gracias por su donación!",
+        "description": "Su contribución nos ayuda a continuar nuestra misión."
       }
     }
   },
-
   "history": {
     "pageTitle": "Nuestra Historia",
     "pageDescription": "Desde nuestra creación, FCH se ha dedicado a servir a aquellos que ejercen el ministerio de la catequesis con los hispanos. Nuestra línea de tiempo refleja años de compromiso, fe y crecimiento comunitario, mientras continuamos empoderando a líderes y catequistas en toda la nación."
