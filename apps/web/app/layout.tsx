@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
-import { Footer } from "@/components/layout/footer"
-import Navbar from "@/components/layout/navbar"
+import LayoutWrapper from "@/components/layout/layout-wrapper"
 import QueryProvider from "@/providers/query-provider"
+import { Toaster } from "@workspace/ui/components/sonner"
 import { TooltipProvider } from "@workspace/ui/components/tooltip"
 import "@workspace/ui/globals.css"
 import { cn } from "@workspace/ui/lib/utils"
@@ -39,14 +39,11 @@ export default async function RootLayout({
         <QueryProvider>
           <TooltipProvider>
             <NextIntlClientProvider locale={locale} messages={messages}>
-              <div className="overflow-hidden">
-                <Navbar />
-                <div className="mt-20">{children}</div>
-                <Footer />
-              </div>
+              <LayoutWrapper>{children}</LayoutWrapper>
             </NextIntlClientProvider>
           </TooltipProvider>
         </QueryProvider>
+        <Toaster />
       </body>
     </html>
   )

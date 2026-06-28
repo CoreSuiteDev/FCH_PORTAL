@@ -1,21 +1,42 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { Lock, Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react"
-import { useTranslations } from "next-intl"
 import { Button } from "@workspace/ui/components/button"
 import {
-  useResetPasswordForm,
-  ResetPasswordFormValues,
-} from "@/store/auth/use-reset-password-store"
-import { useMutation } from "@tanstack/react-query"
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@workspace/ui/components/field"
+import { Input } from "@workspace/ui/components/input"
+import { CheckCircle2, Eye, EyeOff, Lock } from "lucide-react"
+import { useTranslations } from "next-intl"
 import Link from "next/link"
+import { useEffect, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import z from "zod"
+
+const ZCResetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters long" }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: "Confirmation password is required" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  })
+
+type ZTCResetPasswordFormValues = z.infer<typeof ZCResetPasswordSchema>
 
 export default function ResetPasswordForm() {
   const t = useTranslations("auth.resetPassword")
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
-  const [apiError, setApiError] = useState<string | null>(null)
   const [isSuccess, setIsSuccess] = useState<boolean>(false)
 
   const [email, setEmail] = useState<string>("")
@@ -27,50 +48,25 @@ export default function ResetPasswordForm() {
     setOtp(params.get("otp") || "")
   }, [])
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useResetPasswordForm()
-
-  const resetPasswordMutation = useMutation({
-    mutationFn: async (data: ResetPasswordFormValues) => {
-      setApiError(null)
-      if (!email || !otp) {
-        throw new Error(
-          "Missing email or OTP verification code. Please request a new password reset link."
-        )
-      }
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
-      const res = await fetch(`${apiBase}/api/v1/auth/reset-password-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          otp,
-          newPassword: data.password,
-        }),
-      })
-
-      const result = await res.json()
-      if (!res.ok) {
-        throw new Error(result.message || "Failed to reset password")
-      }
-      return result
-    },
-    onSuccess: () => {
-      setIsSuccess(true)
-    },
-    onError: (error: any) => {
-      setApiError(error.message || "Something went wrong. Please try again.")
+  const form = useForm<ZTCResetPasswordFormValues>({
+    resolver: zodResolver(ZCResetPasswordSchema),
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
     },
   })
 
-  const onSubmit = (data: ResetPasswordFormValues) => {
-    resetPasswordMutation.mutate(data)
-  }
+  const onSubmit = (data: ZTCResetPasswordFormValues) => {
+    // Just logging the form data
+    console.log("Reset Password Data Submitted:", {
+      email,
+      otp,
+      newPassword: data.password,
+    })
 
-  const isLoading = resetPasswordMutation.isPending
+    // Triggering success UI
+    setIsSuccess(true)
+  }
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 font-sans text-foreground transition-colors duration-300">
@@ -120,91 +116,105 @@ export default function ResetPasswordForm() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {/* New Password */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium tracking-wide text-foreground/90">
-                  {t("newPasswordLabel")}
-                </label>
-                <div className="group relative">
-                  <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
-                    <Lock size={18} />
-                  </span>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    disabled={isLoading || !email || !otp}
-                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none disabled:opacity-50"
-                    {...register("password")}
-                  />
-                  <button
-                    type="button"
-                    disabled={!email || !otp}
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="mt-1 px-1 text-xs font-medium text-destructive">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FieldGroup>
+                {/* New Password */}
+                <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field
+                      data-invalid={fieldState.invalid}
+                      className="space-y-1.5"
+                    >
+                      <FieldLabel className="text-sm font-medium tracking-wide text-foreground/90">
+                        {t("newPasswordLabel")}
+                      </FieldLabel>
+                      <div className="group relative">
+                        <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
+                          <Lock size={18} />
+                        </span>
+                        <Input
+                          {...field}
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          disabled={!email || !otp}
+                          aria-invalid={fieldState.invalid}
+                          className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none disabled:opacity-50"
+                        />
+                        <button
+                          type="button"
+                          disabled={!email || !otp}
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                        >
+                          {showPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      </div>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
 
-              {/* Confirm Password */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium tracking-wide text-foreground/90">
-                  {t("confirmPasswordLabel")}
-                </label>
-                <div className="group relative">
-                  <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
-                    <Lock size={18} />
-                  </span>
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    disabled={isLoading || !email || !otp}
-                    className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none disabled:opacity-50"
-                    {...register("confirmPassword")}
-                  />
-                  <button
-                    type="button"
-                    disabled={!email || !otp}
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff size={18} />
-                    ) : (
-                      <Eye size={18} />
-                    )}
-                  </button>
-                </div>
-                {errors.confirmPassword && (
-                  <p className="mt-1 px-1 text-xs font-medium text-destructive">
-                    {errors.confirmPassword.message}
-                  </p>
-                )}
-              </div>
-
-              {apiError && (
-                <p className="text-center text-xs font-medium text-destructive">
-                  {apiError}
-                </p>
-              )}
+                {/* Confirm Password */}
+                <Controller
+                  name="confirmPassword"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field
+                      data-invalid={fieldState.invalid}
+                      className="space-y-1.5"
+                    >
+                      <FieldLabel className="text-sm font-medium tracking-wide text-foreground/90">
+                        {t("confirmPasswordLabel")}
+                      </FieldLabel>
+                      <div className="group relative">
+                        <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
+                          <Lock size={18} />
+                        </span>
+                        <Input
+                          {...field}
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          disabled={!email || !otp}
+                          aria-invalid={fieldState.invalid}
+                          className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none disabled:opacity-50"
+                        />
+                        <button
+                          type="button"
+                          disabled={!email || !otp}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </button>
+                      </div>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
 
               <Button
                 type="submit"
-                disabled={isLoading || !email || !otp}
+                disabled={!email || !otp}
                 className="mt-2 h-11 w-full font-medium shadow-md shadow-primary/20 transition-all disabled:opacity-50"
               >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <span>{t("resetPassword")}</span>
-                )}
+                <span>{t("resetPassword")}</span>
               </Button>
             </form>
           </>

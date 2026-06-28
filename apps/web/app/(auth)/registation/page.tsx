@@ -1,56 +1,44 @@
 "use client"
 
 import React, { useState } from "react"
-import { Eye, EyeOff, Mail, Lock, User, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, User, Loader2, CheckCircle2 } from "lucide-react"
 import { useTranslations } from "next-intl"
+import Link from "next/link"
+import { Controller, useForm } from "react-hook-form"
+
+// Workspace UI Components
 import { Button } from "@workspace/ui/components/button"
+import { Checkbox } from "@workspace/ui/components/checkbox"
 import {
-  RegisterFormValues,
-  useRegisterForm,
-} from "@/store/auth/use-register-store"
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@workspace/ui/components/field"
+import { Input } from "@workspace/ui/components/input"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ZCRegisterSchema, ZTCRegisterSchema } from "@workspace/types"
+import { useRegistration } from "@/hooks/useAuth"
 import { useMutation } from "@tanstack/react-query"
 import { authClient } from "@/lib/auth"
-import Link from "next/link"
+import { toast } from "@workspace/ui/components/sonner"
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
-  const [apiError, setApiError] = useState<string | null>(null)
-  const [isSuccess, setIsSuccess] = useState<boolean>(false)
 
   const t = useTranslations("auth.register")
 
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useRegisterForm()
-
-  const registerMutation = useMutation({
-    mutationFn: async (data: RegisterFormValues) => {
-      setApiError(null)
-      const { data: resData, error } = await authClient.signUp.email({
-        email: data.email,
-        password: data.password,
-        name: data.name,
-      })
-
-      if (error) {
-        throw new Error(error.message || "Registration failed")
-      }
-      return resData
-    },
-    onSuccess: () => {
-      setIsSuccess(true)
-    },
-    onError: (error: any) => {
-      setApiError(error.message || "Something went wrong. Please try again.")
-    },
-  })
+    mutate: signup,
+    isPending: isRegisterPending,
+    error: registerError,
+    isSuccess,
+  } = useRegistration()
 
   const googleSignupMutation = useMutation({
     mutationFn: async () => {
-      setApiError(null)
       const { error } = await authClient.signIn.social({
         provider: "google",
         callbackURL:
@@ -60,16 +48,42 @@ export default function RegisterForm() {
         throw new Error(error.message || "Google registration failed")
       }
     },
-    onError: (error: any) => {
-      setApiError(error.message || "Google registration failed")
+  })
+
+  const form = useForm<ZTCRegisterSchema>({
+    resolver: zodResolver(ZCRegisterSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      acceptTerms: false,
     },
   })
 
-  const onSubmit = (data: RegisterFormValues): void => {
-    registerMutation.mutate(data)
+  const onSubmit = (data: ZTCRegisterSchema): void => {
+    signup(data, {
+      onSuccess: () => {
+        toast.success("Account created successfully!")
+      },
+      onError: (err: any) => {
+        toast.error(err.message || "Registration failed. Please try again.")
+      },
+    })
   }
 
-  const isLoading = registerMutation.isPending || googleSignupMutation.isPending
+  const onGoogleSignup = (): void => {
+    googleSignupMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success("Signed in with Google successfully!")
+      },
+      onError: (err: any) => {
+        toast.error(err.message || "Google registration failed.")
+      },
+    })
+  }
+
+  const isLoading = isRegisterPending || googleSignupMutation.isPending
 
   if (isSuccess) {
     return (
@@ -80,31 +94,24 @@ export default function RegisterForm() {
         <div className="relative z-10 w-full max-w-[500px] rounded-2xl border border-border/60 bg-card p-8 text-center text-card-foreground shadow-xl backdrop-blur-md">
           <div className="mb-6 flex flex-col items-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 shadow-md">
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
+              <CheckCircle2 size={24} />
             </div>
             <h2 className="font-trajan text-3xl font-extrabold tracking-tight text-foreground">
               Registration Successful!
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Your account has been created successfully. You can now sign in to
-              your account.
+            <p className="mt-2 text-sm text-muted-foreground animate-fade-in">
+              Your account has been successfully created. You can now use your security credentials to sign in.
             </p>
+
+            <Link href="/login" className="mt-6 w-full">
+              <Button
+                type="button"
+                className="h-11 w-full font-medium shadow-md shadow-primary/20"
+              >
+                {t("signInHere")}
+              </Button>
+            </Link>
           </div>
-          <Link href="/login" className="block w-full">
-            <Button className="h-11 w-full font-medium">Go to Sign In</Button>
-          </Link>
         </div>
       </div>
     )
@@ -123,157 +130,220 @@ export default function RegisterForm() {
           <p className="mt-2 text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
-          {/* Full Name */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium tracking-wide text-foreground/90">
-              {t("nameLabel")}
-            </label>
-            <div className="group relative">
-              <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
-                <User size={18} />
-              </span>
-              <input
-                placeholder="John Doe"
-                type="text"
-                disabled={isLoading}
-                className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-3 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
-                {...register("name")}
-              />
-            </div>
-            {errors.name && (
-              <p className="mt-1 px-1 text-xs font-medium text-destructive">
-                {errors.name.message}
-              </p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium tracking-wide text-foreground/90">
-              {t("emailLabel")}
-            </label>
-            <div className="group relative">
-              <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
-                <Mail size={18} />
-              </span>
-              <input
-                placeholder="name@example.com"
-                type="email"
-                disabled={isLoading}
-                className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-3 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
-                {...register("email")}
-              />
-            </div>
-            {errors.email && (
-              <p className="mt-1 px-1 text-xs font-medium text-destructive">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-
-          {/* Password */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium tracking-wide text-foreground/90">
-              {t("passwordLabel")}
-            </label>
-            <div className="group relative">
-              <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
-                <Lock size={18} />
-              </span>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                disabled={isLoading}
-                className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
-                {...register("password")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="mt-1 px-1 text-xs font-medium text-destructive">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          {/* Confirm Password */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium tracking-wide text-foreground/90">
-              {t("confirmPasswordLabel")}
-            </label>
-            <div className="group relative">
-              <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
-                <Lock size={18} />
-              </span>
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="••••••••"
-                disabled={isLoading}
-                className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
-                {...register("confirmPassword")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-            {errors.confirmPassword && (
-              <p className="mt-1 px-1 text-xs font-medium text-destructive">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
-
-          {/* Terms Checkbox */}
-          <div className="flex flex-row items-start space-y-0 space-x-2 py-0.5">
-            <input
-              type="checkbox"
-              id="acceptTerms"
-              disabled={isLoading}
-              className="mt-0.5 h-4 w-4 cursor-pointer rounded border-input"
-              {...register("acceptTerms")}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3.5">
+          <FieldGroup>
+            {/* Full Name */}
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  data-invalid={fieldState.invalid}
+                  className="space-y-1.5"
+                >
+                  <FieldLabel
+                    htmlFor="register-name"
+                    className="text-sm font-medium tracking-wide text-foreground/90"
+                  >
+                    {t("nameLabel")}
+                  </FieldLabel>
+                  <div className="group relative">
+                    <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
+                      <User size={18} />
+                    </span>
+                    <Input
+                      {...field}
+                      id="register-name"
+                      placeholder="John Doe"
+                      type="text"
+                      disabled={isLoading}
+                      aria-invalid={fieldState.invalid}
+                      className="h-11 bg-background/50 pl-11 placeholder:text-muted-foreground/60"
+                    />
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
             />
-            <label
-              htmlFor="acceptTerms"
-              className="cursor-pointer text-xs leading-normal font-medium text-muted-foreground select-none"
-            >
-              {t("agreeTerms")}{" "}
-              <a
-                href="/terms"
-                className="font-semibold text-primary hover:underline"
-              >
-                {t("termsOfService")}
-              </a>{" "}
-              {t("and")}{" "}
-              <a
-                href="/privacy"
-                className="font-semibold text-primary hover:underline"
-              >
-                {t("privacyPolicy")}
-              </a>
-            </label>
-          </div>
-          {errors.acceptTerms && (
-            <p className="px-1 text-xs font-medium text-destructive">
-              {t("mustAcceptTerms")}
-            </p>
-          )}
 
-          {apiError && (
-            <p className="mt-1 px-1 text-center text-xs font-medium text-destructive">
-              {apiError}
-            </p>
-          )}
+            {/* Email */}
+            <Controller
+              name="email"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  data-invalid={fieldState.invalid}
+                  className="space-y-1.5"
+                >
+                  <FieldLabel
+                    htmlFor="register-email"
+                    className="text-sm font-medium tracking-wide text-foreground/90"
+                  >
+                    {t("emailLabel")}
+                  </FieldLabel>
+                  <div className="group relative">
+                    <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
+                      <Mail size={18} />
+                    </span>
+                    <Input
+                      {...field}
+                      id="register-email"
+                      placeholder="name@example.com"
+                      type="email"
+                      disabled={isLoading}
+                      aria-invalid={fieldState.invalid}
+                      className="h-11 bg-background/50 pl-11 placeholder:text-muted-foreground/60"
+                    />
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            {/* Password */}
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  data-invalid={fieldState.invalid}
+                  className="space-y-1.5"
+                >
+                  <FieldLabel
+                    htmlFor="register-password"
+                    className="text-sm font-medium tracking-wide text-foreground/90"
+                  >
+                    {t("passwordLabel")}
+                  </FieldLabel>
+                  <div className="group relative">
+                    <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
+                      <Lock size={18} />
+                    </span>
+                    <Input
+                      {...field}
+                      id="register-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      disabled={isLoading}
+                      aria-invalid={fieldState.invalid}
+                      className="h-11 bg-background/50 px-11 placeholder:text-muted-foreground/60"
+                    />
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            {/* Confirm Password */}
+            <Controller
+              name="confirmPassword"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  data-invalid={fieldState.invalid}
+                  className="space-y-1.5"
+                >
+                  <FieldLabel
+                    htmlFor="register-confirm-password"
+                    className="text-sm font-medium tracking-wide text-foreground/90"
+                  >
+                    {t("confirmPasswordLabel")}
+                  </FieldLabel>
+                  <div className="group relative">
+                    <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
+                      <Lock size={18} />
+                    </span>
+                    <Input
+                      {...field}
+                      id="register-confirm-password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      disabled={isLoading}
+                      aria-invalid={fieldState.invalid}
+                      className="h-11 bg-background/50 px-11 placeholder:text-muted-foreground/60"
+                    />
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                    </button>
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            {/* Terms Checkbox */}
+            <Controller
+              name="acceptTerms"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  data-invalid={fieldState.invalid}
+                  orientation="horizontal"
+                  className="items-center space-y-0 space-x-2 py-0.5"
+                >
+                  <Checkbox
+                    id="register-terms"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={isLoading}
+                    aria-invalid={fieldState.invalid}
+                    className="shrink-0 border-primary"
+                  />
+                  <div className="space-y-1 leading-none">
+                    <FieldLabel
+                      htmlFor="register-terms"
+                      className="cursor-pointer text-xs leading-normal font-medium text-muted-foreground"
+                    >
+                      {t("agreeTerms")}{" "}
+                      <Link
+                        href="/terms"
+                        className="font-semibold text-primary hover:underline"
+                      >
+                        {t("termsOfService")}
+                      </Link>{" "}
+                      {t("and")}{" "}
+                      <Link
+                        href="/privacy"
+                        className="font-semibold text-primary hover:underline"
+                      >
+                        {t("privacyPolicy")}
+                      </Link>
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </div>
+                </Field>
+              )}
+            />
+          </FieldGroup>
+
+
 
           <Button
             type="submit"
@@ -281,10 +351,9 @@ export default function RegisterForm() {
             className="h-11 w-full font-medium transition-all"
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <span>{t("createAccount")}</span>
-            )}
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : null}
+            <span>{t("createAccount")}</span>
           </Button>
         </form>
 
@@ -300,10 +369,42 @@ export default function RegisterForm() {
         <Button
           type="button"
           variant="secondary"
-          onClick={() => googleSignupMutation.mutate()}
-          disabled={isLoading}
+          onClick={onGoogleSignup}
           className="h-11 w-full gap-2 border border-border/40 font-medium"
+          disabled={isLoading}
         >
+          <svg
+            viewBox="-3 0 262 262"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="xMidYMid"
+            fill="#000000"
+            className="h-4 w-4"
+          >
+            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+            <g
+              id="SVGRepo_tracerCarrier"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            ></g>
+            <g id="SVGRepo_iconCarrier">
+              <path
+                d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"
+                fill="#4285F4"
+              ></path>
+              <path
+                d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"
+                fill="#34A853"
+              ></path>
+              <path
+                d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782"
+                fill="#FBBC05"
+              ></path>
+              <path
+                d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"
+                fill="#EB4335"
+              ></path>
+            </g>
+          </svg>
           {t("signUpWithGoogle")}
         </Button>
 

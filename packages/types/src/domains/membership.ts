@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MembershipTypeEnum, MembershipStatusEnum } from "./auth.js";
+import { MembershipTypeEnum, MembershipStatusEnum } from "./auth";
 
 // --- ENUMS ---
 export const BillingCycleEnum = z.enum(["MONTHLY", "YEARLY"]);

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ZCIUserOutputSchema } from "./auth.js";
+import { ZCIUserOutputSchema } from "./auth";
 
 // --- PAGINATION SCHEMAS ---
 

@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { PaymentStatusEnum } from "./auth.js"
-import { PaginationMetaSchema } from "./pagination.js"
+import { PaymentStatusEnum } from "./auth"
+import { PaginationMetaSchema } from "./pagination"
 
 // Re-export for convenience so consumers can import PaymentStatus from this domain too
 export { PaymentStatusEnum }

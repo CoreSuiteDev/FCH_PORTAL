@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PaginationMetaSchema } from "./pagination.js"
+import { PaginationMetaSchema } from "./pagination"
 
 // --- ENUMS ---
 
