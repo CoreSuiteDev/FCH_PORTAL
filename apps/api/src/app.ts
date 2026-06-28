@@ -18,7 +18,19 @@ import config from "./utils/config.js";
 
 const app:Application = express();
 
+// Enable CORS before Better Auth handler so headers are set correctly
+app.use(
+  cors({
+    origin: config.cors.origin,
+    methods: config.cors.methods as any,
+    credentials: config.cors.credentials,
+  }),
+);
 
+// Mount Better Auth handler BEFORE body-parser (express.json)
+app.all("/api/auth/*", toNodeHandler(auth));
+
+// Body parsing and security middleware (applied to subsequent routes)
 app.use(express.json());
 app.use(helmet());
 
@@ -30,20 +42,8 @@ const openapiDocument = generateOpenApiDocument(appRouter, {
 
 writeFileSync("./openapi-fch.json", JSON.stringify(openapiDocument, null, 2))
 
-
-app.use(
-  cors({
-    origin: config.cors.origin,
-    methods: config.cors.methods as any,
-    credentials: config.cors.credentials,
-  }),
-);
-
 // Logging
 app.use(morgan(config.logFormat));
-
-// 3. Auth Routes - PRIORITY 1: Custom Handlers
-app.all("/api/auth/*splat", toNodeHandler(auth));
 
 // 5. Rate Limiting
 const limiter = rateLimit({

@@ -1,12 +1,11 @@
 "use client"
 
 import React, { useState } from "react"
-import { Eye, EyeOff, Mail, Lock } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { Controller, useForm } from "react-hook-form"
 
-// Workspace UI Components
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Checkbox } from "@workspace/ui/components/checkbox"
@@ -18,13 +17,30 @@ import {
 } from "@workspace/ui/components/field"
 import { ZCLoginSchema, ZTCLoginSchema } from "@workspace/types/index"
 import { zodResolver } from "@hookform/resolvers/zod"
-
-
+import { useLogin } from "@/hooks/useAuth"
+import { useMutation } from "@tanstack/react-query"
+import { authClient } from "@/lib/auth"
+import { toast } from "@workspace/ui/components/sonner"
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
   const t = useTranslations("auth.login")
+
+  const { mutate: login, isPending: isLoginPending } = useLogin()
+
+  const googleLoginMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL:
+          process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/",
+      })
+      if (error) {
+        throw new Error(error.message || "Google sign-in failed")
+      }
+    },
+  })
 
   const form = useForm<ZTCLoginSchema>({
     resolver: zodResolver(ZCLoginSchema),
@@ -36,13 +52,30 @@ export default function LoginForm() {
   })
 
   const onSubmit = (data: ZTCLoginSchema) => {
-    // Just logging the form data
-    console.log("Login Form Submitted Successfully:", data)
+    login(data, {
+      onSuccess: () => {
+        toast.success("Signed in successfully!")
+        window.location.href =
+          process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
+      },
+      onError: (err: Error) => {
+        toast.error(err.message || "Invalid email or password.")
+      },
+    })
   }
 
   const onGoogleLogin = () => {
-    console.log("Google Login Triggered")
+    googleLoginMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success("Signed in with Google successfully!")
+      },
+      onError: (err: Error) => {
+        toast.error(err.message || "Google sign-in failed.")
+      },
+    })
   }
+
+  const isLoading = isLoginPending || googleLoginMutation.isPending
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 font-sans text-foreground transition-colors duration-300">
@@ -81,6 +114,7 @@ export default function LoginForm() {
                       id="login-email"
                       placeholder="name@example.com"
                       type="email"
+                      disabled={isLoading}
                       aria-invalid={fieldState.invalid}
                       className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-3 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
                     />
@@ -121,11 +155,13 @@ export default function LoginForm() {
                       id="login-password"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
+                      disabled={isLoading}
                       aria-invalid={fieldState.invalid}
                       className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
                     />
                     <button
                       type="button"
+                      disabled={isLoading}
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute top-1/2 right-3 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
                     >
@@ -153,6 +189,7 @@ export default function LoginForm() {
                     id="login-rememberMe"
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={isLoading}
                     aria-invalid={fieldState.invalid}
                     className="shrink-0 border-primary"
                   />
@@ -172,23 +209,29 @@ export default function LoginForm() {
 
           <Button
             type="submit"
+            disabled={isLoading}
             className="h-11 w-full cursor-pointer font-medium shadow-md shadow-primary/20 transition-all active:scale-[0.99]"
           >
             <span className="flex items-center gap-2">
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
               {t("signIn")}
-              <svg
-                className="h-4 w-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                />
-              </svg>
+              {!isLoading && (
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                  />
+                </svg>
+              )}
             </span>
           </Button>
         </form>
@@ -207,6 +250,7 @@ export default function LoginForm() {
           variant="secondary"
           onClick={onGoogleLogin}
           className="h-11 w-full cursor-pointer gap-2 border border-border/40 font-medium transition-all hover:bg-secondary/80"
+          disabled={isLoading}
         >
           Continue with Google
         </Button>

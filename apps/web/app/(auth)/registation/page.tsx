@@ -33,7 +33,6 @@ export default function RegisterForm() {
   const {
     mutate: signup,
     isPending: isRegisterPending,
-    error: registerError,
     isSuccess,
   } = useRegistration()
 
@@ -66,7 +65,7 @@ export default function RegisterForm() {
       onSuccess: () => {
         toast.success("Account created successfully!")
       },
-      onError: (err: any) => {
+      onError: (err: Error) => {
         toast.error(err.message || "Registration failed. Please try again.")
       },
     })
@@ -77,7 +76,7 @@ export default function RegisterForm() {
       onSuccess: () => {
         toast.success("Signed in with Google successfully!")
       },
-      onError: (err: any) => {
+      onError: (err: Error) => {
         toast.error(err.message || "Google registration failed.")
       },
     })
