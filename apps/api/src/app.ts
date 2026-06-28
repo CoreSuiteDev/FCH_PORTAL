@@ -10,6 +10,7 @@ import { generateOpenApiDocument, createOpenApiExpressMiddleware } from 'trpc-to
 import { toNodeHandler } from "better-auth/node";
 import { errorMiddleware } from "./apps/middleware/error.middleware.js";
 import { auth } from "./lib/auth.js";
+import { prisma } from "./infrastructure/database/prisma.js";
 import { writeFileSync } from "fs";
 import { AppError } from "./utils/AppError.js";
 import { appRouter } from "./server/index.js";
@@ -29,6 +30,50 @@ app.use(
 );
 
 // Mount Better Auth handler BEFORE body-parser (express.json)
+app.get("/api/auth/session-info", async (req, res): Promise<any> => {
+  try {
+    const headers = new Headers()
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (value) {
+        if (Array.isArray(value)) {
+          value.forEach((v) => headers.append(key, v))
+        } else {
+          headers.set(key, value as string)
+        }
+      }
+    }
+
+    const session = await auth.api.getSession({ headers })
+    if (!session) {
+      return res.status(200).json({ authenticated: false, roles: [] })
+    }
+
+    const userWithRoles = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        userRoles: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    })
+
+    const roles = userWithRoles?.userRoles.map((ur) => ur.role.name) || []
+
+    return res.status(200).json({
+      authenticated: true,
+      user: {
+        ...session.user,
+        roles,
+      },
+    })
+  } catch (error: any) {
+    console.error("[Session-Info Endpoint] Error:", error)
+    return res.status(500).json({ error: error.message || "Failed to fetch session info" })
+  }
+})
+
 app.all("/api/auth/*", toNodeHandler(auth));
 
 // Body parsing and security middleware (applied to subsequent routes)

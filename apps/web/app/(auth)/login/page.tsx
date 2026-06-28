@@ -113,7 +113,10 @@ export default function LoginForm() {
               name="email"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="space-y-1.5">
+                <Field
+                  data-invalid={fieldState.invalid}
+                  className="space-y-1.5"
+                >
                   <FieldLabel
                     htmlFor="login-email"
                     className="text-sm font-medium tracking-wide text-foreground/90"
@@ -142,8 +145,8 @@ export default function LoginForm() {
             />
 
             {requiresOtp ? (
-              <div className="flex flex-col items-center justify-center space-y-3 py-3 animate-in fade-in zoom-in-95 duration-300">
-                <Field className="flex flex-col items-center justify-center space-y-3 w-full">
+              <div className="flex animate-in flex-col items-center justify-center space-y-3 py-3 duration-300 zoom-in-95 fade-in">
+                <Field className="flex w-full flex-col items-center justify-center space-y-3">
                   <FieldLabel className="w-full text-left text-sm font-medium tracking-wide text-foreground/90">
                     Verification Code (OTP)
                   </FieldLabel>
@@ -172,7 +175,10 @@ export default function LoginForm() {
                   name="password"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid} className="space-y-1.5">
+                    <Field
+                      data-invalid={fieldState.invalid}
+                      className="space-y-1.5"
+                    >
                       <div className="flex items-center justify-between">
                         <FieldLabel
                           htmlFor="login-password"
@@ -206,7 +212,11 @@ export default function LoginForm() {
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute top-1/2 right-3 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
                         >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          {showPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
                         </button>
                       </div>
                       {fieldState.invalid && (
@@ -255,9 +265,9 @@ export default function LoginForm() {
             disabled={isLoading || (requiresOtp && otpCode.length < 6)}
             className="h-11 w-full cursor-pointer font-medium shadow-md shadow-primary/20 transition-all active:scale-[0.99]"
           >
-            <span className="flex items-center gap-2 justify-center w-full">
+            <span className="flex w-full items-center justify-center gap-2">
               {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
               {requiresOtp ? "Verify & Login" : t("signIn")}
               {!isLoading && (
@@ -283,7 +293,7 @@ export default function LoginForm() {
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-border" />
           </div>
-          <div className="relative flex justify-center text-xs uppercase text-muted-foreground">
+          <div className="relative flex justify-center text-xs text-muted-foreground uppercase">
             <span className="bg-card px-3">{t("orContinueWith")}</span>
           </div>
         </div>

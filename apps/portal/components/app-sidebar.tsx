@@ -18,8 +18,12 @@ import { NavSecondary } from "./nav-secondary"
 import { NavUser } from "./nav-user"
 import { data } from "@/constants/dashboard-data"
 import Link from "next/link"
+import { useSessionInfo } from "@/hooks/use-session-info"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useSessionInfo()
+  const roles = user?.roles || []
+
   // navSecondary theke items gulo ke separate/filter kore nilam static title er jonno
   const internalDocs = data.navSecondary.filter((item) =>
     ["General FCH Documents", "Newsletter Archive"].includes(item.title)
@@ -28,6 +32,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const accountAndHelp = data.navSecondary.filter((item) =>
     ["My Profile", "Settings", "Get Help", "Search"].includes(item.title)
   )
+
+  const sidebarUser = user
+    ? {
+        name: user.name,
+        email: user.email,
+        avatar: user.image || "",
+      }
+    : data.user
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -49,28 +61,38 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarContent>
         {/* ================= Admin Panel ================= */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
-            Admin Panel
-          </SidebarGroupLabel>
-          <NavMain items={data.adminMenu} />
-        </SidebarGroup>
+        {(roles.includes("ADMIN") || roles.includes("SUPER_ADMIN")) && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
+              Admin Panel
+            </SidebarGroupLabel>
+            <NavMain items={data.adminMenu} />
+          </SidebarGroup>
+        )}
 
         {/* ================= Board Room ================= */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
-            Board Room
-          </SidebarGroupLabel>
-          <NavMain items={data.boardMenu} />
-        </SidebarGroup>
+        {(roles.includes("BOARD") ||
+          roles.includes("ADMIN") ||
+          roles.includes("SUPER_ADMIN")) && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
+              Board Room
+            </SidebarGroupLabel>
+            <NavMain items={data.boardMenu} />
+          </SidebarGroup>
+        )}
 
         {/* ================= Pastoral Resources ================= */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
-            Pastoral Resources
-          </SidebarGroupLabel>
-          <NavMain items={data.pastoralMenu} />
-        </SidebarGroup>
+        {(roles.includes("PASTORAL") ||
+          roles.includes("ADMIN") ||
+          roles.includes("SUPER_ADMIN")) && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
+              Pastoral Resources
+            </SidebarGroupLabel>
+            <NavMain items={data.pastoralMenu} />
+          </SidebarGroup>
+        )}
 
         {/* ================= General Area ================= */}
         <SidebarGroup>
@@ -99,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={sidebarUser} />
       </SidebarFooter>
     </Sidebar>
   )

@@ -22,13 +22,11 @@ import {
 import z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-
 const ZCEmailSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
 })
 
 type ZTCEmailSchema = z.infer<typeof ZCEmailSchema>
-
 
 export default function ForgotPasswordForm() {
   const t = useTranslations("auth.forgotPassword")
@@ -82,7 +80,10 @@ export default function ForgotPasswordForm() {
                 name="email"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-1.5">
+                  <Field
+                    data-invalid={fieldState.invalid}
+                    className="space-y-1.5"
+                  >
                     <FieldLabel
                       htmlFor="forgot-password-email"
                       className="text-sm font-medium tracking-wide text-foreground/90"

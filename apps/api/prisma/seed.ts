@@ -1,71 +1,64 @@
 import { prisma } from "../src/infrastructure/database/prisma.js"
+import { auth } from "../src/lib/auth.js"
 
 async function main() {
-  console.log("Seeding membership packages...")
 
-  const packages = [
-    {
-      name: "General Monthly",
-      slug: "general-monthly",
-      type: "GENERAL" as const,
-      billingCycle: "MONTHLY" as const,
-      price: 10.0,
-      currency: "USD" as const,
-      oktaGroup: "FCH-General-Monthly",
-      description: "General membership billed monthly",
-      isActive: true,
-    },
-    {
-      name: "General Yearly",
-      slug: "general-yearly",
-      type: "GENERAL" as const,
-      billingCycle: "YEARLY" as const,
-      price: 100.0,
-      currency: "USD" as const,
-      oktaGroup: "FCH-General-Yearly",
-      description: "General membership billed annually",
-      isActive: true,
-    },
-    {
-      name: "Pastoral Monthly",
-      slug: "pastoral-monthly",
-      type: "PASTORAL" as const,
-      billingCycle: "MONTHLY" as const,
-      price: 20.0,
-      currency: "USD" as const,
-      oktaGroup: "FCH-Pastoral-Monthly",
-      description: "Pastoral membership billed monthly",
-      isActive: true,
-    },
-    {
-      name: "Pastoral Yearly",
-      slug: "pastoral-yearly",
-      type: "PASTORAL" as const,
-      billingCycle: "YEARLY" as const,
-      price: 200.0,
-      currency: "USD" as const,
-      oktaGroup: "FCH-Pastoral-Yearly",
-      description: "Pastoral membership billed annually",
-      isActive: true,
-    },
-  ]
+  console.log("Seeding admin user...")
+  const adminEmail = "smmasrafi2003@gmail.com"
+  const adminPassword = "AdminPassword123!"
+  const adminName = "Admin User"
 
-  for (const pkg of packages) {
-    const upserted = await prisma.membershipPackage.upsert({
-      where: { slug: pkg.slug },
-      update: {
-        name: pkg.name,
-        type: pkg.type,
-        billingCycle: pkg.billingCycle,
-        price: pkg.price,
-        currency: pkg.currency,
-        oktaGroup: pkg.oktaGroup,
-        description: pkg.description,
-        isActive: pkg.isActive,
+  let user = await prisma.user.findUnique({
+    where: { email: adminEmail },
+  })
+
+  if (!user) {
+    console.log(`Creating admin user: ${adminEmail}`)
+    try {
+      await auth.api.signUpEmail({
+        body: {
+          email: adminEmail,
+          password: adminPassword,
+          name: adminName,
+        },
+      })
+
+      // Fetch the newly created user
+      user = await prisma.user.findUnique({
+        where: { email: adminEmail },
+      })
+    } catch (err) {
+      console.error("Failed to sign up admin user:", err)
+    }
+  } else {
+    console.log(`Admin user already exists: ${adminEmail}`)
+  }
+
+  if (user) {
+    console.log("Seeding ADMIN role and associating with user...")
+    const adminRole = await prisma.role.upsert({
+      where: { name: "ADMIN" },
+      update: {},
+      create: {
+        name: "ADMIN",
+        description: "Administrator Role with full access",
       },
-      create: pkg,
     })
-    console.log(`Upserted package: ${upserted.name} (${upserted.slug})`)
+
+    await prisma.userRole.upsert({
+      where: {
+        userId_roleId: {
+          userId: user.id,
+          roleId: adminRole.id,
+        },
+      },
+      update: {},
+      create: {
+        userId: user.id,
+        roleId: adminRole.id,
+      },
+    })
+    console.log(`Admin user ${adminEmail} successfully linked to ADMIN role.`)
   }
 
   console.log("Seeding complete!")

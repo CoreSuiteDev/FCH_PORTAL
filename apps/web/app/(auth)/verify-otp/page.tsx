@@ -15,11 +15,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@workspace/ui/components/input-otp"
-import {
-  Field,
-  FieldLabel,
-  FieldError,
-} from "@workspace/ui/components/field"
+import { Field, FieldLabel, FieldError } from "@workspace/ui/components/field"
 import z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -42,10 +38,10 @@ export default function VerifyOtpForm() {
     setEmail(params.get("email") || "")
   }, [])
 
- const form = useForm<ZTCCodeSchema>({
-  resolver: zodResolver(ZCCodeSchema),
-  defaultValues: { code: "" },
- })
+  const form = useForm<ZTCCodeSchema>({
+    resolver: zodResolver(ZCCodeSchema),
+    defaultValues: { code: "" },
+  })
 
   const { mutate: verifyOtp, isPending } = useVerifyOtp()
 
@@ -74,7 +70,7 @@ export default function VerifyOtpForm() {
       <div className="relative z-10 w-full max-w-[440px] rounded-2xl border border-border/60 bg-card p-8 text-card-foreground shadow-xl backdrop-blur-md">
         {/* STEP 2: Verify OTP */}
         {currentStep === "VERIFY_CODE" && (
-          <div className="animate-in fade-in zoom-in-95 duration-300">
+          <div className="animate-in duration-300 zoom-in-95 fade-in">
             <div className="mb-8 flex flex-col items-center text-center">
               <div className="mb-4 flex h-12 w-12 animate-pulse items-center justify-center rounded-xl bg-primary shadow-md shadow-primary/20">
                 <KeyRound size={20} className="text-primary-foreground" />
@@ -89,7 +85,8 @@ export default function VerifyOtpForm() {
 
             {!email && (
               <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-center text-xs font-medium text-destructive">
-                Warning: Missing email parameter. Please return to the forgot password page.
+                Warning: Missing email parameter. Please return to the forgot
+                password page.
               </div>
             )}
 
@@ -102,7 +99,7 @@ export default function VerifyOtpForm() {
                     data-invalid={fieldState.invalid}
                     className="flex flex-col items-center justify-center space-y-3"
                   >
-                    <FieldLabel className="w-full text-left text-sm font-medium tracking-wide text-foreground/90 align-self-start">
+                    <FieldLabel className="align-self-start w-full text-left text-sm font-medium tracking-wide text-foreground/90">
                       {t("codeLabel")}
                     </FieldLabel>
 
@@ -126,7 +123,7 @@ export default function VerifyOtpForm() {
                     {fieldState.invalid && (
                       <FieldError
                         errors={[fieldState.error]}
-                        className="w-full text-left px-1 mt-1 text-xs"
+                        className="mt-1 w-full px-1 text-left text-xs"
                       />
                     )}
                   </Field>

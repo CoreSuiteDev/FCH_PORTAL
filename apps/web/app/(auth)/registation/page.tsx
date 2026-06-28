@@ -1,7 +1,15 @@
 "use client"
 
 import React, { useState } from "react"
-import { Eye, EyeOff, Mail, Lock, User, Loader2, CheckCircle2 } from "lucide-react"
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Loader2,
+  CheckCircle2,
+} from "lucide-react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { Controller, useForm } from "react-hook-form"
@@ -98,8 +106,9 @@ export default function RegisterForm() {
             <h2 className="font-trajan text-3xl font-extrabold tracking-tight text-foreground">
               Registration Successful!
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground animate-fade-in">
-              Your account has been successfully created. You can now use your security credentials to sign in.
+            <p className="animate-fade-in mt-2 text-sm text-muted-foreground">
+              Your account has been successfully created. You can now use your
+              security credentials to sign in.
             </p>
 
             <Link href="/login" className="mt-6 w-full">
@@ -278,7 +287,9 @@ export default function RegisterForm() {
                     <button
                       type="button"
                       disabled={isLoading}
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute top-1/2 right-3 z-10 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                     >
                       {showConfirmPassword ? (
@@ -342,15 +353,13 @@ export default function RegisterForm() {
             />
           </FieldGroup>
 
-
-
           <Button
             type="submit"
             disabled={isLoading}
             className="h-11 w-full font-medium transition-all"
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : null}
             <span>{t("createAccount")}</span>
           </Button>
