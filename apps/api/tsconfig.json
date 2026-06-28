@@ -5,6 +5,8 @@
     "declarationMap": false,
     "outDir": "./dist",
     "rootDir": "./src",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "paths": {
       "@workspace/types/*": ["../../packages/types/src/*"]
     }

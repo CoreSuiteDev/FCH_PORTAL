@@ -8,8 +8,6 @@ export type BillingCycle = z.infer<typeof BillingCycleEnum>;
 export const CurrencyEnum = z.enum(["USD", "EUR"]);
 export type Currency = z.infer<typeof CurrencyEnum>;
 
-// Re-export membership enums from auth (they live there due to UserOutput dependency)
-export { MembershipTypeEnum, MembershipStatusEnum };
 
 // --- MEMBERSHIP PACKAGE SCHEMAS ---
 

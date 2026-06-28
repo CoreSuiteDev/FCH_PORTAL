@@ -87,7 +87,8 @@ export type ZTCIUserOutput = z.infer<typeof ZCIUserOutputSchema>
 export const ZCICAuthResponseSchema = z.object({
   token: z.string().optional(),
   redirect: z.boolean().optional(),
-  user: ZCIUserSchema,
+  user: ZCIUserSchema.optional(),
+  requiresOtp: z.boolean().optional(),
 })
 export type ZTCIAuthResponse = z.infer<typeof ZCICAuthResponseSchema>
 

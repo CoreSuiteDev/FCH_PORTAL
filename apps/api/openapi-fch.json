@@ -1283,11 +1283,11 @@
                         "updatedAt"
                       ],
                       "additionalProperties": false
+                    },
+                    "requiresOtp": {
+                      "type": "boolean"
                     }
                   },
-                  "required": [
-                    "user"
-                  ],
                   "additionalProperties": false
                 }
               }
@@ -1361,6 +1361,9 @@
                     "type": "string"
                   },
                   "password": {
+                    "type": "string"
+                  },
+                  "otp": {
                     "type": "string"
                   }
                 },
@@ -1438,11 +1441,11 @@
                         "updatedAt"
                       ],
                       "additionalProperties": false
+                    },
+                    "requiresOtp": {
+                      "type": "boolean"
                     }
                   },
-                  "required": [
-                    "user"
-                  ],
                   "additionalProperties": false
                 }
               }

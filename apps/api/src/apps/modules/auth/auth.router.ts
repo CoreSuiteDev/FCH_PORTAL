@@ -63,12 +63,14 @@ export const authRouter = router({
     .input(z.object({
       email: z.string(),
       password: z.string(),
+      otp: z.string().optional(),
     }))
     .output(ZCICAuthResponseSchema)
     .mutation(async ({ input, ctx }) => {
       return AuthController.signIn({
         email: input.email,
         password: input.password,
+        otp: input.otp,
         req: ctx.req,
         res: ctx.res,
       });

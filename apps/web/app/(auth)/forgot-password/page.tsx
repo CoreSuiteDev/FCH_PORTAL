@@ -1,10 +1,13 @@
 "use client"
 
 import React from "react"
-import { Mail, ArrowLeft } from "lucide-react"
+import { Mail, ArrowLeft, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { Controller, useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
+import { useSendOtp } from "@/hooks/useAuth"
+import { toast } from "@workspace/ui/components/sonner"
 
 // Workspace UI Components
 import { Button } from "@workspace/ui/components/button"
@@ -29,6 +32,8 @@ type ZTCEmailSchema = z.infer<typeof ZCEmailSchema>
 
 export default function ForgotPasswordForm() {
   const t = useTranslations("auth.forgotPassword")
+  const router = useRouter()
+  const { mutate: sendOtp, isPending } = useSendOtp()
 
   // Extract control and handleSubmit from the form store
   const form = useForm<ZTCEmailSchema>({
@@ -37,8 +42,18 @@ export default function ForgotPasswordForm() {
   })
 
   const onEmailSubmit = (data: ZTCEmailSchema) => {
-    
-    console.log("Forgot Password Form Submitted:", data)
+    sendOtp(
+      { email: data.email, type: "forget-password" },
+      {
+        onSuccess: () => {
+          toast.success("OTP sent to your email successfully!")
+          router.push(`/verify-otp?email=${encodeURIComponent(data.email)}`)
+        },
+        onError: (err: Error) => {
+          toast.error(err.message || "Failed to send OTP.")
+        },
+      }
+    )
   }
 
   return (
@@ -97,8 +112,10 @@ export default function ForgotPasswordForm() {
 
             <Button
               type="submit"
+              disabled={isPending}
               className="h-11 w-full font-medium shadow-md transition-all active:scale-[0.99]"
             >
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               <span>{t("sendCode")}</span>
             </Button>
           </form>

@@ -14,6 +14,7 @@ import { writeFileSync } from "fs";
 import { AppError } from "./utils/AppError.js";
 import { appRouter } from "./server/index.js";
 import { createContext } from "./server/context.js";
+import sendMail from "./infrastructure/email/email.js";
 import config from "./utils/config.js";
 
 const app:Application = express();
@@ -72,6 +73,20 @@ app.use(
 
 app.get("/health", (_: Request, res: Response) => {
   res.status(200).json({ status: "ok", message: "Server is healthy" });
+});
+
+app.post("/test-email", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { to, subject, text } = req.body;
+    if (!to || !subject || !text) {
+      res.status(400).json({ error: "Missing to, subject, or text in request body" });
+      return;
+    }
+    const result = await sendMail(to, subject, text);
+    res.status(200).json({ success: true, message: "Email sent successfully", result });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message || error });
+  }
 });
 
 // 7. Error Handling

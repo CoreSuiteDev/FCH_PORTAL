@@ -1,10 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ArrowLeft, CheckCircle2, KeyRound } from "lucide-react"
+import { ArrowLeft, CheckCircle2, KeyRound, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { Controller, useForm } from "react-hook-form"
+import { useVerifyOtp } from "@/hooks/useAuth"
+import { toast } from "@workspace/ui/components/sonner"
 
 // Workspace UI Components
 import { Button } from "@workspace/ui/components/button"
@@ -45,13 +47,22 @@ export default function VerifyOtpForm() {
   defaultValues: { code: "" },
  })
 
+  const { mutate: verifyOtp, isPending } = useVerifyOtp()
+
   const onSubmit = (data: ZTCCodeSchema) => {
-    // Just logging the form data
-    console.log("OTP Verification Data Submitted:", data)
-    
-    // Simulating success flow
-    setOtpCode(data.code)
-    setCurrentStep("SUCCESS")
+    verifyOtp(
+      { email, otp: data.code, type: "forget-password" },
+      {
+        onSuccess: () => {
+          toast.success("OTP verified successfully!")
+          setOtpCode(data.code)
+          setCurrentStep("SUCCESS")
+        },
+        onError: (err: Error) => {
+          toast.error(err.message || "Invalid OTP code.")
+        },
+      }
+    )
   }
 
   return (
@@ -124,9 +135,10 @@ export default function VerifyOtpForm() {
 
               <Button
                 type="submit"
-                disabled={!email}
+                disabled={!email || isPending}
                 className="h-11 w-full font-medium shadow-md transition-all active:scale-[0.99]"
               >
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 <span>{t("verifyCode")}</span>
               </Button>
             </form>

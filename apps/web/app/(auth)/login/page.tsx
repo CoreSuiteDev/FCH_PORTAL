@@ -15,6 +15,11 @@ import {
   FieldLabel,
   FieldError,
 } from "@workspace/ui/components/field"
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@workspace/ui/components/input-otp"
 import { ZCLoginSchema, ZTCLoginSchema } from "@workspace/types/index"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useLogin } from "@/hooks/useAuth"
@@ -24,6 +29,8 @@ import { toast } from "@workspace/ui/components/sonner"
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [requiresOtp, setRequiresOtp] = useState<boolean>(false)
+  const [otpCode, setOtpCode] = useState<string>("")
 
   const t = useTranslations("auth.login")
 
@@ -52,16 +59,24 @@ export default function LoginForm() {
   })
 
   const onSubmit = (data: ZTCLoginSchema) => {
-    login(data, {
-      onSuccess: () => {
-        toast.success("Signed in successfully!")
-        window.location.href =
-          process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
-      },
-      onError: (err: Error) => {
-        toast.error(err.message || "Invalid email or password.")
-      },
-    })
+    login(
+      { ...data, otp: otpCode || undefined },
+      {
+        onSuccess: (res) => {
+          if (res.requiresOtp) {
+            toast.success("Correct password! OTP sent to your email.")
+            setRequiresOtp(true)
+          } else {
+            toast.success("Signed in successfully!")
+            window.location.href =
+              process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
+          }
+        },
+        onError: (err: Error) => {
+          toast.error(err.message || "Invalid email or password.")
+        },
+      }
+    )
   }
 
   const onGoogleLogin = () => {
@@ -114,7 +129,7 @@ export default function LoginForm() {
                       id="login-email"
                       placeholder="name@example.com"
                       type="email"
-                      disabled={isLoading}
+                      disabled={isLoading || requiresOtp}
                       aria-invalid={fieldState.invalid}
                       className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-3 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
                     />
@@ -126,97 +141,125 @@ export default function LoginForm() {
               )}
             />
 
-            {/* Password Field */}
-            <Controller
-              name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <FieldLabel
-                      htmlFor="login-password"
-                      className="text-sm font-medium tracking-wide text-foreground/90"
-                    >
-                      {t("passwordLabel")}
-                    </FieldLabel>
-                    <Link
-                      href="/forgot-password"
-                      className="text-xs font-semibold text-secondary-foreground transition-colors hover:underline"
-                    >
-                      {t("forgotPassword")}
-                    </Link>
-                  </div>
-                  <div className="group relative">
-                    <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
-                      <Lock size={18} />
-                    </span>
-                    <Input
-                      {...field}
-                      id="login-password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      disabled={isLoading}
-                      aria-invalid={fieldState.invalid}
-                      className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
-                    />
-                    <button
-                      type="button"
-                      disabled={isLoading}
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute top-1/2 right-3 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            {/* Remember Me Field */}
-            <Controller
-              name="rememberMe"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field
-                  data-invalid={fieldState.invalid}
-                  orientation="horizontal"
-                  className="items-center space-y-0 space-x-2 py-0.5"
-                >
-                  <Checkbox
-                    id="login-rememberMe"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isLoading}
-                    aria-invalid={fieldState.invalid}
-                    className="shrink-0 border-primary"
-                  />
-                  <FieldLabel
-                    htmlFor="login-rememberMe"
-                    className="cursor-pointer text-xs leading-none font-medium text-muted-foreground select-none"
-                  >
-                    {t("rememberMe")}
+            {requiresOtp ? (
+              <div className="flex flex-col items-center justify-center space-y-3 py-3 animate-in fade-in zoom-in-95 duration-300">
+                <Field className="flex flex-col items-center justify-center space-y-3 w-full">
+                  <FieldLabel className="w-full text-left text-sm font-medium tracking-wide text-foreground/90">
+                    Verification Code (OTP)
                   </FieldLabel>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                  <InputOTP
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={setOtpCode}
+                    disabled={isLoading}
+                  >
+                    <InputOTPGroup className="gap-2">
+                      {[0, 1, 2, 3, 4, 5].map((index) => (
+                        <InputOTPSlot
+                          key={index}
+                          index={index}
+                          className="flex h-12 w-12 items-center justify-center rounded-md border border-input bg-background/50 text-lg font-bold shadow-sm transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        />
+                      ))}
+                    </InputOTPGroup>
+                  </InputOTP>
                 </Field>
-              )}
-            />
+              </div>
+            ) : (
+              <>
+                {/* Password Field */}
+                <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid} className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <FieldLabel
+                          htmlFor="login-password"
+                          className="text-sm font-medium tracking-wide text-foreground/90"
+                        >
+                          {t("passwordLabel")}
+                        </FieldLabel>
+                        <Link
+                          href="/forgot-password"
+                          className="text-xs font-semibold text-secondary-foreground transition-colors hover:underline"
+                        >
+                          {t("forgotPassword")}
+                        </Link>
+                      </div>
+                      <div className="group relative">
+                        <span className="absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary">
+                          <Lock size={18} />
+                        </span>
+                        <Input
+                          {...field}
+                          id="login-password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          disabled={isLoading}
+                          aria-invalid={fieldState.invalid}
+                          className="flex h-11 w-full rounded-md border border-input bg-background/50 py-2 pr-11 pl-11 text-sm ring-offset-background transition-all placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:outline-none"
+                        />
+                        <button
+                          type="button"
+                          disabled={isLoading}
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute top-1/2 right-3 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+
+                {/* Remember Me Field */}
+                <Controller
+                  name="rememberMe"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field
+                      data-invalid={fieldState.invalid}
+                      orientation="horizontal"
+                      className="items-center space-y-0 space-x-2 py-0.5"
+                    >
+                      <Checkbox
+                        id="login-rememberMe"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={isLoading}
+                        aria-invalid={fieldState.invalid}
+                        className="shrink-0 border-primary"
+                      />
+                      <FieldLabel
+                        htmlFor="login-rememberMe"
+                        className="cursor-pointer text-xs leading-none font-medium text-muted-foreground select-none"
+                      >
+                        {t("rememberMe")}
+                      </FieldLabel>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </>
+            )}
           </FieldGroup>
 
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || (requiresOtp && otpCode.length < 6)}
             className="h-11 w-full cursor-pointer font-medium shadow-md shadow-primary/20 transition-all active:scale-[0.99]"
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2 justify-center w-full">
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
               ) : null}
-              {t("signIn")}
+              {requiresOtp ? "Verify & Login" : t("signIn")}
               {!isLoading && (
                 <svg
                   className="h-4 w-4"

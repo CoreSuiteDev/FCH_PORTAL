@@ -1,5 +1,7 @@
 import type { Response as ExpressResponse, Request } from "express"
 import { AuthService } from "./auth.service.js"
+import { prisma } from "../../../infrastructure/database/prisma.js"
+import { auth } from "../../../lib/auth.js"
 
 export class AuthController {
   private static copyCookies(
@@ -62,15 +64,79 @@ export class AuthController {
   static async signIn(input: {
     email: string
     password: string
+    otp?: string
     req: Request
     res: ExpressResponse
   }) {
-    const response = await AuthService.signIn({
-      email: input.email,
+    if (input.otp) {
+      const verifyResponse = await AuthService.checkVerificationOTP({
+        email: input.email,
+        otp: input.otp,
+        type: "sign-in",
+        req: input.req,
+      });
+
+      if (!verifyResponse.ok) {
+        return AuthController.handleResponse(verifyResponse, input.res);
+      }
+
+      const loginResponse = await AuthService.signInEmailOTP({
+        email: input.email,
+        otp: input.otp,
+        req: input.req,
+      });
+      return AuthController.handleResponse(loginResponse, input.res);
+    }
+
+    // Verify user credentials first
+    const user = await prisma.user.findUnique({
+      where: { email: input.email },
+      include: { accounts: true }
+    });
+
+    if (!user) {
+      throw new Error("Invalid email or password.");
+    }
+
+    const credentialAccount = user.accounts.find(a => a.providerId === "credential");
+    if (!credentialAccount || !credentialAccount.password) {
+      throw new Error("Invalid email or password.");
+    }
+
+    const context = await auth.$context;
+    const isValid = await context.password.verify({
       password: input.password,
+      hash: credentialAccount.password
+    });
+
+    if (!isValid) {
+      throw new Error("Invalid email or password.");
+    }
+
+    // Credentials are correct, send OTP
+    const sendOtpResponse = await AuthService.sendVerificationOTP({
+      email: input.email,
+      type: "sign-in",
       req: input.req,
-    })
-    return AuthController.handleResponse(response, input.res)
+    });
+
+    if (!sendOtpResponse.ok) {
+      return AuthController.handleResponse(sendOtpResponse, input.res);
+    }
+
+    return {
+      requiresOtp: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        emailVerified: user.emailVerified,
+        image: user.image,
+        status: user.status,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      }
+    };
   }
 
   static async forgetPassword(input: {

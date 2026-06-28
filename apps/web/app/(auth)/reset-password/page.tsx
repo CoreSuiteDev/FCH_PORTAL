@@ -8,11 +8,13 @@ import {
   FieldLabel,
 } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
-import { CheckCircle2, Eye, EyeOff, Lock } from "lucide-react"
+import { CheckCircle2, Eye, EyeOff, Lock, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { useResetPasswordWithOtp } from "@/hooks/useAuth"
+import { toast } from "@workspace/ui/components/sonner"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import z from "zod"
@@ -56,16 +58,21 @@ export default function ResetPasswordForm() {
     },
   })
 
-  const onSubmit = (data: ZTCResetPasswordFormValues) => {
-    // Just logging the form data
-    console.log("Reset Password Data Submitted:", {
-      email,
-      otp,
-      newPassword: data.password,
-    })
+  const { mutate: resetPassword, isPending } = useResetPasswordWithOtp()
 
-    // Triggering success UI
-    setIsSuccess(true)
+  const onSubmit = (data: ZTCResetPasswordFormValues) => {
+    resetPassword(
+      { email, otp, newPassword: data.password },
+      {
+        onSuccess: () => {
+          toast.success("Password reset successfully!")
+          setIsSuccess(true)
+        },
+        onError: (err: Error) => {
+          toast.error(err.message || "Failed to reset password.")
+        },
+      }
+    )
   }
 
   return (
@@ -211,9 +218,10 @@ export default function ResetPasswordForm() {
 
               <Button
                 type="submit"
-                disabled={!email || !otp}
+                disabled={!email || !otp || isPending}
                 className="mt-2 h-11 w-full font-medium shadow-md shadow-primary/20 transition-all disabled:opacity-50"
               >
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 <span>{t("resetPassword")}</span>
               </Button>
             </form>
