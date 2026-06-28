@@ -20,6 +20,9 @@ import config from "./utils/config.js";
 
 const app:Application = express();
 
+// Trust reverse proxy headers (Nginx, Cloudflare, etc.)
+app.set("trust proxy", true);
+
 // Enable CORS before Better Auth handler so headers are set correctly
 app.use(
   cors({
