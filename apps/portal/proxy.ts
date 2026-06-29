@@ -20,9 +20,15 @@ export async function proxy(request: NextRequest) {
   try {
     const backendUrl =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+
+    // Send the correct cookie name to the API
+    const cookieHeader = secureCookie
+      ? `__Secure-better-auth.session_token=${secureCookie}`
+      : `better-auth.session_token=${token}`
+
     const response = await fetch(`${backendUrl}/api/auth/session-info`, {
       headers: {
-        cookie: `better-auth.session_token=${token}`,
+        cookie: cookieHeader,
       },
     })
 
