@@ -53,6 +53,16 @@ export const auth = betterAuth({
   secret: config.betterAuth.secret,
   baseURL: config.betterAuth.url,
   trustedOrigins: config.betterAuth.trustedOrigins,
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: ".fch-catechesis.org",
+    },
+    defaultCookieAttributes: {
+      sameSite: "none" as const,
+      secure: true,
+    },
+  },
   session: {
     cookieCache: {
       enabled: true,
