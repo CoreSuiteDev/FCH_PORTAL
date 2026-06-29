@@ -30,6 +30,7 @@ services:
       args:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
         - NEXT_PUBLIC_PORTAL_URL=${NEXT_PUBLIC_PORTAL_URL}
+        - NEXT_PUBLIC_LOGIN_URL=${NEXT_PUBLIC_LOGIN_URL}
     container_name: portal
     restart: always
     expose:
