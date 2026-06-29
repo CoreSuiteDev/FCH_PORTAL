@@ -20,6 +20,7 @@ enum MembershipStatus {
 
 enum PaymentStatus {
   PENDING
+  SUCCEEDED
   PAID
   FAILED
   REFUNDED

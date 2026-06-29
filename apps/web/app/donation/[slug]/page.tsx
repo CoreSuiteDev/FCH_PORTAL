@@ -3,22 +3,64 @@
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { useTranslations } from "next-intl"
+import { Check, CheckCircle, CreditCard, X, Loader2 } from "lucide-react"
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { loadStripe } from "@stripe/stripe-js"
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js"
+
+// Workspace UI Components
 import { Button } from "@workspace/ui/components/button"
-import { Check, CheckCircle, CreditCard, X } from "lucide-react"
+import { Input } from "@workspace/ui/components/input"
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldError,
+} from "@workspace/ui/components/field"
 import Container from "@/components/shared/container"
+import { useDonate } from "@/hooks/useDonation"
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || "")
+
+// Zod validation schema
+const paymentSchema = z.object({
+  name: z.string().min(1, "Cardholder name is required"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().optional(),
+})
+
+type PaymentFormValues = z.infer<typeof paymentSchema>
 
 export default function DonateDetailsPage() {
+  return (
+    <Elements stripe={stripePromise}>
+      <DonateDetailsForm />
+    </Elements>
+  )
+}
+
+function DonateDetailsForm() {
   const t = useTranslations("donatePage.DonateDetailsPage")
   const params = useParams()
   const amount = Number(params.slug) || 3000
 
-  const [isProcessing, setIsProcessing] = useState(false)
+  const stripe = useStripe()
+  const elements = useElements()
+
   const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [formData, setFormData] = useState({
-    name: "",
-    number: "",
-    expiry: "",
-    cvc: "",
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const { mutateAsync: donate, isPending } = useDonate()
+
+  const form = useForm<PaymentFormValues>({
+    resolver: zodResolver(paymentSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+    },
   })
 
   useEffect(() => {
@@ -28,49 +70,60 @@ export default function DonateDetailsPage() {
     }
   }, [showSuccessModal])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    if (name === "number") {
-      setFormData((prev) => ({
-        ...prev,
-        number: value.replace(/\D/g, "").slice(0, 16),
-      }))
-    } else if (name === "expiry") {
-      let val = value.replace(/\D/g, "")
-      if (val.length > 4) val = val.slice(0, 4)
-      setFormData((prev) => ({
-        ...prev,
-        expiry: val.length > 2 ? `${val.slice(0, 2)}/${val.slice(2)}` : val,
-      }))
-    } else if (name === "cvc") {
-      setFormData((prev) => ({
-        ...prev,
-        cvc: value.replace(/\D/g, "").slice(0, 3),
-      }))
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }))
-    }
-  }
+  const onSubmit = async (data: PaymentFormValues) => {
+    setErrorMessage(null)
 
-  const handlePaymentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (
-      formData.number.length !== 16 ||
-      formData.expiry.length !== 5 ||
-      formData.cvc.length !== 3 ||
-      !formData.name
-    )
-      return
-    setIsProcessing(true)
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsProcessing(false)
-    setShowSuccessModal(true)
+    try {
+      if (!stripe || !elements) {
+        throw new Error("Stripe has not loaded yet. Please try again.")
+      }
+
+      const cardElement = elements.getElement(CardElement)
+      if (!cardElement) {
+        throw new Error("Payment fields are not ready. Please refresh.")
+      }
+
+      const { paymentMethod, error } = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardElement,
+        billing_details: {
+          name: data.name,
+          email: data.email,
+          phone: data.phone || undefined,
+        },
+      })
+
+      if (error) {
+        throw new Error(error.message || "Failed to process card details.")
+      }
+
+      if (!paymentMethod) {
+        throw new Error("Failed to process payment method. Please try again.")
+      }
+
+      await donate({
+        amount,
+        name: data.name,
+        email: data.email,
+        phone: data.phone || undefined,
+        paymentMethodId: paymentMethod.id,
+      })
+
+      // Successful payment!
+      setShowSuccessModal(true)
+      form.reset()
+      cardElement.clear()
+    } catch (err: unknown) {
+      console.error("Payment Error:", err)
+      const msg = err instanceof Error ? err.message : "An unexpected error occurred during payment."
+      setErrorMessage(msg)
+    }
   }
 
   return (
     <section>
       <Container className="py-12">
-        <button className="mb-6 text-sm text-gray-500 hover:text-gray-800">
+        <button className="mb-6 text-sm text-gray-500 hover:text-gray-800 transition-colors">
           {t("back")}
         </button>
 
@@ -118,63 +171,123 @@ export default function DonateDetailsPage() {
                 </h2>
               </div>
 
-              <form onSubmit={handlePaymentSubmit} className="space-y-5">
-                <div>
-                  <label className="text-xs font-bold tracking-wider text-gray-500 uppercase">
-                    {t("payment.cardholder")}
-                  </label>
-                  <input
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    type="text"
-                    placeholder="John Doe"
-                    className="mt-2 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold tracking-wider text-gray-500 uppercase">
-                    {t("payment.cardNumber")}
-                  </label>
-                  <input
-                    name="number"
-                    required
-                    value={formData.number}
-                    onChange={handleInputChange}
-                    type="text"
-                    placeholder="4111 2222 3333 4444"
-                    className="mt-2 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold tracking-wider text-gray-500 uppercase">
-                      {t("payment.expiry")}
-                    </label>
-                    <input
-                      name="expiry"
-                      required
-                      value={formData.expiry}
-                      onChange={handleInputChange}
-                      type="text"
-                      placeholder="MM/YY"
-                      className="mt-2 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3"
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Donor Details Section */}
+                <div className="space-y-4">
+                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-[#8B0033]">
+                    {t("payment.donorSection")}
+                  </h3>
+                  <FieldGroup className="space-y-4">
+                    {/*  Name */}
+                    <Controller
+                      name="name"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel className="text-xs font-bold tracking-wider text-gray-500 uppercase">
+                            {t("payment.cardholder")}
+                          </FieldLabel>
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="John Doe"
+                            disabled={isPending}
+                            aria-invalid={fieldState.invalid}
+                            className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 focus-visible:border-gray-300 focus-visible:ring-0 shadow-none"
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} className="mt-1" />
+                          )}
+                        </Field>
+                      )}
                     />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold tracking-wider text-gray-500 uppercase">
-                      {t("payment.cvc")}
-                    </label>
-                    <input
-                      name="cvc"
-                      required
-                      value={formData.cvc}
-                      onChange={handleInputChange}
-                      type="text"
-                      placeholder="123"
-                      className="mt-2 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3"
-                    />
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {/* Email Address */}
+                      <Controller
+                        name="email"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel className="text-xs font-bold tracking-wider text-gray-500 uppercase">
+                              {t("payment.email")}
+                            </FieldLabel>
+                            <Input
+                              {...field}
+                              type="email"
+                              placeholder="johndoe@example.com"
+                              disabled={isPending}
+                              aria-invalid={fieldState.invalid}
+                              className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 focus-visible:border-gray-300 focus-visible:ring-0 shadow-none"
+                            />
+                            {fieldState.invalid && (
+                              <FieldError errors={[fieldState.error]} className="mt-1" />
+                            )}
+                          </Field>
+                        )}
+                      />
+
+                      {/* Phone Number */}
+                      <Controller
+                        name="phone"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel className="text-xs font-bold tracking-wider text-gray-500 uppercase">
+                              {t("payment.phone")}
+                            </FieldLabel>
+                            <Input
+                              {...field}
+                              type="tel"
+                              placeholder="+1 (555) 000-0000"
+                              disabled={isPending}
+                              aria-invalid={fieldState.invalid}
+                              className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 focus-visible:border-gray-300 focus-visible:ring-0 shadow-none"
+                            />
+                            {fieldState.invalid && (
+                              <FieldError errors={[fieldState.error]} className="mt-1" />
+                            )}
+                          </Field>
+                        )}
+                      />
+                    </div>
+                  </FieldGroup>
+                </div>
+
+                <hr className="border-gray-200/60" />
+
+                {/* Card Details Section */}
+                <div className="space-y-4">
+                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-[#8B0033]">
+                    {t("payment.cardSection")}
+                  </h3>
+                  <div className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm space-y-4">
+                    <FieldGroup className="space-y-4">
+                      <Field>
+                        <FieldLabel className="text-xs font-bold tracking-wider text-gray-500 uppercase">
+                          {t("payment.cardSection")}
+                        </FieldLabel>
+                        <div className="mt-2 rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-4 shadow-none">
+                          <CardElement
+                            options={{
+                              style: {
+                                base: {
+                                  fontSize: "16px",
+                                  color: "#1A1A1A",
+                                  fontFamily: "inherit",
+                                  "::placeholder": {
+                                    color: "#A0A0A0",
+                                  },
+                                },
+                                invalid: {
+                                  color: "#EF4444",
+                                },
+                              },
+                            }}
+                          />
+                        </div>
+                      </Field>
+                    </FieldGroup>
                   </div>
                 </div>
 
@@ -193,11 +306,22 @@ export default function DonateDetailsPage() {
                   </div>
                 </div>
 
+                {errorMessage && (
+                  <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600 border border-red-100 font-medium">
+                    {errorMessage}
+                  </div>
+                )}
+
                 <Button
-                  disabled={isProcessing}
-                  className="w-full rounded-lg bg-[#AC172C] py-6 text-lg font-bold text-white hover:bg-[#8F1324]"
+                  type="submit"
+                  disabled={isPending}
+                  className="w-full rounded-lg bg-[#AC172C] py-6 text-lg font-bold text-white hover:bg-[#8F1324] transition-colors"
                 >
-                  {isProcessing ? t("payment.processing") : t("payment.button")}
+                  {isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    t("payment.button")
+                  )}
                 </Button>
               </form>
             </div>
@@ -211,11 +335,11 @@ export default function DonateDetailsPage() {
 
       {/* Success Popup */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="relative w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
+          <div className="relative w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-xl animate-in zoom-in-95 duration-200">
             <button
               onClick={() => setShowSuccessModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-black"
+              className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors"
             >
               <X size={20} />
             </button>

@@ -17,6 +17,7 @@ import { appRouter } from "./server/index.js";
 import { createContext } from "./server/context.js";
 import sendMail from "./infrastructure/email/email.js";
 import config from "./utils/config.js";
+import { DonationController } from "./apps/modules/payment/payment.controller.js";
 
 const app:Application = express();
 
@@ -78,6 +79,17 @@ app.get("/api/auth/session-info", async (req, res): Promise<any> => {
 })
 
 app.all("/api/auth/*", toNodeHandler(auth));
+
+// ---------------------------------------------------------------------------
+// Stripe Webhook — MUST be registered with express.raw() BEFORE express.json().
+// Stripe signs the raw request body; if it has been parsed by json() the HMAC
+// verification will always fail and every webhook event will be rejected (400).
+// ---------------------------------------------------------------------------
+app.post(
+  "/webhook/stripe",
+  express.raw({ type: "application/json" }),
+  DonationController.handleWebhook,
+);
 
 // Body parsing and security middleware (applied to subsequent routes)
 app.use(express.json());

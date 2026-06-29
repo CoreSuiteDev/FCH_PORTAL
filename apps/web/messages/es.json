@@ -776,8 +776,12 @@
         "community": "Alcance comunitario"
       },
       "payment": {
-        "title": "Integración de pasarela de pago",
-        "cardholder": "Nombre del titular",
+        "title": "Donar ahora",
+        "donorSection": "Información del donante",
+        "cardSection": "Detalles del pago",
+        "cardholder": "Nombre",
+        "email": "Dirección de correo electrónico",
+        "phone": "Número de teléfono (Opcional)",
         "cardNumber": "Número de tarjeta",
         "expiry": "Expiración",
         "cvc": "CVC",
@@ -786,7 +790,7 @@
         "total": "Contribución total:",
         "button": "Completar donación",
         "processing": "Procesando...",
-        "secure": "Validación de donación tokenizada segura."
+        "secure": "Seguro por Stripe"
       },
       "success": {
         "title": "¡Gracias por su donación!",

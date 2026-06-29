@@ -25,6 +25,10 @@ model User {
 
   committeeMembers CommitteeMember[]
 
+  donations Donation[]
+
+  sponsorShips SponsorShip[]
+
   @@unique([email])
   @@index([status])
   @@map("user")

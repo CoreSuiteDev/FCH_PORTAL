@@ -778,8 +778,12 @@
         "community": "Community outreach"
       },
       "payment": {
-        "title": "Payment Gateway Integration",
-        "cardholder": "Cardholder Name",
+        "title": "Donate Now",
+        "donorSection": "Donor Information",
+        "cardSection": "Payment Details",
+        "cardholder": "Name",
+        "email": "Email Address",
+        "phone": "Phone Number (Optional)",
         "cardNumber": "Card Number",
         "expiry": "Expiration",
         "cvc": "CVC",
@@ -788,7 +792,7 @@
         "total": "Total Contribution:",
         "button": "Complete Donation",
         "processing": "Processing...",
-        "secure": "Secure Tokenized Donation Validation."
+        "secure": "Secure by Stripe"
       },
       "success": {
         "title": "Thank you for your donation!",

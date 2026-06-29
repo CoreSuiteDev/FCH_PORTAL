@@ -83,6 +83,10 @@ const envSchema = z.object({
 
   // Logging
   LOG_FORMAT: z.string().default("dev"),
+
+  // Stripe
+  STRIPE_SECRET_KEY: z.string().min(1),
+  STRIPE_WEBHOOK_SECRET: z.string().min(1),
 });
 
 const env = envSchema.parse(process.env);
@@ -160,6 +164,11 @@ const config = {
 
   socket: {
     corsOrigin: env.SOCKET_CORS_ORIGIN || env.CORS_ORIGIN,
+  },
+
+  stripe: {
+    secretKey: env.STRIPE_SECRET_KEY,
+    webhookSecret: env.STRIPE_WEBHOOK_SECRET,
   },
 } as const;
 
