@@ -68,13 +68,13 @@
 //     console.log("Credential account already exists.")
 //   }
 
-//   console.log("Seeding ADMIN role and associating with user...")
-//   const adminRole = await prisma.role.upsert({
-//     where: { name: "ADMIN" },
+//   console.log("Seeding SUPER_ADMIN role and associating with user...")
+//   const superAdminRole = await prisma.role.upsert({
+//     where: { name: "SUPER_ADMIN" },
 //     update: {},
 //     create: {
-//       name: "ADMIN",
-//       description: "Administrator Role with full access",
+//       name: "SUPER_ADMIN",
+//       description: "Super Administrator Role with full access",
 //     },
 //   })
 
@@ -82,16 +82,16 @@
 //     where: {
 //       userId_roleId: {
 //         userId: user.id,
-//         roleId: adminRole.id,
+//         roleId: superAdminRole.id,
 //       },
 //     },
 //     update: {},
 //     create: {
 //       userId: user.id,
-//       roleId: adminRole.id,
+//       roleId: superAdminRole.id,
 //     },
 //   })
-//   console.log(`Admin user ${adminEmail} successfully linked to ADMIN role.`)
+//   console.log(`Admin user ${adminEmail} successfully linked to SUPER_ADMIN role.`)
 
 //   console.log("Seeding complete!")
 // }

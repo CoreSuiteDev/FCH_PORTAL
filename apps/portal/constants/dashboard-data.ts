@@ -54,9 +54,19 @@ export const data = {
       icon: IconCreditCard,
     },
     {
-      title: "sponsorship  & Payments ",
-      url: "/admin/sopnsor",
+      title: "Sponsorship & Payments",
+      url: "/admin/sponsor-plans",
       icon: IconCreditCard,
+      items: [
+        {
+          title: "Sponsor Directory",
+          url: "/admin/sopnsor",
+        },
+        {
+          title: "Sponsor Plans",
+          url: "/admin/sponsor-plans",
+        },
+      ],
     },
     {
       title: "Events Manager",

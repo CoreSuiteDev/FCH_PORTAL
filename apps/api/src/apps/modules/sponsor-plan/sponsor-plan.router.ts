@@ -44,7 +44,7 @@ export const sponsorPlanRouter = router({
     .meta({
       openapi: {
         method: "GET",
-        path: "/sponsor-plan/:id",
+        path: "/sponsor-plan/{id}",
         tags: ["sponsor-plan"],
         summary: "Get a sponsor plan by ID",
         description: "Returns a sponsor plan by ID",
@@ -60,7 +60,7 @@ export const sponsorPlanRouter = router({
     .meta({
       openapi: {
         method: "PUT",
-        path: "/sponsor-plan/:id",
+        path: "/sponsor-plan/{id}",
         tags: ["sponsor-plan"],
         summary: "Update a sponsor plan",
         description: "Updates a sponsor plan",
@@ -77,7 +77,7 @@ export const sponsorPlanRouter = router({
     .meta({
       openapi: {
         method: "DELETE",
-        path: "/sponsor-plan/:id",
+        path: "/sponsor-plan/{id}",
         tags: ["sponsor-plan"],
         summary: "Delete a sponsor plan",
         description: "Deletes a sponsor plan",

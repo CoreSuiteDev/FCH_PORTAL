@@ -7583,7 +7583,7 @@
         }
       }
     },
-    "/sponsor-plan/:id": {
+    "/sponsor-plan/{id}": {
       "get": {
         "operationId": "sponsorPlan-getSponsorPlanById",
         "summary": "Get a sponsor plan by ID",
@@ -7598,7 +7598,7 @@
         ],
         "parameters": [
           {
-            "in": "query",
+            "in": "path",
             "name": "id",
             "schema": {
               "type": "string"
@@ -7750,7 +7750,16 @@
             "Authorization": []
           }
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -7758,9 +7767,6 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "id": {
-                    "type": "string"
-                  },
                   "planName": {
                     "type": "string",
                     "minLength": 1
@@ -7797,7 +7803,6 @@
                   }
                 },
                 "required": [
-                  "id",
                   "planName",
                   "amount",
                   "currency",
@@ -7946,7 +7951,7 @@
         ],
         "parameters": [
           {
-            "in": "query",
+            "in": "path",
             "name": "id",
             "schema": {
               "type": "string"

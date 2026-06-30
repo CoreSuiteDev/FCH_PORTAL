@@ -40,7 +40,14 @@ export const createContext = async ({
     },
   });
 
-  const role = userWithRoles?.userRoles?.[0]?.role?.name || "MEMBER";
+  const roles = userWithRoles?.userRoles?.map((ur) => ur.role?.name) || [];
+  const role = roles.includes("SUPER_ADMIN")
+    ? "SUPER_ADMIN"
+    : roles.includes("BOARD")
+      ? "BOARD"
+      : roles.includes("PASTORAL")
+        ? "PASTORAL"
+        : roles[0] || "MEMBER";
 
   return {
     req,
