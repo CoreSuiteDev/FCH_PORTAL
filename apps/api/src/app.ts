@@ -21,10 +21,8 @@ import { DonationController } from "./apps/modules/payment/payment.controller.js
 
 const app:Application = express();
 
-// Trust reverse proxy headers (Nginx, Cloudflare, etc.)
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
-// Enable CORS before Better Auth handler so headers are set correctly
 app.use(
   cors({
     origin: config.cors.origin,
@@ -80,11 +78,7 @@ app.get("/api/auth/session-info", async (req, res): Promise<any> => {
 
 app.all("/api/auth/*", toNodeHandler(auth));
 
-// ---------------------------------------------------------------------------
-// Stripe Webhook — MUST be registered with express.raw() BEFORE express.json().
-// Stripe signs the raw request body; if it has been parsed by json() the HMAC
-// verification will always fail and every webhook event will be rejected (400).
-// ---------------------------------------------------------------------------
+
 app.post(
   "/webhook/stripe",
   express.raw({ type: "application/json" }),

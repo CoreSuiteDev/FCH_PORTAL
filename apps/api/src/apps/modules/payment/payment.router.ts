@@ -6,8 +6,10 @@ import {
   ZCIPaginatedPaymentsSchema,
   ZCDonationInputSchema,
   ZCDonationResponseSchema,
+  ZCPaginatedDonationHistorySchema,
 } from "@workspace/types";
 import { getPaginationMeta } from "../../../utils/pagination.js";
+import { NullableJsonNullValueInput } from "../../../generated/prisma/internal/prismaNamespace.js";
 
 export const paymentRouter = router({
   /**
@@ -54,5 +56,49 @@ export const paymentRouter = router({
     .output(ZCDonationResponseSchema)
     .mutation(async ({ input }) => {
       return DonationController.createDonation(input);
+    }),
+
+  donationHistory: publicProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/payment/donation-history",
+        tags: ["payment"],
+        summary: "Get donation history",
+        description: "Returns a paginated list of user donation histories",
+      },
+    })
+    .input(PaginationInputSchema.optional())
+    .output(ZCPaginatedDonationHistorySchema)
+    .query(async ({ input }) => {
+      const page = input?.page ?? 1;
+      const limit = input?.limit ?? 10;
+      const { totalCount, data } = await DonationController.getDonationHistory({ page, limit });
+      return {
+        data: data.map((d) => ({
+          id: d.id,
+          amount: d.amount,
+          status: d.status,
+          currency: d.currency,
+          donator: d.donator,
+          user: d.user
+            ? {
+                id: d.user.id,
+                name: d.user.name,
+                email: d.user.email,
+                phone: d.user.phone ?? null,
+                role: d.user.userRoles?.[0]?.role?.name ?? "Geust",
+                createdAt: d.user.createdAt,
+              }
+            : null,
+          receiptUrl: d.receiptUrl,
+          paymentMethod: d.paymentMethod,
+          cardBrand: d.cardBrand,
+          cardLast4: d.cardLast4,
+          stripeCustomerId: d.stripeCustomerId,
+          createdAt: d.createdAt,
+        })),
+        meta: getPaginationMeta(totalCount, page, limit),
+      };
     }),
 });

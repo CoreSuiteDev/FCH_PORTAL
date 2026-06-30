@@ -38,3 +38,45 @@ export const ZCDonationResponseSchema = z.object({
   donationId: z.string(),
 })
 export type ZTDonationResponse = z.infer<typeof ZCDonationResponseSchema>
+
+// --- DONATION HISTORY ---
+
+const ZCDonatorSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  phone: z.string().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+})
+
+const ZCDonationUserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  phone: z.string().nullable(),
+  email: z.string(),
+  role: z.string(),
+  createdAt: z.coerce.date(),
+})
+
+export const ZCDonationHistoryItemSchema = z.object({
+  id: z.string(),
+  amount: z.number(),
+  currency: CurrencyEnum,
+  status: z.string(),
+  paymentMethod: z.string().nullable(),
+  cardBrand: z.string().nullable(),
+  cardLast4: z.string().nullable(),
+  receiptUrl: z.string().nullable(),
+  stripeCustomerId: z.string().nullable(),
+  donator: ZCDonatorSchema.nullable(),
+  user: ZCDonationUserSchema.nullable(),
+  createdAt: z.coerce.date(),
+})
+export type ZTDonationHistoryItem = z.infer<typeof ZCDonationHistoryItemSchema>
+
+export const ZCPaginatedDonationHistorySchema = z.object({
+  data: z.array(ZCDonationHistoryItemSchema),
+  meta: PaginationMetaSchema,
+})
+export type ZTPaginatedDonationHistory = z.infer<typeof ZCPaginatedDonationHistorySchema>

@@ -6,6 +6,7 @@ model User {
   name          String
   email         String
   emailVerified Boolean @default(false)
+  phone         String?
   image         String?
 
   status UserStatus @default(ACTIVE)

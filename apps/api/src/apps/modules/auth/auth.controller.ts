@@ -1,4 +1,5 @@
 import type { Response as ExpressResponse, Request } from "express"
+import { TRPCError } from "@trpc/server"
 import { AuthService } from "./auth.service.js"
 import { prisma } from "../../../infrastructure/database/prisma.js"
 import { auth } from "../../../lib/auth.js"
@@ -95,12 +96,12 @@ export class AuthController {
     });
 
     if (!user) {
-      throw new Error("Invalid email or password.");
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
     }
 
     const credentialAccount = user.accounts.find(a => a.providerId === "credential");
     if (!credentialAccount || !credentialAccount.password) {
-      throw new Error("Invalid email or password.");
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
     }
 
     const context = await auth.$context;
@@ -110,7 +111,7 @@ export class AuthController {
     });
 
     if (!isValid) {
-      throw new Error("Invalid email or password.");
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
     }
 
     // Credentials are correct, send OTP

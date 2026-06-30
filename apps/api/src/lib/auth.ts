@@ -55,12 +55,12 @@ export const auth = betterAuth({
   trustedOrigins: config.betterAuth.trustedOrigins,
   advanced: {
     crossSubDomainCookies: {
-      enabled: true,
-      domain: ".fch-catechesis.org",
+      enabled: process.env.NODE_ENV === "production",
+      domain: process.env.NODE_ENV === "production" ? ".fch-catechesis.org" : undefined,
     },
     defaultCookieAttributes: {
-      sameSite: "none" as const,
-      secure: true,
+      sameSite: process.env.NODE_ENV === "production" ? ("none" as const) : ("lax" as const),
+      secure: process.env.NODE_ENV === "production",
     },
   },
   session: {
