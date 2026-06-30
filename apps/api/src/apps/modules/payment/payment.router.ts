@@ -1,20 +1,19 @@
-import { z } from "zod";
+
 import { router, publicProcedure, adminProcedure } from "../../../server/trpc.js";
-import { PaymentController, DonationController } from "./payment.controller.js";
+import { PaymentController, DonationController, SponsorshipController } from "./payment.controller.js";
 import {
   PaginationInputSchema,
   ZCIPaginatedPaymentsSchema,
   ZCDonationInputSchema,
   ZCDonationResponseSchema,
   ZCPaginatedDonationHistorySchema,
+  ZCSponsorShipInputSchema,
+  ZCSponsorShipResponseSchema,
 } from "@workspace/types";
 import { getPaginationMeta } from "../../../utils/pagination.js";
-import { NullableJsonNullValueInput } from "../../../generated/prisma/internal/prismaNamespace.js";
 
 export const paymentRouter = router({
-  /**
-   * GET /payment/history — paginated donation history (admin only)
-   */
+ 
   history: adminProcedure
     .meta({
       openapi: {
@@ -37,11 +36,7 @@ export const paymentRouter = router({
       };
     }),
 
-  /**
-   * POST /payment/donate — create a Stripe PaymentIntent for a donation.
-   * Public: both guests and logged-in users can donate.
-   * Returns a clientSecret for the frontend to confirm payment with Stripe.js.
-   */
+// Donation Routers
   donate: publicProcedure
     .meta({
       openapi: {
@@ -101,4 +96,23 @@ export const paymentRouter = router({
         meta: getPaginationMeta(totalCount, page, limit),
       };
     }),
+
+
+    // Sponsorship Routers
+
+    sponsorship: publicProcedure
+      .meta({
+        openapi: {
+          method: "POST",
+          path: "/payment/sponsorship",
+          tags: ["payment"],
+          summary: "Create a sponsorship",
+          description: "Creates a Stripe PaymentIntent and returns a clientSecret for frontend confirmation",
+        }
+      })
+      .input(ZCSponsorShipInputSchema)
+      .output(ZCSponsorShipResponseSchema)
+      .mutation(async ({ input }) => {
+        return SponsorshipController.createSponsorship(input);
+      }),
 });

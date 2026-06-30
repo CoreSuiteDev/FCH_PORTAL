@@ -1,0 +1,68 @@
+enum Tier {
+    BRONZE
+    SILVER
+    GOLD
+    PLATINUM
+    DIAMOND
+}
+
+model SponsorPlans {
+    id          String   @id @default(cuid())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    planName    String
+    amount      Float
+    currency    Currency @default(USD)
+    tier        Tier
+
+    description String?   @db.Text
+    benefits    Json?    
+    @@index([tier])
+}
+
+model SponsorShip {
+    id               String   @id @default(cuid())
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt 
+
+    tier             Tier
+
+    amount           Float
+    currency         Currency @default(USD)
+    status           PaymentStatus
+
+    paymentIntentId  String   @unique
+    stripeCustomerId String?
+    paymentMethod    String?
+    cardLast4        String?
+    cardBrand        String?
+    receiptUrl       String?
+    errorMessage     String?
+
+    sponsorId        String
+    sponsor          Sponsor  @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+
+    userId           String?
+    user             User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([sponsorId])
+    @@index([userId])
+    @@index([status])
+    @@index([createdAt])
+}
+
+model Sponsor {
+    id           String        @id @default(cuid())
+
+    name         String
+    email        String        @unique 
+    phone        String?
+    
+    sponsorShips SponsorShip[]
+
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    
+    
+}

@@ -6,6 +6,8 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import { AlertCircle, Loader2, RefreshCw } from "lucide-react"
+import Link from "next/link"
 import { useState } from "react"
 
 // UI Components
@@ -22,26 +24,35 @@ import {
 
 // Local Components
 import { useDonationHistory } from "@/hooks/useDonation"
+import { ZTDonationHistoryItem } from "@workspace/types"
 import DonationStats from "./donation-stats"
 import { DonationFilter } from "./filter-donation"
-
-import { ZTDonationHistoryItem } from "@workspace/types"
-import Link from "next/link"
 
 export const Donation = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 20
 
-  const { data, isLoading, refetch, isFetching } = useDonationHistory(
-    currentPage,
-    itemsPerPage
-  )
-  const responseData = data
-  console.log("data-------------------------------->", data)
+  const {
+    data: responseData,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useDonationHistory(currentPage, itemsPerPage)
 
   // Table Columns Definition
   const columnHelper = createColumnHelper<ZTDonationHistoryItem>()
   const columns = [
+    columnHelper.display({
+      id: "sl",
+      header: "SL",
+      cell: (info) => (
+        <span className="font-medium text-slate-900">
+          {(currentPage - 1) * itemsPerPage + info.row.index + 1}
+        </span>
+      ),
+    }),
     columnHelper.accessor("id", {
       header: "PAYMENT ID",
       cell: (info) => (
@@ -183,8 +194,8 @@ export const Donation = () => {
     manualPagination: true,
   })
 
-  const totalRecords = responseData?.meta.totalCount || 0
-  const totalPages = responseData?.meta.totalPages || 1
+  const totalRecords = responseData?.meta?.totalCount || 0
+  const totalPages = responseData?.meta?.totalPages || 1
 
   return (
     <div className="min-h-screen bg-slate-50 p-6">
@@ -202,11 +213,32 @@ export const Donation = () => {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="p-6 pb-0">
-          <h2 className="text-lg font-semibold">System Payments Directory</h2>
-          <p className="mb-4 text-sm text-slate-500">
-            Showing {totalRecords} records {isLoading && " (Loading...)"}
-          </p>
+        <div className="flex items-center justify-between p-6 pb-0">
+          <div>
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              System Payments Directory
+              {/* Background fetching indicator */}
+              {isFetching && !isLoading && (
+                <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+              )}
+            </h2>
+            <p className="mb-4 text-sm text-slate-500">
+              Showing {totalRecords} records
+            </p>
+          </div>
+
+          {/* Refresh Data Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </Button>
         </div>
 
         <Table>
@@ -227,9 +259,49 @@ export const Donation = () => {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {/* 1. INITIAL LOADING STATE */}
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-64 text-center"
+                >
+                  <div className="flex flex-col items-center justify-center text-slate-500">
+                    <Loader2 className="mb-4 h-8 w-8 animate-spin text-slate-400" />
+                    <p>Loading donation records...</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : /* 2. ERROR STATE */
+            isError ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-64 text-center"
+                >
+                  <div className="flex flex-col items-center justify-center text-red-500">
+                    <AlertCircle className="mb-4 h-8 w-8" />
+                    <p className="font-medium">Failed to load data</p>
+                    <p className="mb-4 text-sm text-red-400">
+                      {error?.message || "An unexpected error occurred."}
+                    </p>
+                    <Button
+                      onClick={() => refetch()}
+                      variant="outline"
+                      className="text-slate-700"
+                    >
+                      <RefreshCw className="mr-2 h-4 w-4" /> Try Again
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : /* 3. SUCCESS WITH DATA */
+            table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="border-b border-slate-100">
+                <TableRow
+                  key={row.id}
+                  className={`border-b border-slate-100 ${isFetching ? "opacity-60 transition-opacity" : ""}`}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
@@ -241,12 +313,20 @@ export const Donation = () => {
                 </TableRow>
               ))
             ) : (
+              /* 4. SUCCESS BUT EMPTY STATE */
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center text-slate-500"
+                  className="h-64 text-center"
                 >
-                  {isLoading ? "Fetching records..." : "No records found."}
+                  <div className="flex flex-col items-center justify-center text-slate-500">
+                    <p className="font-medium text-slate-900">
+                      No records found
+                    </p>
+                    <p className="mt-1 text-sm">
+                      There are no donations matching your criteria.
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
@@ -259,7 +339,9 @@ export const Donation = () => {
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={!responseData?.meta.hasPreviousPage || isLoading}
+            disabled={
+              !responseData?.meta?.hasPreviousPage || isLoading || isFetching
+            }
           >
             Previous
           </Button>
@@ -270,7 +352,9 @@ export const Donation = () => {
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={!responseData?.meta.hasNextPage || isLoading}
+            disabled={
+              !responseData?.meta?.hasNextPage || isLoading || isFetching
+            }
           >
             Next
           </Button>

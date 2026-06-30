@@ -17,7 +17,7 @@ import { appRouter } from "./server/index.js";
 import { createContext } from "./server/context.js";
 import sendMail from "./infrastructure/email/email.js";
 import config from "./utils/config.js";
-import { DonationController } from "./apps/modules/payment/payment.controller.js";
+import { PaymentController } from "./apps/modules/payment/payment.controller.js";
 
 const app:Application = express();
 
@@ -82,7 +82,7 @@ app.all("/api/auth/*", toNodeHandler(auth));
 app.post(
   "/webhook/stripe",
   express.raw({ type: "application/json" }),
-  DonationController.handleWebhook,
+  PaymentController.handleWebhook,
 );
 
 // Body parsing and security middleware (applied to subsequent routes)

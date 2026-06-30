@@ -9,6 +9,7 @@ import { portalRouter } from "../apps/modules/portral/portal.router.js";
 import { resourcesRouter } from "../apps/modules/resources/resources.router.js";
 import { packageRouter } from "../apps/modules/package/package.router.js";
 import { inqueryRouter } from "../apps/modules/inquery/inquery.router.js";
+import { sponsorPlanRouter } from "../apps/modules/sponsor-plan/sponsor-plan.router.js";
 
 // Root Router
 export const appRouter = router({
@@ -39,6 +40,7 @@ export const appRouter = router({
   resources: resourcesRouter,
   package: packageRouter,
   inquery: inqueryRouter,
+  sponsorPlan: sponsorPlanRouter,
 });
 
 export type AppRouter = typeof appRouter;
