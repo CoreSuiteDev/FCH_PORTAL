@@ -35,9 +35,19 @@ export async function proxy(request: NextRequest) {
         if (response.ok) {
           const data = await response.json()
           if (data && data.authenticated && data.user) {
-            const portalUrl =
-              process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
-            return NextResponse.redirect(new URL(portalUrl))
+            // Only redirect to portal if the user has an allowed role.
+            // Plain 'USER' role (default on registration) should NOT access the portal.
+            const PORTAL_ROLES = ["MEMBER", "PASTORAL", "BOARD", "SUPER_ADMIN"]
+            const userRoles: string[] = data.user.roles ?? []
+            const hasPortalAccess = userRoles.some((r) =>
+              PORTAL_ROLES.includes(r)
+            )
+
+            if (hasPortalAccess) {
+              const portalUrl =
+                process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
+              return NextResponse.redirect(new URL(portalUrl))
+            }
           }
         }
       } catch (error) {

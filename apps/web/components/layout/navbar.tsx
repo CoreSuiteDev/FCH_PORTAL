@@ -1,15 +1,27 @@
 "use client"
 
-import { LogIn, Menu, Phone } from "lucide-react"
+import { LogIn, LogOut, Menu, Phone, User as UserIcon } from "lucide-react"
+import { useTranslations } from "next-intl"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { useTranslations } from "next-intl"
 
 import { NavLink, navLinks } from "@/constants/nav-manus"
+import { useSessionInfo } from "@/hooks/useUser"
 import { useNavStore } from "@/store/use-nav-store"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@workspace/ui/components/avatar"
 import { Button } from "@workspace/ui/components/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover"
+import { Separator } from "@workspace/ui/components/separator"
 import {
   Sheet,
   SheetContent,
@@ -25,6 +37,8 @@ export default function Navbar() {
   const [activeLang, setActiveLang] = useState<"en" | "es">("en")
 
   const t = useTranslations("nav")
+
+  const { data, isError, isLoading } = useSessionInfo()
 
   useEffect(() => {
     let ticking = false
@@ -52,6 +66,8 @@ export default function Navbar() {
     }
   }, [setOpen])
 
+  const user = data?.user
+
   return (
     <header
       className={`fixed top-0 z-1000 w-full bg-white transition-shadow duration-500 ease-in-out ${
@@ -69,11 +85,13 @@ export default function Navbar() {
             >
               <Phone className="h-3 w-3" /> {t("topBar.contact")}
             </Link>
-            <Link href="/login">
-              <span className="flex cursor-pointer items-center gap-1 hover:text-red-600">
-                <LogIn className="h-3 w-3" /> {t("topBar.login")}
-              </span>
-            </Link>
+            {!user && (
+              <Link href="/login">
+                <span className="flex cursor-pointer items-center gap-1 hover:text-red-600">
+                  <LogIn className="h-3 w-3" /> {t("topBar.login")}
+                </span>
+              </Link>
+            )}
           </div>
         </Container>
       </div>
@@ -103,16 +121,84 @@ export default function Navbar() {
               </Link>
             )
           })}
+
           <Link href="/donation">
             <Button size="lg" className="w-full bg-green-700">
               {t("buttons.donate")}
             </Button>
           </Link>
-          <Link href="/registation">
-            <Button size="lg" className="bg-red-700">
-              {t("buttons.signUp")}
-            </Button>
-          </Link>
+
+          {user ? (
+            <Popover>
+              <PopoverTrigger asChild className="z-100001">
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full p-0"
+                >
+                  <Avatar className="h-10 w-10 border border-gray-200">
+                    <AvatarImage
+                      src={user?.image || ""}
+                      alt={user?.name || "User"}
+                    />
+                    <AvatarFallback className="bg-red-50 font-medium text-red-700">
+                      {user?.name?.charAt(0).toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="z-100000001 flex w-56 flex-col gap-0 p-2"
+                align="end"
+              >
+                {/* User Info Section */}
+
+                <div className="flex items-center justify-center gap-2">
+                  <Avatar className="h-10 w-10 border border-gray-200">
+                    <AvatarImage
+                      src={user?.image || ""}
+                      alt={user?.name || "User"}
+                    />
+                    <AvatarFallback className="bg-red-50 font-medium text-red-700">
+                      {user?.name?.charAt(0).toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col gap-1.5 px-2 py-1.5">
+                    <p className="text-sm leading-none font-medium">
+                      {user?.name}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Visible Separator */}
+                <Separator className="my-1 h-px bg-slate-200" />
+
+                <Link
+                  href="/profile"
+                  className="flex w-full cursor-pointer items-center rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-slate-100"
+                >
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
+
+                {/* Visible Separator */}
+                <Separator className="my-1 h-px bg-slate-200" />
+
+                <button className="flex w-full cursor-pointer items-center rounded-md px-2 py-1.5 text-sm text-red-600 transition-colors hover:bg-red-50 hover:text-red-700">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </button>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <Link href="/registation">
+              <Button size="lg" className="bg-red-700 hover:bg-red-800">
+                {t("buttons.signUp")}
+              </Button>
+            </Link>
+          )}
         </nav>
 
         {/* Mobile Trigger */}
@@ -154,17 +240,51 @@ export default function Navbar() {
                   </Link>
                 ))}
               </nav>
-              <div className="space-y-3 border-t p-5">
+
+              <div className="space-y-3 border-t bg-gray-50 p-5">
+                {user ? (
+                  <div className="mb-4 flex items-center gap-3 rounded-lg border bg-white p-3 shadow-sm">
+                    <Avatar className="h-10 w-10 border border-gray-200">
+                      <AvatarImage
+                        src={user?.image || ""}
+                        alt={user?.name || "User"}
+                      />
+                      <AvatarFallback className="bg-red-50 font-medium text-red-700">
+                        {user?.name?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="truncate text-sm font-semibold">
+                        {user?.name}
+                      </span>
+                      <span className="truncate text-xs text-gray-500">
+                        {user?.email}
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
+
                 <Link href="/donation">
-                  <Button className="w-full bg-green-700">
+                  <Button className="w-full bg-green-700 hover:bg-green-800">
                     {t("buttons.donate")}
                   </Button>
                 </Link>
-                <Link href="/registation">
-                  <Button className="w-full bg-red-700">
-                    {t("buttons.signUp")}
+
+                {user ? (
+                  <Button
+                    variant="outline"
+                    className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
                   </Button>
-                </Link>
+                ) : (
+                  <Link href="/registation">
+                    <Button className="w-full bg-red-700 hover:bg-red-800">
+                      {t("buttons.signUp")}
+                    </Button>
+                  </Link>
+                )}
               </div>
             </SheetContent>
           </Sheet>

@@ -49,41 +49,44 @@ export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl
     const roles: string[] = data.user.roles || []
 
-    // Redirect root "/" based on highest role
+    const PORTAL_ROLES = ["MEMBER", "PASTORAL", "BOARD", "SUPER_ADMIN"]
+    const hasPortalAccess = roles.some((r) => PORTAL_ROLES.includes(r))
+    if (!hasPortalAccess) {
+      const webUrl = process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000"
+      return NextResponse.redirect(new URL(webUrl))
+    }
+
     if (pathname === "/") {
-      if (roles.includes("ADMIN") || roles.includes("SUPER_ADMIN")) {
+      if (roles.includes("SUPER_ADMIN")) {
         return NextResponse.redirect(new URL("/admin", request.url))
       }
       if (roles.includes("BOARD")) {
         return NextResponse.redirect(new URL("/board", request.url))
       }
-      return NextResponse.redirect(new URL("/portal", request.url))
+      if (roles.includes("PASTORAL")) {
+        return NextResponse.redirect(new URL("/pastoral", request.url))
+      }
+      if (roles.includes("MEMBER")) {
+        return NextResponse.redirect(new URL("/portal", request.url))
+      }
     }
 
-    // 1. Guard Admin routes
-    if (
-      pathname.startsWith("/admin") &&
-      !roles.includes("ADMIN") &&
-      !roles.includes("SUPER_ADMIN")
-    ) {
+    if (pathname.startsWith("/admin") && !roles.includes("SUPER_ADMIN")) {
       return NextResponse.redirect(new URL("/forbidden", request.url))
     }
 
-    // 2. Guard Board routes
     if (
       pathname.startsWith("/board") &&
       !roles.includes("BOARD") &&
-      !roles.includes("ADMIN") &&
       !roles.includes("SUPER_ADMIN")
     ) {
       return NextResponse.redirect(new URL("/forbidden", request.url))
     }
 
-    // 3. Guard Pastoral routes
     if (
       pathname.startsWith("/pastoral") &&
       !roles.includes("PASTORAL") &&
-      !roles.includes("ADMIN") &&
+      !roles.includes("BOARD") &&
       !roles.includes("SUPER_ADMIN")
     ) {
       return NextResponse.redirect(new URL("/forbidden", request.url))

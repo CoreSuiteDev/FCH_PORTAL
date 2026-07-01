@@ -12,7 +12,10 @@ model MembershipPackage {
   price    Decimal  @db.Decimal(10, 2)
   currency Currency @default(USD)
 
+  subTitle    String?
   description String?
+
+  features Json?
 
   isActive Boolean @default(true)
 
@@ -26,8 +29,6 @@ model Subscription {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId    String
-  packageId String
 
   startDate DateTime
   endDate   DateTime
@@ -35,13 +36,19 @@ model Subscription {
   status SubscriptionStatus @default(PENDING)
 
   stripeCustomerId String?
-  stripeSessionId  String?
-  stripeSubId      String?
+  paymentMethod String?
+  cardLast4 String?
+  cardBrand String?
+  receiptUrl String?
+  errorMessage String?
 
   cancelAtPeriodEnd Boolean   @default(false)
   cancledAt         DateTime?
 
+  userId    String
   user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  packageId String
   package MembershipPackage @relation(fields: [packageId], references: [id])
 
   @@index([userId])

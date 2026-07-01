@@ -139,6 +139,7 @@ export const ZCSponsorshipHistoryItemSchema = z.object({
   id: z.string(),
   amount: z.number(),
   currency: CurrencyEnum,
+  tier: z.enum(["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND"]),
   status: z.string(),
   paymentMethod: z.string().nullable(),
   cardBrand: z.string().nullable(),

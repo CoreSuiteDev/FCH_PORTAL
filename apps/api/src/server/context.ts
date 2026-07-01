@@ -47,7 +47,9 @@ export const createContext = async ({
       ? "BOARD"
       : roles.includes("PASTORAL")
         ? "PASTORAL"
-        : roles[0] || "MEMBER";
+        : roles.includes("MEMBER")
+          ? "MEMBER"
+          : roles[0] || "USER";
 
   return {
     req,

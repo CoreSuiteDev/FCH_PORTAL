@@ -9,6 +9,7 @@ import {
   ZCPaginatedDonationHistorySchema,
   ZCSponsorShipInputSchema,
   ZCSponsorShipResponseSchema,
+  ZCPaginatedSponsorshipHistorySchema,
 } from "@workspace/types";
 import { getPaginationMeta } from "../../../utils/pagination.js";
 
@@ -115,4 +116,49 @@ export const paymentRouter = router({
       .mutation(async ({ input }) => {
         return SponsorshipController.createSponsorship(input);
       }),
+
+    sponsorshipHistory: adminProcedure
+        .meta({
+          openapi: {
+            method: "GET",
+            path: "/payment/sponsorship-history",
+            tags: ["payment"],
+            summary: "Get sponsorship history",
+            description: "Returns a paginated list of user sponsorship histories",
+          },
+        })
+        .input(PaginationInputSchema.optional())
+        .output(ZCPaginatedSponsorshipHistorySchema)
+        .query(async ({ input }) => {
+          const page = input?.page ?? 1;
+          const limit = input?.limit ?? 10;
+          const { totalCount, data } = await SponsorshipController.getSponsorshipHistory({ page, limit });
+          return {
+            data: data.map((d) => ({
+              id: d.id,
+              amount: d.amount,
+              status: d.status,
+              currency: d.currency,
+              sponsor: d.sponsor,
+              tier: d.tier,
+              user: d.user
+                ? {
+                    id: d.user.id,
+                    name: d.user.name,
+                    email: d.user.email,
+                    phone: d.user.phone ?? null,
+                    role: d.user.userRoles?.[0]?.role?.name ?? "Geust",
+                    createdAt: d.user.createdAt,
+                  }
+                : null,
+              receiptUrl: d.receiptUrl,
+              paymentMethod: d.paymentMethod,
+              cardBrand: d.cardBrand,
+              cardLast4: d.cardLast4,
+              stripeCustomerId: d.stripeCustomerId,
+              createdAt: d.createdAt,
+            })),
+            meta: getPaginationMeta(totalCount, page, limit),
+          };
+        }),
 });

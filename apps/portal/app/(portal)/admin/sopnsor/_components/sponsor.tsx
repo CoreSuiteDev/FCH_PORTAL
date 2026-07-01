@@ -1,7 +1,14 @@
 "use client"
 
-import React, { useMemo, useState } from "react"
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
 import { Badge } from "@workspace/ui/components/badge"
+import { Button } from "@workspace/ui/components/button"
+import { Skeleton } from "@workspace/ui/components/skeleton"
 import {
   Table,
   TableBody,
@@ -10,260 +17,378 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
-import { Button } from "@workspace/ui/components/button"
+import { AlertCircle, RefreshCcw } from "lucide-react"
+import { useMemo, useState } from "react"
 
-import { useSponsorStore } from "@/store/use-sponsor-store"
+import { useSponsorshipHistory } from "@/hooks/useSponsor"
+import type { ZTCSPonsorshipHistoryItem } from "@workspace/types"
+import Link from "next/link"
 import { SponsorFilter } from "./sopncer-filter"
-import SopnsorStats from "./sponsor-stats"
+import SponsorStats from "./sponsor-stats"
 
-const mockData = [
-  {
-    id: "101",
-    userName: "John Doe",
-    email: "john@example.com",
-    role: "General",
-    sponsorship: "Diamond",
-    amount: 3000,
-    date: "2026-06-01",
-    status: "Success",
-  },
-  {
-    id: "102",
-    userName: "Jane Smith",
-    email: "jane@example.com",
-    role: "Pastoral",
-    sponsorship: "Platinum",
-    amount: 2500,
-    date: "2026-06-05",
-    status: "Success",
-  },
-  {
-    id: "103",
-    userName: "Bob Brown",
-    email: "bob@example.com",
-    role: "Board",
-    sponsorship: "Gold",
-    amount: 2000,
-    date: "2026-06-10",
-    status: "Pending",
-  },
-  {
-    id: "104",
-    userName: "Alice White",
-    email: "alice@example.com",
-    role: "General",
-    sponsorship: "Silver",
-    amount: 1000,
-    date: "2026-06-12",
-    status: "Success",
-  },
-  {
-    id: "105",
-    userName: "Charlie Day",
-    email: "charlie@example.com",
-    role: "Pastoral",
-    sponsorship: "Bronze",
-    amount: 500,
-    date: "2026-06-13",
-    status: "Success",
-  },
-  {
-    id: "106",
-    userName: "Eve Black",
-    email: "eve@example.com",
-    role: "Board",
-    sponsorship: "Diamond",
-    amount: 3000,
-    date: "2026-06-14",
-    status: "Success",
-  },
-  {
-    id: "107",
-    userName: "Frank Wright",
-    email: "frank@example.com",
-    role: "General",
-    sponsorship: "Platinum",
-    amount: 2500,
-    date: "2026-06-15",
-    status: "Pending",
-  },
-  {
-    id: "108",
-    userName: "Grace Hall",
-    email: "grace@example.com",
-    role: "Pastoral",
-    sponsorship: "Gold",
-    amount: 2000,
-    date: "2026-06-16",
-    status: "Success",
-  },
-  {
-    id: "109",
-    userName: "Hank Hill",
-    email: "hank@example.com",
-    role: "Board",
-    sponsorship: "Silver",
-    amount: 1000,
-    date: "2026-06-17",
-    status: "Success",
-  },
-  {
-    id: "110",
-    userName: "Ivy Ion",
-    email: "ivy@example.com",
-    role: "General",
-    sponsorship: "Bronze",
-    amount: 500,
-    date: "2026-06-18",
-    status: "Pending",
-  },
-]
+type SponsorshipRecord = ZTCSPonsorshipHistoryItem
 
-const getSponsorshipBadgeStyle = (tier: string) => {
-  switch (tier) {
-    case "Diamond":
-      return "bg-sky-100 text-sky-700 hover:bg-sky-200 border-sky-200"
-    case "Platinum":
-      return "bg-slate-200 text-slate-700 hover:bg-slate-300 border-slate-300"
-    case "Gold":
-      return "bg-amber-100 text-amber-700 hover:bg-amber-200 border-amber-200"
-    case "Silver":
-      return "bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-200"
-    case "Bronze":
-      return "bg-orange-100 text-orange-700 hover:bg-orange-200 border-orange-200"
+const getTierBadgeStyle = (tier: string) => {
+  switch (tier.toUpperCase()) {
+    case "DIAMOND":
+      return "bg-sky-100 text-sky-700 border-sky-200"
+    case "PLATINUM":
+      return "bg-slate-200 text-slate-700 border-slate-300"
+    case "GOLD":
+      return "bg-amber-100 text-amber-700 border-amber-200"
+    case "SILVER":
+      return "bg-gray-100 text-gray-600 border-gray-200"
+    case "BRONZE":
+      return "bg-orange-100 text-orange-700 border-orange-200"
     default:
       return "bg-slate-100 text-slate-600"
   }
 }
 
-export default function Sponsor() {
-  const {
-    searchQuery,
-    selectedTier,
-    selectedSponsorship,
-    selectedDate,
-    minAmount,
-    maxAmount,
-  } = useSponsorStore()
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 8
+const getStatusStyle = (status: string) => {
+  switch (status.toUpperCase()) {
+    case "SUCCEEDED":
+      return "text-emerald-600"
+    case "PENDING":
+      return "text-amber-500"
+    case "FAILED":
+      return "text-red-500"
+    default:
+      return "text-slate-500"
+  }
+}
 
-  const filteredData = useMemo(() => {
-    return mockData.filter((d) => {
-      const matchesSearch =
-        d.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        d.email.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesTier = selectedTier === "All" || d.role === selectedTier
-      const matchesSponsorship =
-        selectedSponsorship === "All" || d.sponsorship === selectedSponsorship
-      const matchesMin = minAmount === "" || d.amount >= Number(minAmount)
-      const matchesMax = maxAmount === "" || d.amount <= Number(maxAmount)
-      const matchesDate =
-        !selectedDate ||
-        new Date(d.date).toDateString() === selectedDate.toDateString()
+const capitalize = (s: string) => s.charAt(0) + s.slice(1).toLowerCase()
+
+const ITEMS_PER_PAGE = 20
+
+// ---- Column definitions -------------------------------------------------
+
+const baseColumns: ColumnDef<SponsorshipRecord>[] = [
+  {
+    id: "paymentId",
+    header: "PAYMENT ID",
+    accessorKey: "id",
+    cell: ({ row }) => (
+      <span className="font-mono text-xs text-slate-500">
+        {row.original.id.slice(0, 10)}…
+      </span>
+    ),
+  },
+  {
+    id: "sponsor",
+    header: "SPONSOR",
+    accessorKey: "sponsor",
+    cell: ({ row }) => {
+      const sponsor = row.original.sponsor
+      const user = row.original.user
+      const name = sponsor?.name || user?.name || "Guest"
+      const email = sponsor?.email || user?.email || "No Email"
+      const phone = sponsor?.phone || user?.phone || "No Phone"
       return (
-        matchesSearch &&
-        matchesTier &&
-        matchesSponsorship &&
-        matchesMin &&
-        matchesMax &&
-        matchesDate
+        <>
+          <div className="font-medium text-slate-900">{name}</div>
+          <div className="text-xs text-slate-500">{email}</div>
+          <div className="text-xs text-slate-500">{phone}</div>
+        </>
       )
-    })
-  }, [
-    searchQuery,
-    selectedTier,
-    selectedSponsorship,
-    selectedDate,
-    minAmount,
-    maxAmount,
-  ])
+    },
+  },
+  {
+    id: "role",
+    header: "ROLE",
+    accessorKey: "user",
+    cell: ({ row }) => {
+      const role = row.original.user?.role || "Guest"
+      return <span>{role}</span>
+    },
+  },
+  {
+    id: "tier",
+    header: "TIER",
+    accessorKey: "tier",
+    cell: ({ row }) => {
+      const displayTier = row.getValue("tier") as string
+      if (!displayTier) {
+        return <span className="text-slate-400">N/A</span>
+      }
+      return (
+        <Badge
+          variant="outline"
+          className={`font-semibold capitalize ${getTierBadgeStyle(displayTier)}`}
+        >
+          {capitalize(displayTier)}
+        </Badge>
+      )
+    },
+  },
+  {
+    id: "amount",
+    header: "AMOUNT",
+    accessorKey: "amount",
+    cell: ({ row }) => (
+      <span className="font-bold text-slate-900">
+        {row.original.currency === "USD" ? "$" : "€"}
+        {row.original.amount.toLocaleString()}
+      </span>
+    ),
+  },
+  {
+    id: "card",
+    header: "CARD",
+    accessorFn: (row) =>
+      row.cardBrand && row.cardLast4
+        ? `${row.cardBrand} ${row.cardLast4}`
+        : "—",
+    cell: ({ row }) => (
+      <span className="text-xs text-slate-500">
+        {row.original.cardBrand && row.original.cardLast4
+          ? `${row.original.cardBrand.toUpperCase()} ••••${row.original.cardLast4}`
+          : "—"}
+      </span>
+    ),
+  },
+  {
+    id: "status",
+    header: "STATUS",
+    accessorKey: "status",
+    cell: ({ row }) => (
+      <span className={`font-semibold ${getStatusStyle(row.original.status)}`}>
+        • {capitalize(row.original.status)}
+      </span>
+    ),
+  },
+  {
+    id: "date",
+    header: "DATE",
+    accessorKey: "createdAt",
+    cell: ({ row }) => (
+      <span className="text-xs text-slate-500">
+        {new Date(row.original.createdAt).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })}
+      </span>
+    ),
+  },
+  {
+    id: "stripeCustomerId",
+    header: "STRIPE ID",
+    accessorKey: "stripeCustomerId",
+    cell: ({ row }) => {
+      const id = row.original.stripeCustomerId
+      if (!id) return <span className="text-slate-400">No ID</span>
+      return <span className="text-xs text-slate-500">{id}</span>
+    },
+  },
+  {
+    id: "receipt",
+    header: "RECEIPT URL",
+    accessorKey: "receiptUrl",
+    cell: ({ row }) => {
+      const url = row.original.receiptUrl
+      if (!url) return <span className="text-slate-400">No Receipt</span>
+      return (
+        <Link
+          href={url}
+          target="_blank"
+          className="cursor-pointer text-xs text-blue-400 capitalize hover:underline"
+        >
+          View Receipt
+        </Link>
+      )
+    },
+  },
+]
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+function SponsorTableSkeleton() {
+  return (
+    <div className="mt-6 overflow-hidden rounded-xl border bg-white shadow-sm">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-slate-50/50">
+            {baseColumns.map((col) => (
+              <TableHead key={col.id}>
+                {typeof col.header === "string" ? col.header : null}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <TableRow key={i}>
+              {baseColumns.map((col) => (
+                <TableCell key={col.id}>
+                  <Skeleton className="h-4 w-24 rounded" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}
+
+// ---- Main component ---------------------------------------------------
+
+export default function Sponsor() {
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const columns = useMemo<ColumnDef<SponsorshipRecord>[]>(
+    () => [
+      {
+        id: "sl",
+        header: "SL",
+        cell: (info) => (
+          <span className="font-medium text-slate-900">
+            {(currentPage - 1) * ITEMS_PER_PAGE + info.row.index + 1}
+          </span>
+        ),
+      },
+      ...baseColumns,
+    ],
+    [currentPage]
   )
 
-  return (
-    <div className="min-h-screen bg-slate-50 p-8">
-      <div>
-        <SopnsorStats />
-      </div>
-      <SponsorFilter />
-      <div className="mt-6 overflow-hidden rounded-xl border bg-white shadow-sm">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-50/50">
-              <TableHead>PAYMENT ID</TableHead>
-              <TableHead>CUSTOMER</TableHead>
-              <TableHead>ROLE</TableHead>
-              <TableHead>SPONSORSHIP</TableHead>
-              <TableHead>AMOUNT</TableHead>
-              <TableHead>STATUS</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedData.map((d) => (
-              <TableRow key={d.id}>
-                <TableCell className="font-mono text-slate-500">
-                  PAY-{d.id}
-                </TableCell>
-                <TableCell>
-                  <div className="font-medium text-slate-900">{d.userName}</div>
-                  <div className="text-xs text-slate-400">{d.email}</div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">{d.role}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={`font-semibold ${getSponsorshipBadgeStyle(d.sponsorship)}`}
-                  >
-                    {d.sponsorship}
-                  </Badge>
-                </TableCell>
-                <TableCell className="font-bold text-slate-900">
-                  ${d.amount}
-                </TableCell>
-                <TableCell
-                  className={
-                    d.status === "Success"
-                      ? "text-emerald-600"
-                      : "text-orange-500"
-                  }
-                >
-                  • {d.status}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    useSponsorshipHistory(currentPage, ITEMS_PER_PAGE)
 
-        {/* Pagination Controls */}
-        <div className="flex items-center justify-between border-t p-4">
+  console.log(data)
+
+  const meta = data?.meta
+  const totalPages = meta?.totalPages ?? 1
+
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const table = useReactTable({
+    data: data?.data ?? [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    pageCount: totalPages,
+  })
+
+  // Error State
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-8">
+        <SponsorStats />
+        <div className="mt-8 flex flex-col items-center justify-center rounded-xl border border-red-100 bg-white py-16 text-center shadow-sm">
+          <AlertCircle className="mb-4 h-12 w-12 text-red-400" />
+          <h3 className="text-lg font-semibold text-slate-800">
+            Failed to load sponsorship data
+          </h3>
+          <p className="mt-1 text-sm text-slate-500">
+            {error instanceof Error
+              ? error.message
+              : "An unexpected error occurred."}
+          </p>
           <Button
+            onClick={() => refetch()}
             variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
+            className="mt-6 gap-2 border-slate-200"
           >
-            Previous
-          </Button>
-          <span className="text-sm">
-            Page {currentPage} of {totalPages || 1}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage >= totalPages}
-          >
-            Next
+            <RefreshCcw className="h-4 w-4" /> Try Again
           </Button>
         </div>
       </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-8">
+      <SponsorStats />
+      <SponsorFilter />
+
+      {isLoading ? (
+        <SponsorTableSkeleton />
+      ) : (
+        <div
+          className={`mt-6 overflow-hidden rounded-xl border bg-white shadow-sm transition-opacity ${
+            isFetching ? "opacity-60" : "opacity-100"
+          }`}
+        >
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="bg-slate-50/50">
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="py-16 text-center text-slate-400"
+                  >
+                    No sponsorship records found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.original.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+
+          {/* Pagination Controls */}
+          <div className="flex items-center justify-between border-t p-4">
+            <span className="text-xs text-slate-500">
+              {meta
+                ? `Showing ${(currentPage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(
+                    currentPage * ITEMS_PER_PAGE,
+                    meta.totalCount
+                  )} of ${meta.totalCount} records`
+                : ""}
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1 || isFetching}
+              >
+                Previous
+              </Button>
+              <span className="text-sm font-medium">
+                Page {currentPage} of {totalPages || 1}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+                disabled={currentPage >= totalPages || isFetching}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
