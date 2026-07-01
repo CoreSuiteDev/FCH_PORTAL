@@ -1,0 +1,94 @@
+"use client"
+
+import React, { Suspense } from "react"
+import Link from "next/link"
+import { useSearchParams } from "next/navigation"
+import { CheckCircle2, Download, ArrowRight } from "lucide-react"
+
+import Container from "@/components/shared/container"
+import { Button } from "@workspace/ui/components/button"
+import { Card, CardContent, CardFooter, CardHeader } from "@workspace/ui/components/card"
+
+function ReceiptContent() {
+  const searchParams = useSearchParams()
+  const tier = searchParams.get("tier") || "Sponsorship Plan"
+  const amount = searchParams.get("amount") || "0.00"
+  const currency = searchParams.get("currency") || "USD"
+  const txId = searchParams.get("txId") || "TXN-XXXXXX"
+  const date = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+
+  return (
+    <Card className="mx-auto w-md md:w-xl lg:w-2xl overflow-hidden rounded-2xl border-gray-200 bg-white shadow-xl pt-0">
+      <CardHeader className="bg-rose-50/50 p-8 text-center pb-6">
+        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-600">
+          <CheckCircle2 size={40} />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900">Payment Successful!</h2>
+        <p className="mt-2 text-sm text-gray-600">
+          Thank you for your generous sponsorship. Your support makes a big difference.
+        </p>
+      </CardHeader>
+
+      <CardContent className="p-8">
+        <div className="rounded-xl border border-gray-100 bg-gray-50 p-6">
+          <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400">
+            Transaction Receipt
+          </h3>
+          <div className="space-y-4 text-sm">
+            <div className="flex justify-between border-b border-gray-200 pb-4">
+              <span className="text-gray-500">Plan</span>
+              <span className="font-semibold text-gray-900">{tier}</span>
+            </div>
+            <div className="flex justify-between border-b border-gray-200 pb-4">
+              <span className="text-gray-500">Amount Paid</span>
+              <span className="font-semibold text-gray-900">
+                {currency === "USD" ? "$" : "€"}
+                {amount}
+              </span>
+            </div>
+            <div className="flex justify-between border-b border-gray-200 pb-4">
+              <span className="text-gray-500">Date</span>
+              <span className="font-semibold text-gray-900">{date}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Transaction ID</span>
+              <span className="font-mono text-xs font-semibold text-gray-900">{txId}</span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+
+      <CardFooter className="flex flex-col gap-3 p-8">
+        <Button 
+          variant="outline" 
+          className="w-full h-12 border-gray-200 text-gray-700 hover:bg-gray-50 hover:cursor-pointer"
+          onClick={() => window.print()}
+        >
+          <Download className="mr-2 h-4 w-4" /> Download Receipt
+        </Button>
+        <Link href="/" className="w-full">
+          <Button className="w-full h-12 bg-rose-800 font-semibold hover:bg-rose-900 hover:cursor-pointer">
+            Return to Home <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </Link>
+      </CardFooter>
+    </Card>
+  )
+}
+
+export default function SuccessPage() {
+  return (
+    <div className="min-h-screen bg-[#f9f9f9] py-16">
+      <Container>
+        {/* Suspense is required when using useSearchParams in Next.js App Router */}
+        <Suspense fallback={<div className="text-center py-20 text-gray-500">Loading your receipt...</div>}>
+          <ReceiptContent />
+        </Suspense>
+      </Container>
+    </div>
+  )
+}
