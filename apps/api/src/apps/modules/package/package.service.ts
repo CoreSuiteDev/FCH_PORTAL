@@ -1,70 +1,60 @@
+import { ZTCCreatePackage, ZTCUpdatePackage } from "@workspace/types"
 import { prisma } from "../../../infrastructure/database/prisma.js"
-import { MembershipType, BillingCycle, Currency } from "../../../generated/prisma/client.js"
 
 export class PackageService {
-
   static async getPackages() {
     return prisma.membershipPackage.findMany({
       orderBy: {
-        createdAt: "desc",
+        sortOrder: "asc",
       },
     })
   }
 
-  static async findPackageById(id: string) {
+  static async getPackageBySlug(slug: string) {
     return prisma.membershipPackage.findUnique({
-      where: { id },
+      where: { slug },
     })
   }
 
-  static async createPackage(data: {
-    name: string
-    slug: string
-    type: MembershipType
-    billingCycle: BillingCycle
-    price: number
-    currency: Currency
-    description?: string
-    isActive?: boolean
-  }) {
+  static async createPackage(data: ZTCCreatePackage) {
+    const { name, billingCycle, currency, isActive, isPopular, price, slug, sortOrder, type, description, featureTitle, features, subTitle } = data
+
     return prisma.membershipPackage.create({
       data: {
-        name: data.name,
-        slug: data.slug,
-        type: data.type,
-        billingCycle: data.billingCycle,
-        price: data.price,
-        currency: data.currency,
-        description: data.description,
-        isActive: data.isActive ?? true,
+        name,
+        billingCycle,
+        currency,
+        isActive,
+        isPopular,
+        price,
+        slug,
+        sortOrder,
+        type,
+        description,
+        featureTitle,
+        features: features ?? undefined,
+        subTitle,
       },
     })
   }
 
-  static async updatePackage(
-    id: string,
-    data: {
-      name?: string
-      slug?: string
-      type?: MembershipType
-      billingCycle?: BillingCycle
-      price?: number
-      currency?: Currency
-      description?: string
-      isActive?: boolean
-    }
-  ) {
+  static async updatePackage(id: string, data: ZTCUpdatePackage) {
     return prisma.membershipPackage.update({
       where: { id },
       data: {
         name: data.name,
-        slug: data.slug,
-        type: data.type,
         billingCycle: data.billingCycle,
-        price: data.price,
         currency: data.currency,
-        description: data.description,
         isActive: data.isActive,
+        isPopular: data.isPopular,
+        price: data.price,
+        slug: data.slug,
+        sortOrder: data.sortOrder,
+        type: data.type,
+        description: data.description,
+        featureTitle: data.featureTitle,
+        features: data.features ?? undefined,
+        subTitle: data.subTitle,
       },
     })
   }

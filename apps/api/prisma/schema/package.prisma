@@ -15,13 +15,19 @@ model MembershipPackage {
   subTitle    String?
   description String?
 
+  featureTitle String?
   features Json?
+
+  isPopular Boolean @default(false)
+  sortOrder Int @default(0)
 
   isActive Boolean @default(true)
 
   subscriptions Subscription[]
 
   @@unique([type, billingCycle])
+  @@index([type])
+  @@index([billingCycle])
 }
 
 model Subscription {
@@ -29,30 +35,69 @@ model Subscription {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-
-  startDate DateTime
-  endDate   DateTime
-
-  status SubscriptionStatus @default(PENDING)
-
-  stripeCustomerId String?
-  paymentMethod String?
-  cardLast4 String?
-  cardBrand String?
-  receiptUrl String?
-  errorMessage String?
-
-  cancelAtPeriodEnd Boolean   @default(false)
-  cancledAt         DateTime?
-
   userId    String
   user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   packageId String
   package MembershipPackage @relation(fields: [packageId], references: [id])
 
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+
+  cancelAtPeriodEnd Boolean @default(false)
+  cancelledAt DateTime?
+
+  trialEndsAt DateTime?
+
+  status SubscriptionStatus @default(PENDING)
+  stripeCustomerId String?
+
+  stripeSubscriptionId String? @unique
+
+  latestInvoiceId String?
+
+  metadata Json?
+
+  payments Payment[]
+
+
   @@index([userId])
-  @@index([stripeCustomerId])
+  @@index([packageId])
   @@index([status])
-  @@map("subscription")
+  @@index([stripeCustomerId])
+}
+
+
+model Payment {
+   id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptionId String
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  amount Decimal @db.Decimal(10,2)
+  currency Currency
+
+  status PaymentStatus
+
+  stripePaymentIntentId String? @unique
+  stripeCheckoutSessionId String? @unique
+  stripeInvoiceId String? @unique
+
+  receiptUrl String?
+  invoicePdfUrl String?
+  paymentMethod String?
+  cardBrand String?
+  cardLast4 String?
+
+  refundedAmount Decimal? @db.Decimal(10,2)
+
+  failureCode String?
+  failureMessage String?
+
+  metadata Json?
+
+  @@index([subscriptionId])
+  @@index([status])
 }

@@ -6277,13 +6277,20 @@
                     "type": "object",
                     "properties": {
                       "id": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "cuid",
+                        "pattern": "^[cC][0-9a-z]{6,}$"
                       },
                       "name": {
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 100
                       },
                       "slug": {
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 100,
+                        "pattern": "^[a-z0-9-]+$"
                       },
                       "type": {
                         "type": "string",
@@ -6300,28 +6307,47 @@
                         ]
                       },
                       "price": {
-                        "type": "number"
+                        "type": "number",
+                        "minimum": 0,
+                        "multipleOf": 0.01
                       },
                       "currency": {
-                        "default": "USD",
                         "type": "string",
                         "enum": [
                           "USD",
                           "EUR"
                         ]
                       },
+                      "subTitle": {
+                        "type": "string",
+                        "maxLength": 150
+                      },
                       "description": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ]
+                        "type": "string",
+                        "maxLength": 5000
+                      },
+                      "featureTitle": {
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "features": {
+                        "maxItems": 100,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      },
+                      "isPopular": {
+                        "type": "boolean"
+                      },
+                      "sortOrder": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
                       },
                       "isActive": {
-                        "default": true,
                         "type": "boolean"
                       },
                       "createdAt": {
@@ -6339,6 +6365,8 @@
                       "billingCycle",
                       "price",
                       "currency",
+                      "isPopular",
+                      "sortOrder",
                       "isActive",
                       "createdAt",
                       "updatedAt"
@@ -6403,11 +6431,14 @@
                 "properties": {
                   "name": {
                     "type": "string",
-                    "minLength": 1
+                    "minLength": 2,
+                    "maxLength": 100
                   },
                   "slug": {
                     "type": "string",
-                    "minLength": 1
+                    "minLength": 2,
+                    "maxLength": 100,
+                    "pattern": "^[a-z0-9-]+$"
                   },
                   "type": {
                     "type": "string",
@@ -6425,7 +6456,8 @@
                   },
                   "price": {
                     "type": "number",
-                    "minimum": 0
+                    "minimum": 0,
+                    "multipleOf": 0.01
                   },
                   "currency": {
                     "default": "USD",
@@ -6435,12 +6467,36 @@
                       "EUR"
                     ]
                   },
-                  "oktaGroup": {
+                  "subTitle": {
                     "type": "string",
-                    "minLength": 1
+                    "maxLength": 150
                   },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 5000
+                  },
+                  "featureTitle": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "features": {
+                    "maxItems": 100,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    }
+                  },
+                  "isPopular": {
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "sortOrder": {
+                    "default": 0,
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
                   },
                   "isActive": {
                     "default": true,
@@ -6452,8 +6508,7 @@
                   "slug",
                   "type",
                   "billingCycle",
-                  "price",
-                  "oktaGroup"
+                  "price"
                 ]
               }
             }
@@ -6468,13 +6523,20 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string"
+                      "type": "string",
+                      "format": "cuid",
+                      "pattern": "^[cC][0-9a-z]{6,}$"
                     },
                     "name": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 100
                     },
                     "slug": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 100,
+                      "pattern": "^[a-z0-9-]+$"
                     },
                     "type": {
                       "type": "string",
@@ -6491,28 +6553,47 @@
                       ]
                     },
                     "price": {
-                      "type": "number"
+                      "type": "number",
+                      "minimum": 0,
+                      "multipleOf": 0.01
                     },
                     "currency": {
-                      "default": "USD",
                       "type": "string",
                       "enum": [
                         "USD",
                         "EUR"
                       ]
                     },
+                    "subTitle": {
+                      "type": "string",
+                      "maxLength": 150
+                    },
                     "description": {
-                      "anyOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
+                      "type": "string",
+                      "maxLength": 5000
+                    },
+                    "featureTitle": {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "features": {
+                      "maxItems": 100,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      }
+                    },
+                    "isPopular": {
+                      "type": "boolean"
+                    },
+                    "sortOrder": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "isActive": {
-                      "default": true,
                       "type": "boolean"
                     },
                     "createdAt": {
@@ -6530,6 +6611,8 @@
                     "billingCycle",
                     "price",
                     "currency",
+                    "isPopular",
+                    "sortOrder",
                     "isActive",
                     "createdAt",
                     "updatedAt"
@@ -6582,6 +6665,190 @@
         }
       }
     },
+    "/package/{slug}": {
+      "get": {
+        "operationId": "package-getBySlug",
+        "summary": "Get package by slug",
+        "description": "Returns a single package by its unique slug",
+        "tags": [
+          "packages"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "cuid",
+                      "pattern": "^[cC][0-9a-z]{6,}$"
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 100
+                    },
+                    "slug": {
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 100,
+                      "pattern": "^[a-z0-9-]+$"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "GENERAL",
+                        "PASTORAL"
+                      ]
+                    },
+                    "billingCycle": {
+                      "type": "string",
+                      "enum": [
+                        "MONTHLY",
+                        "YEARLY"
+                      ]
+                    },
+                    "price": {
+                      "type": "number",
+                      "minimum": 0,
+                      "multipleOf": 0.01
+                    },
+                    "currency": {
+                      "type": "string",
+                      "enum": [
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "subTitle": {
+                      "type": "string",
+                      "maxLength": 150
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 5000
+                    },
+                    "featureTitle": {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "features": {
+                      "maxItems": 100,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      }
+                    },
+                    "isPopular": {
+                      "type": "boolean"
+                    },
+                    "sortOrder": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "slug",
+                    "type",
+                    "billingCycle",
+                    "price",
+                    "currency",
+                    "isPopular",
+                    "sortOrder",
+                    "isActive",
+                    "createdAt",
+                    "updatedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/package/{id}": {
       "patch": {
         "operationId": "package-update",
@@ -6616,10 +6883,15 @@
                     "type": "object",
                     "properties": {
                       "name": {
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 100
                       },
                       "slug": {
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 100,
+                        "pattern": "^[a-z0-9-]+$"
                       },
                       "type": {
                         "type": "string",
@@ -6637,7 +6909,8 @@
                       },
                       "price": {
                         "type": "number",
-                        "minimum": 0
+                        "minimum": 0,
+                        "multipleOf": 0.01
                       },
                       "currency": {
                         "type": "string",
@@ -6646,11 +6919,34 @@
                           "EUR"
                         ]
                       },
-                      "oktaGroup": {
-                        "type": "string"
+                      "subTitle": {
+                        "type": "string",
+                        "maxLength": 150
                       },
                       "description": {
-                        "type": "string"
+                        "type": "string",
+                        "maxLength": 5000
+                      },
+                      "featureTitle": {
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "features": {
+                        "maxItems": 100,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        }
+                      },
+                      "isPopular": {
+                        "type": "boolean"
+                      },
+                      "sortOrder": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
                       },
                       "isActive": {
                         "type": "boolean"
@@ -6674,13 +6970,20 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string"
+                      "type": "string",
+                      "format": "cuid",
+                      "pattern": "^[cC][0-9a-z]{6,}$"
                     },
                     "name": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 100
                     },
                     "slug": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 100,
+                      "pattern": "^[a-z0-9-]+$"
                     },
                     "type": {
                       "type": "string",
@@ -6697,28 +7000,47 @@
                       ]
                     },
                     "price": {
-                      "type": "number"
+                      "type": "number",
+                      "minimum": 0,
+                      "multipleOf": 0.01
                     },
                     "currency": {
-                      "default": "USD",
                       "type": "string",
                       "enum": [
                         "USD",
                         "EUR"
                       ]
                     },
+                    "subTitle": {
+                      "type": "string",
+                      "maxLength": 150
+                    },
                     "description": {
-                      "anyOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
+                      "type": "string",
+                      "maxLength": 5000
+                    },
+                    "featureTitle": {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "features": {
+                      "maxItems": 100,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      }
+                    },
+                    "isPopular": {
+                      "type": "boolean"
+                    },
+                    "sortOrder": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "isActive": {
-                      "default": true,
                       "type": "boolean"
                     },
                     "createdAt": {
@@ -6736,6 +7058,8 @@
                     "billingCycle",
                     "price",
                     "currency",
+                    "isPopular",
+                    "sortOrder",
                     "isActive",
                     "createdAt",
                     "updatedAt"

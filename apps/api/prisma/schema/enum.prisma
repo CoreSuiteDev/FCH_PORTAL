@@ -21,10 +21,10 @@ enum MembershipStatus {
 enum PaymentStatus {
   PENDING
   SUCCEEDED
-  PAID
   FAILED
   REFUNDED
-  PARTIAL_REFUNDED
+  PARTIALLY_REFUNDED
+  CANCELED
 }
 
 enum Currency {
@@ -48,10 +48,13 @@ enum BillingCycle {
 }
 
 enum SubscriptionStatus {
-  ACTIVE
-  EXPIRED
-  CANCELLED
   PENDING
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  UNPAID
+  CANCELED
+  EXPIRED
 }
 
 
