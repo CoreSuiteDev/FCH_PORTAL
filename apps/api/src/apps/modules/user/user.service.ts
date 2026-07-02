@@ -14,8 +14,11 @@ export class UserService {
             role: true,
           },
         },
-        memberships: true,
-        payments: true,
+        subscriptions: {
+          include: {
+            payments: true,
+          },
+        },
       },
     })
   }
@@ -38,8 +41,11 @@ export class UserService {
               role: true,
             },
           },
-          memberships: true,
-          payments: true,
+          subscriptions: {
+            include: {
+              payments: true,
+            },
+          },
         },
       }),
     ])
@@ -60,8 +66,11 @@ export class UserService {
             role: true,
           },
         },
-        memberships: true,
-        payments: true,
+        subscriptions: {
+          include: {
+            payments: true,
+          },
+        },
       },
     })
   }

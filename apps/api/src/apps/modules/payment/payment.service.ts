@@ -177,8 +177,7 @@ export class PaymentService {
           await prisma.payment.update({
             where: { stripePaymentIntentId: paymentIntent.id },
             data: {
-              status: "PAID",
-              stripeCustomerId: customerId,
+              status: "SUCCEEDED",
             },
           })
           console.log(
@@ -189,7 +188,6 @@ export class PaymentService {
             where: { stripePaymentIntentId: paymentIntent.id },
             data: {
               status: "FAILED",
-              stripeCustomerId: customerId,
             },
           })
           console.log(
