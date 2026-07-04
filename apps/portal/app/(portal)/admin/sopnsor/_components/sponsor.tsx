@@ -17,10 +17,11 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
-import { AlertCircle, RefreshCcw } from "lucide-react"
+import { AlertCircle, RefreshCcw, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 
-import { useSponsorshipHistory } from "@/hooks/useSponsor"
+import { useSponsorshipHistory, useDeleteSponsorship } from "@/hooks/useSponsor"
+import { toast } from "@workspace/ui/components/sonner"
 import type { ZTCSPonsorshipHistoryItem } from "@workspace/types"
 import Link from "next/link"
 import { SponsorFilter } from "./sopncer-filter"
@@ -208,7 +209,7 @@ const baseColumns: ColumnDef<SponsorshipRecord>[] = [
         </Link>
       )
     },
-  },
+  }
 ]
 
 function SponsorTableSkeleton() {
@@ -245,6 +246,19 @@ function SponsorTableSkeleton() {
 export default function Sponsor() {
   const [currentPage, setCurrentPage] = useState(1)
 
+  const { mutateAsync: deleteSponsorship } = useDeleteSponsorship()
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this sponsorship record?")) {
+      try {
+        await deleteSponsorship(id)
+        toast.success("Sponsorship record deleted successfully!")
+      } catch (err: any) {
+        toast.error(err.message || "Failed to delete sponsorship record")
+      }
+    }
+  }
+
   const columns = useMemo<ColumnDef<SponsorshipRecord>[]>(
     () => [
       {
@@ -257,6 +271,15 @@ export default function Sponsor() {
         ),
       },
       ...baseColumns,
+      {
+        id: "action",
+        header: "ACTIONS",
+        cell: ({ row }) => (
+          <Button variant="ghost" size="sm" className="hover:text-red-600" onClick={() => handleDelete(row.original.id)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        ),
+      }
     ],
     [currentPage]
   )

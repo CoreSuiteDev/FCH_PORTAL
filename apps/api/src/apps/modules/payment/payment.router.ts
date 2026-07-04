@@ -1,4 +1,5 @@
 
+import { z } from "zod";
 import { router, publicProcedure, adminProcedure } from "../../../server/trpc.js";
 import { PaymentController, DonationController, SponsorshipController } from "./payment.controller.js";
 import {
@@ -195,4 +196,36 @@ export const paymentRouter = router({
             meta: getPaginationMeta(totalCount, page, limit),
           };
         }),
+
+  deleteDonation: adminProcedure
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/payment/donation/{id}",
+        tags: ["payment"],
+        summary: "Delete a donation",
+        description: "Deletes a donation history record by ID",
+      },
+    })
+    .input(z.object({ id: z.string() }))
+    .output(z.any())
+    .mutation(async ({ input }) => {
+      return DonationController.deleteDonation(input.id);
+    }),
+
+  deleteSponsorship: adminProcedure
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/payment/sponsorship/{id}",
+        tags: ["payment"],
+        summary: "Delete a sponsorship",
+        description: "Deletes a sponsorship history record by ID",
+      },
+    })
+    .input(z.object({ id: z.string() }))
+    .output(z.any())
+    .mutation(async ({ input }) => {
+      return SponsorshipController.deleteSponsorship(input.id);
+    }),
 });

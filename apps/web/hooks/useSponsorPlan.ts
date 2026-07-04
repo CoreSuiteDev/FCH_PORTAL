@@ -1,5 +1,6 @@
 import { api } from "@/lib/api-client"
-import { useQuery, useMutation } from "@tanstack/react-query"
+import { queryClient } from "@/providers/query-provider"
+import { useMutation, useQuery } from "@tanstack/react-query"
 
 export const useSponsorPlan = () => {
   return useQuery({
@@ -39,6 +40,9 @@ export const useCreateSponsorship = () => {
     mutationFn: async (payload: CreateSponsorshipPayload) => {
       const res = await api.post("/payment/sponsorship", payload)
       return res.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sponsorship-history"] })
     },
   })
 }

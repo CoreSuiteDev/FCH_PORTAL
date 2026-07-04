@@ -38,6 +38,10 @@ export class DonationController {
     return DonationService.getDonationById(id);
   }
 
+  static async deleteDonation(id: string) {
+    return DonationService.deleteDonation(id);
+  }
+
 }
 
 
@@ -49,6 +53,10 @@ export class SponsorshipController {
 
   static async getSponsorshipHistory(params: { page: number; limit: number }) {
     return SponsorShipService.getSponsorshipHistory(params);
+  }
+
+  static async deleteSponsorship(id: string) {
+    return SponsorShipService.deleteSponsorship(id);
   }
 
 }

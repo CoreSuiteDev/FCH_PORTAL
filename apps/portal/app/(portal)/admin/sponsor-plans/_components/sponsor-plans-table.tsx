@@ -1,8 +1,9 @@
 "use client"
 
-import React from "react"
+import { ZTCSponsorPlanResponse } from "@workspace/types"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
+import { Skeleton } from "@workspace/ui/components/skeleton"
 import {
   Table,
   TableBody,
@@ -11,8 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
-import { Loader2, Edit, Trash2, ShieldAlert } from "lucide-react"
-import { ZTCSponsorPlanResponse } from "@workspace/types"
+import { Edit, ShieldAlert, Trash2 } from "lucide-react"
 
 const TIER_COLORS: Record<string, string> = {
   BRONZE: "bg-orange-50 text-orange-700 border-orange-200",
@@ -39,12 +39,19 @@ export const SponsorPlansTable = ({
 }: SponsorPlansTableProps) => {
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div className="p-6">
-        <h2 className="text-lg font-semibold">Tiers & Plans Directory</h2>
-        <p className="text-sm text-slate-500">
-          A list of all active sponsorship plans configured for Stripe
-          collection.
-        </p>
+      <div className="flex w-full justify-between p-6">
+        <div>
+          <h2 className="text-lg font-semibold">Tiers & Plans Directory</h2>
+          <p className="text-sm text-slate-500">
+            A list of all active sponsorship plans configured for Stripe
+            collection.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <p className="text-xm font-medium text-slate-500">Total Plans: </p>
+          <h3 className="text-xl font-medium text-slate-950">{plans.length}</h3>
+        </div>
       </div>
 
       <Table>
@@ -60,14 +67,31 @@ export const SponsorPlansTable = ({
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableRow>
-              <TableCell colSpan={6} className="h-64 text-center">
-                <div className="flex flex-col items-center justify-center text-slate-500">
-                  <Loader2 className="mb-4 h-8 w-8 animate-spin text-slate-400" />
-                  <p>Loading sponsor plans...</p>
-                </div>
-              </TableCell>
-            </TableRow>
+            Array.from({ length: 5 }).map((_, i) => (
+              <TableRow key={i} className="border-b border-slate-100">
+                <TableCell>
+                  <Skeleton className="h-6 w-20 rounded" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-32 rounded" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-16 rounded" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-40 rounded" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-48 rounded" />
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
           ) : isError ? (
             <TableRow>
               <TableCell colSpan={6} className="h-64 text-center">

@@ -608,5 +608,20 @@ export class SponsorShipService {
 
     return { data, totalCount }
   }
+
+  static async deleteSponsorship(id: string) {
+    const sponsorship = await prisma.sponsorship.delete({
+      where: {
+        id
+      },
+    })
+    if (!sponsorship) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Sponsorship not found",
+      })
+    }
+    return sponsorship
+  }
   
 }
