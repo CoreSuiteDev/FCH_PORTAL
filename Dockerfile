@@ -76,4 +76,4 @@ ENV PORT=5000
 ENV NODE_ENV=production
 EXPOSE 5000
 
-CMD ["sh", "-c", "cd apps/api && bunx --bun prisma db push --accept-data-loss && bun src/server.ts"]
+CMD ["sh", "-c", "cd apps/api && bunx --bun prisma migrate deploy && bun src/server.ts"]
