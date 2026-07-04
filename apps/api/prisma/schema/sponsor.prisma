@@ -1,68 +1,107 @@
-enum Tier {
-    BRONZE
-    SILVER
-    GOLD
-    PLATINUM
-    DIAMOND
+model SponsorPlan {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  name String @db.VarChar(100)
+  slug String @unique
+
+  tier Tier
+
+  amount   Decimal  @db.Decimal(12,2)
+  currency Currency @default(USD)
+
+  description String? @db.Text
+  benefits    Json?
+
+  isActive   Boolean @default(true)
+  isFeatured Boolean @default(false)
+
+  sortOrder Int @default(0)
+
+  sponsorships Sponsorship[]
+
+  @@index([tier])
+  @@index([isActive])
+  @@index([sortOrder])
+
+  @@map("sponsor_plans")
 }
 
-model SponsorPlans {
-    id          String   @id @default(cuid())
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+model Sponsorship {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
-    planName    String
-    amount      Float
-    currency    Currency @default(USD)
-    tier        Tier
+  // Selected Plan
+  planId String
+  plan   SponsorPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
 
-    description String?   @db.Text
-    benefits    Json?    
-    @@index([tier])
-}
+  // Snapshot of pricing (history preserved)
+  amount   Decimal  @db.Decimal(12,2)
+  currency Currency @default(USD)
 
-model SponsorShip {
-    id               String   @id @default(cuid())
-    createdAt        DateTime @default(now())
-    updatedAt        DateTime @updatedAt 
+  status PaymentStatus @default(PENDING)
 
-    tier             Tier
+  paymentMethod PaymentMethod?
 
-    amount           Float
-    currency         Currency @default(USD)
-    status           PaymentStatus
+  paymentIntentId      String? @unique
+  paymentTransactionId String? @unique
+  stripeChargeId       String? @unique
+  stripeCustomerId     String?
 
-    paymentIntentId  String   @unique
-    stripeCustomerId String?
-    paymentMethod    String?
-    cardLast4        String?
-    cardBrand        String?
-    receiptUrl       String?
-    errorMessage     String?
+  cardBrand String?
+  cardLast4 String?
 
-    sponsorId        String
-    sponsor          Sponsor  @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  receiptUrl String?
+  invoiceUrl String?
 
-    userId           String?
-    user             User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  errorMessage String?
 
-    @@index([sponsorId])
-    @@index([userId])
-    @@index([status])
-    @@index([createdAt])
+  refundedAmount Decimal @db.Decimal(12,2) @default(0)
+  refundedAt DateTime?
+
+  metadata Json?
+
+  startsAt DateTime?
+  expiresAt DateTime?
+
+  sponsorId String
+  sponsor Sponsor @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([planId])
+  @@index([sponsorId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([status, createdAt])
+  @@index([sponsorId, createdAt])
+
+  @@map("sponsorships")
 }
 
 model Sponsor {
-    id           String        @id @default(cuid())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
-    name         String
-    email        String        @unique 
-    phone        String?
-    
-    sponsorShips SponsorShip[]
+  name  String @db.VarChar(120)
+  email String @unique
+  phone String? @db.VarChar(20)
 
-    createdAt    DateTime      @default(now())
-    updatedAt    DateTime      @updatedAt
-    
-    
+  company String?
+  website String?
+  logo    String?
+
+  sponsorships Sponsorship[]
+
+  @@index([email])
+
+  @@map("sponsors")
 }

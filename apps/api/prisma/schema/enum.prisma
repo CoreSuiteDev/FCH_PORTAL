@@ -57,7 +57,6 @@ enum SubscriptionStatus {
   EXPIRED
 }
 
-
 enum EventVisibility {
   PUBLIC
   FREE_WEBINAR
@@ -79,12 +78,10 @@ enum RegistrationStatus {
   CANCELLED
 }
 
-
 enum EventType {
   EVENT
   WEBINAR
 }
-
 
 enum ResourceVisibility {
   MEMBER
@@ -93,4 +90,35 @@ enum ResourceVisibility {
   ADMIN
   COMMITTEE
   SUPER_ADMIN
+}
+
+
+enum Tier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+enum PaymentMethod {
+  CARD
+  BANK_TRANSFER
+  CASH
+  OTHER
+}
+
+
+enum PublishStatus {
+  DRAFT
+  REVIEW
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum NewsType {
+  NEWS
+  BLOG
+  ANNOUNCEMENT
 }

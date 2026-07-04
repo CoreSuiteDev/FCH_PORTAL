@@ -99,7 +99,16 @@ const baseColumns: ColumnDef<SponsorshipRecord>[] = [
     header: "ROLE",
     accessorKey: "user",
     cell: ({ row }) => {
-      const role = row.original.user?.role || "Guest"
+      const user = row.original.user
+      if (!user) return <span>Guest</span>
+      const roleMap: Record<string, string> = {
+        SUPER_ADMIN: "Admin",
+        BOARD: "Board",
+        PASTORAL: "Pastoral",
+        MEMBER: "Member",
+        USER: "User",
+      }
+      const role = roleMap[user.role] || user.role || "User"
       return <span>{role}</span>
     },
   },
@@ -178,7 +187,7 @@ const baseColumns: ColumnDef<SponsorshipRecord>[] = [
     accessorKey: "stripeCustomerId",
     cell: ({ row }) => {
       const id = row.original.stripeCustomerId
-      if (!id) return <span className="text-slate-400">No ID</span>
+      if (!id) return <span className="text-slate-400">N/A</span>
       return <span className="text-xs text-slate-500">{id}</span>
     },
   },

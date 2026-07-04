@@ -28,6 +28,14 @@ import {
   useSponsorPlanById,
 } from "@/hooks/useSponsorPlan"
 import { authClient } from "@/lib/auth"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@workspace/ui/components/breadcrumb"
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Field, FieldError, FieldLabel } from "@workspace/ui/components/field"
@@ -111,12 +119,25 @@ function TierDetails() {
     return (
       <div className="min-h-screen bg-[#f9f9f9] py-16">
         <Container className="max-w-5xl">
-          <Link
-            href="/sponsor"
-            className="mb-8 inline-flex items-center text-sm font-medium text-gray-500 hover:cursor-pointer hover:text-gray-900"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Pricing Registry
-          </Link>
+          <Breadcrumb className="mb-8">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/">Home</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/sponsor">Sponsor</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Loading...</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
           <div className="grid gap-8 md:grid-cols-2">
             <Card className="animate-pulse space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-none">
               <div className="h-4 w-1/3 rounded bg-gray-200" />
@@ -246,12 +267,25 @@ function TierDetails() {
   return (
     <div className="min-h-screen bg-[#f9f9f9] py-16">
       <Container className="max-w-5xl">
-        <Link
-          href="/sponsor"
-          className="mb-8 inline-flex items-center text-sm font-medium text-gray-500 hover:cursor-pointer hover:text-gray-900"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Pricing Registry
-        </Link>
+        <Breadcrumb className="mb-8">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/sponsor">Sponsor</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{tier.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
         <div className="grid gap-8 md:grid-cols-2">
           {/* Left Column: Plan Details */}
@@ -351,7 +385,7 @@ function TierDetails() {
                         type="tel"
                         placeholder="+880 1XXXXXXXXX"
                         className="h-10 border-gray-200"
-                        disabled={isMutating || !!user}
+                        disabled={isMutating || (!!user && !!(user as any).phone)}
                       />
                       {errors.phone && <FieldError errors={[errors.phone]} />}
                     </Field>

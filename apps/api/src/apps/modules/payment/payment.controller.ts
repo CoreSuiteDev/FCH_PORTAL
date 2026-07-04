@@ -33,6 +33,11 @@ export class DonationController {
   static async getDonationHistory(params: {page: number, limit: number}){
     return DonationService.getDonationHistory(params);
   }
+
+  static async getDonationById(id: string) {
+    return DonationService.getDonationById(id);
+  }
+
 }
 
 

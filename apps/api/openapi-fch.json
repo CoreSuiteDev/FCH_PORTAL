@@ -5427,7 +5427,14 @@
                                     "type": "string"
                                   },
                                   "email": {
-                                    "type": "string"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "phone": {
                                     "anyOf": [
@@ -7937,7 +7944,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "planName": {
+                  "name": {
                     "type": "string",
                     "minLength": 1
                   },
@@ -7970,10 +7977,24 @@
                     "items": {
                       "type": "string"
                     }
+                  },
+                  "sortOrder": {
+                    "default": 0,
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "isActive": {
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "isFeatured": {
+                    "default": false,
+                    "type": "boolean"
                   }
                 },
                 "required": [
-                  "planName",
+                  "name",
                   "amount",
                   "currency",
                   "tier"
@@ -7999,7 +8020,7 @@
                     "updatedAt": {
                       "type": "string"
                     },
-                    "planName": {
+                    "name": {
                       "type": "string"
                     },
                     "amount": {
@@ -8039,16 +8060,28 @@
                           "type": "null"
                         }
                       ]
+                    },
+                    "sortOrder": {
+                      "type": "number"
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "isFeatured": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
                     "id",
                     "createdAt",
                     "updatedAt",
-                    "planName",
+                    "name",
                     "amount",
                     "currency",
-                    "tier"
+                    "tier",
+                    "sortOrder",
+                    "isActive",
+                    "isFeatured"
                   ],
                   "additionalProperties": false
                 }
@@ -8130,7 +8163,7 @@
                       "updatedAt": {
                         "type": "string"
                       },
-                      "planName": {
+                      "name": {
                         "type": "string"
                       },
                       "amount": {
@@ -8170,16 +8203,28 @@
                             "type": "null"
                           }
                         ]
+                      },
+                      "sortOrder": {
+                        "type": "number"
+                      },
+                      "isActive": {
+                        "type": "boolean"
+                      },
+                      "isFeatured": {
+                        "type": "boolean"
                       }
                     },
                     "required": [
                       "id",
                       "createdAt",
                       "updatedAt",
-                      "planName",
+                      "name",
                       "amount",
                       "currency",
-                      "tier"
+                      "tier",
+                      "sortOrder",
+                      "isActive",
+                      "isFeatured"
                     ],
                     "additionalProperties": false
                   }
@@ -8282,7 +8327,7 @@
                         "updatedAt": {
                           "type": "string"
                         },
-                        "planName": {
+                        "name": {
                           "type": "string"
                         },
                         "amount": {
@@ -8322,16 +8367,28 @@
                               "type": "null"
                             }
                           ]
+                        },
+                        "sortOrder": {
+                          "type": "number"
+                        },
+                        "isActive": {
+                          "type": "boolean"
+                        },
+                        "isFeatured": {
+                          "type": "boolean"
                         }
                       },
                       "required": [
                         "id",
                         "createdAt",
                         "updatedAt",
-                        "planName",
+                        "name",
                         "amount",
                         "currency",
-                        "tier"
+                        "tier",
+                        "sortOrder",
+                        "isActive",
+                        "isFeatured"
                       ],
                       "additionalProperties": false
                     },
@@ -8424,7 +8481,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "planName": {
+                  "name": {
                     "type": "string",
                     "minLength": 1
                   },
@@ -8457,10 +8514,24 @@
                     "items": {
                       "type": "string"
                     }
+                  },
+                  "sortOrder": {
+                    "default": 0,
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "isActive": {
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "isFeatured": {
+                    "default": false,
+                    "type": "boolean"
                   }
                 },
                 "required": [
-                  "planName",
+                  "name",
                   "amount",
                   "currency",
                   "tier"
@@ -8486,7 +8557,7 @@
                     "updatedAt": {
                       "type": "string"
                     },
-                    "planName": {
+                    "name": {
                       "type": "string"
                     },
                     "amount": {
@@ -8526,16 +8597,28 @@
                           "type": "null"
                         }
                       ]
+                    },
+                    "sortOrder": {
+                      "type": "number"
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "isFeatured": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
                     "id",
                     "createdAt",
                     "updatedAt",
-                    "planName",
+                    "name",
                     "amount",
                     "currency",
-                    "tier"
+                    "tier",
+                    "sortOrder",
+                    "isActive",
+                    "isFeatured"
                   ],
                   "additionalProperties": false
                 }
@@ -8633,7 +8716,7 @@
                     "updatedAt": {
                       "type": "string"
                     },
-                    "planName": {
+                    "name": {
                       "type": "string"
                     },
                     "amount": {
@@ -8673,16 +8756,28 @@
                           "type": "null"
                         }
                       ]
+                    },
+                    "sortOrder": {
+                      "type": "number"
+                    },
+                    "isActive": {
+                      "type": "boolean"
+                    },
+                    "isFeatured": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
                     "id",
                     "createdAt",
                     "updatedAt",
-                    "planName",
+                    "name",
                     "amount",
                     "currency",
-                    "tier"
+                    "tier",
+                    "sortOrder",
+                    "isActive",
+                    "isFeatured"
                   ],
                   "additionalProperties": false
                 }

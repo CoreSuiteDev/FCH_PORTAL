@@ -1,14 +1,14 @@
 model ContactInquery {
-    id String @id @default(cuid())
-    
-    name String
-    email String
-    phone String
-    message String
+  id String @id @default(cuid())
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  name    String
+  email   String
+  phone   String
+  message String
 
-    @@map("contact_inqueries")
-    @@index([createdAt])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@map("contact_inqueries")
 }

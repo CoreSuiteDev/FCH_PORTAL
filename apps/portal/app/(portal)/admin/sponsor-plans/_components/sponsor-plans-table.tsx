@@ -89,7 +89,7 @@ export const SponsorPlansTable = ({
                   </Badge>
                 </TableCell>
                 <TableCell className="font-medium text-slate-900">
-                  {plan.planName}
+                  {plan.name}
                 </TableCell>
                 <TableCell className="font-bold text-slate-900">
                   {plan.currency === "USD" ? "$ " : "€"}

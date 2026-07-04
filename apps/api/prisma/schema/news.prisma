@@ -1,0 +1,91 @@
+
+
+model News {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  title    String  @db.VarChar(255)
+  supTitle String? @db.VarChar(255)
+  slug     String  @unique
+
+  excerpt String? @db.Text
+  content String  @db.Text
+
+  // SEO
+  metaTitle       String? @db.VarChar(255)
+  metaDescription String? @db.Text
+  metaKeywords    String? @db.Text
+  canonicalUrl    String?
+
+  // Featured Image
+  featuredImage    String?
+  featuredImageAlt String?
+
+  // Status
+  status   PublishStatus @default(DRAFT)
+  newsType NewsType      @default(NEWS)
+
+  // Analytics
+  viewCount   Int  @default(0)
+  readingTime Int?
+
+  // Publish Information
+  publishedAt DateTime?
+
+  // Realation
+  authorId String
+  author   Author @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  tags Tag[]
+
+  // Audit
+  createdById   String?
+  updatedById   String?
+  publishedById String?
+
+  createdBy   User? @relation("NewsCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy   User? @relation("NewsUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  publishedBy User? @relation("NewsPublishedBy", fields: [publishedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([newsType])
+  @@index([publishedAt])
+  @@index([authorId])
+  @@index([deletedAt])
+  @@index([status, publishedAt])
+  @@map("news")
+}
+
+model Author {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  slug        String  @unique
+  bio         String? @db.Text
+  avatar      String?
+  designation String?
+
+  news News[]
+
+  @@index([slug])
+  @@map("authors")
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String @db.VarChar(255)
+  slug String @unique
+
+  news News[]
+
+  @@unique([name])
+  @@index([slug])
+  @@map("tags")
+}

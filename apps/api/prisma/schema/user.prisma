@@ -26,7 +26,11 @@ model User {
 
   donations Donation[]
 
-  sponsorShips SponsorShip[]
+  sponsorShips Sponsorship[]
+
+  newsCreated   News[] @relation("NewsCreatedBy")
+  newsUpdated   News[] @relation("NewsUpdatedBy")
+  newsPublished News[] @relation("NewsPublishedBy")
 
   @@unique([email])
   @@index([status])
@@ -90,7 +94,6 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
-
 
 model Role {
   id String @id @default(cuid())

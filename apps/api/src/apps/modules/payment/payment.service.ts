@@ -88,7 +88,7 @@ export class PaymentService {
       if (donationExists) {
         type = "donation"
       } else {
-        const sponsorshipExists = await prisma.sponsorShip.findUnique({
+        const sponsorshipExists = await prisma.sponsorship.findUnique({
           where: { paymentIntentId: paymentIntent.id },
           select: { id: true },
         })
@@ -116,17 +116,36 @@ export class PaymentService {
     try {
       if (type === "donation") {
         if (event.type === "payment_intent.succeeded") {
+          let mappedPaymentMethod: "CARD" | "BANK_TRANSFER" | "CASH" | "OTHER" = "CARD";
+          if (paymentMethod === "bank_transfer") {
+            mappedPaymentMethod = "BANK_TRANSFER";
+          } else if (paymentMethod === "cash") {
+            mappedPaymentMethod = "CASH";
+          } else if (paymentMethod && paymentMethod !== "card") {
+            mappedPaymentMethod = "OTHER";
+          }
+
           await prisma.donation.update({
             where: { paymentIntentId: paymentIntent.id },
             data: {
               status: "SUCCEEDED",
               receiptUrl,
-              paymentMethod,
+              paymentMethod: mappedPaymentMethod,
               cardBrand,
               cardLast4,
-              stripeCustomerId: customerId,
             },
           })
+
+          const donationObj = await prisma.donation.findUnique({
+            where: { paymentIntentId: paymentIntent.id },
+            select: { donatorId: true },
+          })
+          if (donationObj?.donatorId && customerId) {
+            await prisma.donator.update({
+              where: { id: donationObj.donatorId },
+              data: { stripeCustomerId: customerId },
+            })
+          }
           console.log(
             `[webhook] Donation SUCCEEDED — PaymentIntent: ${paymentIntent.id}`
           )
@@ -135,8 +154,7 @@ export class PaymentService {
             where: { paymentIntentId: paymentIntent.id },
             data: {
               status: "FAILED",
-              errorMessage,
-              stripeCustomerId: customerId,
+              failureReason: errorMessage,
             },
           })
           console.log(
@@ -145,12 +163,21 @@ export class PaymentService {
         }
       } else if (type === "sponsorship") {
         if (event.type === "payment_intent.succeeded") {
-          await prisma.sponsorShip.update({
+          let mappedPaymentMethod: "CARD" | "BANK_TRANSFER" | "CASH" | "OTHER" = "CARD";
+          if (paymentMethod === "bank_transfer") {
+            mappedPaymentMethod = "BANK_TRANSFER";
+          } else if (paymentMethod === "cash") {
+            mappedPaymentMethod = "CASH";
+          } else if (paymentMethod && paymentMethod !== "card") {
+            mappedPaymentMethod = "OTHER";
+          }
+
+          await prisma.sponsorship.update({
             where: { paymentIntentId: paymentIntent.id },
             data: {
               status: "SUCCEEDED",
               receiptUrl,
-              paymentMethod,
+              paymentMethod: mappedPaymentMethod,
               cardBrand,
               cardLast4,
               stripeCustomerId: customerId,
@@ -160,7 +187,7 @@ export class PaymentService {
             `[webhook] Sponsorship SUCCEEDED — PaymentIntent: ${paymentIntent.id}`
           )
         } else if (event.type === "payment_intent.payment_failed") {
-          await prisma.sponsorShip.update({
+          await prisma.sponsorship.update({
             where: { paymentIntentId: paymentIntent.id },
             data: {
               status: "FAILED",
@@ -286,6 +313,15 @@ export class DonationService {
       }
     }
 
+    let mappedPaymentMethod: "CARD" | "BANK_TRANSFER" | "CASH" | "OTHER" = "CARD";
+    if (paymentMethod === "bank_transfer") {
+      mappedPaymentMethod = "BANK_TRANSFER";
+    } else if (paymentMethod === "cash") {
+      mappedPaymentMethod = "CASH";
+    } else if (paymentMethod && paymentMethod !== "card") {
+      mappedPaymentMethod = "OTHER";
+    }
+
     const donation = await prisma.donation.create({
       data: {
         amount,
@@ -295,7 +331,7 @@ export class DonationService {
         donatorId: donator.id,
         userId: userId ?? null,
         receiptUrl,
-        paymentMethod,
+        paymentMethod: mappedPaymentMethod,
         cardBrand,
         cardLast4,
       },
@@ -336,6 +372,88 @@ export class DonationService {
     const totalCount = await prisma.donation.count()
 
     return { data, totalCount }
+  }
+
+  static async getDonationById(id: string) {
+    const donation = await prisma.donation.findUnique({
+      where: {
+        id
+      },
+      include: {
+        donator: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            userRoles: {
+              select: {
+                role: true
+              }
+            },
+            createdAt: true,
+          },
+        },
+      },
+    })
+    if (!donation) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Donation not found",
+      })
+    }
+    return donation
+  }
+
+
+  static async getDonationByUserId(userId: string) {
+    const donations = await prisma.donation.findMany({
+      where: {
+        userId
+      },
+      include: {
+        donator: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            userRoles: {
+              select: {
+                role: true
+              }
+            },
+            createdAt: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    })
+    if (!donations) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Donation not found",
+      })
+    }
+    return donations
+  }
+
+
+  static async deleteDonation(id: string) {
+    const donation = await prisma.donation.delete({
+      where: {
+        id
+      },
+    })
+    if (!donation) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Donation not found",
+      })
+    }
+    return donation
   }
 }
 
@@ -413,9 +531,31 @@ export class SponsorShipService {
       }
     }
 
-    const sponsorship = await prisma.sponsorShip.create({
+    const plan = await prisma.sponsorPlan.findFirst({
+      where: {
+        tier: tier.toUpperCase() as any,
+        isActive: true,
+      },
+    })
+    if (!plan) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `No active sponsor plan found for tier ${tier}`,
+      })
+    }
+
+    let mappedPaymentMethod: "CARD" | "BANK_TRANSFER" | "CASH" | "OTHER" = "CARD";
+    if (paymentMethod === "bank_transfer") {
+      mappedPaymentMethod = "BANK_TRANSFER";
+    } else if (paymentMethod === "cash") {
+      mappedPaymentMethod = "CASH";
+    } else if (paymentMethod && paymentMethod !== "card") {
+      mappedPaymentMethod = "OTHER";
+    }
+
+    const sponsorship = await prisma.sponsorship.create({
       data: {
-        tier,
+        planId: plan.id,
         amount,
         currency: currency.toUpperCase() as "USD" | "EUR",
         status: paymentIntent.status === "succeeded" ? "SUCCEEDED" : "PENDING",
@@ -423,7 +563,7 @@ export class SponsorShipService {
         sponsorId: sponsor.id, 
         userId: userId ?? null,
         receiptUrl,
-        paymentMethod,
+        paymentMethod: mappedPaymentMethod,
         cardBrand,
         cardLast4,
       },
@@ -441,12 +581,13 @@ export class SponsorShipService {
     const { page, limit } = params
     const skip = (page - 1) * limit
 
-    const data = await prisma.sponsorShip.findMany({
+    const data = await prisma.sponsorship.findMany({
       skip,
       take: limit,
       orderBy: { createdAt: "desc" },
       include: {
         sponsor: true,
+        plan: true,
         user: {
           select: {
             id: true,
@@ -463,7 +604,7 @@ export class SponsorShipService {
         },
       },
     })
-    const totalCount = await prisma.sponsorShip.count()
+    const totalCount = await prisma.sponsorship.count()
 
     return { data, totalCount }
   }

@@ -71,29 +71,46 @@ export const paymentRouter = router({
       const limit = input?.limit ?? 10;
       const { totalCount, data } = await DonationController.getDonationHistory({ page, limit });
       return {
-        data: data.map((d) => ({
-          id: d.id,
-          amount: d.amount,
-          status: d.status,
-          currency: d.currency,
-          donator: d.donator,
-          user: d.user
-            ? {
-                id: d.user.id,
-                name: d.user.name,
-                email: d.user.email,
-                phone: d.user.phone ?? null,
-                role: d.user.userRoles?.[0]?.role?.name ?? "Geust",
-                createdAt: d.user.createdAt,
-              }
-            : null,
-          receiptUrl: d.receiptUrl,
-          paymentMethod: d.paymentMethod,
-          cardBrand: d.cardBrand,
-          cardLast4: d.cardLast4,
-          stripeCustomerId: d.stripeCustomerId,
-          createdAt: d.createdAt,
-        })),
+        data: data.map((d) => {
+          let topRole = "USER";
+          if (d.user) {
+            const roles = d.user.userRoles.map((ur: any) => ur.role.name);
+            if (roles.includes("SUPER_ADMIN")) {
+              topRole = "SUPER_ADMIN";
+            } else if (roles.includes("BOARD")) {
+              topRole = "BOARD";
+            } else if (roles.includes("PASTORAL")) {
+              topRole = "PASTORAL";
+            } else if (roles.includes("MEMBER")) {
+              topRole = "MEMBER";
+            } else if (roles[0]) {
+              topRole = roles[0];
+            }
+          }
+          return {
+            id: d.id,
+            amount: Number(d.amount),
+            status: d.status,
+            currency: d.currency,
+            donator: d.donator,
+            user: d.user
+              ? {
+                  id: d.user.id,
+                  name: d.user.name,
+                  email: d.user.email,
+                  phone: d.user.phone ?? null,
+                  role: topRole,
+                  createdAt: d.user.createdAt,
+                }
+              : null,
+            receiptUrl: d.receiptUrl,
+            paymentMethod: d.paymentMethod,
+            cardBrand: d.cardBrand,
+            cardLast4: d.cardLast4,
+            stripeCustomerId: d.donator?.stripeCustomerId || null,
+            createdAt: d.createdAt,
+          };
+        }),
         meta: getPaginationMeta(totalCount, page, limit),
       };
     }),
@@ -134,30 +151,47 @@ export const paymentRouter = router({
           const limit = input?.limit ?? 10;
           const { totalCount, data } = await SponsorshipController.getSponsorshipHistory({ page, limit });
           return {
-            data: data.map((d) => ({
-              id: d.id,
-              amount: d.amount,
-              status: d.status,
-              currency: d.currency,
-              sponsor: d.sponsor,
-              tier: d.tier,
-              user: d.user
-                ? {
-                    id: d.user.id,
-                    name: d.user.name,
-                    email: d.user.email,
-                    phone: d.user.phone ?? null,
-                    role: d.user.userRoles?.[0]?.role?.name ?? "Geust",
-                    createdAt: d.user.createdAt,
-                  }
-                : null,
-              receiptUrl: d.receiptUrl,
-              paymentMethod: d.paymentMethod,
-              cardBrand: d.cardBrand,
-              cardLast4: d.cardLast4,
-              stripeCustomerId: d.stripeCustomerId,
-              createdAt: d.createdAt,
-            })),
+            data: data.map((d: any) => {
+              let topRole = "USER";
+              if (d.user) {
+                const roles = d.user.userRoles.map((ur: any) => ur.role.name);
+                if (roles.includes("SUPER_ADMIN")) {
+                  topRole = "SUPER_ADMIN";
+                } else if (roles.includes("BOARD")) {
+                  topRole = "BOARD";
+                } else if (roles.includes("PASTORAL")) {
+                  topRole = "PASTORAL";
+                } else if (roles.includes("MEMBER")) {
+                  topRole = "MEMBER";
+                } else if (roles[0]) {
+                  topRole = roles[0];
+                }
+              }
+              return {
+                id: d.id,
+                amount: Number(d.amount),
+                status: d.status,
+                currency: d.currency,
+                sponsor: d.sponsor,
+                tier: d.plan?.tier || "BRONZE",
+                user: d.user
+                  ? {
+                      id: d.user.id,
+                      name: d.user.name,
+                      email: d.user.email,
+                      phone: d.user.phone ?? null,
+                      role: topRole,
+                      createdAt: d.user.createdAt,
+                    }
+                  : null,
+                receiptUrl: d.receiptUrl,
+                paymentMethod: d.paymentMethod,
+                cardBrand: d.cardBrand,
+                cardLast4: d.cardLast4,
+                stripeCustomerId: d.stripeCustomerId,
+                createdAt: d.createdAt,
+              };
+            }),
             meta: getPaginationMeta(totalCount, page, limit),
           };
         }),
