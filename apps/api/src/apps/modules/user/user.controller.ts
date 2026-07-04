@@ -81,5 +81,25 @@ export class UserController {
       })
     }
   }
+
+  /**
+   * Controller for updating user roles
+   */
+  static async updateUserRole({
+    userId,
+    role,
+  }: {
+    userId: string
+    role: string
+  }) {
+    try {
+      return await UserService.updateUserRole(userId, role)
+    } catch (error: any) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to update user role: ${error.message}`,
+      })
+    }
+  }
 }
 

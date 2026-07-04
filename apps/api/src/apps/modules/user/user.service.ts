@@ -142,5 +142,39 @@ export class UserService {
     // 3. Refetch complete record
     return UserService.findUserById(user.id)
   }
+
+  /**
+   * Update the user's role by clearing existing assignments and setting a new one
+   */
+  static async updateUserRole(userId: string, roleName: string) {
+    const upperRoleName = roleName.toUpperCase()
+    let role = await prisma.role.findUnique({
+      where: { name: upperRoleName },
+    })
+
+    if (!role) {
+      role = await prisma.role.create({
+        data: {
+          name: upperRoleName,
+          description: `Automatically created role for ${upperRoleName}`,
+        },
+      })
+    }
+
+    // Clear previous assignments
+    await prisma.userRole.deleteMany({
+      where: { userId },
+    })
+
+    // Assign new role
+    await prisma.userRole.create({
+      data: {
+        userId,
+        roleId: role.id,
+      },
+    })
+
+    return { success: true, role: upperRoleName }
+  }
 }
 

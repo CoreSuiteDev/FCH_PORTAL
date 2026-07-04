@@ -142,5 +142,31 @@ export const userRouter = router({
       const user = await UserController.createMember(input)
       return mapUser(user)
     }),
+
+  updateRole: adminProcedure
+    .meta({
+      openapi: {
+        method: "PATCH",
+        path: "/users/{userId}/role",
+        tags: ["users"],
+        summary: "Update user role hierarchy",
+        description: "Re-assigns user role clearances (e.g., BOARD, PASTORAL, MEMBER, SUPER_ADMIN)"
+      },
+    })
+    .input(
+      z.object({
+        userId: z.string(),
+        role: z.string(),
+      })
+    )
+    .output(
+      z.object({
+        success: z.boolean(),
+        role: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return UserController.updateUserRole(input)
+    }),
 })
 

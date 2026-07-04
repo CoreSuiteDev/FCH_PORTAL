@@ -39,14 +39,24 @@ export const data = {
       icon: IconUsers,
     },
     {
+      title: "Memberships Manager",
+      url: "/admin/memberships",
+      icon: IconAward,
+      items: [
+        {
+          title: "Status Manager",
+          url: "/admin/memberships",
+        },
+        {
+          title: "Membership Packages",
+          url: "/admin/membership-packages",
+        },
+      ],
+    },
+    {
       title: "Board Access",
       url: "/admin/board-management",
       icon: IconLockSquare,
-    },
-    {
-      title: "Payments & Stripe",
-      url: "/admin/payments",
-      icon: IconCreditCard,
     },
     {
       title: "Donation & Payments ",

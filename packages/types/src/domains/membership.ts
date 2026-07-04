@@ -143,3 +143,25 @@ export const ZCIUpdatePackageSchema = z.object({
 })
 
 export type ZTCUpdatePackage = z.infer<typeof ZCIUpdatePackageSchema>
+
+
+export const ZCPackageFormSchema = z.object({
+  name: z.string().min(2, "Package Name must be at least 2 characters"),
+  slug: z
+    .string()
+    .min(2, "Slug must be at least 2 characters")
+    .regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens"),
+  type: z.enum(["GENERAL", "PASTORAL"]),
+  billingCycle: z.enum(["MONTHLY", "YEARLY"]),
+  price: z.number().nonnegative("Price must be non-negative"),
+  currency: z.enum(["USD", "EUR"]),
+  subTitle: z.string().optional(),
+  description: z.string().optional(),
+  featureTitle: z.string().optional(),
+  features: z.array(z.string()),
+  sortOrder: z.number().int().nonnegative("Sort order must be non-negative"),
+  isActive: z.boolean(),
+  isPopular: z.boolean(),
+})
+
+export type ZTPackageFormValues = z.infer<typeof ZCPackageFormSchema>

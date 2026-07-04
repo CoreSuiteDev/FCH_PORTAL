@@ -1,27 +1,24 @@
 "use client"
 
+import React, { useMemo, useState } from "react"
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   Download,
   Filter,
   RefreshCw,
   Search,
   ShieldAlert,
-  SlidersHorizontal,
-  Terminal,
+  Shield,
+  Loader2,
 } from "lucide-react"
-import { useMemo } from "react"
 
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
@@ -34,7 +31,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
-
+import { Badge } from "@workspace/ui/components/badge"
 import { Input } from "@workspace/ui/components/input"
 import {
   Select,
@@ -51,25 +48,53 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
+import { toast } from "@workspace/ui/components/sonner"
 
-import {
-  AllowedClearance,
-  BoardMemberAccess,
-} from "@/constants/board-access-data"
-import { useBoardAccessStore } from "@/store/use-board-access-store"
+import { ZTCIUserOutput } from "@workspace/types"
+import { useUsers, useUpdateUserRole } from "@/hooks/useUser"
 
-const clearanceOptions: AllowedClearance[] = ["General", "Pastoral", "Board"]
+const clearanceOptions = [
+  { value: "MEMBER", label: "General" },
+  { value: "PASTORAL", label: "Pastoral" },
+  { value: "BOARD", label: "Board" },
+  { value: "SUPER_ADMIN", label: "Super Admin" },
+]
+
+// Helper to determine top priority role
+const getTopRole = (roles: string[] | undefined): string => {
+  if (!roles || roles.length === 0) return "GUEST"
+  const upperRoles = roles.map((r) => r.toUpperCase())
+  if (upperRoles.includes("SUPER_ADMIN")) return "SUPER_ADMIN"
+  if (upperRoles.includes("BOARD")) return "BOARD"
+  if (upperRoles.includes("PASTORAL")) return "PASTORAL"
+  if (upperRoles.includes("MEMBER")) return "MEMBER"
+  return roles[0] || "USER"
+}
 
 export default function BoardAccess() {
-  const {
-    accessList,
-    globalFilter,
-    selectedTier,
-    setGlobalFilter,
-    setSelectedTier,
-    updateClearanceLevel,
-    rotateTokens,
-  } = useBoardAccessStore()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedTier, setSelectedTier] = useState<string>("All")
+  const [globalFilter, setGlobalFilter] = useState("")
+
+  // 1. Query users
+  const { data, isLoading, isError, refetch } = useUsers(currentPage, 25)
+
+  // 2. Role Mutation
+  const updateRoleMutation = useUpdateUserRole()
+
+  const handleUpdateRole = (userId: string, newRole: string) => {
+    updateRoleMutation.mutate(
+      { userId, role: newRole },
+      {
+        onSuccess: () => {
+          toast.success("User access clearance level updated successfully")
+        },
+        onError: (err: any) => {
+          toast.error(`Clearance update failed: ${err.message || "Unknown error"}`)
+        },
+      }
+    )
+  }
 
   const handleExportPDF = () => {
     const doc = new jsPDF()
@@ -80,15 +105,15 @@ export default function BoardAccess() {
       .rows.map((row) => [
         row.original.id,
         row.original.name,
-        row.original.role,
-        row.original.mfaStatus,
-        row.original.lastActive,
-        row.original.clearanceLevel,
+        row.original.email,
+        getTopRole(row.original.roles),
+        row.original.status,
+        new Date(row.original.createdAt).toLocaleDateString(),
       ])
 
     autoTable(doc, {
       startY: 25,
-      head: [["ID", "Name", "Role", "MFA", "Activity", "Clearance"]],
+      head: [["ID", "Name", "Email", "Role", "Status", "Joined"]],
       body: tableRows,
     })
 
@@ -96,17 +121,19 @@ export default function BoardAccess() {
   }
 
   const getTierStyles = (tier: string) => {
-    switch (tier) {
-      case "Board":
+    switch (tier.toUpperCase()) {
+      case "SUPER_ADMIN":
+        return "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-900/50"
+      case "BOARD":
         return "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-900/50"
-      case "Pastoral":
+      case "PASTORAL":
         return "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/50"
       default:
         return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
     }
   }
 
-  const columns = useMemo<ColumnDef<BoardMemberAccess>[]>(
+  const columns = useMemo<ColumnDef<ZTCIUserOutput>[]>(
     () => [
       {
         accessorKey: "id",
@@ -126,61 +153,70 @@ export default function BoardAccess() {
               {row.original.name}
             </div>
             <div className="mt-0.5 text-xs text-slate-400">
-              {row.original.role}
+              {row.original.email}
             </div>
           </div>
         ),
       },
       {
-        accessorKey: "mfaStatus",
-        header: "Security Verification",
+        accessorKey: "status",
+        header: "Access State",
         cell: ({ row }) => {
-          const mfa = row.original.mfaStatus
+          const status = row.original.status || "ACTIVE"
+          const isActive = status === "ACTIVE"
           return (
             <span className="flex items-center gap-1.5 text-xs font-medium">
               <span
-                className={`h-2 w-2 rounded-full ${mfa === "Enabled" ? "bg-emerald-500" : "bg-rose-500"}`}
+                className={`h-2 w-2 rounded-full ${isActive ? "bg-emerald-500" : "bg-rose-500"}`}
               />
-              {mfa}
+              {status.toLowerCase()}
             </span>
           )
         },
       },
       {
-        accessorKey: "lastActive",
-        header: "Activity Log",
+        accessorKey: "createdAt",
+        header: "Enrollment Date",
         cell: ({ row }) => (
           <span className="text-xs text-slate-500">
-            {row.original.lastActive}
+            {new Date(row.original.createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
           </span>
         ),
       },
       {
-        accessorKey: "clearanceLevel",
+        id: "clearanceLevel",
         header: "Clearance Authority",
         cell: ({ row }) => {
-          const member = row.original
+          const user = row.original
+          const currentTopRole = getTopRole(user.roles)
+
           return (
-            <div className="w-[140px]">
+            <div className="w-[150px]">
               <Select
-                value={member.clearanceLevel}
-                onValueChange={(value) =>
-                  updateClearanceLevel(member.id, value as AllowedClearance)
-                }
+                value={currentTopRole}
+                onValueChange={(value) => handleUpdateRole(user.id, value)}
+                disabled={updateRoleMutation.isPending && updateRoleMutation.variables?.userId === user.id}
               >
                 <SelectTrigger
-                  className={`h-8 rounded-md border text-xs font-medium shadow-sm transition-all focus:ring-1 focus:ring-primary ${getTierStyles(member.clearanceLevel)}`}
+                  className={`h-8 rounded-md border text-xs font-medium shadow-sm transition-all focus:ring-1 focus:ring-primary ${getTierStyles(currentTopRole)}`}
                 >
+                  {updateRoleMutation.isPending && updateRoleMutation.variables?.userId === user.id ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                  ) : null}
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {clearanceOptions.map((level) => (
+                  {clearanceOptions.map((opt) => (
                     <SelectItem
-                      key={level}
-                      value={level}
+                      key={opt.value}
+                      value={opt.value}
                       className="text-xs font-medium"
                     >
-                      {level}
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -190,15 +226,23 @@ export default function BoardAccess() {
         },
       },
     ],
-    [updateClearanceLevel]
+    [updateRoleMutation.isPending, updateRoleMutation.variables]
   )
 
-  const finalFilteredData = useMemo(() => {
-    if (selectedTier === "All") return accessList
-    return accessList.filter((user) => user.clearanceLevel === selectedTier)
-  }, [accessList, selectedTier])
+  const usersList: ZTCIUserOutput[] = data?.data || []
 
-  // eslint-disable-next-line react-hooks/incompatible-library
+  const finalFilteredData = useMemo(() => {
+    return usersList.filter((user) => {
+      const topRole = getTopRole(user.roles)
+      if (selectedTier === "All") return true
+      if (selectedTier === "General") return topRole === "MEMBER" || topRole === "USER"
+      if (selectedTier === "Pastoral") return topRole === "PASTORAL"
+      if (selectedTier === "Board") return topRole === "BOARD"
+      if (selectedTier === "Super Admin") return topRole === "SUPER_ADMIN"
+      return true
+    })
+  }, [usersList, selectedTier])
+
   const table = useReactTable({
     data: finalFilteredData,
     columns,
@@ -206,9 +250,39 @@ export default function BoardAccess() {
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 10 } },
+    globalFilterFn: (row, columnId, filterValue) => {
+      const search = filterValue.toLowerCase()
+      const name = String(row.getValue("name") || "").toLowerCase()
+      const id = String(row.getValue("id") || "").toLowerCase()
+      const email = String(row.original.email || "").toLowerCase()
+      return name.includes(search) || id.includes(search) || email.includes(search)
+    },
   })
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <Loader2 className="h-10 w-10 text-slate-500 animate-spin" />
+        <p className="text-sm font-medium text-slate-500">Retrieving security permission records...</p>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-2 border border-rose-100 bg-rose-50/20 rounded-xl">
+        <ShieldAlert className="h-10 w-10 text-rose-500" />
+        <h4 className="text-base font-bold text-slate-800">Connection Failed</h4>
+        <p className="text-xs text-slate-500">Failed to fetch the registered members. Please retry.</p>
+        <Button variant="outline" onClick={() => refetch()} className="mt-2 h-8 hover:cursor-pointer">
+          Retry Connection
+        </Button>
+      </div>
+    )
+  }
+
+  const meta = data?.meta
+  const totalPages = meta?.totalPages || 1
 
   return (
     <div className="min-h-screen space-y-6 bg-slate-50 p-4 text-slate-900 md:p-6 dark:bg-slate-900 dark:text-slate-50">
@@ -219,7 +293,7 @@ export default function BoardAccess() {
           </h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Manage system access criteria and instantly revoke or elevate
-            operator tokens.
+            operator role clearances.
           </p>
         </div>
 
@@ -228,28 +302,21 @@ export default function BoardAccess() {
             size="sm"
             variant="outline"
             onClick={handleExportPDF}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto hover:cursor-pointer"
           >
             <Download className="mr-2 h-4 w-4" /> Export Data (PDF)
-          </Button>
-          <Button
-            size="sm"
-            onClick={rotateTokens}
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" /> Rotate Access Tokens
           </Button>
         </div>
       </div>
 
-      <Card className="shadow-sm">
+      <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
         <CardContent className="p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative flex-1">
               <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search by name, token string, role identity..."
-                className="w-full bg-white pl-9 dark:bg-slate-800"
+                className="w-full bg-white pl-9 dark:bg-slate-800 border-slate-200 focus-visible:ring-rose-800/10 focus-visible:border-slate-300 shadow-none"
                 value={globalFilter}
                 onChange={(e) => setGlobalFilter(e.target.value)}
               />
@@ -260,12 +327,12 @@ export default function BoardAccess() {
                 <Filter className="h-3.5 w-3.5" />
                 <span>Filter Tier:</span>
               </div>
-              {["All", "General", "Pastoral", "Board"].map((tier) => (
+              {["All", "General", "Pastoral", "Board", "Super Admin"].map((tier) => (
                 <Button
                   key={tier}
                   variant={selectedTier === tier ? "default" : "outline"}
                   size="sm"
-                  className="h-8 px-3 text-xs"
+                  className="h-8 px-3 text-xs hover:cursor-pointer"
                   onClick={() => setSelectedTier(tier)}
                 >
                   {tier}
@@ -276,7 +343,7 @@ export default function BoardAccess() {
         </CardContent>
       </Card>
 
-      <Card className="overflow-hidden shadow-sm">
+      <Card className="overflow-hidden shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
         <CardHeader className="border-b border-slate-100 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-900/50">
           <div className="flex items-center justify-between">
             <div>
@@ -288,7 +355,6 @@ export default function BoardAccess() {
                 current criteria.
               </CardDescription>
             </div>
-            <SlidersHorizontal className="hidden h-4 w-4 text-slate-400 sm:block" />
           </div>
         </CardHeader>
 
@@ -299,7 +365,7 @@ export default function BoardAccess() {
               No matching security profiles identified inside this scope.
             </div>
           ) : (
-            <div className="hidden md:block">
+            <div className="block overflow-x-auto">
               <Table>
                 <TableHeader className="bg-slate-50/70 dark:bg-slate-800/40">
                   {table.getHeaderGroups().map((headerGroup) => (
@@ -320,7 +386,7 @@ export default function BoardAccess() {
                 </TableHeader>
                 <TableBody>
                   {table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
+                    <TableRow key={row.id} className="hover:bg-slate-50/40 border-b border-slate-100 dark:border-slate-900">
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}
@@ -340,55 +406,34 @@ export default function BoardAccess() {
           )}
         </CardContent>
         {/* PAGINATION SECTION */}
-        <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4">
-          <div className="text-xs text-slate-500">
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4 dark:border-slate-800">
+            <div className="text-xs text-slate-500">
+              Page {currentPage} of {totalPages}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="hover:cursor-pointer h-9 px-3 text-xs"
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="hover:cursor-pointer h-9 px-3 text-xs"
+              >
+                Next
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        )}
       </Card>
-
-      <div className="flex items-center justify-center gap-2 pt-2 text-xs text-slate-400 dark:text-slate-500">
-        <Terminal className="h-3.5 w-3.5 text-primary" />
-        <span>
-          Cryptographic audit log system fully locked down under active global
-          configurations.
-        </span>
-      </div>
     </div>
   )
 }
