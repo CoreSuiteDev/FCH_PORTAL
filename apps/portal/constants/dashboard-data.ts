@@ -79,6 +79,21 @@ export const data = {
       ],
     },
     {
+      title: "News Manager",
+      url: "/admin/news",
+      icon: IconFileText,
+      items: [
+        {
+          title: "Manage News",
+          url: "/admin/news",
+        },
+        {
+          title: "Manage Authors",
+          url: "/admin/news/authors",
+        },
+      ],
+    },
+    {
       title: "Events Manager",
       url: "/admin/events",
       icon: IconCalendarEvent,

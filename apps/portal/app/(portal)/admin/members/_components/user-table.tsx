@@ -32,6 +32,7 @@ import {
 import { Badge } from "@workspace/ui/components/badge"
 import { Input } from "@workspace/ui/components/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
+import { Skeleton } from "@workspace/ui/components/skeleton"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -394,9 +395,34 @@ const UserTable = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <Loader2 className="h-10 w-10 text-slate-500 animate-spin" />
-        <p className="text-sm font-medium text-slate-500">Retrieving system members database...</p>
+      <div className="space-y-4 animate-pulse mt-6">
+        <div className="flex gap-2">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-8 w-28 rounded-md bg-slate-200 dark:bg-slate-800" />
+          ))}
+        </div>
+        <div className="border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-950 overflow-hidden shadow-none">
+          <div className="border-b border-slate-100 dark:border-slate-800 px-6 py-4 space-y-2">
+            <Skeleton className="h-5 w-44 rounded bg-slate-200 dark:bg-slate-800" />
+            <Skeleton className="h-3.5 w-72 rounded bg-slate-200 dark:bg-slate-800" />
+          </div>
+          <div className="p-6 space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 dark:border-slate-900">
+                <div className="flex gap-4 items-center">
+                  <Skeleton className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-800" />
+                  <div className="space-y-1">
+                    <Skeleton className="h-4 w-32 rounded bg-slate-200 dark:bg-slate-800" />
+                    <Skeleton className="h-3 w-44 rounded bg-slate-200 dark:bg-slate-800" />
+                  </div>
+                </div>
+                <Skeleton className="h-4 w-20 rounded bg-slate-200 dark:bg-slate-800" />
+                <Skeleton className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-800" />
+                <Skeleton className="h-8 w-20 rounded bg-slate-200 dark:bg-slate-800" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }

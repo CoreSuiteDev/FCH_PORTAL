@@ -10,6 +10,8 @@ import { resourcesRouter } from "../apps/modules/resources/resources.router.js";
 import { packageRouter } from "../apps/modules/package/package.router.js";
 import { inqueryRouter } from "../apps/modules/inquery/inquery.router.js";
 import { sponsorPlanRouter } from "../apps/modules/sponsor-plan/sponsor-plan.router.js";
+import { newsRouter } from "../apps/modules/news/news.router.js";
+import { authorRouter } from "../apps/modules/author/author.router.js";
 
 // Root Router
 export const appRouter = router({
@@ -41,6 +43,8 @@ export const appRouter = router({
   package: packageRouter,
   inquery: inqueryRouter,
   sponsorPlan: sponsorPlanRouter,
+  news: newsRouter,
+  author: authorRouter,
 });
 
 export type AppRouter = typeof appRouter;
