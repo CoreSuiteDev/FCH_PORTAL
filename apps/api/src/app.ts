@@ -47,6 +47,7 @@ app.get("/api/auth/session-info", async (req, res): Promise<any> => {
 
     const session = await auth.api.getSession({ headers })
     if (!session) {
+      console.log("[session-info] No session found in request headers")
       return res.status(200).json({ authenticated: false, roles: [] })
     }
 
@@ -62,6 +63,7 @@ app.get("/api/auth/session-info", async (req, res): Promise<any> => {
     })
 
     const roles = userWithRoles?.userRoles.map((ur) => ur.role.name) || []
+    console.log("[session-info] Found session for user:", session.user.email, "with roles:", roles)
 
     return res.status(200).json({
       authenticated: true,

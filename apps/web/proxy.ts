@@ -11,6 +11,7 @@ export async function proxy(request: NextRequest) {
     "/forgot-password",
     "/reset-password",
     "/verify-otp",
+    "/sp-admin",
   ].some((path) => pathname.startsWith(path))
 
   if (isAuthPage) {
@@ -35,8 +36,6 @@ export async function proxy(request: NextRequest) {
         if (response.ok) {
           const data = await response.json()
           if (data && data.authenticated && data.user) {
-            // Only redirect to portal if the user has an allowed role.
-            // Plain 'USER' role (default on registration) should NOT access the portal.
             const PORTAL_ROLES = ["MEMBER", "PASTORAL", "BOARD", "SUPER_ADMIN"]
             const userRoles: string[] = data.user.roles ?? []
             const hasPortalAccess = userRoles.some((r) =>
@@ -47,6 +46,8 @@ export async function proxy(request: NextRequest) {
               const portalUrl =
                 process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
               return NextResponse.redirect(new URL(portalUrl))
+            } else {
+              return NextResponse.redirect(new URL("/", request.url))
             }
           }
         }
@@ -66,5 +67,6 @@ export const config = {
     "/forgot-password",
     "/reset-password",
     "/verify-otp",
+    "/sp-admin",
   ],
 }

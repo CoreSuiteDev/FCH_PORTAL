@@ -192,11 +192,12 @@ export const PlanFormDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-   
-      <DialogContent className="flex max-h-[90vh] flex-col min-w-md lg:min-w-xl p-0 sm:max-w-[600px]">
-        <form onSubmit={handleSubmit(onSubmit)} className="flex h-full flex-col overflow-hidden">
-          
-          <div className="px-6 pb-2 pt-6">
+      <DialogContent className="flex max-h-[90vh] min-w-md flex-col p-0 sm:max-w-[600px] lg:min-w-xl">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex h-full flex-col overflow-hidden"
+        >
+          <div className="px-6 pt-6 pb-2">
             <DialogHeader>
               <DialogTitle>
                 {editingPlan ? "Edit Sponsor Plan" : "Create Sponsor Plan"}
@@ -238,7 +239,10 @@ export const PlanFormDialog = ({
                     control={control}
                     name="currency"
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>

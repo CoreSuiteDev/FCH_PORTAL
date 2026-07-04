@@ -216,11 +216,26 @@ export class DonationService {
       paymentMethodId,
     } = body
 
+    let donorName = name
+    let donorEmail = email
+    let donorPhone = phone
+
+    if (userId) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      })
+      if (user) {
+        donorName = user.name
+        donorEmail = user.email
+        donorPhone = user.phone ?? phone
+      }
+    }
+
     // Upsert donator — handles repeat donors with the same email gracefully
     const donator = await prisma.donator.upsert({
-      where: { email },
-      update: { name, phone: phone ?? undefined },
-      create: { name, email, phone: phone ?? undefined },
+      where: { email: donorEmail },
+      update: { name: donorName, phone: donorPhone ?? undefined },
+      create: { name: donorName, email: donorEmail, phone: donorPhone ?? undefined },
     })
 
     const amountInCents = Math.round(amount * 100)
@@ -292,8 +307,6 @@ export class DonationService {
     }
   }
 
-
-
   static async getDonationHistory(params: { page: number; limit: number }) {
     const { page, limit } = params
     const skip = (page - 1) * limit
@@ -327,15 +340,29 @@ export class DonationService {
 }
 
 
-
 export class SponsorShipService {
  static async createStripeSponsorship(body: ZTSponsorshipInput) {
     const { amount, currency, email, phone, name, paymentMethodId, tier, userId, description } = body
 
+    let sponsorName = name
+    let sponsorEmail = email
+    let sponsorPhone = phone
+
+    if (userId) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      })
+      if (user) {
+        sponsorName = user.name
+        sponsorEmail = user.email
+        sponsorPhone = user.phone ?? phone
+      }
+    }
+
     const sponsor = await prisma.sponsor.upsert({
-      where: { email },
-      update: { name, phone: phone ?? undefined },
-      create: { name, email, phone: phone ?? undefined },
+      where: { email: sponsorEmail },
+      update: { name: sponsorName, phone: sponsorPhone ?? undefined },
+      create: { name: sponsorName, email: sponsorEmail, phone: sponsorPhone ?? undefined },
     })
 
     const amountInCents = Math.round(amount * 100)
@@ -440,8 +467,5 @@ export class SponsorShipService {
 
     return { data, totalCount }
   }
-
-  
-
   
 }

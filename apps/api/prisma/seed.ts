@@ -3,8 +3,8 @@
 
 // async function main() {
 //   console.log("Seeding admin user...")
-//   const adminEmail = "smmasrafi2003@gmail.com"
-//   const adminPassword = "AdminPassword123!"
+//   const adminEmail = "smmasrafi01@gmail.com"
+//   const adminPassword = "admin@123"
 //   const adminName = "Admin User"
 
 //   let user = await prisma.user.findUnique({

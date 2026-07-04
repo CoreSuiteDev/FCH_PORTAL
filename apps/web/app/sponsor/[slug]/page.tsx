@@ -1,7 +1,12 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js"
+import {
+  CardElement,
+  Elements,
+  useElements,
+  useStripe,
+} from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
 import {
   ArrowLeft,
@@ -13,12 +18,15 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import Container from "@/components/shared/container"
-import { useCreateSponsorship, useSponsorPlanById } from "@/hooks/useSponsorPlan"
+import {
+  useCreateSponsorship,
+  useSponsorPlanById,
+} from "@/hooks/useSponsorPlan"
 import { authClient } from "@/lib/auth"
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
@@ -26,7 +34,9 @@ import { Field, FieldError, FieldLabel } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
 import { toast } from "@workspace/ui/components/sonner"
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || "")
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || ""
+)
 
 const personalInfoSchema = z.object({
   name: z.string().min(2, "Name is required (at least 2 characters)"),
@@ -61,7 +71,8 @@ function TierDetails() {
   const { data: dbTier, isLoading } = useSponsorPlanById(slug)
 
   // Submit sponsorship mutation
-  const { mutateAsync: createSponsorship, isPending: isMutating } = useCreateSponsorship()
+  const { mutateAsync: createSponsorship, isPending: isMutating } =
+    useCreateSponsorship()
 
   // Steps State
   const [currentStep, setCurrentStep] = useState<1 | 2>(1)
@@ -71,7 +82,7 @@ function TierDetails() {
   const {
     register,
     handleSubmit,
-    trigger, 
+    trigger,
     formState: { errors },
     reset,
   } = useForm<PersonalInfoValues>({
@@ -83,6 +94,18 @@ function TierDetails() {
     },
   })
 
+  const user = session?.user
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        name: user.name || "",
+        email: user.email || "",
+        phone: (user as any).phone || "",
+      })
+    }
+  }, [user, reset])
+
   // Loading State (Skeleton)
   if (isLoading) {
     return (
@@ -90,17 +113,17 @@ function TierDetails() {
         <Container className="max-w-5xl">
           <Link
             href="/sponsor"
-            className="mb-8 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 hover:cursor-pointer"
+            className="mb-8 inline-flex items-center text-sm font-medium text-gray-500 hover:cursor-pointer hover:text-gray-900"
           >
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Pricing Registry
           </Link>
           <div className="grid gap-8 md:grid-cols-2">
-            <Card className="animate-pulse rounded-xl border border-gray-200 bg-white p-8 shadow-none space-y-6">
+            <Card className="animate-pulse space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-none">
               <div className="h-4 w-1/3 rounded bg-gray-200" />
               <div className="h-8 w-2/3 rounded bg-gray-200" />
               <div className="h-20 w-full rounded bg-gray-200" />
             </Card>
-            <Card className="animate-pulse rounded-xl border border-gray-200 bg-white p-8 shadow-none space-y-6">
+            <Card className="animate-pulse space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-none">
               <div className="h-6 w-1/2 rounded bg-gray-200" />
               <div className="h-10 w-full rounded bg-gray-200" />
               <div className="h-10 w-full rounded bg-gray-200" />
@@ -129,12 +152,15 @@ function TierDetails() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
             <ArrowLeft size={24} />
           </div>
-          <h2 className="text-xl font-bold text-gray-900">Sponsor Plan Not Found</h2>
+          <h2 className="text-xl font-bold text-gray-900">
+            Sponsor Plan Not Found
+          </h2>
           <p className="mt-2 text-sm text-gray-500">
-            The sponsorship tier you are looking for does not exist or has been removed.
+            The sponsorship tier you are looking for does not exist or has been
+            removed.
           </p>
           <Link href="/sponsor" className="mt-6 inline-block">
-            <Button className="rounded-lg bg-gray-900 px-6 py-2 font-medium text-white hover:bg-gray-800 hover:cursor-pointer">
+            <Button className="rounded-lg bg-gray-900 px-6 py-2 font-medium text-white hover:cursor-pointer hover:bg-gray-800">
               Back to Sponsorship
             </Button>
           </Link>
@@ -143,7 +169,9 @@ function TierDetails() {
     )
   }
 
-  const basePrice = dbTier ? dbTier.amount : parseFloat(tier.price.replace(/[^0-9.-]+/g, ""))
+  const basePrice = dbTier
+    ? dbTier.amount
+    : parseFloat(tier.price.replace(/[^0-9.-]+/g, ""))
   const setupFee = 0
   const totalAmount = basePrice + setupFee
 
@@ -162,22 +190,23 @@ function TierDetails() {
 
     setStripeError(null)
     const cardElement = elements.getElement(CardElement)
-    
+
     if (!cardElement) {
       setStripeError("Payment fields are not ready. Please refresh.")
       return
     }
 
     try {
-      const { paymentMethod, error: stripeErr } = await stripe.createPaymentMethod({
-        type: "card",
-        card: cardElement,
-        billing_details: {
-          name: data.name,
-          email: data.email,
-          phone: data.phone || undefined,
-        },
-      })
+      const { paymentMethod, error: stripeErr } =
+        await stripe.createPaymentMethod({
+          type: "card",
+          card: cardElement,
+          billing_details: {
+            name: data.name,
+            email: data.email,
+            phone: data.phone || undefined,
+          },
+        })
 
       if (stripeErr) {
         throw new Error(stripeErr.message || "Failed to process card details.")
@@ -203,12 +232,12 @@ function TierDetails() {
       toast.success("Payment Successful! Generating your receipt...")
       reset()
       cardElement.clear()
-      
-      // রিডাইরেক্ট করার সময় URL Parameter দিয়ে ডেটা পাঠিয়ে দিচ্ছি যেন রিসিট পেজে দেখানো যায়
-      router.push(`/sponsor/success?tier=${encodeURIComponent(tier.title)}&amount=${totalAmount}&currency=${dbTier?.currency || "USD"}&txId=${paymentMethod.id}`)
 
+      router.push(
+        `/sponsor/success?tier=${encodeURIComponent(tier.title)}&amount=${totalAmount}&currency=${dbTier?.currency || "USD"}&txId=${paymentMethod.id}`
+      )
     } catch (err: unknown) {
-      if(err instanceof Error){
+      if (err instanceof Error) {
         setStripeError(err.message)
       }
     }
@@ -219,7 +248,7 @@ function TierDetails() {
       <Container className="max-w-5xl">
         <Link
           href="/sponsor"
-          className="mb-8 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 hover:cursor-pointer"
+          className="mb-8 inline-flex items-center text-sm font-medium text-gray-500 hover:cursor-pointer hover:text-gray-900"
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Pricing Registry
         </Link>
@@ -231,16 +260,22 @@ function TierDetails() {
               <span className="inline-block rounded-md bg-rose-50 px-2.5 py-0.5 text-xs font-medium text-rose-800">
                 Selected Configuration Package
               </span>
-              <h1 className="mt-4 text-3xl font-bold text-gray-900">{tier.title}</h1>
-              <p className="mt-4 text-sm leading-relaxed text-gray-600">{tier.description}</p>
+              <h1 className="mt-4 text-3xl font-bold text-gray-900">
+                {tier.title}
+              </h1>
+              <p className="mt-4 text-sm leading-relaxed text-gray-600">
+                {tier.description}
+              </p>
 
               <div className="mt-8">
-                <span className="text-4xl font-bold text-gray-900">{tier.price}</span>
+                <span className="text-4xl font-bold text-gray-900">
+                  {tier.price}
+                </span>
                 <span className="ml-2 text-gray-500">/ {tier.period}</span>
               </div>
 
               <div className="mt-8 space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                <p className="text-xs font-bold tracking-wider text-gray-400 uppercase">
                   Included Core Features:
                 </p>
                 {tier.features?.map((feat: string, i: number) => (
@@ -268,49 +303,62 @@ function TierDetails() {
 
             <CardContent className="p-6">
               <div className="mb-6 flex gap-2">
-                <div className={`h-1 flex-1 rounded-full ${currentStep >= 1 ? "bg-rose-800" : "bg-gray-200"}`} />
-                <div className={`h-1 flex-1 rounded-full ${currentStep === 2 ? "bg-rose-800" : "bg-gray-200"}`} />
+                <div
+                  className={`h-1 flex-1 rounded-full ${currentStep >= 1 ? "bg-rose-800" : "bg-gray-200"}`}
+                />
+                <div
+                  className={`h-1 flex-1 rounded-full ${currentStep === 2 ? "bg-rose-800" : "bg-gray-200"}`}
+                />
               </div>
 
-              <form onSubmit={handleSubmit(handlePaymentSubmit)} className="space-y-4">
+              <form
+                onSubmit={handleSubmit(handlePaymentSubmit)}
+                className="space-y-4"
+              >
                 {currentStep === 1 && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
+                  <div className="animate-in space-y-4 fade-in slide-in-from-right-4">
                     <Field data-invalid={!!errors.name}>
-                      <FieldLabel className="text-[10px] font-bold uppercase text-gray-500">Full Name</FieldLabel>
+                      <FieldLabel className="text-[10px] font-bold text-gray-500 uppercase">
+                        Full Name
+                      </FieldLabel>
                       <Input
                         {...register("name")}
                         placeholder="John Doe"
                         className="h-10 border-gray-200"
-                        disabled={isMutating}
+                        disabled={isMutating || !!user}
                       />
                       {errors.name && <FieldError errors={[errors.name]} />}
                     </Field>
                     <Field data-invalid={!!errors.email}>
-                      <FieldLabel className="text-[10px] font-bold uppercase text-gray-500">Email Address</FieldLabel>
+                      <FieldLabel className="text-[10px] font-bold text-gray-500 uppercase">
+                        Email Address
+                      </FieldLabel>
                       <Input
                         {...register("email")}
                         type="email"
                         placeholder="john@example.com"
                         className="h-10 border-gray-200"
-                        disabled={isMutating}
+                        disabled={isMutating || !!user}
                       />
                       {errors.email && <FieldError errors={[errors.email]} />}
                     </Field>
                     <Field data-invalid={!!errors.phone}>
-                      <FieldLabel className="text-[10px] font-bold uppercase text-gray-500">Phone Number</FieldLabel>
+                      <FieldLabel className="text-[10px] font-bold text-gray-500 uppercase">
+                        Phone Number
+                      </FieldLabel>
                       <Input
                         {...register("phone")}
                         type="tel"
                         placeholder="+880 1XXXXXXXXX"
                         className="h-10 border-gray-200"
-                        disabled={isMutating}
+                        disabled={isMutating || !!user}
                       />
                       {errors.phone && <FieldError errors={[errors.phone]} />}
                     </Field>
                     <Button
                       type="button"
                       onClick={handleNextStep}
-                      className="mt-6 h-12 w-full bg-rose-800 text-base font-semibold hover:bg-rose-900 hover:cursor-pointer"
+                      className="mt-6 h-12 w-full bg-rose-800 text-base font-semibold hover:cursor-pointer hover:bg-rose-900"
                       disabled={isMutating}
                     >
                       Continue to Payment
@@ -319,9 +367,11 @@ function TierDetails() {
                 )}
 
                 {currentStep === 2 && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
+                  <div className="animate-in space-y-4 fade-in slide-in-from-right-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase text-gray-500">Card Details</label>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">
+                        Card Details
+                      </label>
                       <div className="rounded-md border border-gray-200 bg-white p-3 shadow-sm">
                         <CardElement
                           options={{
@@ -336,14 +386,19 @@ function TierDetails() {
                           }}
                         />
                       </div>
-                      {stripeError && <p className="text-xs font-medium text-red-500 mt-2">{stripeError}</p>}
+                      {stripeError && (
+                        <p className="mt-2 text-xs font-medium text-red-500">
+                          {stripeError}
+                        </p>
+                      )}
                     </div>
 
                     <div className="mt-6 space-y-3 rounded-lg border border-gray-100 p-4 text-sm">
                       <div className="flex justify-between border-t border-gray-100 pt-3 font-bold text-gray-900">
                         <span>Total Billable Amount:</span>
                         <span>
-                          {tier.price.charAt(0)}{totalAmount.toLocaleString()}
+                          {tier.price.charAt(0)}
+                          {totalAmount.toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -360,7 +415,7 @@ function TierDetails() {
                       </Button>
                       <Button
                         type="submit"
-                        className="h-12 flex-1 bg-rose-800 text-base font-semibold hover:bg-rose-900 hover:cursor-pointer"
+                        className="h-12 flex-1 bg-rose-800 text-base font-semibold hover:cursor-pointer hover:bg-rose-900"
                         disabled={!stripe || isMutating}
                       >
                         {isMutating ? (

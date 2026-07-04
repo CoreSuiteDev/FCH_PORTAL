@@ -42,7 +42,8 @@ export const SponsorPlansTable = ({
       <div className="p-6">
         <h2 className="text-lg font-semibold">Tiers & Plans Directory</h2>
         <p className="text-sm text-slate-500">
-          A list of all active sponsorship plans configured for Stripe collection.
+          A list of all active sponsorship plans configured for Stripe
+          collection.
         </p>
       </div>
 
@@ -87,7 +88,9 @@ export const SponsorPlansTable = ({
                     {plan.tier}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-medium text-slate-900">{plan.planName}</TableCell>
+                <TableCell className="font-medium text-slate-900">
+                  {plan.planName}
+                </TableCell>
                 <TableCell className="font-bold text-slate-900">
                   {plan.currency === "USD" ? "$ " : "€"}
                   {plan.amount}
@@ -99,14 +102,14 @@ export const SponsorPlansTable = ({
                         <Badge
                           key={i}
                           variant="secondary"
-                          className="bg-slate-100 text-slate-600 text-xs font-normal"
+                          className="bg-slate-100 text-xs font-normal text-slate-600"
                         >
                           {b}
                         </Badge>
                       ))}
                   </div>
                 </TableCell>
-                <TableCell className="max-w-xs text-slate-500 truncate">
+                <TableCell className="max-w-xs truncate text-slate-500">
                   {plan.description || "N/A"}
                 </TableCell>
                 <TableCell className="text-right">
@@ -133,7 +136,10 @@ export const SponsorPlansTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="h-64 text-center text-slate-500">
+              <TableCell
+                colSpan={6}
+                className="h-64 text-center text-slate-500"
+              >
                 No sponsor plans found. Create one to get started.
               </TableCell>
             </TableRow>

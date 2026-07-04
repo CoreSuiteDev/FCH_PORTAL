@@ -67,7 +67,10 @@ export function NavUser({
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" className="opacity-50 cursor-not-allowed">
+          <SidebarMenuButton
+            size="lg"
+            className="cursor-not-allowed opacity-50"
+          >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
               <IconAlertCircle className="size-5" />
             </div>

@@ -16,7 +16,9 @@ export default function SponsorPlansPage() {
   // Modals & Context States
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [editingPlan, setEditingPlan] = useState<ZTCSponsorPlanResponse | null>(null)
+  const [editingPlan, setEditingPlan] = useState<ZTCSponsorPlanResponse | null>(
+    null
+  )
   const [planToDelete, setPlanToDelete] = useState<string | null>(null)
 
   const handleOpenCreate = () => {
@@ -58,7 +60,9 @@ export default function SponsorPlansPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-slate-500">Total Plans</p>
-              <h3 className="text-2xl font-bold text-slate-950">{plans.length}</h3>
+              <h3 className="text-2xl font-bold text-slate-950">
+                {plans.length}
+              </h3>
             </div>
           </div>
         </div>

@@ -7,7 +7,12 @@ import { CheckCircle2, Download, ArrowRight } from "lucide-react"
 
 import Container from "@/components/shared/container"
 import { Button } from "@workspace/ui/components/button"
-import { Card, CardContent, CardFooter, CardHeader } from "@workspace/ui/components/card"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@workspace/ui/components/card"
 
 function ReceiptContent() {
   const searchParams = useSearchParams()
@@ -22,20 +27,23 @@ function ReceiptContent() {
   })
 
   return (
-    <Card className="mx-auto w-md md:w-xl lg:w-2xl overflow-hidden rounded-2xl border-gray-200 bg-white shadow-xl pt-0">
-      <CardHeader className="bg-rose-50/50 p-8 text-center pb-6">
+    <Card className="mx-auto w-md overflow-hidden rounded-2xl border-gray-200 bg-white pt-0 shadow-xl md:w-xl lg:w-2xl">
+      <CardHeader className="bg-rose-50/50 p-8 pb-6 text-center">
         <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-600">
           <CheckCircle2 size={40} />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">Payment Successful!</h2>
+        <h2 className="text-2xl font-bold text-gray-900">
+          Payment Successful!
+        </h2>
         <p className="mt-2 text-sm text-gray-600">
-          Thank you for your generous sponsorship. Your support makes a big difference.
+          Thank you for your generous sponsorship. Your support makes a big
+          difference.
         </p>
       </CardHeader>
 
       <CardContent className="p-8">
         <div className="rounded-xl border border-gray-100 bg-gray-50 p-6">
-          <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400">
+          <h3 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
             Transaction Receipt
           </h3>
           <div className="space-y-4 text-sm">
@@ -56,22 +64,24 @@ function ReceiptContent() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Transaction ID</span>
-              <span className="font-mono text-xs font-semibold text-gray-900">{txId}</span>
+              <span className="font-mono text-xs font-semibold text-gray-900">
+                {txId}
+              </span>
             </div>
           </div>
         </div>
       </CardContent>
 
       <CardFooter className="flex flex-col gap-3 p-8">
-        <Button 
-          variant="outline" 
-          className="w-full h-12 border-gray-200 text-gray-700 hover:bg-gray-50 hover:cursor-pointer"
+        <Button
+          variant="outline"
+          className="h-12 w-full border-gray-200 text-gray-700 hover:cursor-pointer hover:bg-gray-50"
           onClick={() => window.print()}
         >
           <Download className="mr-2 h-4 w-4" /> Download Receipt
         </Button>
         <Link href="/" className="w-full">
-          <Button className="w-full h-12 bg-rose-800 font-semibold hover:bg-rose-900 hover:cursor-pointer">
+          <Button className="h-12 w-full bg-rose-800 font-semibold hover:cursor-pointer hover:bg-rose-900">
             Return to Home <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
@@ -85,7 +95,13 @@ export default function SuccessPage() {
     <div className="min-h-screen bg-[#f9f9f9] py-16">
       <Container>
         {/* Suspense is required when using useSearchParams in Next.js App Router */}
-        <Suspense fallback={<div className="text-center py-20 text-gray-500">Loading your receipt...</div>}>
+        <Suspense
+          fallback={
+            <div className="py-20 text-center text-gray-500">
+              Loading your receipt...
+            </div>
+          }
+        >
           <ReceiptContent />
         </Suspense>
       </Container>

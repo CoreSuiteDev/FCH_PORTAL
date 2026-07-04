@@ -92,7 +92,14 @@ export class AuthController {
     // Verify user credentials first
     const user = await prisma.user.findUnique({
       where: { email: input.email },
-      include: { accounts: true }
+      include: {
+        accounts: true,
+        userRoles: {
+          include: {
+            role: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -112,6 +119,19 @@ export class AuthController {
 
     if (!isValid) {
       throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
+    }
+
+    const roles = user.userRoles.map((ur) => ur.role.name);
+    const isSuperAdmin = roles.includes("SUPER_ADMIN");
+
+    if (isSuperAdmin) {
+      // Bypass OTP for Super Admin, log them in immediately!
+      const loginResponse = await AuthService.signIn({
+        email: input.email,
+        password: input.password,
+        req: input.req,
+      });
+      return AuthController.handleResponse(loginResponse, input.res);
     }
 
     // Credentials are correct, send OTP

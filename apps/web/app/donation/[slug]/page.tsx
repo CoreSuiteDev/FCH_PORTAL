@@ -8,7 +8,12 @@ import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { loadStripe } from "@stripe/stripe-js"
-import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js"
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js"
 
 // Workspace UI Components
 import { Button } from "@workspace/ui/components/button"
@@ -21,8 +26,11 @@ import {
 } from "@workspace/ui/components/field"
 import Container from "@/components/shared/container"
 import { useDonate } from "@/hooks/useDonation"
+import { authClient } from "@/lib/auth"
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || "")
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || ""
+)
 
 // Zod validation schema
 const paymentSchema = z.object({
@@ -53,6 +61,8 @@ function DonateDetailsForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const { mutateAsync: donate, isPending } = useDonate()
+  const { data: session } = authClient.useSession()
+  const user = session?.user
 
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
@@ -62,6 +72,16 @@ function DonateDetailsForm() {
       phone: "",
     },
   })
+
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        name: user.name || "",
+        email: user.email || "",
+        phone: (user as any).phone || "",
+      })
+    }
+  }, [user, form])
 
   useEffect(() => {
     if (showSuccessModal) {
@@ -107,6 +127,7 @@ function DonateDetailsForm() {
         email: data.email,
         phone: data.phone || undefined,
         paymentMethodId: paymentMethod.id,
+        userId: user?.id || undefined,
       })
 
       // Successful payment!
@@ -115,7 +136,10 @@ function DonateDetailsForm() {
       cardElement.clear()
     } catch (err: unknown) {
       console.error("Payment Error:", err)
-      const msg = err instanceof Error ? err.message : "An unexpected error occurred during payment."
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred during payment."
       setErrorMessage(msg)
     }
   }
@@ -123,7 +147,7 @@ function DonateDetailsForm() {
   return (
     <section>
       <Container className="py-12">
-        <button className="mb-6 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+        <button className="mb-6 text-sm text-gray-500 transition-colors hover:text-gray-800">
           {t("back")}
         </button>
 
@@ -171,10 +195,13 @@ function DonateDetailsForm() {
                 </h2>
               </div>
 
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 {/* Donor Details Section */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-[#8B0033]">
+                  <h3 className="text-xs font-extrabold tracking-widest text-[#8B0033] uppercase">
                     {t("payment.donorSection")}
                   </h3>
                   <FieldGroup className="space-y-4">
@@ -191,12 +218,15 @@ function DonateDetailsForm() {
                             {...field}
                             type="text"
                             placeholder="John Doe"
-                            disabled={isPending}
+                            disabled={isPending || !!user}
                             aria-invalid={fieldState.invalid}
-                            className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 focus-visible:border-gray-300 focus-visible:ring-0 shadow-none"
+                            className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 shadow-none focus-visible:border-gray-300 focus-visible:ring-0"
                           />
                           {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} className="mt-1" />
+                            <FieldError
+                              errors={[fieldState.error]}
+                              className="mt-1"
+                            />
                           )}
                         </Field>
                       )}
@@ -216,12 +246,15 @@ function DonateDetailsForm() {
                               {...field}
                               type="email"
                               placeholder="johndoe@example.com"
-                              disabled={isPending}
+                              disabled={isPending || !!user}
                               aria-invalid={fieldState.invalid}
-                              className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 focus-visible:border-gray-300 focus-visible:ring-0 shadow-none"
+                              className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 shadow-none focus-visible:border-gray-300 focus-visible:ring-0"
                             />
                             {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} className="mt-1" />
+                              <FieldError
+                                errors={[fieldState.error]}
+                                className="mt-1"
+                              />
                             )}
                           </Field>
                         )}
@@ -242,10 +275,13 @@ function DonateDetailsForm() {
                               placeholder="+1 (555) 000-0000"
                               disabled={isPending}
                               aria-invalid={fieldState.invalid}
-                              className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 focus-visible:border-gray-300 focus-visible:ring-0 shadow-none"
+                              className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 shadow-none focus-visible:border-gray-300 focus-visible:ring-0"
                             />
                             {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} className="mt-1" />
+                              <FieldError
+                                errors={[fieldState.error]}
+                                className="mt-1"
+                              />
                             )}
                           </Field>
                         )}
@@ -258,10 +294,10 @@ function DonateDetailsForm() {
 
                 {/* Card Details Section */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-[#8B0033]">
+                  <h3 className="text-xs font-extrabold tracking-widest text-[#8B0033] uppercase">
                     {t("payment.cardSection")}
                   </h3>
-                  <div className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm space-y-4">
+                  <div className="space-y-4 rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm">
                     <FieldGroup className="space-y-4">
                       <Field>
                         <FieldLabel className="text-xs font-bold tracking-wider text-gray-500 uppercase">
@@ -307,7 +343,7 @@ function DonateDetailsForm() {
                 </div>
 
                 {errorMessage && (
-                  <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600 border border-red-100 font-medium">
+                  <div className="rounded-lg border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-600">
                     {errorMessage}
                   </div>
                 )}
@@ -315,7 +351,7 @@ function DonateDetailsForm() {
                 <Button
                   type="submit"
                   disabled={isPending}
-                  className="w-full rounded-lg bg-[#AC172C] py-6 text-lg font-bold text-white hover:bg-[#8F1324] transition-colors"
+                  className="w-full rounded-lg bg-[#AC172C] py-6 text-lg font-bold text-white transition-colors hover:bg-[#8F1324]"
                 >
                   {isPending ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -335,11 +371,11 @@ function DonateDetailsForm() {
 
       {/* Success Popup */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
-          <div className="relative w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/50 p-4 duration-200 fade-in">
+          <div className="relative w-full max-w-sm animate-in rounded-2xl bg-white p-8 text-center shadow-xl duration-200 zoom-in-95">
             <button
               onClick={() => setShowSuccessModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors"
+              className="absolute top-4 right-4 text-gray-400 transition-colors hover:text-black"
             >
               <X size={20} />
             </button>

@@ -21,7 +21,7 @@ import Link from "next/link"
 import { useSessionInfo } from "@/hooks/use-session-info"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: userinfo , isLoading, isError} = useSessionInfo()
+  const { data: userinfo, isLoading, isError } = useSessionInfo()
   const roles = userinfo?.user?.roles || []
 
   // navSecondary theke items gulo ke separate/filter kore nilam static title er jonno
@@ -121,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={sidebarUser}  isLoading={isLoading} isError={isError}/>
+        <NavUser user={sidebarUser} isLoading={isLoading} isError={isError} />
       </SidebarFooter>
     </Sidebar>
   )

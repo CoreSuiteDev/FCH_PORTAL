@@ -1,27 +1,25 @@
 import { api } from "@/lib/api-client"
 import { useQuery, useMutation } from "@tanstack/react-query"
 
-
-
 export const useSponsorPlan = () => {
-    return useQuery({
-        queryKey: ["sponsor-plans"],
-        queryFn: async () => {
-            const res = await api.get("/sponsor-plan/get")
-            return res.data
-        },
-    })
+  return useQuery({
+    queryKey: ["sponsor-plans"],
+    queryFn: async () => {
+      const res = await api.get("/sponsor-plan/get")
+      return res.data
+    },
+  })
 }
 
 export const useSponsorPlanById = (id: string) => {
-    return useQuery({
-        queryKey: ["sponsor-plans", id],
-        queryFn: async () => {
-            const res = await api.get(`/sponsor-plan/${id}`)
-            return res.data
-        },
-        enabled: !!id,
-    })
+  return useQuery({
+    queryKey: ["sponsor-plans", id],
+    queryFn: async () => {
+      const res = await api.get(`/sponsor-plan/${id}`)
+      return res.data
+    },
+    enabled: !!id,
+  })
 }
 
 export interface CreateSponsorshipPayload {

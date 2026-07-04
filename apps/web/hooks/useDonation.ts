@@ -7,6 +7,7 @@ export interface DonatePayload {
   email: string
   phone?: string
   paymentMethodId: string
+  userId?: string
 }
 
 export const useDonate = () => {
@@ -20,6 +21,7 @@ export const useDonate = () => {
         email: payload.email,
         phone: payload.phone || undefined,
         paymentMethodId: payload.paymentMethodId,
+        userId: payload.userId,
       })
 
       return res.data
