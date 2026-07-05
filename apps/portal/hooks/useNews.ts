@@ -1,9 +1,9 @@
 import { api } from "@/lib/axios"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { ZTCCreateNews, ZTCUpdateNews, ZTCNews } from "@workspace/types"
+import { ZTCCreateNews, ZTCUpdateNews,  ZTCNewsOutput } from "@workspace/types"
 
 interface GetNewsResponse {
-  data: ZTCNews[]
+  data: ZTCNewsOutput[]
   meta: {
     totalCount: number
     page: number

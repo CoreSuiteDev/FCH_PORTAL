@@ -128,6 +128,7 @@ export const ZCICreateEventSchema = z.object({
   categoryIds: z.array(z.string()).optional(),
 });
 export type ZTCCreateEvent = z.infer<typeof ZCICreateEventSchema>;
+export type ZTCCreateEventInput = z.input<typeof ZCICreateEventSchema>;
 
 export const ZCIUpdateEventSchema = z.object({
   title: z.string().min(1, "Title cannot be empty").optional(),
@@ -146,6 +147,9 @@ export const ZCIUpdateEventSchema = z.object({
   status: EventStatusEnum.optional(),
 });
 export type ZTUpdateEvent = z.infer<typeof ZCIUpdateEventSchema>;
+export type ZTUpdateEventInput = z.input<typeof ZCIUpdateEventSchema>;
+
+
 
 // --- ANALYTICS ---
 

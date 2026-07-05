@@ -97,11 +97,16 @@ export const data = {
       title: "Events Manager",
       url: "/admin/events",
       icon: IconCalendarEvent,
-    },
-    {
-      title: "Webinar Library",
-      url: "/admin/webinars",
-      icon: IconVideo,
+      items: [
+        {
+          title: "Manage Events",
+          url: "/admin/events",
+        },
+        {
+          title: "Webinar Library",
+          url: "/admin/webinars",
+        },
+      ],
     },
     {
       title: "Communications",
@@ -198,11 +203,16 @@ export const data = {
       title: "Member Events",
       url: "/portal/events",
       icon: IconCalendarEvent,
-    },
-    {
-      title: "Webinars",
-      url: "/portal/webinars",
-      icon: IconVideo,
+      items: [
+        {
+          title: "Events",
+          url: "/portal/events",
+        },
+        {
+          title: "Webinars",
+          url: "/portal/webinars",
+        },
+      ],
     },
     {
       title: "Basic Resources",

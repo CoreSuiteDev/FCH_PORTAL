@@ -86,6 +86,7 @@ export const ZCICreateNewsSchema = ZCINewsSchema.omit({
   viewCount: true,
 })
 export type ZTCCreateNews = z.infer<typeof ZCICreateNewsSchema>
+export type ZTCCreateNewsInput = z.input<typeof ZCICreateNewsSchema>
 
 export const ZCIUpdateNewsSchema = ZCICreateNewsSchema.partial()
 export type ZTCUpdateNews = z.infer<typeof ZCIUpdateNewsSchema>
