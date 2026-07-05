@@ -52,7 +52,8 @@ export async function proxy(request: NextRequest) {
     const PORTAL_ROLES = ["MEMBER", "PASTORAL", "BOARD", "SUPER_ADMIN"]
     const hasPortalAccess = roles.some((r) => PORTAL_ROLES.includes(r))
     if (!hasPortalAccess) {
-      const webUrl = process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000"
+      const loginUrl = process.env.NEXT_PUBLIC_LOGIN_URL || "http://localhost:3000/login"
+      const webUrl = process.env.NEXT_PUBLIC_WEB_URL || new URL(loginUrl).origin
       return NextResponse.redirect(new URL(webUrl))
     }
 
