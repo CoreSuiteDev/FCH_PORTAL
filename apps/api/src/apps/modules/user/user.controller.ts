@@ -101,5 +101,23 @@ export class UserController {
       })
     }
   }
+
+  /**
+   * Controller for provisioning a new board member
+   */
+  static async createBoardMember(input: { name: string; email: string }) {
+    try {
+      const user = await UserService.createBoardMember(input)
+      if (!user) {
+        throw new Error("Board member user creation succeeded but lookup failed")
+      }
+      return user
+    } catch (error: any) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Failed to create board member: ${error.message}`,
+      })
+    }
+  }
 }
 

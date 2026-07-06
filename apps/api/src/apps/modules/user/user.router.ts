@@ -12,6 +12,7 @@ const mapUser = (user: any) => ({
   emailVerified: user.emailVerified,
   image: user.image,
   status: user.status,
+  passwordChangeRequired: user.passwordChangeRequired,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
   roles: user.userRoles ? user.userRoles.map((ur: any) => ur.role.name) : [],
@@ -167,6 +168,36 @@ export const userRouter = router({
     )
     .mutation(async ({ input }) => {
       return UserController.updateUserRole(input)
+    }),
+
+  createBoardMember: adminProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/users/create-board",
+        tags: ["users"],
+        summary: "Create a new board member",
+        description: "Provisions a new board member account with a temporary password"
+      },
+    })
+    .input(
+      z.object({
+        name: z.string(),
+        email: z.string(),
+      })
+    )
+    .output(
+      z.object({
+        success: z.boolean(),
+        user: ZCIUserOutputSchema,
+      })
+    )
+    .mutation(async ({ input }) => {
+      const user = await UserController.createBoardMember(input)
+      return {
+        success: true,
+        user: mapUser(user),
+      }
     }),
 })
 

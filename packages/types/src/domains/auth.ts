@@ -39,6 +39,7 @@ export const ZCIUserSchema = z.object({
   emailVerified: z.boolean(),
   image: z.string().nullable().optional(),
   status: UserStatusEnum.default("ACTIVE"),
+  passwordChangeRequired: z.boolean().nullable().optional(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

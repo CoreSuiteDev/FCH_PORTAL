@@ -52,3 +52,14 @@ export const useUpdateUserRole = () => {
     },
   })
 }
+
+export const useCreateBoardMember = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { name: string; email: string }) =>
+      api.post("/users/create-board", data).then((res) => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] })
+    },
+  })
+}

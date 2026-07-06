@@ -1,5 +1,6 @@
 import { prisma } from "../../../infrastructure/database/prisma.js"
 import { UserStatus, MembershipType } from "../../../generated/prisma/client.js"
+import { auth } from "../../../lib/auth.js"
 
 export class UserService {
   /**
@@ -175,6 +176,78 @@ export class UserService {
     })
 
     return { success: true, role: upperRoleName }
+  }
+
+  /**
+   * Create a new board member user with temporary password and passwordChangeRequired flag
+   */
+  static async createBoardMember(data: { name: string; email: string }) {
+    const existingUser = await prisma.user.findUnique({
+      where: { email: data.email },
+    })
+    if (existingUser) {
+      throw new Error("User with this email already registered.")
+    }
+
+    const tempPassword = Math.random().toString(36).slice(-10) + "A1!"
+    const context = await auth.$context
+    const hashedPassword = await context.password.hash(tempPassword)
+
+    // Create user with passwordChangeRequired: true
+    const user = await prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        status: "ACTIVE",
+        passwordChangeRequired: true,
+        accounts: {
+          create: {
+            providerId: "credential",
+            accountId: data.email,
+            password: hashedPassword,
+          },
+        },
+      },
+    })
+
+    // Assign BOARD role
+    let role = await prisma.role.findUnique({
+      where: { name: "BOARD" },
+    })
+    if (!role) {
+      role = await prisma.role.create({
+        data: {
+          name: "BOARD",
+          description: "Board Member Role",
+        },
+      })
+    }
+
+    await prisma.userRole.create({
+      data: {
+        userId: user.id,
+        roleId: role.id,
+      },
+    })
+
+    // Send email with registration and temporary password
+    try {
+      const sendMail = (await import("../../../infrastructure/email/email.js")).default
+      const subject = "Welcome to FCH Portal - Board Member Registration"
+      const text = `Dear ${data.name},\n\n` +
+        `A board member account has been created for you on the FCH Portal.\n\n` +
+        `Your login credentials are:\n` +
+        `Email: ${data.email}\n` +
+        `Temporary Password: ${tempPassword}\n\n` +
+        `Please log in using the board login page. You will be required to change your password upon your first login.\n\n` +
+        `Best regards,\nFCH Portal Admin Team`
+      await sendMail(data.email, subject, text)
+      console.log(`[Email] Registration mail sent to new board member: ${data.email}`)
+    } catch (emailError) {
+      console.error(`[Email] Failed to send board member registration email to ${data.email}:`, emailError)
+    }
+
+    return UserService.findUserById(user.id)
   }
 }
 

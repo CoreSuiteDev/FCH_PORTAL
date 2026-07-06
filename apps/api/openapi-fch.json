@@ -168,6 +168,9 @@
                         "BANNED"
                       ]
                     },
+                    "passwordChangeRequired": {
+                      "type": "boolean"
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -406,6 +409,9 @@
                               "SUSPENDED",
                               "BANNED"
                             ]
+                          },
+                          "passwordChangeRequired": {
+                            "type": "boolean"
                           },
                           "createdAt": {
                             "type": "string"
@@ -924,6 +930,9 @@
                         "BANNED"
                       ]
                     },
+                    "passwordChangeRequired": {
+                      "type": "boolean"
+                    },
                     "createdAt": {
                       "type": "string"
                     },
@@ -1191,6 +1200,247 @@
         }
       }
     },
+    "/users/create-board": {
+      "post": {
+        "operationId": "user-createBoardMember",
+        "summary": "Create a new board member",
+        "description": "Provisions a new board member account with a temporary password",
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "emailVerified": {
+                          "type": "boolean"
+                        },
+                        "image": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "status": {
+                          "default": "ACTIVE",
+                          "type": "string",
+                          "enum": [
+                            "ACTIVE",
+                            "RESTRICTED",
+                            "SUSPENDED",
+                            "BANNED"
+                          ]
+                        },
+                        "passwordChangeRequired": {
+                          "type": "boolean"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "roles": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "memberships": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "GENERAL",
+                                  "PASTORAL"
+                                ]
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "PENDING",
+                                  "ACTIVE",
+                                  "EXPIRED",
+                                  "CANCELED",
+                                  "FAILED"
+                                ]
+                              },
+                              "startsAt": {
+                                "type": "string"
+                              },
+                              "expiresAt": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "status",
+                              "startsAt",
+                              "expiresAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "payments": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "amount": {
+                                "type": "number"
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "PENDING",
+                                  "PAID",
+                                  "FAILED",
+                                  "REFUNDED",
+                                  "PARTIAL_REFUNDED"
+                                ]
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "amount",
+                              "status",
+                              "createdAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "email",
+                        "emailVerified",
+                        "status",
+                        "createdAt",
+                        "updatedAt",
+                        "roles",
+                        "memberships",
+                        "payments"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "user"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/session/{userId}": {
       "get": {
         "operationId": "auth-session",
@@ -1384,6 +1634,9 @@
                             "BANNED"
                           ]
                         },
+                        "passwordChangeRequired": {
+                          "type": "boolean"
+                        },
                         "createdAt": {
                           "type": "string"
                         },
@@ -1541,6 +1794,9 @@
                             "SUSPENDED",
                             "BANNED"
                           ]
+                        },
+                        "passwordChangeRequired": {
+                          "type": "boolean"
                         },
                         "createdAt": {
                           "type": "string"
@@ -2268,6 +2524,9 @@
                                 "BANNED"
                               ]
                             },
+                            "passwordChangeRequired": {
+                              "type": "boolean"
+                            },
                             "createdAt": {
                               "type": "string"
                             },
@@ -2337,6 +2596,109 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/change-password-forced": {
+      "post": {
+        "operationId": "auth-changePasswordForced",
+        "summary": "Forced first-time password change",
+        "description": "Enforces board members to change their temporary password on first login",
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "currentPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "currentPassword",
+                  "newPassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
                 }
               }
             }

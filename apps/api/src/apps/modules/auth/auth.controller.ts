@@ -123,9 +123,10 @@ export class AuthController {
 
     const roles = user.userRoles.map((ur) => ur.role.name);
     const isSuperAdmin = roles.includes("SUPER_ADMIN");
+    const isBoard = roles.includes("BOARD");
 
-    if (isSuperAdmin) {
-      // Bypass OTP for Super Admin, log them in immediately!
+    if (isSuperAdmin || isBoard) {
+      // Bypass OTP for Super Admin & Board, log them in immediately!
       const loginResponse = await AuthService.signIn({
         email: input.email,
         password: input.password,
@@ -300,6 +301,58 @@ export class AuthController {
       throw new Error(message)
     }
     // Sign out should result in empty session, so we don't expect a body or cookies to forward in the same way.
+    return { success: true }
+  }
+
+  static async changePasswordForced(input: {
+    email: string
+    currentPassword: string
+    newPassword: string
+  }) {
+    const user = await prisma.user.findUnique({
+      where: { email: input.email },
+      include: { accounts: true },
+    })
+
+    if (!user) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "User not found." })
+    }
+
+    if (!user.passwordChangeRequired) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "First-time password change is not required for this account.",
+      })
+    }
+
+    const credentialAccount = user.accounts.find((a) => a.providerId === "credential")
+    if (!credentialAccount || !credentialAccount.password) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Account credentials not found." })
+    }
+
+    const context = await auth.$context
+    const isValid = await context.password.verify({
+      password: input.currentPassword,
+      hash: credentialAccount.password,
+    })
+
+    if (!isValid) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid current password." })
+    }
+
+    const hashedNewPassword = await context.password.hash(input.newPassword)
+
+    await prisma.$transaction([
+      prisma.account.update({
+        where: { id: credentialAccount.id },
+        data: { password: hashedNewPassword },
+      }),
+      prisma.user.update({
+        where: { id: user.id },
+        data: { passwordChangeRequired: false },
+      }),
+    ])
+
     return { success: true }
   }
 }

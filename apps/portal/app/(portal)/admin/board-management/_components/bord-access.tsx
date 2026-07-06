@@ -1,6 +1,5 @@
 "use client"
 
-import React, { useMemo, useState } from "react"
 import {
   ColumnDef,
   flexRender,
@@ -8,17 +7,8 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import {
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Filter,
-  RefreshCw,
-  Search,
-  ShieldAlert,
-  Shield,
-  Loader2,
-} from "lucide-react"
+import { Download, Filter, Loader2, Search, ShieldAlert, Plus } from "lucide-react"
+import { useMemo, useState } from "react"
 
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
@@ -31,7 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
-import { Badge } from "@workspace/ui/components/badge"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@workspace/ui/components/dialog"
 import { Input } from "@workspace/ui/components/input"
 import {
   Select,
@@ -40,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
+import { toast } from "@workspace/ui/components/sonner"
 import {
   Table,
   TableBody,
@@ -48,10 +39,9 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
-import { toast } from "@workspace/ui/components/sonner"
 
+import { useUpdateUserRole, useUsers, useCreateBoardMember } from "@/hooks/useUser"
 import { ZTCIUserOutput } from "@workspace/types"
-import { useUsers, useUpdateUserRole } from "@/hooks/useUser"
 
 const clearanceOptions = [
   { value: "MEMBER", label: "General" },
@@ -76,11 +66,39 @@ export default function BoardAccess() {
   const [selectedTier, setSelectedTier] = useState<string>("All")
   const [globalFilter, setGlobalFilter] = useState("")
 
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [createName, setCreateName] = useState("")
+  const [createEmail, setCreateEmail] = useState("")
+
   // 1. Query users
   const { data, isLoading, isError, refetch } = useUsers(currentPage, 25)
 
   // 2. Role Mutation
   const updateRoleMutation = useUpdateUserRole()
+
+  // 3. Create Board Member Mutation
+  const createBoardMemberMutation = useCreateBoardMember()
+
+  const handleCreateSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    createBoardMemberMutation.mutate(
+      { name: createName, email: createEmail },
+      {
+        onSuccess: () => {
+          toast.success("Board member account created and invitation sent successfully.")
+          setIsCreateOpen(false)
+          setCreateName("")
+          setCreateEmail("")
+          refetch()
+        },
+        onError: (err: unknown) => {
+          toast.error(
+            `Failed to create board member: ${err instanceof Error ? err.message : "Unknown error"}`
+          )
+        },
+      }
+    )
+  }
 
   const handleUpdateRole = (userId: string, newRole: string) => {
     updateRoleMutation.mutate(
@@ -89,8 +107,10 @@ export default function BoardAccess() {
         onSuccess: () => {
           toast.success("User access clearance level updated successfully")
         },
-        onError: (err: any) => {
-          toast.error(`Clearance update failed: ${err.message || "Unknown error"}`)
+        onError: (err: unknown) => {
+          toast.error(
+            `Clearance update failed: ${err instanceof Error ? err.message : "Unknown error"}`
+          )
         },
       }
     )
@@ -199,13 +219,17 @@ export default function BoardAccess() {
               <Select
                 value={currentTopRole}
                 onValueChange={(value) => handleUpdateRole(user.id, value)}
-                disabled={updateRoleMutation.isPending && updateRoleMutation.variables?.userId === user.id}
+                disabled={
+                  updateRoleMutation.isPending &&
+                  updateRoleMutation.variables?.userId === user.id
+                }
               >
                 <SelectTrigger
                   className={`h-8 rounded-md border text-xs font-medium shadow-sm transition-all focus:ring-1 focus:ring-primary ${getTierStyles(currentTopRole)}`}
                 >
-                  {updateRoleMutation.isPending && updateRoleMutation.variables?.userId === user.id ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                  {updateRoleMutation.isPending &&
+                  updateRoleMutation.variables?.userId === user.id ? (
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                   ) : null}
                   <SelectValue />
                 </SelectTrigger>
@@ -235,7 +259,8 @@ export default function BoardAccess() {
     return usersList.filter((user) => {
       const topRole = getTopRole(user.roles)
       if (selectedTier === "All") return true
-      if (selectedTier === "General") return topRole === "MEMBER" || topRole === "USER"
+      if (selectedTier === "General")
+        return topRole === "MEMBER" || topRole === "USER"
       if (selectedTier === "Pastoral") return topRole === "PASTORAL"
       if (selectedTier === "Board") return topRole === "BOARD"
       if (selectedTier === "Super Admin") return topRole === "SUPER_ADMIN"
@@ -255,26 +280,38 @@ export default function BoardAccess() {
       const name = String(row.getValue("name") || "").toLowerCase()
       const id = String(row.getValue("id") || "").toLowerCase()
       const email = String(row.original.email || "").toLowerCase()
-      return name.includes(search) || id.includes(search) || email.includes(search)
+      return (
+        name.includes(search) || id.includes(search) || email.includes(search)
+      )
     },
   })
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <Loader2 className="h-10 w-10 text-slate-500 animate-spin" />
-        <p className="text-sm font-medium text-slate-500">Retrieving security permission records...</p>
+      <div className="flex flex-col items-center justify-center gap-4 py-24">
+        <Loader2 className="h-10 w-10 animate-spin text-slate-500" />
+        <p className="text-sm font-medium text-slate-500">
+          Retrieving security permission records...
+        </p>
       </div>
     )
   }
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-2 border border-rose-100 bg-rose-50/20 rounded-xl">
+      <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-rose-100 bg-rose-50/20 py-20">
         <ShieldAlert className="h-10 w-10 text-rose-500" />
-        <h4 className="text-base font-bold text-slate-800">Connection Failed</h4>
-        <p className="text-xs text-slate-500">Failed to fetch the registered members. Please retry.</p>
-        <Button variant="outline" onClick={() => refetch()} className="mt-2 h-8 hover:cursor-pointer">
+        <h4 className="text-base font-bold text-slate-800">
+          Connection Failed
+        </h4>
+        <p className="text-xs text-slate-500">
+          Failed to fetch the registered members. Please retry.
+        </p>
+        <Button
+          variant="outline"
+          onClick={() => refetch()}
+          className="mt-2 h-8 hover:cursor-pointer"
+        >
           Retry Connection
         </Button>
       </div>
@@ -300,23 +337,30 @@ export default function BoardAccess() {
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <Button
             size="sm"
+            onClick={() => setIsCreateOpen(true)}
+            className="w-full hover:cursor-pointer sm:w-auto"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Create Board Member
+          </Button>
+          <Button
+            size="sm"
             variant="outline"
             onClick={handleExportPDF}
-            className="w-full sm:w-auto hover:cursor-pointer"
+            className="w-full hover:cursor-pointer sm:w-auto"
           >
             <Download className="mr-2 h-4 w-4" /> Export Data (PDF)
           </Button>
         </div>
       </div>
 
-      <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+      <Card className="border border-slate-200 bg-white shadow-none dark:border-slate-800 dark:bg-slate-950">
         <CardContent className="p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative flex-1">
               <Search className="absolute top-2.5 left-3 h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search by name, token string, role identity..."
-                className="w-full bg-white pl-9 dark:bg-slate-800 border-slate-200 focus-visible:ring-rose-800/10 focus-visible:border-slate-300 shadow-none"
+                className="w-full border-slate-200 bg-white pl-9 shadow-none focus-visible:border-slate-300 focus-visible:ring-rose-800/10 dark:bg-slate-800"
                 value={globalFilter}
                 onChange={(e) => setGlobalFilter(e.target.value)}
               />
@@ -327,23 +371,25 @@ export default function BoardAccess() {
                 <Filter className="h-3.5 w-3.5" />
                 <span>Filter Tier:</span>
               </div>
-              {["All", "General", "Pastoral", "Board", "Super Admin"].map((tier) => (
-                <Button
-                  key={tier}
-                  variant={selectedTier === tier ? "default" : "outline"}
-                  size="sm"
-                  className="h-8 px-3 text-xs hover:cursor-pointer"
-                  onClick={() => setSelectedTier(tier)}
-                >
-                  {tier}
-                </Button>
-              ))}
+              {["All", "General", "Pastoral", "Board", "Super Admin"].map(
+                (tier) => (
+                  <Button
+                    key={tier}
+                    variant={selectedTier === tier ? "default" : "outline"}
+                    size="sm"
+                    className="h-8 px-3 text-xs hover:cursor-pointer"
+                    onClick={() => setSelectedTier(tier)}
+                  >
+                    {tier}
+                  </Button>
+                )
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="overflow-hidden shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+      <Card className="overflow-hidden border border-slate-200 bg-white shadow-none dark:border-slate-800 dark:bg-slate-950">
         <CardHeader className="border-b border-slate-100 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-900/50">
           <div className="flex items-center justify-between">
             <div>
@@ -386,7 +432,10 @@ export default function BoardAccess() {
                 </TableHeader>
                 <TableBody>
                   {table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id} className="hover:bg-slate-50/40 border-b border-slate-100 dark:border-slate-900">
+                    <TableRow
+                      key={row.id}
+                      className="border-b border-slate-100 hover:bg-slate-50/40 dark:border-slate-900"
+                    >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}
@@ -417,16 +466,18 @@ export default function BoardAccess() {
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="hover:cursor-pointer h-9 px-3 text-xs"
+                className="h-9 px-3 text-xs hover:cursor-pointer"
               >
                 Previous
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
                 disabled={currentPage === totalPages}
-                className="hover:cursor-pointer h-9 px-3 text-xs"
+                className="h-9 px-3 text-xs hover:cursor-pointer"
               >
                 Next
               </Button>
@@ -434,6 +485,57 @@ export default function BoardAccess() {
           </div>
         )}
       </Card>
+
+      {/* Create Board Member Dialog */}
+      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create Board Member</DialogTitle>
+            <DialogDescription>
+              Enter the new board member's name and email. They will receive an email containing a temporary password.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateSubmit} className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase">Name</label>
+              <Input
+                placeholder="e.g. John Doe"
+                value={createName}
+                onChange={(e) => setCreateName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase">Email Address</label>
+              <Input
+                type="email"
+                placeholder="name@example.com"
+                value={createEmail}
+                onChange={(e) => setCreateEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <DialogFooter className="pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+                disabled={createBoardMemberMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={createBoardMemberMutation.isPending}>
+                {createBoardMemberMutation.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Create
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
