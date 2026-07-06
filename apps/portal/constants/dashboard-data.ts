@@ -11,6 +11,7 @@ import {
   IconHierarchy,
   IconLockSquare,
   IconMail,
+  IconMessage,
   IconPresentation,
   IconReceipt2,
   IconSchool,
@@ -20,6 +21,7 @@ import {
   IconUsers,
   IconVideo,
 } from "@tabler/icons-react"
+
 
 export const data = {
   user: {
@@ -112,6 +114,21 @@ export const data = {
       title: "Communications",
       url: "/admin/communications",
       icon: IconMail,
+    },
+    {
+      title: "Inquiries",
+      url: "/admin/inquiries/contact",
+      icon: IconMessage,
+      items: [
+        {
+          title: "Contact Inquiries",
+          url: "/admin/inquiries/contact",
+        },
+        {
+          title: "Newsletter Subscribers",
+          url: "/admin/inquiries/newsletter",
+        },
+      ],
     },
   ],
   boardMenu: [

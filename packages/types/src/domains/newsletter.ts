@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PaginationMetaSchema } from "./pagination";
 
 export const ZCICNewsletterSchema = z.object({
   id: z.string(),
@@ -7,6 +8,12 @@ export const ZCICNewsletterSchema = z.object({
   createdAt: z.coerce.date(),
 });
 export type ZTNewsletter = z.infer<typeof ZCICNewsletterSchema>;
+
+export const ZCIPaginatedNewslettersSchema = z.object({
+  data: z.array(ZCICNewsletterSchema),
+  meta: PaginationMetaSchema,
+});
+export type ZTPaginatedNewsletters = z.infer<typeof ZCIPaginatedNewslettersSchema>;
 
 export const ZCICreateNewsletterSchema = z.object({
   firstName: z.string().min(1, "First name must be at least 1 character long"),

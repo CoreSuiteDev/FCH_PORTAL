@@ -20,4 +20,29 @@ export class NewsletterService {
       },
     })
   }
+
+  static async findAllSubscribers(params: { page: number; limit: number }) {
+    const { page, limit } = params;
+    const skip = (page - 1) * limit;
+
+    const [totalCount, data] = await prisma.$transaction([
+      prisma.newsletterSubscriber.count(),
+      prisma.newsletterSubscriber.findMany({
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+    ]);
+
+    return { totalCount, data };
+  }
+
+  static async deleteSubscriber(id: string) {
+    await prisma.newsletterSubscriber.delete({
+      where: { id },
+    });
+    return { success: true };
+  }
 }
