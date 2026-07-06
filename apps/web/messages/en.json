@@ -163,14 +163,16 @@
     },
     "newsletter": {
       "title": "Sign Up For Our Newsletter",
-      "firstNameLabel": "Name",
+      "firstNameLabel": "First Name",
       "firstNamePlaceholder": "First Name",
+      "lastNameLabel": "Last Name",
       "lastNamePlaceholder": "Last Name",
       "emailLabel": "Email",
       "emailPlaceholder": "your@mail.com",
       "button": "Submit",
       "errors": {
         "firstName": "First name is required",
+        "lastName": "Last name is required",
         "email": "Valid email is required"
       }
     }

@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { GripVertical, Loader2, Plus, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { z } from "zod"
 
 import {
   useCreatePackage,

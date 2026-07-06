@@ -1,18 +1,9 @@
 "use client"
 
-import React, { useState } from "react"
-import {
-  Mail,
-  User,
-  MessageSquare,
-  Loader2,
-  Send,
-  MapPin,
-  Phone,
-  Clock,
-} from "lucide-react"
-import { useForm } from "react-hook-form"
 import { Button } from "@workspace/ui/components/button"
+import { Clock, Loader2, Mail, MapPin } from "lucide-react"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
 
 export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -20,7 +11,7 @@ export default function ContactForm() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+
   } = useForm()
 
   const onSubmit = async (data: any) => {

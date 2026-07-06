@@ -165,11 +165,13 @@
       "firstNameLabel": "Nombre",
       "firstNamePlaceholder": "Nombre",
       "lastNamePlaceholder": "Apellido",
+      "lastNameLabel": "Apellido",
       "emailLabel": "Correo electrónico",
       "emailPlaceholder": "tu@correo.com",
       "button": "Enviar",
       "errors": {
         "firstName": "El nombre es obligatorio",
+        "lastName": "El apellido es obligatorio",
         "email": "Se requiere un correo electrónico válido"
       }
     }

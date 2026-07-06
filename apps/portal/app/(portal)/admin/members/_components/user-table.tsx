@@ -11,7 +11,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
-  CheckCircle,
 } from "lucide-react"
 import {
   useReactTable,
@@ -194,7 +193,7 @@ const UserTable = () => {
         onSuccess: () => {
           toast.success(`Access state updated to ${newStatus}`)
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           toast.error(`Failed to update status: ${err.message || "Unknown error"}`)
         },
       }

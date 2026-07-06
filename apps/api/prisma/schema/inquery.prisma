@@ -3,7 +3,6 @@ model ContactInquery {
 
   name    String
   email   String
-  phone   String
   message String
 
   createdAt DateTime @default(now())
@@ -11,4 +10,16 @@ model ContactInquery {
 
   @@index([createdAt])
   @@map("contact_inqueries")
+}
+
+model NewsletterSubscriber {
+  id String @id @default(cuid())
+
+  name String
+  email String @unique
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("newsletter_subscribers")
 }

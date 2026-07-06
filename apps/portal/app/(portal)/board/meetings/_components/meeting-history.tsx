@@ -10,7 +10,7 @@ import {
 } from "@workspace/ui/components/select"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
-import { IconDownload, IconEye, IconSettings } from "@tabler/icons-react"
+import { IconDownload, IconEye } from "@tabler/icons-react"
 
 export const MeetingTable = () => {
   const { meetings, updateStatus, searchQuery, filterStatus } =

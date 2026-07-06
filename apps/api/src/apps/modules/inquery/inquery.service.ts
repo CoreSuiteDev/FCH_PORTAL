@@ -5,14 +5,12 @@ export class InqueryService {
   static async createInquery(data: {
     name: string;
     email: string;
-    phone: string;
     message: string;
   }) {
     return prisma.contactInquery.create({
       data: {
         name: data.name,
         email: data.email,
-        phone: data.phone,
         message: data.message,
       },
     });
@@ -50,7 +48,6 @@ export class InqueryService {
     data: {
       name?: string;
       email?: string;
-      phone?: string;
       message?: string;
     }
   ) {

@@ -1,11 +1,10 @@
 "use client"
 
-import React from "react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
 
-import { useSponsorPlan } from "@/hooks/useSponsorPlan"
 import Container from "@/components/shared/container"
+import { useSponsorPlan } from "@/hooks/useSponsorPlan"
 import { Button } from "@workspace/ui/components/button"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { AlertCircle } from "lucide-react"
@@ -126,7 +125,7 @@ export default function Sponsorship() {
                 </span>
               </p>
 
-              <ul className="mb-8 flex-grow space-y-4">
+              <ul className="mb-8 grow space-y-4">
                 {(tier.features || tier.benefits || []).map(
                   (feat: string, i: number) => (
                     <li key={i} className="flex items-center gap-3 text-sm">
@@ -172,7 +171,7 @@ export default function Sponsorship() {
                 </span>
               </p>
 
-              <ul className="mb-8 flex-grow space-y-3">
+              <ul className="mb-8 grow space-y-3">
                 {(tier.features || tier.benefits || []).map(
                   (feat: string, i: number) => (
                     <li key={i} className="flex items-center gap-2 text-sm">

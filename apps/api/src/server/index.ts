@@ -12,6 +12,7 @@ import { inqueryRouter } from "../apps/modules/inquery/inquery.router.js";
 import { sponsorPlanRouter } from "../apps/modules/sponsor-plan/sponsor-plan.router.js";
 import { newsRouter } from "../apps/modules/news/news.router.js";
 import { authorRouter } from "../apps/modules/author/author.router.js";
+import { newsletterRouter } from "../apps/modules/newsletter/newsletter.router.js";
 
 // Root Router
 export const appRouter = router({
@@ -45,6 +46,7 @@ export const appRouter = router({
   sponsorPlan: sponsorPlanRouter,
   news: newsRouter,
   author: authorRouter,
+  newsletter: newsletterRouter,
 });
 
 export type AppRouter = typeof appRouter;

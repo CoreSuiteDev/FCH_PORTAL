@@ -95,7 +95,7 @@ export default function BoardLoginForm() {
                   process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
               },
               onError: (err: Error) => {
-                toast.error("Forced login failed. Please login manually with your new password.")
+                toast.error(err instanceof Error? err.message : "")
                 setIsForcedChange(false)
                 setNewPasswordVal("")
                 setConfirmPasswordVal("")

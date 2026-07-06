@@ -38,7 +38,7 @@ export default function Navbar() {
 
   const t = useTranslations("nav")
 
-  const { data, isError, isLoading } = useSessionInfo()
+  const { data } = useSessionInfo()
 
   useEffect(() => {
     let ticking = false

@@ -4,7 +4,7 @@ import { ZTCMembershipPackage } from "@workspace/types"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
 import { Skeleton } from "@workspace/ui/components/skeleton"
-import { Edit, ShieldAlert, Trash2, CheckCircle2, XCircle, Layers } from "lucide-react"
+import { Edit, ShieldAlert, Trash2, Layers } from "lucide-react"
 
 const TYPE_COLORS: Record<string, string> = {
   BOARD: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/50",

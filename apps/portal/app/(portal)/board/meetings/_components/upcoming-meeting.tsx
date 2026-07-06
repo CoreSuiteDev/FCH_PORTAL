@@ -2,7 +2,6 @@
 import { useState } from "react"
 import {
   IconCalendarEvent,
-  IconClock,
   IconPlus,
   IconVideo,
   IconLink,

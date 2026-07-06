@@ -169,7 +169,14 @@
                       ]
                     },
                     "passwordChangeRequired": {
-                      "type": "boolean"
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
                     "createdAt": {
                       "type": "string"
@@ -411,7 +418,14 @@
                             ]
                           },
                           "passwordChangeRequired": {
-                            "type": "boolean"
+                            "anyOf": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "createdAt": {
                             "type": "string"
@@ -931,7 +945,14 @@
                       ]
                     },
                     "passwordChangeRequired": {
-                      "type": "boolean"
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
                     "createdAt": {
                       "type": "string"
@@ -1283,7 +1304,14 @@
                           ]
                         },
                         "passwordChangeRequired": {
-                          "type": "boolean"
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "createdAt": {
                           "type": "string"
@@ -1635,7 +1663,14 @@
                           ]
                         },
                         "passwordChangeRequired": {
-                          "type": "boolean"
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "createdAt": {
                           "type": "string"
@@ -1796,7 +1831,14 @@
                           ]
                         },
                         "passwordChangeRequired": {
-                          "type": "boolean"
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "createdAt": {
                           "type": "string"
@@ -2525,7 +2567,14 @@
                               ]
                             },
                             "passwordChangeRequired": {
-                              "type": "boolean"
+                              "anyOf": [
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
                             },
                             "createdAt": {
                               "type": "string"
@@ -7903,10 +7952,6 @@
                     "format": "email",
                     "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                   },
-                  "phone": {
-                    "type": "string",
-                    "minLength": 1
-                  },
                   "message": {
                     "type": "string",
                     "minLength": 1
@@ -7915,7 +7960,6 @@
                 "required": [
                   "name",
                   "email",
-                  "phone",
                   "message"
                 ]
               }
@@ -7947,9 +7991,6 @@
                           "format": "email",
                           "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                         },
-                        "phone": {
-                          "type": "string"
-                        },
                         "message": {
                           "type": "string"
                         },
@@ -7964,7 +8005,6 @@
                         "id",
                         "name",
                         "email",
-                        "phone",
                         "message",
                         "createdAt",
                         "updatedAt"
@@ -8083,9 +8123,6 @@
                             "format": "email",
                             "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                           },
-                          "phone": {
-                            "type": "string"
-                          },
                           "message": {
                             "type": "string"
                           },
@@ -8100,7 +8137,6 @@
                           "id",
                           "name",
                           "email",
-                          "phone",
                           "message",
                           "createdAt",
                           "updatedAt"
@@ -8245,9 +8281,6 @@
                       "format": "email",
                       "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                     },
-                    "phone": {
-                      "type": "string"
-                    },
                     "message": {
                       "type": "string"
                     },
@@ -8262,7 +8295,6 @@
                     "id",
                     "name",
                     "email",
-                    "phone",
                     "message",
                     "createdAt",
                     "updatedAt"
@@ -8364,9 +8396,6 @@
                         "format": "email",
                         "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                       },
-                      "phone": {
-                        "type": "string"
-                      },
                       "message": {
                         "type": "string"
                       }
@@ -8399,9 +8428,6 @@
                       "format": "email",
                       "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                     },
-                    "phone": {
-                      "type": "string"
-                    },
                     "message": {
                       "type": "string"
                     },
@@ -8416,7 +8442,6 @@
                     "id",
                     "name",
                     "email",
-                    "phone",
                     "message",
                     "createdAt",
                     "updatedAt"
@@ -13754,6 +13779,139 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/newsletter/subscribe": {
+      "post": {
+        "operationId": "newsletter-subscribe",
+        "summary": "Subscribe to newsletter",
+        "description": "Registers a new email address for newsletter subscription",
+        "tags": [
+          "newsletter"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  }
+                },
+                "required": [
+                  "firstName",
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 3
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email",
+                          "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "email",
+                        "createdAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
                 }
               }
             }

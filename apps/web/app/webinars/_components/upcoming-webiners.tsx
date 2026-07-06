@@ -40,7 +40,7 @@ export default function UpcomingWebinars() {
               fill
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
             <div className="absolute bottom-0 p-8 text-white">
               <h1 className="font-trajan text-4xl font-bold uppercase">
                 {featured.title}

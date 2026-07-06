@@ -4,14 +4,6 @@ import Link from "next/link"
 import Container from "@/components/shared/container"
 import { newsData } from "@/constants/news-data"
 
-interface NewsItem {
-  id: number
-  img: string
-  categoryKey: string
-  titleKey: string
-  descKey: string
-  link: string
-}
 
 export default async function NewsDetailsPage({
   params,

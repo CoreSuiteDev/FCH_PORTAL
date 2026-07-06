@@ -53,7 +53,7 @@ export default function ImpactAndMissionSection() {
               {t("card.title")}
             </h3>
             <div className="space-y-6 text-lg leading-relaxed italic">
-              <p>"{t("card.quote")}"</p>
+              <p>{`"${t("card.quote")}"`}</p>
               <p className="text-white not-italic">{t("card.description")}</p>
               <p className="border-t border-emerald-700 pt-6 font-semibold text-white">
                 {t("card.footer")}

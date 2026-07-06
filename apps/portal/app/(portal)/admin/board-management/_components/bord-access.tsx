@@ -7,7 +7,14 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { Download, Filter, Loader2, Search, ShieldAlert, Plus } from "lucide-react"
+import {
+  Download,
+  Filter,
+  Loader2,
+  Plus,
+  Search,
+  ShieldAlert,
+} from "lucide-react"
 import { useMemo, useState } from "react"
 
 import jsPDF from "jspdf"
@@ -21,7 +28,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@workspace/ui/components/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@workspace/ui/components/dialog"
 import { Input } from "@workspace/ui/components/input"
 import {
   Select,
@@ -40,7 +54,11 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 
-import { useUpdateUserRole, useUsers, useCreateBoardMember } from "@/hooks/useUser"
+import {
+  useCreateBoardMember,
+  useUpdateUserRole,
+  useUsers,
+} from "@/hooks/useUser"
 import { ZTCIUserOutput } from "@workspace/types"
 
 const clearanceOptions = [
@@ -85,7 +103,9 @@ export default function BoardAccess() {
       { name: createName, email: createEmail },
       {
         onSuccess: () => {
-          toast.success("Board member account created and invitation sent successfully.")
+          toast.success(
+            "Board member account created and invitation sent successfully."
+          )
           setIsCreateOpen(false)
           setCreateName("")
           setCreateEmail("")
@@ -100,6 +120,7 @@ export default function BoardAccess() {
     )
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleUpdateRole = (userId: string, newRole: string) => {
     updateRoleMutation.mutate(
       { userId, role: newRole },
@@ -250,9 +271,14 @@ export default function BoardAccess() {
         },
       },
     ],
-    [updateRoleMutation.isPending, updateRoleMutation.variables]
+    [
+      handleUpdateRole,
+      updateRoleMutation.isPending,
+      updateRoleMutation.variables?.userId,
+    ]
   )
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const usersList: ZTCIUserOutput[] = data?.data || []
 
   const finalFilteredData = useMemo(() => {
@@ -268,6 +294,7 @@ export default function BoardAccess() {
     })
   }, [usersList, selectedTier])
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: finalFilteredData,
     columns,
@@ -492,13 +519,15 @@ export default function BoardAccess() {
           <DialogHeader>
             <DialogTitle>Create Board Member</DialogTitle>
             <DialogDescription>
-              Enter the new board member's name and email. They will receive an email containing a temporary password.
+              {`Enter the new board member's name and email. They will receive an email containing a temporary password.`}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleCreateSubmit} className="space-y-4 pt-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 uppercase">Name</label>
+              <label className="text-xs font-bold text-slate-500 uppercase">
+                Name
+              </label>
               <Input
                 placeholder="e.g. John Doe"
                 value={createName}
@@ -507,7 +536,9 @@ export default function BoardAccess() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 uppercase">Email Address</label>
+              <label className="text-xs font-bold text-slate-500 uppercase">
+                Email Address
+              </label>
               <Input
                 type="email"
                 placeholder="name@example.com"
@@ -526,7 +557,10 @@ export default function BoardAccess() {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={createBoardMemberMutation.isPending}>
+              <Button
+                type="submit"
+                disabled={createBoardMemberMutation.isPending}
+              >
                 {createBoardMemberMutation.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
