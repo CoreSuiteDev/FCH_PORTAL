@@ -68,6 +68,12 @@ export default function Navbar() {
 
   const user = data?.user
 
+  const portalUrl = process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
+  const roles = user?.roles?.map((r) => r.toUpperCase()) || []
+  const hasPortalAccess = roles.some((role) =>
+    ["GENERAL", "MEMBER", "PASTORAL", "ADMIN", "SUPER_ADMIN", "BOARD"].includes(role)
+  )
+
   return (
     <header
       className={`fixed top-0 z-1000 w-full bg-white transition-shadow duration-500 ease-in-out ${
@@ -127,6 +133,14 @@ export default function Navbar() {
               {t("buttons.donate")}
             </Button>
           </Link>
+
+          {hasPortalAccess && (
+            <Link href={portalUrl}>
+              <Button size="lg" className="bg-primary hover:bg-primary/95 text-white">
+                Portal
+              </Button>
+            </Link>
+          )}
 
           {user ? (
             <Popover>
@@ -269,6 +283,14 @@ export default function Navbar() {
                     {t("buttons.donate")}
                   </Button>
                 </Link>
+
+                {hasPortalAccess && (
+                  <Link href={portalUrl}>
+                    <Button className="w-full bg-primary hover:bg-primary/95 text-white">
+                      Portal
+                    </Button>
+                  </Link>
+                )}
 
                 {user ? (
                   <Button

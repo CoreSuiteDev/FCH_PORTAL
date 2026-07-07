@@ -65,7 +65,7 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL("/board", request.url))
       }
       if (roles.includes("PASTORAL")) {
-        return NextResponse.redirect(new URL("/pastoral", request.url))
+        return NextResponse.redirect(new URL("/portal", request.url))
       }
       if (roles.includes("MEMBER")) {
         return NextResponse.redirect(new URL("/portal", request.url))

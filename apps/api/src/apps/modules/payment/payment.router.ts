@@ -228,4 +228,35 @@ export const paymentRouter = router({
     .mutation(async ({ input }) => {
       return SponsorshipController.deleteSponsorship(input.id);
     }),
+
+  buyPackage: publicProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/payment/buy-package",
+        tags: ["payment"],
+        summary: "Buy a membership package",
+        description: "Charges the card, provisions a subscription and updates the user role",
+      },
+    })
+    .input(
+      z.object({
+        packageId: z.string().cuid(),
+        name: z.string().min(1, "Name is required"),
+        email: z.string().email("Invalid email address"),
+        phone: z.string().optional(),
+        userId: z.string(),
+        paymentMethodId: z.string().min(1, "Payment method ID is required"),
+      })
+    )
+    .output(
+      z.object({
+        clientSecret: z.string(),
+        subscriptionId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { MembershipService } = await import("./payment.service.js")
+      return MembershipService.createMembershipSubscription(input)
+    }),
 });

@@ -201,12 +201,33 @@ export class PaymentService {
         }
       } else if (type === "payment") {
         if (event.type === "payment_intent.succeeded") {
-          await prisma.payment.update({
+          const payment = await prisma.payment.update({
             where: { stripePaymentIntentId: paymentIntent.id },
             data: {
               status: "SUCCEEDED",
             },
+            include: {
+              subscription: {
+                include: {
+                  package: true,
+                },
+              },
+            },
           })
+
+          if (payment.subscription) {
+            await prisma.subscription.update({
+              where: { id: payment.subscription.id },
+              data: {
+                status: "ACTIVE",
+              },
+            })
+
+            const roleName = payment.subscription.package.type === "GENERAL" ? "MEMBER" : "PASTORAL"
+            const { UserService } = await import("../user/user.service.js")
+            await UserService.updateUserRole(payment.subscription.userId, roleName)
+          }
+
           console.log(
             `[webhook] Payment SUCCEEDED — PaymentIntent: ${paymentIntent.id}`
           )
@@ -624,4 +645,132 @@ export class SponsorShipService {
     return sponsorship
   }
   
+}
+
+export class MembershipService {
+  static async createMembershipSubscription(body: {
+    packageId: string
+    name: string
+    email: string
+    phone?: string
+    userId: string
+    paymentMethodId: string
+  }) {
+    const { packageId, name, email, phone, userId, paymentMethodId } = body
+
+    const pkg = await prisma.membershipPackage.findUnique({
+      where: { id: packageId },
+    })
+    if (!pkg) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Membership package not found",
+      })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    })
+    if (!user) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      })
+    }
+
+    const basePrice = Number(pkg.price)
+    const setupFee = basePrice > 0 ? 5.0 : 0
+    const totalAmount = basePrice + setupFee
+    const amountInCents = Math.round(totalAmount * 100)
+
+    let paymentIntent
+    try {
+      paymentIntent = await stripe.paymentIntents.create({
+        amount: amountInCents,
+        currency: pkg.currency.toLowerCase(),
+        description: `Membership Subscription: ${pkg.name}`,
+        payment_method: paymentMethodId,
+        confirm: true,
+        return_url: `${config.frontendUrl}`,
+        metadata: {
+          packageId: pkg.id,
+          userId,
+          type: "payment",
+        },
+      })
+    } catch (err: any) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: err.message || "Stripe error",
+        cause: err,
+      })
+    }
+
+    let receiptUrl: string | null = null
+    let paymentMethod: string | null = null
+    let cardBrand: string | null = null
+    let cardLast4: string | null = null
+
+    if (paymentIntent.status === "succeeded" && paymentIntent.latest_charge) {
+      try {
+        const charge = await stripe.charges.retrieve(
+          paymentIntent.latest_charge as string
+        )
+        receiptUrl = charge.receipt_url ?? null
+        paymentMethod = charge.payment_method_details?.type ?? null
+        cardBrand = charge.payment_method_details?.card?.brand ?? null
+        cardLast4 = charge.payment_method_details?.card?.last4 ?? null
+      } catch (chargeErr) {
+        console.warn(
+          `[createMembershipSubscription] Could not retrieve charge details:`,
+          chargeErr
+        )
+      }
+    }
+
+    const currentPeriodStart = new Date()
+    const currentPeriodEnd = new Date()
+    if (pkg.billingCycle === "MONTHLY") {
+      currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + 1)
+    } else {
+      currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 1)
+    }
+
+    const isSucceeded = paymentIntent.status === "succeeded"
+
+    const subscription = await prisma.subscription.create({
+      data: {
+        userId,
+        packageId: pkg.id,
+        currentPeriodStart,
+        currentPeriodEnd,
+        status: isSucceeded ? "ACTIVE" : "PENDING",
+      },
+    })
+
+    await prisma.payment.create({
+      data: {
+        subscriptionId: subscription.id,
+        amount: totalAmount,
+        currency: pkg.currency,
+        status: isSucceeded ? "SUCCEEDED" : "PENDING",
+        stripePaymentIntentId: paymentIntent.id,
+        receiptUrl,
+        paymentMethod: paymentMethod === "card" ? "CARD" : "OTHER",
+        cardBrand,
+        cardLast4,
+      },
+    })
+
+    if (isSucceeded) {
+      const roleName = pkg.type === "GENERAL" ? "MEMBER" : "PASTORAL"
+      const { UserService } = await import("../user/user.service.js")
+      await UserService.updateUserRole(userId, roleName)
+    }
+
+    return {
+      clientSecret: paymentIntent.client_secret || "",
+      subscriptionId: subscription.id,
+    }
+  }
 }

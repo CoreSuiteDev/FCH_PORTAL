@@ -93,6 +93,101 @@ async function main() {
   })
   console.log(`Admin user ${adminEmail} successfully linked to SUPER_ADMIN role.`)
 
+  console.log("Seeding membership packages...")
+  const packagesToSeed = [
+    {
+      name: "General Membership",
+      slug: "general-monthly",
+      type: "GENERAL" as const,
+      billingCycle: "MONTHLY" as const,
+      price: 19.00,
+      currency: "USD" as const,
+      subTitle: "Community access, member updates, events, and standard webinars.",
+      description: "Designed for individuals who want to stay connected with the FCH network, participate in member events, receive important updates, and access standard webinars and community resources.",
+      features: [
+        "Member Dashboard access",
+        "Newsletter and communication updates",
+        "Member Events Calendar",
+        "Access to standard FCH webinars",
+        "Basic member resources"
+      ],
+      isPopular: false,
+      sortOrder: 1,
+      isActive: true
+    },
+    {
+      name: "Pastoral Membership",
+      slug: "pastoral-monthly",
+      type: "PASTORAL" as const,
+      billingCycle: "MONTHLY" as const,
+      price: 49.00,
+      currency: "USD" as const,
+      subTitle: "Advanced formation, pastoral resources, ministry tools, and leadership support.",
+      description: "Designed for catechetical leaders, parish teams, diocesan staff, ministry coordinators, educators, and organizations serving Hispanic Catholic communities.",
+      features: [
+        "Everything in General Membership",
+        "Advanced webinar access",
+        "Pastoral Resources Library",
+        "Catechetical resources",
+        "Parish and Diocese resources",
+        "Access to general FCH documents and archives"
+      ],
+      isPopular: true,
+      sortOrder: 2,
+      isActive: true
+    },
+    {
+      name: "General Membership",
+      slug: "general-yearly",
+      type: "GENERAL" as const,
+      billingCycle: "YEARLY" as const,
+      price: 190.00,
+      currency: "USD" as const,
+      subTitle: "Community access, member updates, events, and standard webinars.",
+      description: "Designed for individuals who want to stay connected with the FCH network, participate in member events, receive important updates, and access standard webinars and community resources.",
+      features: [
+        "Member Dashboard access",
+        "Newsletter and communication updates",
+        "Member Events Calendar",
+        "Access to standard FCH webinars",
+        "Basic member resources"
+      ],
+      isPopular: false,
+      sortOrder: 3,
+      isActive: true
+    },
+    {
+      name: "Pastoral Membership",
+      slug: "pastoral-yearly",
+      type: "PASTORAL" as const,
+      billingCycle: "YEARLY" as const,
+      price: 490.00,
+      currency: "USD" as const,
+      subTitle: "Advanced formation, pastoral resources, ministry tools, and leadership support.",
+      description: "Designed for catechetical leaders, parish teams, diocesan staff, ministry coordinators, educators, and organizations serving Hispanic Catholic communities.",
+      features: [
+        "Everything in General Membership",
+        "Advanced webinar access",
+        "Pastoral Resources Library",
+        "Catechetical resources",
+        "Parish and Diocese resources",
+        "Access to general FCH documents and archives"
+      ],
+      isPopular: true,
+      sortOrder: 4,
+      isActive: true
+    }
+  ]
+
+  for (const pkg of packagesToSeed) {
+    await prisma.membershipPackage.upsert({
+      where: { slug: pkg.slug },
+      update: pkg,
+      create: pkg,
+    })
+  }
+  console.log("Seeding membership packages completed.")
+
   console.log("Seeding complete!")
 }
 

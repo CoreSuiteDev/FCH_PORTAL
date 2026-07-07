@@ -15,6 +15,8 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Badge } from "@workspace/ui/components/badge"
+import { Skeleton } from "@workspace/ui/components/skeleton"
+import { toast } from "@workspace/ui/components/sonner"
 import {
   Card,
   CardContent,
@@ -24,71 +26,176 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 
-import { PackageTier, usePackageStore } from "@/store/use-membership-store"
-import { MEMBERSHIP_REGISTRY } from "@/constants/membership"
+import { loadStripe } from "@stripe/stripe-js"
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js"
+
+import { usePackageStore } from "@/store/use-membership-store"
+import { usePackageBySlug, useBuyPackage } from "@/hooks/usePackage"
 import { useTranslations } from "next-intl"
+import { authClient } from "@/lib/auth"
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || ""
+)
 
 interface PageProps {
   params: Promise<{ slug: string }>
 }
 
-export default function PackageDynamicDetailsPage({ params }: PageProps) {
+function PackageDynamicDetailsForm({ params }: PageProps) {
   const router = useRouter()
   const resolvedParams = use(params)
 
-  const { selectPackage, billingCycle } = usePackageStore()
+  const { selectPackage } = usePackageStore()
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
+  const [cardholderName, setCardholderName] = useState<string>("")
 
   const t = useTranslations("membership.checkout")
   const tp = useTranslations("membership.packages")
 
-  const slugId = resolvedParams.slug as PackageTier
-  const activePackage =
-    slugId && MEMBERSHIP_REGISTRY[slugId] ? MEMBERSHIP_REGISTRY[slugId] : null
+  const slug = resolvedParams.slug
 
-  const localizedActivePackage = activePackage
-    ? {
-        ...activePackage,
-        title: tp(`items.${activePackage.id}.title`),
-        description: tp(`items.${activePackage.id}.description`),
-        features: tp.raw(`items.${activePackage.id}.features`) as string[],
-      }
-    : null
+  const stripe = useStripe()
+  const elements = useElements()
+
+  const { data: session } = authClient.useSession()
+  const user = session?.user
+
+  const { data: activePackage, isLoading, isError } = usePackageBySlug(slug)
+  const { mutateAsync: buyPackage } = useBuyPackage()
 
   useEffect(() => {
-    if (slugId && MEMBERSHIP_REGISTRY[slugId]) {
-      selectPackage(slugId)
-    } else {
+    if (activePackage) {
+      selectPackage(activePackage.slug)
+    }
+  }, [activePackage, selectPackage])
+
+  useEffect(() => {
+    if (user) {
+      setCardholderName(user.name || "")
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (isError) {
+      toast.error("Failed to load membership package. Redirecting...")
       router.push("/membership")
     }
-  }, [slugId, router, selectPackage])
+  }, [isError, router])
 
-  const getCalculatedPrice = (price: number) => {
-    return billingCycle === "monthly" ? price : Math.round(price * 10)
-  }
-
-  const basePrice = activePackage ? getCalculatedPrice(activePackage.price) : 0
-  const setupFee = basePrice > 0 ? 5.0 : 0
-  const totalInvoiceAmount = basePrice + setupFee
-
-  const handlePaymentSubmit = (e: React.FormEvent) => {
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!user) {
+      toast.error("You must be logged in to purchase a membership package.")
+      router.push("/login")
+      return
+    }
+
+    if (!stripe || !elements) {
+      toast.error("Stripe is not fully loaded. Please try again.")
+      return
+    }
+
+    const cardElement = elements.getElement(CardElement)
+    if (!cardElement) {
+      toast.error("Payment fields are not ready. Please try again.")
+      return
+    }
+
     setIsProcessing(true)
 
-    setTimeout(() => {
-      setIsProcessing(false)
+    try {
+      const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardElement,
+        billing_details: {
+          name: cardholderName,
+          email: user.email,
+        },
+      })
+
+      if (stripeError) {
+        throw new Error(stripeError.message || "Stripe card validation failed.")
+      }
+
+      if (!paymentMethod) {
+        throw new Error("Could not process payment method details.")
+      }
+
+      await buyPackage({
+        packageId: activePackage!.id,
+        name: cardholderName,
+        email: user.email,
+        paymentMethodId: paymentMethod.id,
+        userId: user.id,
+      })
+
+      toast.success("Subscription completed successfully!")
       setShowSuccessModal(true)
-    }, 2000)
+    } catch (err: any) {
+      console.error("Subscription payment error:", err)
+      toast.error(err.message || "Failed to complete subscription purchase.")
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   const handleModalClose = () => {
     setShowSuccessModal(false)
-    router.push(`/`)
+    const portalUrl = process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
+    window.location.href = portalUrl
   }
 
-  if (!localizedActivePackage) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F6F4F2] px-4 py-16 font-sans text-[#1C1A19]">
+        <div className="mx-auto max-w-5xl">
+          <Skeleton className="h-5 w-24 mb-8" />
+          <div className="grid items-stretch gap-8 md:grid-cols-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-8 shadow-sm md:col-span-6 h-[500px]">
+              <div>
+                <Skeleton className="h-5 w-32 rounded-full mb-4" />
+                <Skeleton className="h-10 w-3/4 mb-3" />
+                <Skeleton className="h-4 w-1/2 mb-3" />
+                <Skeleton className="h-16 w-full mb-6" />
+                <Skeleton className="h-12 w-28 mb-6" />
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-4/5" />
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-8 shadow-lg md:col-span-6 h-[500px]">
+              <div>
+                <Skeleton className="h-6 w-1/3 mb-6" />
+                <div className="space-y-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              </div>
+              <Skeleton className="h-11 w-full mt-4" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!activePackage) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F6F4F2]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -96,8 +203,26 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
     )
   }
 
+  // Determine localized properties
+  const baseSlug = activePackage.slug.split("-")[0]
+  let title = activePackage.name
+  let subtitle = activePackage.subTitle || ""
+  let description = activePackage.description || ""
+  let features = Array.isArray(activePackage.features) ? (activePackage.features as string[]) : []
+
+  try {
+    title = tp(`items.${baseSlug}.title`)
+    subtitle = tp(`items.${baseSlug}.subtitle`)
+    description = tp(`items.${baseSlug}.description`)
+    features = tp.raw(`items.${baseSlug}.features`) as string[]
+  } catch (e) {
+    // fallback to DB if localization fails
+  }
+
+  const basePrice = Number(activePackage.price)
+
   const cycleText =
-    billingCycle === "monthly" ? t("pricePerMonth") : t("pricePerYear")
+    activePackage.billingCycle === "MONTHLY" ? t("pricePerMonth") : t("pricePerYear")
 
   return (
     <div className="min-h-screen bg-[#F6F4F2] px-4 py-16 font-sans text-[#1C1A19]">
@@ -126,13 +251,13 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                   </Badge>
                 </div>
                 <CardTitle className="text-3xl font-extrabold text-[#2C2927]">
-                  {localizedActivePackage.title}
+                  {title}
                 </CardTitle>
                 <CardDescription className="mt-3 text-xs text-[14px] font-semibold">
-                  {localizedActivePackage.subtitle}
+                  {subtitle}
                 </CardDescription>
                 <CardDescription className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                  {localizedActivePackage.description}
+                  {description}
                 </CardDescription>
               </CardHeader>
 
@@ -151,7 +276,7 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                     {t("includedFeatures")}
                   </h4>
                   <ul className="space-y-3 text-xs text-muted-foreground">
-                    {localizedActivePackage.features.map((feature, index) => (
+                    {features.map((feature, index) => (
                       <li key={index} className="flex items-start gap-2.5">
                         <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                           <Check size={10} strokeWidth={3} />
@@ -190,6 +315,8 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                       required
                       type="text"
                       disabled={isProcessing}
+                      value={cardholderName}
+                      onChange={(e) => setCardholderName(e.target.value)}
                       placeholder="John Doe"
                       className="h-10 bg-background/50 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring/20"
                     />
@@ -197,42 +324,25 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
 
                   <div className="space-y-1.5">
                     <Label className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                      {t("cardNumber")}
+                      Card Details
                     </Label>
-                    <Input
-                      required
-                      type="text"
-                      maxLength={16}
-                      disabled={isProcessing}
-                      placeholder="4111 2222 3333 4444"
-                      className="h-10 bg-background/50 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring/20"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                        {t("expiration")}
-                      </Label>
-                      <Input
-                        required
-                        type="text"
-                        disabled={isProcessing}
-                        placeholder="MM / YY"
-                        className="h-10 bg-background/50 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring/20"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                        {t("cvc")}
-                      </Label>
-                      <Input
-                        required
-                        type="password"
-                        maxLength={3}
-                        disabled={isProcessing}
-                        placeholder="•••"
-                        className="h-10 bg-background/50 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring/20"
+                    <div className="rounded-lg border border-border/80 bg-background/50 p-4">
+                      <CardElement
+                        options={{
+                          style: {
+                            base: {
+                              fontSize: "12px",
+                              color: "#1C1A19",
+                              fontFamily: "inherit",
+                              "::placeholder": {
+                                color: "#8E8C8A",
+                              },
+                            },
+                            invalid: {
+                              color: "#EF4444",
+                            },
+                          },
+                        }}
                       />
                     </div>
                   </div>
@@ -244,16 +354,10 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                         ${basePrice.toFixed(2)}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>{t("processingFee")}</span>
-                      <span className="text-[#1C1A19]">
-                        ${setupFee.toFixed(2)}
-                      </span>
-                    </div>
                     <div className="flex justify-between border-t border-border/60 pt-2 font-bold text-[#1C1A19]">
                       <span>{t("totalBillable")}</span>
                       <span className="text-sm font-extrabold text-primary">
-                        ${totalInvoiceAmount.toFixed(2)}
+                        ${basePrice.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -267,7 +371,7 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       t("completeCheckout", {
-                        amount: totalInvoiceAmount.toFixed(2),
+                        amount: basePrice.toFixed(2),
                       })
                     )}
                   </Button>
@@ -295,7 +399,7 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
               </CardTitle>
               <CardDescription className="mt-2 px-2 text-sm leading-relaxed text-muted-foreground">
                 {t("successDesc", {
-                  packageName: localizedActivePackage.title,
+                  packageName: title,
                 })}
               </CardDescription>
             </CardHeader>
@@ -312,5 +416,13 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
         </div>
       )}
     </div>
+  )
+}
+
+export default function PackageDynamicDetailsPage({ params }: PageProps) {
+  return (
+    <Elements stripe={stripePromise}>
+      <PackageDynamicDetailsForm params={params} />
+    </Elements>
   )
 }

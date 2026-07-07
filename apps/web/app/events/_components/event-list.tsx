@@ -14,7 +14,7 @@ import {
 } from "@workspace/ui/components/tabs"
 import { events, EventStatus } from "@/constants/upcoming-events-data"
 import Container from "@/components/shared/container"
-import { Calendar, MapPin, Users } from "lucide-react" // আইকন ইমপোর্ট
+import { Calendar, MapPin, Users } from "lucide-react" 
 
 export default function EventsList() {
   const t = useTranslations("eventsList")
