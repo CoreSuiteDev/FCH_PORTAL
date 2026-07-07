@@ -679,9 +679,7 @@ export class MembershipService {
     }
 
     const basePrice = Number(pkg.price)
-    const setupFee = basePrice > 0 ? 5.0 : 0
-    const totalAmount = basePrice + setupFee
-    const amountInCents = Math.round(totalAmount * 100)
+    const amountInCents = Math.round(basePrice * 100)
 
     let paymentIntent
     try {
@@ -751,7 +749,7 @@ export class MembershipService {
     await prisma.payment.create({
       data: {
         subscriptionId: subscription.id,
-        amount: totalAmount,
+        amount: basePrice,
         currency: pkg.currency,
         status: isSucceeded ? "SUCCEEDED" : "PENDING",
         stripePaymentIntentId: paymentIntent.id,
@@ -773,4 +771,528 @@ export class MembershipService {
       subscriptionId: subscription.id,
     }
   }
-}
+
+  static async getMembershipsHistory(params: {
+    page: number
+    limit: number
+    search?: string
+    tier?: string
+    status?: string
+  }) {
+    const { page, limit, search, tier, status } = params
+    const skip = (page - 1) * limit
+
+    const where: any = {}
+
+    if (tier && tier !== "ALL") {
+      const dbType = tier.toUpperCase() === "GENERAL" ? "GENERAL" : "PASTORAL"
+      where.package = {
+        type: dbType,
+      }
+    }
+
+    if (status && status !== "ALL") {
+      let dbStatus: "ACTIVE" | "PENDING" | "CANCELED" | "EXPIRED" | "UNPAID" | undefined
+      if (status === "Active") dbStatus = "ACTIVE"
+      else if (status === "Pending") dbStatus = "PENDING"
+      else if (status === "Canceled") dbStatus = "CANCELED"
+      else if (status === "Expired") dbStatus = "EXPIRED"
+      else if (status === "Suspended") dbStatus = "UNPAID"
+
+      if (dbStatus) {
+        where.status = dbStatus
+      }
+    }
+
+    if (search) {
+      where.OR = [
+        { id: { contains: search, mode: "insensitive" } },
+        {
+          user: {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        },
+      ]
+    }
+
+    const data = await prisma.subscription.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: true,
+        package: true,
+        payments: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    })
+    const totalCount = await prisma.subscription.count({ where })
+
+    const allSubs = await prisma.subscription.findMany({
+      include: {
+        package: true,
+        payments: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    })
+
+    const total = allSubs.length
+    const active = allSubs.filter((sub) => sub.status === "ACTIVE").length
+    const pending = allSubs.filter((sub) => sub.status === "PENDING").length
+    const expiredOrCanceled = allSubs.filter(
+      (sub) => sub.status === "EXPIRED" || sub.status === "CANCELED"
+    ).length
+
+    const stats = { total, active, pending, expiredOrCanceled }
+
+    const pricingStats = {
+      general: { earnings: 0, monthlyCount: 0, yearlyCount: 0 },
+      pastoral: { earnings: 0, monthlyCount: 0, yearlyCount: 0 },
+    }
+
+    allSubs.forEach((sub) => {
+      const latestPayment = sub.payments[0]
+      const amount = latestPayment ? Number(latestPayment.amount) : Number(sub.package.price)
+
+      if (sub.package.type === "GENERAL") {
+        pricingStats.general.earnings += amount
+        if (sub.status === "ACTIVE") {
+          if (sub.package.billingCycle === "MONTHLY") pricingStats.general.monthlyCount++
+          else pricingStats.general.yearlyCount++
+        }
+      } else if (sub.package.type === "PASTORAL") {
+        pricingStats.pastoral.earnings += amount
+        if (sub.status === "ACTIVE") {
+          if (sub.package.billingCycle === "MONTHLY") pricingStats.pastoral.monthlyCount++
+          else pricingStats.pastoral.yearlyCount++
+        }
+      }
+    })
+
+    return {
+      data: data.map((sub) => {
+        const latestPayment = sub.payments[0]
+        const amount = latestPayment ? Number(latestPayment.amount) : Number(sub.package.price)
+        const currencySymbol = sub.package.currency === "USD" ? "$" : sub.package.currency + " "
+
+        let status: "Active" | "Pending" | "Expired" | "Canceled" | "Suspended" = "Pending"
+        if (sub.status === "ACTIVE") status = "Active"
+        else if (sub.status === "CANCELED") status = "Canceled"
+        else if (sub.status === "EXPIRED") status = "Expired"
+        else if (sub.status === "UNPAID" || sub.status === "PAST_DUE") status = "Suspended"
+
+        let tier: "General" | "Pastoral" | "Board" = "General"
+        if (sub.package.type === "PASTORAL") tier = "Pastoral"
+
+        const fmt = (d: Date) =>
+          d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+
+        return {
+          id: sub.id,
+          name: sub.user?.name || "Unknown User",
+          email: sub.user?.email || "No Email",
+          tier,
+          packageName: sub.package.name,
+          billingCycle: sub.package.billingCycle as "MONTHLY" | "YEARLY",
+          joinedDate: fmt(sub.createdAt),
+          expiryDate: fmt(sub.currentPeriodEnd),
+          amountPaid: `${currencySymbol}${amount.toFixed(2)}`,
+          status,
+          // Payment details
+          paymentStatus: latestPayment?.status ?? null,
+          stripePaymentIntentId: latestPayment?.stripePaymentIntentId ?? null,
+          cardBrand: latestPayment?.cardBrand ?? null,
+          cardLast4: latestPayment?.cardLast4 ?? null,
+          paymentMethod: latestPayment?.paymentMethod ?? null,
+          receiptUrl: latestPayment?.receiptUrl ?? null,
+        }
+      }),
+      totalCount,
+      stats,
+      pricingStats,
+    }
+  }
+
+  static async getUserMemberships(userId: string) {
+    const subs = await prisma.subscription.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        package: true,
+        payments: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    })
+
+    return subs.map((sub) => {
+      const latestPayment = sub.payments[0]
+      const amount = latestPayment ? Number(latestPayment.amount) : Number(sub.package.price)
+      const currencySymbol = sub.package.currency === "USD" ? "$" : sub.package.currency + " "
+
+      let status: "Active" | "Pending" | "Expired" | "Canceled" | "Suspended" = "Pending"
+      if (sub.status === "ACTIVE") status = "Active"
+      else if (sub.status === "CANCELED") status = "Canceled"
+      else if (sub.status === "EXPIRED") status = "Expired"
+      else if (sub.status === "UNPAID" || sub.status === "PAST_DUE") status = "Suspended"
+
+      let tier: "General" | "Pastoral" | "Board" = "General"
+      if (sub.package.type === "PASTORAL") tier = "Pastoral"
+
+      const fmt = (d: Date) =>
+        d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+
+      return {
+        id: sub.id,
+        tier,
+        packageName: sub.package.name,
+        billingCycle: sub.package.billingCycle as "MONTHLY" | "YEARLY",
+        joinedDate: fmt(sub.createdAt),
+        expiryDate: fmt(sub.currentPeriodEnd),
+        amountPaid: `${currencySymbol}${amount.toFixed(2)}`,
+        status,
+        paymentStatus: latestPayment?.status ?? null,
+        stripePaymentIntentId: latestPayment?.stripePaymentIntentId ?? null,
+      }
+    })
+  }
+
+  static async deleteMembershipSubscription(id: string) {
+    const sub = await prisma.subscription.findUnique({
+      where: { id },
+    })
+    if (!sub) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Membership subscription not found",
+      })
+    }
+    await prisma.subscription.delete({
+      where: { id },
+    })
+    return { id }
+  }
+
+  static async updateMembershipStatus(id: string, status: "Active" | "Pending" | "Expired" | "Canceled" | "Suspended") {
+    let dbStatus: "ACTIVE" | "PENDING" | "CANCELED" | "EXPIRED" | "UNPAID" = "PENDING"
+    if (status === "Active") dbStatus = "ACTIVE"
+    else if (status === "Pending") dbStatus = "PENDING"
+    else if (status === "Canceled") dbStatus = "CANCELED"
+    else if (status === "Expired") dbStatus = "EXPIRED"
+    else if (status === "Suspended") dbStatus = "UNPAID"
+
+    const sub = await prisma.subscription.findUnique({
+      where: { id },
+    })
+    if (!sub) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Membership subscription not found",
+      })
+    }
+
+    const updated = await prisma.subscription.update({
+      where: { id },
+      data: {
+        status: dbStatus,
+      },
+    })
+    return updated
+  }
+
+  // ── Cancellation request flow ────────────────────────────────────────────
+
+  /**
+   * User submits a cancellation request for their active subscription.
+   * Blocks duplicate PENDING requests.
+   */
+  static async requestCancellation(body: {
+    userId: string
+    subscriptionId: string
+    reason: string
+  }) {
+    const { userId, subscriptionId, reason } = body
+
+    // Verify the subscription belongs to this user and is active
+    const sub = await prisma.subscription.findUnique({
+      where: { id: subscriptionId },
+      include: { package: true, payments: { orderBy: { createdAt: "desc" }, take: 1 } },
+    })
+    if (!sub) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Subscription not found" })
+    }
+    if (sub.userId !== userId) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "This subscription does not belong to you" })
+    }
+    if (sub.status !== "ACTIVE") {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Only ACTIVE subscriptions can be cancelled (current: ${sub.status})`,
+      })
+    }
+
+    // Block duplicate pending request
+    const existing = await prisma.cancellationRequest.findFirst({
+      where: { subscriptionId, status: "PENDING" },
+    })
+    if (existing) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: "You already have a pending cancellation request for this subscription",
+      })
+    }
+
+    // Calculate pro-rata refund for display purposes
+    const now = new Date()
+    const periodTotal = sub.currentPeriodEnd.getTime() - sub.currentPeriodStart.getTime()
+    const remaining = sub.currentPeriodEnd.getTime() - now.getTime()
+    const ratio = Math.max(0, Math.min(1, remaining / periodTotal))
+    const latestPayment = sub.payments[0]
+    const amountPaid = latestPayment ? Number(latestPayment.amount) : Number(sub.package.price)
+    const estimatedRefund = parseFloat((amountPaid * ratio).toFixed(2))
+
+    const request = await prisma.cancellationRequest.create({
+      data: {
+        userId,
+        subscriptionId,
+        reason,
+      },
+    })
+
+    return { id: request.id, estimatedRefund }
+  }
+
+  /**
+   * Admin: Get all cancellation requests (paginated, filterable by status)
+   */
+  static async getCancellationRequests(params: {
+    page: number
+    limit: number
+    status?: string
+  }) {
+    const { page, limit, status } = params
+    const skip = (page - 1) * limit
+
+    const where: any = {}
+    if (status && status !== "ALL") {
+      where.status = status as "PENDING" | "APPROVED" | "REJECTED"
+    }
+
+    const [totalCount, data] = await prisma.$transaction([
+      prisma.cancellationRequest.count({ where }),
+      prisma.cancellationRequest.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        include: {
+          user: {
+            select: { id: true, name: true, email: true },
+          },
+          subscription: {
+            include: {
+              package: true,
+              payments: { orderBy: { createdAt: "desc" }, take: 1 },
+            },
+          },
+        },
+      }),
+    ])
+
+    const formatted = data.map((req) => {
+      const sub = req.subscription
+      const now = new Date()
+      const periodTotal = sub.currentPeriodEnd.getTime() - sub.currentPeriodStart.getTime()
+      const remaining = sub.currentPeriodEnd.getTime() - now.getTime()
+      const ratio = Math.max(0, Math.min(1, remaining / periodTotal))
+      const latestPayment = sub.payments[0]
+      const amountPaid = latestPayment ? Number(latestPayment.amount) : Number(sub.package.price)
+      const estimatedRefund = parseFloat((amountPaid * ratio).toFixed(2))
+
+      return {
+        id: req.id,
+        createdAt: req.createdAt,
+        reason: req.reason,
+        status: req.status,
+        adminNote: req.adminNote ?? null,
+        refundAmount: req.refundAmount ? Number(req.refundAmount) : null,
+        processedAt: req.processedAt ?? null,
+        user: req.user,
+        subscription: {
+          id: sub.id,
+          status: sub.status,
+          packageName: sub.package.name,
+          tier: sub.package.type,
+          billingCycle: sub.package.billingCycle,
+          amountPaid,
+          currency: sub.package.currency,
+          currentPeriodEnd: sub.currentPeriodEnd,
+          stripePaymentIntentId: latestPayment?.stripePaymentIntentId ?? null,
+        },
+        estimatedRefund,
+      }
+    })
+
+    return { data: formatted, totalCount }
+  }
+
+  /**
+   * Super-admin: approve (with refund) or reject a cancellation request.
+   */
+  static async processCancellation(body: {
+    requestId: string
+    action: "APPROVE" | "REJECT"
+    refundAmount?: number
+    adminNote?: string
+  }) {
+    const { requestId, action, refundAmount, adminNote } = body
+
+    const req = await prisma.cancellationRequest.findUnique({
+      where: { id: requestId },
+      include: {
+        subscription: {
+          include: {
+            package: true,
+            payments: { orderBy: { createdAt: "desc" }, take: 1 },
+          },
+        },
+        user: { select: { id: true } },
+      },
+    })
+
+    if (!req) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Cancellation request not found" })
+    }
+    if (req.status !== "PENDING") {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Request is already ${req.status}`,
+      })
+    }
+
+    if (action === "REJECT") {
+      await prisma.cancellationRequest.update({
+        where: { id: requestId },
+        data: {
+          status: "REJECTED",
+          adminNote: adminNote ?? null,
+          processedAt: new Date(),
+        },
+      })
+      return { success: true, action: "REJECTED" }
+    }
+
+    // ── APPROVE path ────────────────────────────────────────────────────────
+
+    const sub = req.subscription
+    const latestPayment = sub.payments[0]
+
+    // Calculate pro-rata refund if not explicitly provided
+    let finalRefundAmount = refundAmount
+    if (finalRefundAmount === undefined || finalRefundAmount === null) {
+      const now = new Date()
+      const periodTotal = sub.currentPeriodEnd.getTime() - sub.currentPeriodStart.getTime()
+      const remaining = sub.currentPeriodEnd.getTime() - now.getTime()
+      const ratio = Math.max(0, Math.min(1, remaining / periodTotal))
+      const amountPaid = latestPayment ? Number(latestPayment.amount) : Number(sub.package.price)
+      finalRefundAmount = parseFloat((amountPaid * ratio).toFixed(2))
+    }
+
+    // Issue partial refund on Stripe if there's a payment intent and a refund > 0
+    let stripeRefundId: string | null = null
+    if (finalRefundAmount > 0 && latestPayment?.stripePaymentIntentId) {
+      try {
+        const refundAmountCents = Math.round(finalRefundAmount * 100)
+        const refund = await stripe.refunds.create({
+          payment_intent: latestPayment.stripePaymentIntentId,
+          amount: refundAmountCents,
+          reason: "requested_by_customer",
+        })
+        stripeRefundId = refund.id
+
+        // Mark payment as PARTIALLY_REFUNDED
+        await prisma.payment.update({
+          where: { id: latestPayment.id },
+          data: {
+            status: "PARTIALLY_REFUNDED",
+            refundedAmount: finalRefundAmount,
+          },
+        })
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Unknown Stripe error"
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Stripe refund failed: ${msg}`,
+        })
+      }
+    }
+
+    // Cancel the subscription
+    await prisma.subscription.update({
+      where: { id: sub.id },
+      data: {
+        status: "CANCELED",
+        cancelledAt: new Date(),
+        cancelAtPeriodEnd: false,
+      },
+    })
+
+    // Revert user role back to GENERAL
+    const { UserService } = await import("../user/user.service.js")
+    await UserService.updateUserRole(req.user.id, "GENERAL")
+
+    // Mark the request as APPROVED
+    await prisma.cancellationRequest.update({
+      where: { id: requestId },
+      data: {
+        status: "APPROVED",
+        refundAmount: finalRefundAmount,
+        adminNote: adminNote ?? null,
+        processedAt: new Date(),
+      },
+    })
+
+    return {
+      success: true,
+      action: "APPROVED",
+      refundAmount: finalRefundAmount,
+      stripeRefundId,
+    }
+  }
+
+  /**
+   * User: get their own cancellation requests
+   */
+  static async getUserCancellationRequests(userId: string) {
+    const data = await prisma.cancellationRequest.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        subscription: {
+          include: { package: true },
+        },
+      },
+    })
+
+    return data.map((req) => ({
+      id: req.id,
+      createdAt: req.createdAt,
+      reason: req.reason,
+      status: req.status,
+      adminNote: req.adminNote ?? null,
+      refundAmount: req.refundAmount ? Number(req.refundAmount) : null,
+      processedAt: req.processedAt ?? null,
+      packageName: req.subscription.package.name,
+      subscriptionId: req.subscriptionId,
+    }))
+  }
+}

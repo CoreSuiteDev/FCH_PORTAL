@@ -1,12 +1,36 @@
+"use client"
+
 import React from "react"
+import Link from "next/link"
 import {
   IconUser,
   IconInfoCircle,
   IconEdit,
   IconCreditCard,
 } from "@tabler/icons-react"
+import { useSessionInfo } from "@/hooks/use-session-info"
+import { Skeleton } from "@workspace/ui/components/skeleton"
 
 export default function ProfilePage() {
+  const { data: session, isLoading } = useSessionInfo()
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 space-y-6 p-8 pt-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Skeleton className="h-64 rounded-lg" />
+          <Skeleton className="h-64 lg:col-span-2 rounded-lg" />
+        </div>
+      </div>
+    )
+  }
+
+  const user = session?.user
+
   return (
     <div className="flex-1 space-y-6 p-8 pt-6">
       {/* Page Header */}
@@ -34,9 +58,7 @@ export default function ProfilePage() {
                 (first/last name, email, avatar).
               </li>
               <li>
-                {`  Stripe Portal Integration: Link the "Billing & Subscriptions"
-                button to your Stripe Customer Portal URL to allow self-serve
-                cancellations, renewals, and invoice downloads.`}
+                Self-serve cancellations and subscription details are managed under Billing & Subscriptions.
               </li>
               <li>
                 Provide profile update forms: Implement inputs to change
@@ -48,7 +70,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Mock Profile details */}
+      {/* Profile details */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* User Card */}
         <div className="space-y-4 rounded-lg border bg-card p-6">
@@ -56,8 +78,8 @@ export default function ProfilePage() {
             <div className="mb-3 rounded-full bg-primary/10 p-4 text-primary">
               <IconUser className="size-16" />
             </div>
-            <h3 className="text-lg font-bold">User Name</h3>
-            <p className="text-sm text-muted-foreground">user@fch.org</p>
+            <h3 className="text-lg font-bold">{user?.name || "User Name"}</h3>
+            <p className="text-sm text-muted-foreground">{user?.email || "user@fch.org"}</p>
             <span className="mt-3 inline-flex items-center rounded-full bg-green-500/10 px-3 py-1 text-xs font-semibold text-green-500">
               Active Member
             </span>
@@ -66,15 +88,9 @@ export default function ProfilePage() {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Membership Tier:</span>
-              <span className="font-semibold text-primary">General Member</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Member Since:</span>
-              <span className="font-semibold">January 15, 2025</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Renewal Date:</span>
-              <span className="font-semibold">January 15, 2027</span>
+              <span className="font-semibold text-primary capitalize">
+                {user?.roles?.find((r) => ["PASTORAL", "BOARD", "MEMBER"].includes(r)) || "General Member"}
+              </span>
             </div>
           </div>
         </div>
@@ -90,9 +106,12 @@ export default function ProfilePage() {
                 <IconEdit className="size-5 text-muted-foreground" /> Edit
                 Profile Details
               </button>
-              <button className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+              <Link
+                href="/portal/profile/membership"
+                className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
                 <IconCreditCard className="size-5" /> Billing & Subscriptions
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -100,3 +119,4 @@ export default function ProfilePage() {
     </div>
   )
 }
+

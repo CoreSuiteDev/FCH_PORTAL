@@ -30,6 +30,8 @@ model User {
 
   sponsorShips Sponsorship[]
 
+  cancellationRequests CancellationRequest[]
+
   newsCreated   News[] @relation("NewsCreatedBy")
   newsUpdated   News[] @relation("NewsUpdatedBy")
   newsPublished News[] @relation("NewsPublishedBy")

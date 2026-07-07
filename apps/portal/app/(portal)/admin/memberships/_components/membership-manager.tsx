@@ -1,100 +1,80 @@
 "use client"
 
-import React, { useState, useMemo } from "react"
-import { RefreshCw } from "lucide-react"
+import React, { useState, useEffect } from "react"
+import { RefreshCw, Users, TicketX } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
+import { Badge } from "@workspace/ui/components/badge"
 import { toast } from "@workspace/ui/components/sonner"
 
 import { MembershipStats } from "./membership-stats"
 import { MembershipFilters } from "./membership-filters"
 import { MembershipTable } from "./membership-table"
+import { CancellationRequestsPanel } from "./cancellation-requests-panel"
+import { useMemberships, useUpdateMembershipStatus, useDeleteMembership } from "@/hooks/useMembership"
+import { useCancellationRequests } from "@/hooks/useCancellationRequests"
 
-// We use the mock users database but add state management to simulate DB mutations
-import { userMembersData as initialData, UserMember } from "@/constants/manage-users-data"
+type Tab = "members" | "cancellations"
 
 export const MembershipManager = () => {
-  const [dataList, setDataList] = useState<UserMember[]>(initialData)
+  const [activeTab, setActiveTab] = useState<Tab>("members")
+
+  // ── Members tab state ────────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedTier, setSelectedTier] = useState<string>("ALL")
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL")
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 8
 
-  // 1. Calculate stats dynamically based on the current data state
-  const stats = useMemo(() => {
-    const total = dataList.length
-    const active = dataList.filter((m) => m.status === "Active").length
-    const pending = dataList.filter((m) => m.status === "Pending").length
-    const expiredOrCanceled = dataList.filter(
-      (m) => m.status === "Expired" || m.status === "Canceled"
-    ).length
+  const { data, isLoading, isError } = useMemberships(
+    currentPage,
+    itemsPerPage,
+    searchQuery,
+    selectedTier,
+    selectedStatus
+  )
 
-    return { total, active, pending, expiredOrCanceled }
-  }, [dataList])
+  const { mutateAsync: updateStatus } = useUpdateMembershipStatus()
+  const { mutateAsync: deleteMembership } = useDeleteMembership()
 
-  // 1b. Calculate pricing metrics dynamically by package tier
-  const pricingStats = useMemo(() => {
-    const pStats = {
-      general: { earnings: 0, monthlyCount: 0, yearlyCount: 0 },
-      pastoral: { earnings: 0, monthlyCount: 0, yearlyCount: 0 },
+  // Cancellation badge count (pending only)
+  const { data: cancelData } = useCancellationRequests(1, 1, "PENDING")
+  const pendingCancelCount = cancelData?.totalCount ?? 0
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery, selectedTier, selectedStatus])
+
+  useEffect(() => {
+    if (isError) {
+      toast.error("Failed to load membership records from server.")
     }
+  }, [isError])
 
-    dataList.forEach((m) => {
-      const amount = Number(m.amountPaid.replace(/[^0-9.-]+/g, "")) || 0
-      
-      if (m.tier === "General") {
-        pStats.general.earnings += amount
-        if (m.status === "Active") {
-          if (amount <= 50) pStats.general.monthlyCount++
-          else pStats.general.yearlyCount++
-        }
-      } else if (m.tier === "Pastoral" || m.tier === "Board") {
-        pStats.pastoral.earnings += amount
-        if (m.status === "Active") {
-          if (amount <= 150) pStats.pastoral.monthlyCount++
-          else pStats.pastoral.yearlyCount++
-        }
-      }
-    })
-
-    return pStats
-  }, [dataList])
-
-  // 2. Filter logic
-  const filteredData = useMemo(() => {
-    return dataList.filter((m) => {
-      const matchesSearch =
-        m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.id.toLowerCase().includes(searchQuery.toLowerCase())
-
-      const matchesTier = selectedTier === "ALL" || m.tier === selectedTier
-      const matchesStatus = selectedStatus === "ALL" || m.status === selectedStatus
-
-      return matchesSearch && matchesTier && matchesStatus
-    })
-  }, [dataList, searchQuery, selectedTier, selectedStatus])
-
-  // 3. Pagination logic
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    return filteredData.slice(startIndex, startIndex + itemsPerPage)
-  }, [filteredData, currentPage])
-
-  // 4. Status actions (simulation of DB mutations)
-  const handleUpdateStatus = (id: string, newStatus: UserMember["status"]) => {
-    setDataList((prev) =>
-      prev.map((user) => (user.id === id ? { ...user, status: newStatus } : user))
-    )
-    toast.success(`Membership status updated to ${newStatus}`)
+  const stats = data?.stats || { total: 0, active: 0, pending: 0, expiredOrCanceled: 0 }
+  const pricingStats = data?.pricingStats || {
+    general: { earnings: 0, monthlyCount: 0, yearlyCount: 0 },
+    pastoral: { earnings: 0, monthlyCount: 0, yearlyCount: 0 },
   }
 
-  const handleDeleteRecord = (id: string) => {
-    if (confirm("Are you sure you want to permanently delete this membership record?")) {
-      setDataList((prev) => prev.filter((user) => user.id !== id))
+  const paginatedData = data?.data || []
+  const totalPages = Math.ceil((data?.totalCount || 0) / itemsPerPage)
+
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
+    try {
+      await updateStatus({ id, status: newStatus as any })
+      toast.success(`Membership status updated to ${newStatus}`)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to update membership status.")
+    }
+  }
+
+  const handleDeleteRecord = async (id: string) => {
+    try {
+      await deleteMembership(id)
       toast.success("Membership record deleted successfully")
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete membership record.")
     }
   }
 
@@ -114,38 +94,82 @@ export const MembershipManager = () => {
             Membership Status Manager
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Review active plans, approve pending applicants, and synchronize group access.
+            Review active plans, approve pending applicants, and process cancellation requests.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleResetFilters} className="hover:cursor-pointer gap-1.5 h-9">
+        {activeTab === "members" && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleResetFilters}
+            className="hover:cursor-pointer gap-1.5 h-9"
+          >
             <RefreshCw className="size-3.5" /> Reset Filters
           </Button>
-        </div>
+        )}
       </div>
 
-      {/* Stats Cards Overview */}
-      <MembershipStats stats={stats} pricingStats={pricingStats} />
+      {/* Stats (members tab only) */}
+      {activeTab === "members" && (
+        <MembershipStats stats={stats} pricingStats={pricingStats} />
+      )}
 
-      {/* Filter and Search Section */}
-      <MembershipFilters
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectedTier={selectedTier}
-        setSelectedTier={setSelectedTier}
-        selectedStatus={selectedStatus}
-        setSelectedStatus={setSelectedStatus}
-      />
+      {/* Tab Switcher */}
+      <div className="flex gap-1 border-b border-slate-200 dark:border-slate-800">
+        <button
+          onClick={() => setActiveTab("members")}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+            activeTab === "members"
+              ? "border-slate-900 text-slate-900 dark:border-slate-50 dark:text-slate-50"
+              : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
+        >
+          <Users className="size-4" />
+          Members
+        </button>
+        <button
+          onClick={() => setActiveTab("cancellations")}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+            activeTab === "cancellations"
+              ? "border-slate-900 text-slate-900 dark:border-slate-50 dark:text-slate-50"
+              : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
+        >
+          <TicketX className="size-4" />
+          Cancellation Requests
+          {pendingCancelCount > 0 && (
+            <Badge className="bg-red-600 text-white text-[10px] h-4 min-w-4 px-1 rounded-full">
+              {pendingCancelCount}
+            </Badge>
+          )}
+        </button>
+      </div>
 
-      {/* Main Members History Table */}
-      <MembershipTable
-        paginatedData={paginatedData}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setCurrentPage={setCurrentPage}
-        handleUpdateStatus={handleUpdateStatus}
-        handleDeleteRecord={handleDeleteRecord}
-      />
+      {/* Tab Content */}
+      {activeTab === "members" ? (
+        <>
+          <MembershipFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedTier={selectedTier}
+            setSelectedTier={setSelectedTier}
+            selectedStatus={selectedStatus}
+            setSelectedStatus={setSelectedStatus}
+          />
+          <MembershipTable
+            paginatedData={paginatedData}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalCount={data?.totalCount ?? 0}
+            setCurrentPage={setCurrentPage}
+            handleUpdateStatus={handleUpdateStatus}
+            handleDeleteRecord={handleDeleteRecord}
+            isLoading={isLoading}
+          />
+        </>
+      ) : (
+        <CancellationRequestsPanel />
+      )}
     </div>
   )
 }

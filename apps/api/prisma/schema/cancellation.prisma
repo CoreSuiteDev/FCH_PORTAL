@@ -1,0 +1,26 @@
+model CancellationRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  reason String
+
+  status CancellationStatus @default(PENDING)
+
+  // Filled by admin when processing
+  refundAmount  Decimal?  @db.Decimal(10, 2)
+  adminNote     String?
+  processedAt   DateTime?
+  processedById String?
+
+  @@index([userId])
+  @@index([subscriptionId])
+  @@index([status])
+  @@map("cancellation_requests")
+}

@@ -122,3 +122,9 @@ enum NewsType {
   BLOG
   ANNOUNCEMENT
 }
+
+enum CancellationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
