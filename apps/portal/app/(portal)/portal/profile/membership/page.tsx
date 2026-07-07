@@ -162,7 +162,7 @@ export default function UserMembershipBillingPage() {
             <CardHeader>
               <CardTitle className="text-lg font-bold">Active Subscriptions</CardTitle>
               <CardDescription>
-                Select a subscription below to request a cancellation.
+                Select an active subscription below to request a cancellation.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -210,6 +210,79 @@ export default function UserMembershipBillingPage() {
                         </div>
                       </button>
                     ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Previous & Inactive Memberships Card */}
+          <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold">Billing &amp; Subscription History</CardTitle>
+              <CardDescription>
+                Your past and inactive memberships.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {isLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-14 w-full rounded-xl" />
+                </div>
+              ) : memberships.filter((m) => m.status !== "Active").length === 0 ? (
+                <div className="text-center py-6 text-slate-400">
+                  <p className="text-xs">No historical subscriptions found.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {memberships
+                    .filter((m) => m.status !== "Active")
+                    .map((sub) => {
+                      const badgColor: Record<string, string> = {
+                        Pending: "bg-amber-100 text-amber-800 dark:bg-amber-950/30 dark:text-amber-400",
+                        Expired: "bg-slate-100 text-slate-800 dark:bg-slate-950/30 dark:text-slate-400",
+                        Canceled: "bg-red-100 text-red-800 dark:bg-red-950/30 dark:text-red-400",
+                        Suspended: "bg-rose-100 text-rose-800 dark:bg-rose-950/30 dark:text-rose-400",
+                      }
+                      return (
+                        <div
+                          key={sub.id}
+                          className="p-4 rounded-xl border border-slate-100 dark:border-slate-900 bg-slate-50/30 dark:bg-slate-950/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                        >
+                          <div className="space-y-1">
+                            <div className="font-semibold text-sm text-slate-900 dark:text-slate-50 flex items-center gap-2">
+                              {sub.packageName}
+                              <Badge
+                                variant="outline"
+                                className={`text-[10px] font-semibold ${badgColor[sub.status] || "bg-slate-100 text-slate-800"}`}
+                              >
+                                {sub.status}
+                              </Badge>
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                              Tier: <span className="capitalize">{sub.tier}</span> · Cycle:{" "}
+                              {sub.billingCycle === "MONTHLY" ? "Monthly" : "Yearly"} · Amount:{" "}
+                              {sub.amountPaid}
+                            </div>
+                            <div className="text-[11px] text-slate-400">
+                              Joined: {sub.joinedDate} · Ended/Expires: {sub.expiryDate}
+                            </div>
+                          </div>
+
+                          {sub.stripePaymentIntentId && (
+                            <div className="text-left sm:text-right space-y-1">
+                              <span className="text-[10px] text-slate-400 block font-mono">
+                                TXN: {sub.stripePaymentIntentId.slice(0, 10)}...
+                              </span>
+                              {sub.paymentStatus && (
+                                <Badge variant="outline" className="text-[9px] uppercase font-bold py-0">
+                                  {sub.paymentStatus}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                 </div>
               )}
             </CardContent>

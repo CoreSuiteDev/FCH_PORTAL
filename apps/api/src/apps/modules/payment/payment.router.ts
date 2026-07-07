@@ -270,13 +270,25 @@ export const paymentRouter = router({
         description: "Returns a paginated list of membership subscriptions with user and package details",
       },
     })
-    .input(PaginationInputSchema.optional())
+    .input(
+      z.object({
+        page: z.number().int().positive().default(1),
+        limit: z.number().int().positive().default(10),
+        search: z.string().optional(),
+        tier: z.string().optional(),
+        status: z.string().optional(),
+      }).optional()
+    )
     .output(z.any())
     .query(async ({ input }) => {
-      const page = input?.page ?? 1
-      const limit = input?.limit ?? 10
       const { MembershipService } = await import("./payment.service.js")
-      return MembershipService.getMembershipsHistory({ page, limit })
+      return MembershipService.getMembershipsHistory({
+        page: input?.page ?? 1,
+        limit: input?.limit ?? 10,
+        search: input?.search,
+        tier: input?.tier,
+        status: input?.status,
+      })
     }),
 
   updateMembershipStatus: adminProcedure
@@ -391,6 +403,8 @@ export const paymentRouter = router({
       z.object({
         page: z.number().int().positive().default(1),
         limit: z.number().int().positive().default(10),
+        search: z.string().optional(),
+        tier: z.string().optional(),
         status: z.string().optional(),
       }).optional()
     )
@@ -400,6 +414,8 @@ export const paymentRouter = router({
       return MembershipService.getCancellationRequests({
         page: input?.page ?? 1,
         limit: input?.limit ?? 10,
+        search: input?.search,
+        tier: input?.tier,
         status: input?.status,
       })
     }),

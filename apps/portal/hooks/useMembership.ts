@@ -34,6 +34,26 @@ interface GetMembershipsResponse {
     general: { earnings: number; monthlyCount: number; yearlyCount: number }
     pastoral: { earnings: number; monthlyCount: number; yearlyCount: number }
   }
+  salesStats: {
+    general: {
+      daily: { count: number; amount: number }
+      monthly: { count: number; amount: number }
+      yearly: { count: number; amount: number }
+      total: { count: number; amount: number }
+    }
+    pastoral: {
+      daily: { count: number; amount: number }
+      monthly: { count: number; amount: number }
+      yearly: { count: number; amount: number }
+      total: { count: number; amount: number }
+    }
+  }
+  cancelStats: {
+    daily: { count: number; refundSum: number }
+    monthly: { count: number; refundSum: number }
+    yearly: { count: number; refundSum: number }
+    total: { count: number; refundSum: number }
+  }
 }
 
 export const useMemberships = (

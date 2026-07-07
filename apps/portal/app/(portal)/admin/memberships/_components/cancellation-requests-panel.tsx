@@ -15,6 +15,9 @@ import {
   ChevronRight,
   AlertTriangle,
   ExternalLink,
+  Search,
+  SlidersHorizontal,
+  RefreshCw,
 } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Badge } from "@workspace/ui/components/badge"
@@ -84,14 +87,33 @@ type DialogState =
 
 export const CancellationRequestsPanel = () => {
   const [page, setPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedTier, setSelectedTier] = useState("ALL")
   const [statusFilter, setStatusFilter] = useState("ALL")
   const [dialog, setDialog] = useState<DialogState>({ kind: "none" })
   const [refundInput, setRefundInput] = useState("")
   const [adminNote, setAdminNote] = useState("")
   const limit = 8
 
-  const { data, isLoading, isError } = useCancellationRequests(page, limit, statusFilter)
+  const { data, isLoading, isError } = useCancellationRequests(
+    page,
+    limit,
+    searchQuery,
+    selectedTier,
+    statusFilter
+  )
   const { mutateAsync: process, isPending } = useProcessCancellation()
+
+  React.useEffect(() => {
+    setPage(1)
+  }, [searchQuery, selectedTier, statusFilter])
+
+  const handleResetFilters = () => {
+    setSearchQuery("")
+    setSelectedTier("ALL")
+    setStatusFilter("ALL")
+    setPage(1)
+  }
 
   const requests = data?.data ?? []
   const totalCount = data?.totalCount ?? 0
@@ -393,30 +415,71 @@ export const CancellationRequestsPanel = () => {
 
       {/* ── Panel Card ──────────────────────────────────────────────────────── */}
       <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 overflow-hidden">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-900 flex items-center justify-between gap-4">
-          <div>
-            <CardTitle className="text-lg font-bold text-slate-900 dark:text-slate-50">
-              Cancellation Requests
-            </CardTitle>
-            <CardDescription className="text-xs mt-0.5">
-              {isLoading
-                ? "Loading requests…"
-                : `${totalCount} total · page ${page} of ${Math.max(1, totalPages)}`}
-            </CardDescription>
+        <div className="p-6 border-b border-slate-100 dark:border-slate-900 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-lg font-bold text-slate-900 dark:text-slate-50">
+                Cancellation Requests
+              </CardTitle>
+              <CardDescription className="text-xs mt-0.5">
+                {isLoading
+                  ? "Loading requests…"
+                  : `${totalCount} total · page ${page} of ${Math.max(1, totalPages)}`}
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetFilters}
+              className="h-9 shrink-0 gap-1.5 self-start hover:cursor-pointer sm:self-auto"
+            >
+              <RefreshCw className="size-3.5" /> Reset Filters
+            </Button>
           </div>
 
-          {/* Status filter */}
-          <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1) }}>
-            <SelectTrigger className="w-[140px] h-8 shadow-none text-xs border-slate-200 cursor-pointer">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Statuses</SelectItem>
-              <SelectItem value="PENDING">Pending</SelectItem>
-              <SelectItem value="APPROVED">Approved</SelectItem>
-              <SelectItem value="REJECTED">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center pt-2">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 size-4 text-slate-400" />
+              <Input
+                placeholder="Search by member name, email, request ID..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 h-10 border-slate-200 bg-white focus-visible:ring-rose-800/10 focus-visible:border-slate-300 shadow-none dark:border-slate-800"
+              />
+            </div>
+
+            {/* Filter controls */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="size-3.5 text-slate-400" />
+                <span className="text-xs font-medium text-slate-500">Tier:</span>
+              </div>
+              <Select value={selectedTier} onValueChange={setSelectedTier}>
+                <SelectTrigger className="w-[140px] h-10 border-slate-200 shadow-none capitalize cursor-pointer">
+                  <SelectValue placeholder="All Tiers" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Tiers</SelectItem>
+                  <SelectItem value="General">General</SelectItem>
+                  <SelectItem value="Pastoral">Pastoral</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <span className="text-xs font-medium text-slate-500">Status:</span>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[140px] h-10 border-slate-200 shadow-none capitalize cursor-pointer">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Status</SelectItem>
+                  <SelectItem value="PENDING">Pending</SelectItem>
+                  <SelectItem value="APPROVED">Approved</SelectItem>
+                  <SelectItem value="REJECTED">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
         <div className="overflow-x-auto">

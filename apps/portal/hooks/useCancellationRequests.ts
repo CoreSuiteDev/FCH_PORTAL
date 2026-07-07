@@ -34,13 +34,15 @@ interface CancellationRequestsResponse {
 export const useCancellationRequests = (
   page = 1,
   limit = 10,
+  search = "",
+  tier = "ALL",
   status = "ALL"
 ) => {
   return useQuery<CancellationRequestsResponse>({
-    queryKey: ["cancellationRequests", page, limit, status],
+    queryKey: ["cancellationRequests", page, limit, search, tier, status],
     queryFn: () =>
       api
-        .get("/payment/cancel-requests", { params: { page, limit, status } })
+        .get("/payment/cancel-requests", { params: { page, limit, search, tier, status } })
         .then((res) => res.data),
   })
 }

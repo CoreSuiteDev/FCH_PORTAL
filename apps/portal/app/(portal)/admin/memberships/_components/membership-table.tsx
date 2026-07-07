@@ -1,53 +1,14 @@
 "use client"
 
-import React, { useState, useMemo } from "react"
+import { UserMember } from "@/hooks/useMembership"
 import {
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
   ColumnDef,
   SortingState,
+  flexRender,
+  getCoreRowModel,
   getSortedRowModel,
+  useReactTable,
 } from "@tanstack/react-table"
-import {
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  Clock,
-  Ban,
-  Trash2,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  ExternalLink,
-  CreditCard,
-  ChevronLeft,
-  ChevronRight,
-  Settings2,
-} from "lucide-react"
-import { Button } from "@workspace/ui/components/button"
-import {
-  Card,
-  CardDescription,
-  CardTitle,
-} from "@workspace/ui/components/card"
-import { Badge } from "@workspace/ui/components/badge"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@workspace/ui/components/table"
-import { Skeleton } from "@workspace/ui/components/skeleton"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,13 +19,52 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@workspace/ui/components/alert-dialog"
+import { Badge } from "@workspace/ui/components/badge"
+import { Button } from "@workspace/ui/components/button"
+import { Card, CardDescription, CardTitle } from "@workspace/ui/components/card"
+import { Input } from "@workspace/ui/components/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
+import { Skeleton } from "@workspace/ui/components/skeleton"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@workspace/ui/components/table"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
-import { UserMember } from "@/hooks/useMembership"
+import {
+  AlertCircle,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Ban,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  CreditCard,
+  ExternalLink,
+  RefreshCw,
+  Search,
+  Settings2,
+  SlidersHorizontal,
+  Trash2,
+  XCircle,
+} from "lucide-react"
+import React, { useMemo, useState } from "react"
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -126,10 +126,13 @@ const SortHeader = ({
   column,
 }: {
   label: string
-  column: { getIsSorted: () => false | "asc" | "desc"; toggleSorting: (asc?: boolean) => void }
+  column: {
+    getIsSorted: () => false | "asc" | "desc"
+    toggleSorting: (asc?: boolean) => void
+  }
 }) => (
   <button
-    className="flex items-center gap-1 font-semibold text-xs tracking-wider uppercase text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
+    className="flex items-center gap-1 text-xs font-semibold tracking-wider text-slate-500 uppercase transition-colors hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100"
     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
   >
     {label}
@@ -149,7 +152,12 @@ type DialogState =
   | { kind: "none" }
   | { kind: "approve"; id: string; name: string }
   | { kind: "reject"; id: string; name: string }
-  | { kind: "status"; id: string; name: string; newStatus: UserMember["status"] }
+  | {
+      kind: "status"
+      id: string
+      name: string
+      newStatus: UserMember["status"]
+    }
   | { kind: "delete"; id: string; name: string }
 
 // ─── props ────────────────────────────────────────────────────────────────────
@@ -162,6 +170,13 @@ interface MembershipTableProps {
   setCurrentPage: (page: number | ((prev: number) => number)) => void
   handleUpdateStatus: (id: string, newStatus: string) => void
   handleDeleteRecord: (id: string) => void
+  searchQuery: string
+  setSearchQuery: (val: string) => void
+  selectedTier: string
+  setSelectedTier: (val: string) => void
+  selectedStatus: string
+  setSelectedStatus: (val: string) => void
+  handleResetFilters: () => void
   isLoading?: boolean
 }
 
@@ -175,6 +190,13 @@ export const MembershipTable = ({
   setCurrentPage,
   handleUpdateStatus,
   handleDeleteRecord,
+  searchQuery,
+  setSearchQuery,
+  selectedTier,
+  setSelectedTier,
+  selectedStatus,
+  setSelectedStatus,
+  handleResetFilters,
   isLoading = false,
 }: MembershipTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -184,7 +206,8 @@ export const MembershipTable = ({
   const confirmDialog = () => {
     if (dialog.kind === "approve") handleUpdateStatus(dialog.id, "Active")
     else if (dialog.kind === "reject") handleUpdateStatus(dialog.id, "Canceled")
-    else if (dialog.kind === "status") handleUpdateStatus(dialog.id, dialog.newStatus)
+    else if (dialog.kind === "status")
+      handleUpdateStatus(dialog.id, dialog.newStatus)
     else if (dialog.kind === "delete") handleDeleteRecord(dialog.id)
     setDialog({ kind: "none" })
   }
@@ -198,10 +221,10 @@ export const MembershipTable = ({
         header: ({ column }) => <SortHeader label="Member" column={column} />,
         cell: ({ row }) => (
           <div className="min-w-[160px]">
-            <div className="font-bold text-sm text-slate-900 dark:text-slate-50">
+            <div className="text-sm font-bold text-slate-900 dark:text-slate-50">
               {row.original.name}
             </div>
-            <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+            <div className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
               {row.original.email}
             </div>
           </div>
@@ -214,11 +237,11 @@ export const MembershipTable = ({
           <div className="space-y-1">
             <Badge
               variant="outline"
-              className={`font-semibold text-xs ${TIER_BADGE[row.original.tier] ?? ""}`}
+              className={`text-xs font-semibold ${TIER_BADGE[row.original.tier] ?? ""}`}
             >
               {row.original.tier}
             </Badge>
-            <div className="text-[10px] text-slate-400 font-medium">
+            <div className="text-[10px] font-medium text-slate-400">
               {row.original.packageName} ·{" "}
               {row.original.billingCycle === "MONTHLY" ? "Monthly" : "Yearly"}
             </div>
@@ -230,7 +253,7 @@ export const MembershipTable = ({
         accessorKey: "joinedDate",
         header: ({ column }) => <SortHeader label="Joined" column={column} />,
         cell: ({ getValue }) => (
-          <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+          <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
             {getValue() as string}
           </span>
         ),
@@ -275,7 +298,10 @@ export const MembershipTable = ({
             icon: <AlertCircle className="size-3" />,
           }
           return (
-            <Badge variant="outline" className={`gap-1 font-semibold text-xs ${style.className}`}>
+            <Badge
+              variant="outline"
+              className={`gap-1 text-xs font-semibold ${style.className}`}
+            >
               {style.icon}
               {s}
             </Badge>
@@ -291,7 +317,7 @@ export const MembershipTable = ({
           return (
             <Badge
               variant="outline"
-              className={`font-semibold text-xs ${PAY_STATUS_STYLE[ps] ?? "bg-slate-100 text-slate-700"}`}
+              className={`text-xs font-semibold ${PAY_STATUS_STYLE[ps] ?? "bg-slate-100 text-slate-700"}`}
             >
               {ps}
             </Badge>
@@ -309,7 +335,7 @@ export const MembershipTable = ({
             <TooltipProvider delayDuration={300}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 cursor-default">
+                  <div className="flex cursor-default items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400">
                     <CreditCard className="size-3.5 shrink-0" />
                     <span className="capitalize">{cardBrand ?? ""}</span>
                     {cardLast4 && <span>·· {cardLast4}</span>}
@@ -328,7 +354,9 @@ export const MembershipTable = ({
                 </TooltipTrigger>
                 <TooltipContent side="top">
                   <p className="text-xs">
-                    {cardBrand ? `${cardBrand.toUpperCase()} ending in ${cardLast4 ?? "—"}` : "Card info"}
+                    {cardBrand
+                      ? `${cardBrand.toUpperCase()} ending in ${cardLast4 ?? "—"}`
+                      : "Card info"}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -347,12 +375,12 @@ export const MembershipTable = ({
             <TooltipProvider delayDuration={300}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="font-mono text-[10px] text-slate-400 cursor-default select-all">
+                  <span className="cursor-default font-mono text-[10px] text-slate-400 select-all">
                     {short}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="top" className="max-w-xs break-all">
-                  <p className="text-xs font-mono">{txn}</p>
+                  <p className="font-mono text-xs">{txn}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -362,20 +390,20 @@ export const MembershipTable = ({
       {
         id: "actions",
         header: () => (
-          <span className="text-xs font-semibold tracking-wider uppercase text-slate-500 flex justify-end">
+          <span className="flex justify-end text-xs font-semibold tracking-wider text-slate-500 uppercase">
             Actions
           </span>
         ),
         cell: ({ row }) => {
           const u = row.original
           return (
-            <div className="flex justify-end items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               {u.status === "Pending" ? (
                 <>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="h-8 hover:cursor-pointer border-slate-200 text-slate-600 hover:text-red-600 text-xs"
+                    className="h-8 border-slate-200 text-xs text-slate-600 hover:cursor-pointer hover:text-red-600"
                     onClick={() =>
                       setDialog({ kind: "reject", id: u.id, name: u.name })
                     }
@@ -384,7 +412,7 @@ export const MembershipTable = ({
                   </Button>
                   <Button
                     size="sm"
-                    className="h-8 hover:cursor-pointer bg-slate-900 text-white hover:bg-slate-800 text-xs"
+                    className="h-8 bg-slate-900 text-xs text-white hover:cursor-pointer hover:bg-slate-800"
                     onClick={() =>
                       setDialog({ kind: "approve", id: u.id, name: u.name })
                     }
@@ -397,11 +425,16 @@ export const MembershipTable = ({
                   <Select
                     value={u.status}
                     onValueChange={(val: UserMember["status"]) =>
-                      setDialog({ kind: "status", id: u.id, name: u.name, newStatus: val })
+                      setDialog({
+                        kind: "status",
+                        id: u.id,
+                        name: u.name,
+                        newStatus: val,
+                      })
                     }
                   >
-                    <SelectTrigger className="w-[120px] h-8 border-slate-200 shadow-none text-xs cursor-pointer">
-                      <Settings2 className="size-3 mr-1 shrink-0 text-slate-400" />
+                    <SelectTrigger className="h-8 w-[120px] cursor-pointer border-slate-200 text-xs shadow-none">
+                      <Settings2 className="mr-1 size-3 shrink-0 text-slate-400" />
                       <SelectValue placeholder="Set Status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -415,7 +448,7 @@ export const MembershipTable = ({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 hover:cursor-pointer hover:bg-red-50 hover:text-red-600 text-slate-400"
+                    className="h-8 w-8 text-slate-400 hover:cursor-pointer hover:bg-red-50 hover:text-red-600"
                     onClick={() =>
                       setDialog({ kind: "delete", id: u.id, name: u.name })
                     }
@@ -488,27 +521,87 @@ export const MembershipTable = ({
               {dialog.kind === "approve"
                 ? "Approve"
                 : dialog.kind === "reject"
-                ? "Reject"
-                : dialog.kind === "delete"
-                ? "Delete"
-                : "Confirm"}
+                  ? "Reject"
+                  : dialog.kind === "delete"
+                    ? "Delete"
+                    : "Confirm"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* ── Table Card ─────────────────────────────────────────────────────── */}
-      <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 overflow-hidden">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-900 flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg font-bold text-slate-900 dark:text-slate-50">
-              Members Directory & Status Sync
-            </CardTitle>
-            <CardDescription className="text-xs mt-0.5">
-              {isLoading
-                ? "Loading membership records…"
-                : `${totalCount} record${totalCount !== 1 ? "s" : ""} found — page ${currentPage} of ${Math.max(1, totalPages)}`}
-            </CardDescription>
+      <Card className="overflow-hidden border border-slate-200 bg-white shadow-none dark:border-slate-800 dark:bg-slate-950">
+        <div className="space-y-4 border-b border-slate-100 p-6 dark:border-slate-900">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            <div>
+              <CardTitle className="text-lg font-bold text-slate-900 dark:text-slate-50">
+                Members Directory &amp; Status Sync
+              </CardTitle>
+              <CardDescription className="mt-0.5 text-xs">
+                {isLoading
+                  ? "Loading membership records…"
+                  : `${totalCount} record${totalCount !== 1 ? "s" : ""} found — page ${currentPage} of ${Math.max(1, totalPages)}`}
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetFilters}
+              className="h-9 shrink-0 gap-1.5 self-start hover:cursor-pointer sm:self-auto"
+            >
+              <RefreshCw className="size-3.5" /> Reset Filters
+            </Button>
+          </div>
+
+          <div className="flex flex-col items-stretch gap-4 pt-2 lg:flex-row lg:items-center">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute top-3 left-3 size-4 text-slate-400" />
+              <Input
+                placeholder="Search by member name, email or ID..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-10 border-slate-200 bg-white pl-9 shadow-none focus-visible:border-slate-300 focus-visible:ring-rose-800/10 dark:border-slate-800"
+              />
+            </div>
+
+            {/* Filter controls */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="size-3.5 text-slate-400" />
+                <span className="text-xs font-medium text-slate-500">
+                  Tier:
+                </span>
+              </div>
+              <Select value={selectedTier} onValueChange={setSelectedTier}>
+                <SelectTrigger className="h-10 w-[140px] cursor-pointer border-slate-200 capitalize shadow-none">
+                  <SelectValue placeholder="All Tiers" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Tiers</SelectItem>
+                  <SelectItem value="General">General</SelectItem>
+                  <SelectItem value="Pastoral">Pastoral</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <span className="text-xs font-medium text-slate-500">
+                Status:
+              </span>
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="h-10 w-[140px] cursor-pointer border-slate-200 capitalize shadow-none">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Status</SelectItem>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Expired">Expired</SelectItem>
+                  <SelectItem value="Canceled">Canceled</SelectItem>
+                  <SelectItem value="Suspended">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
@@ -518,7 +611,10 @@ export const MembershipTable = ({
               {table.getHeaderGroups().map((hg) => (
                 <TableRow key={hg.id}>
                   {hg.headers.map((h) => (
-                    <TableHead key={h.id} className="px-4 py-3 whitespace-nowrap">
+                    <TableHead
+                      key={h.id}
+                      className="px-4 py-3 whitespace-nowrap"
+                    >
                       {flexRender(h.column.columnDef.header, h.getContext())}
                     </TableHead>
                   ))}
@@ -528,7 +624,10 @@ export const MembershipTable = ({
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 6 }).map((_, i) => (
-                  <TableRow key={i} className="border-b border-slate-100 dark:border-slate-900">
+                  <TableRow
+                    key={i}
+                    className="border-b border-slate-100 dark:border-slate-900"
+                  >
                     {/* member */}
                     <TableCell className="px-4 py-3">
                       <div className="space-y-2">
@@ -584,11 +683,17 @@ export const MembershipTable = ({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="border-b border-slate-100 dark:border-slate-900 hover:bg-slate-50/50 dark:hover:bg-slate-900/50"
+                    className="border-b border-slate-100 hover:bg-slate-50/50 dark:border-slate-900 dark:hover:bg-slate-900/50"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-4 py-3 whitespace-nowrap">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <TableCell
+                        key={cell.id}
+                        className="px-4 py-3 whitespace-nowrap"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -609,7 +714,7 @@ export const MembershipTable = ({
 
         {/* ── Pagination ─────────────────────────────────────────────────────── */}
         {totalPages > 1 && (
-          <div className="flex justify-between items-center px-6 py-4 border-t border-slate-100 dark:border-slate-900">
+          <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4 dark:border-slate-900">
             <span className="text-xs text-slate-500 dark:text-slate-400">
               Page {currentPage} of {totalPages}
             </span>
@@ -617,9 +722,13 @@ export const MembershipTable = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage((p) => Math.max(1, typeof p === "number" ? p - 1 : p))}
+                onClick={() =>
+                  setCurrentPage((p) =>
+                    Math.max(1, typeof p === "number" ? p - 1 : p)
+                  )
+                }
                 disabled={currentPage === 1}
-                className="hover:cursor-pointer h-8 text-xs gap-1"
+                className="h-8 gap-1 text-xs hover:cursor-pointer"
               >
                 <ChevronLeft className="size-3.5" />
                 Previous
@@ -633,7 +742,7 @@ export const MembershipTable = ({
                   )
                 }
                 disabled={currentPage === totalPages}
-                className="hover:cursor-pointer h-8 text-xs gap-1"
+                className="h-8 gap-1 text-xs hover:cursor-pointer"
               >
                 Next
                 <ChevronRight className="size-3.5" />

@@ -8,7 +8,6 @@ import { Badge } from "@workspace/ui/components/badge"
 import { toast } from "@workspace/ui/components/sonner"
 
 import { MembershipStats } from "./membership-stats"
-import { MembershipFilters } from "./membership-filters"
 import { MembershipTable } from "./membership-table"
 import { CancellationRequestsPanel } from "./cancellation-requests-panel"
 import { useMemberships, useUpdateMembershipStatus, useDeleteMembership } from "@/hooks/useMembership"
@@ -97,22 +96,15 @@ export const MembershipManager = () => {
             Review active plans, approve pending applicants, and process cancellation requests.
           </p>
         </div>
-        {activeTab === "members" && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleResetFilters}
-            className="hover:cursor-pointer gap-1.5 h-9"
-          >
-            <RefreshCw className="size-3.5" /> Reset Filters
-          </Button>
-        )}
       </div>
 
-      {/* Stats (members tab only) */}
-      {activeTab === "members" && (
-        <MembershipStats stats={stats} pricingStats={pricingStats} />
-      )}
+      {/* Stats Overview */}
+      <MembershipStats
+        stats={stats}
+        pricingStats={pricingStats}
+        salesStats={data?.salesStats}
+        cancelStats={data?.cancelStats}
+      />
 
       {/* Tab Switcher */}
       <div className="flex gap-1 border-b border-slate-200 dark:border-slate-800">
@@ -147,26 +139,23 @@ export const MembershipManager = () => {
 
       {/* Tab Content */}
       {activeTab === "members" ? (
-        <>
-          <MembershipFilters
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            selectedTier={selectedTier}
-            setSelectedTier={setSelectedTier}
-            selectedStatus={selectedStatus}
-            setSelectedStatus={setSelectedStatus}
-          />
-          <MembershipTable
-            paginatedData={paginatedData}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalCount={data?.totalCount ?? 0}
-            setCurrentPage={setCurrentPage}
-            handleUpdateStatus={handleUpdateStatus}
-            handleDeleteRecord={handleDeleteRecord}
-            isLoading={isLoading}
-          />
-        </>
+        <MembershipTable
+          paginatedData={paginatedData}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={data?.totalCount ?? 0}
+          setCurrentPage={setCurrentPage}
+          handleUpdateStatus={handleUpdateStatus}
+          handleDeleteRecord={handleDeleteRecord}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedTier={selectedTier}
+          setSelectedTier={setSelectedTier}
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          handleResetFilters={handleResetFilters}
+          isLoading={isLoading}
+        />
       ) : (
         <CancellationRequestsPanel />
       )}

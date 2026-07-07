@@ -1,8 +1,11 @@
 import { TRPCError } from "@trpc/server"
 import { ZTDonationInput, ZTSponsorshipInput } from "@workspace/types/index.js"
+import { Prisma } from "../../../generated/prisma/client.js"
 import { prisma } from "../../../infrastructure/database/prisma.js"
 import { stripe } from "../../../infrastructure/stripe/stripe.js"
 import config from "../../../utils/config.js"
+
+
 
 
 export class PaymentService {
@@ -782,7 +785,7 @@ export class MembershipService {
     const { page, limit, search, tier, status } = params
     const skip = (page - 1) * limit
 
-    const where: any = {}
+    const where: Prisma.SubscriptionWhereInput = {}
 
     if (tier && tier !== "ALL") {
       const dbType = tier.toUpperCase() === "GENERAL" ? "GENERAL" : "PASTORAL"
@@ -792,15 +795,17 @@ export class MembershipService {
     }
 
     if (status && status !== "ALL") {
-      let dbStatus: "ACTIVE" | "PENDING" | "CANCELED" | "EXPIRED" | "UNPAID" | undefined
-      if (status === "Active") dbStatus = "ACTIVE"
-      else if (status === "Pending") dbStatus = "PENDING"
-      else if (status === "Canceled") dbStatus = "CANCELED"
-      else if (status === "Expired") dbStatus = "EXPIRED"
-      else if (status === "Suspended") dbStatus = "UNPAID"
 
-      if (dbStatus) {
-        where.status = dbStatus
+      const statusMap: Record<string, "ACTIVE" | "PENDING" | "CANCELED" | "EXPIRED" | "UNPAID"> = {
+        "Active": "ACTIVE",
+        "Pending": "PENDING",
+        "Canceled": "CANCELED",
+        "Expired": "EXPIRED",
+        "Suspended": "UNPAID",
+      }
+
+      if(statusMap[status]) {
+        where.status = statusMap[status]
       }
     }
 
@@ -818,62 +823,152 @@ export class MembershipService {
       ]
     }
 
-    const data = await prisma.subscription.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: true,
-        package: true,
-        payments: {
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        },
-      },
+    const [data, totalCount, statusCounts, generalEarnings, pastoralEarnings] = await Promise.all([
+      prisma.subscription.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {createdAt: "desc"},
+        include: {
+          user: true,
+          package: true,
+          payments: {
+            orderBy: {createdAt: "desc"},
+            take: 1,
+          }
+        }
+      }),
+
+      prisma.subscription.count({where}),
+
+      prisma.subscription.groupBy({
+        by: "status",
+        _count: {_all: true},
+      }),
+
+      prisma.payment.aggregate({
+        where: {subscription: {package: {type: "GENERAL"}}},
+        _sum: {amount: true}
+      }),
+
+      prisma.payment.aggregate({
+        where: {subscription: {package: {type: "PASTORAL"}}},
+        _sum: {amount: true}
+      }),   
+    ])
+
+    const stats = {total: 0, active: 0, pending: 0, expiredOrCanceled: 0}
+    statusCounts.forEach((group) => {
+      const count = group._count._all
+      stats.total += count
+      if(group.status === "ACTIVE") stats.active += count
+      if(group.status === "PENDING") stats.pending += count
+      if(group.status === "EXPIRED" || group.status === "CANCELED") stats.expiredOrCanceled += count
     })
-    const totalCount = await prisma.subscription.count({ where })
 
-    const allSubs = await prisma.subscription.findMany({
-      include: {
-        package: true,
-        payments: {
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        },
-      },
+    // Calculate actual active Monthly & Yearly counts
+    const activeSubs = await prisma.subscription.findMany({
+      where: { status: "ACTIVE" },
+      include: { package: true }
     })
-
-    const total = allSubs.length
-    const active = allSubs.filter((sub) => sub.status === "ACTIVE").length
-    const pending = allSubs.filter((sub) => sub.status === "PENDING").length
-    const expiredOrCanceled = allSubs.filter(
-      (sub) => sub.status === "EXPIRED" || sub.status === "CANCELED"
-    ).length
-
-    const stats = { total, active, pending, expiredOrCanceled }
 
     const pricingStats = {
-      general: { earnings: 0, monthlyCount: 0, yearlyCount: 0 },
-      pastoral: { earnings: 0, monthlyCount: 0, yearlyCount: 0 },
+      general: { earnings: Number(generalEarnings._sum.amount || 0), monthlyCount: 0, yearlyCount: 0 },
+      pastoral: { earnings: Number(pastoralEarnings._sum.amount || 0), monthlyCount: 0, yearlyCount: 0 },
     }
 
-    allSubs.forEach((sub) => {
-      const latestPayment = sub.payments[0]
-      const amount = latestPayment ? Number(latestPayment.amount) : Number(sub.package.price)
-
+    activeSubs.forEach((sub) => {
       if (sub.package.type === "GENERAL") {
-        pricingStats.general.earnings += amount
-        if (sub.status === "ACTIVE") {
-          if (sub.package.billingCycle === "MONTHLY") pricingStats.general.monthlyCount++
-          else pricingStats.general.yearlyCount++
-        }
+        if (sub.package.billingCycle === "MONTHLY") pricingStats.general.monthlyCount++
+        else if (sub.package.billingCycle === "YEARLY") pricingStats.general.yearlyCount++
       } else if (sub.package.type === "PASTORAL") {
-        pricingStats.pastoral.earnings += amount
-        if (sub.status === "ACTIVE") {
-          if (sub.package.billingCycle === "MONTHLY") pricingStats.pastoral.monthlyCount++
-          else pricingStats.pastoral.yearlyCount++
-        }
+        if (sub.package.billingCycle === "MONTHLY") pricingStats.pastoral.monthlyCount++
+        else if (sub.package.billingCycle === "YEARLY") pricingStats.pastoral.yearlyCount++
+      }
+    })
+
+    // Define time ranges
+    const now = new Date()
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+
+    // Calculate Active Income/Sales: Daily, Monthly, Yearly, Total counts & amounts
+    const allSuccessfulPayments = await prisma.payment.findMany({
+      where: { status: { in: ["SUCCEEDED", "PARTIALLY_REFUNDED"] } },
+      include: { subscription: { include: { package: true } } }
+    })
+
+    const salesStats = {
+      general: {
+        daily: { count: 0, amount: 0 },
+        monthly: { count: 0, amount: 0 },
+        yearly: { count: 0, amount: 0 },
+        total: { count: 0, amount: 0 },
+      },
+      pastoral: {
+        daily: { count: 0, amount: 0 },
+        yearly: { count: 0, amount: 0 },
+        monthly: { count: 0, amount: 0 },
+        total: { count: 0, amount: 0 },
+      }
+    }
+
+    allSuccessfulPayments.forEach((pay) => {
+      const amt = Number(pay.amount)
+      const date = pay.createdAt
+      const type = pay.subscription?.package?.type // "GENERAL" | "PASTORAL"
+      if (!type) return
+
+      const target = type === "GENERAL" ? salesStats.general : salesStats.pastoral
+
+      target.total.count++
+      target.total.amount += amt
+
+      if (date >= oneDayAgo) {
+        target.daily.count++
+        target.daily.amount += amt
+      }
+      if (date >= oneMonthAgo) {
+        target.monthly.count++
+        target.monthly.amount += amt
+      }
+      if (date >= oneYearAgo) {
+        target.yearly.count++
+        target.yearly.amount += amt
+      }
+    })
+
+    // Calculate Cancellations & Refund Stats: Daily, Monthly, Yearly, Total
+    const allApprovedCancellations = await prisma.cancellationRequest.findMany({
+      where: { status: "APPROVED" }
+    })
+
+    const cancelStats = {
+      daily: { count: 0, refundSum: 0 },
+      monthly: { count: 0, refundSum: 0 },
+      yearly: { count: 0, refundSum: 0 },
+      total: { count: 0, refundSum: 0 },
+    }
+
+    allApprovedCancellations.forEach((req) => {
+      const date = req.processedAt || req.updatedAt
+      const refund = req.refundAmount ? Number(req.refundAmount) : 0
+
+      cancelStats.total.count++
+      cancelStats.total.refundSum += refund
+
+      if (date >= oneDayAgo) {
+        cancelStats.daily.count++
+        cancelStats.daily.refundSum += refund
+      }
+      if (date >= oneMonthAgo) {
+        cancelStats.monthly.count++
+        cancelStats.monthly.refundSum += refund
+      }
+      if (date >= oneYearAgo) {
+        cancelStats.yearly.count++
+        cancelStats.yearly.refundSum += refund
       }
     })
 
@@ -883,14 +978,15 @@ export class MembershipService {
         const amount = latestPayment ? Number(latestPayment.amount) : Number(sub.package.price)
         const currencySymbol = sub.package.currency === "USD" ? "$" : sub.package.currency + " "
 
-        let status: "Active" | "Pending" | "Expired" | "Canceled" | "Suspended" = "Pending"
-        if (sub.status === "ACTIVE") status = "Active"
-        else if (sub.status === "CANCELED") status = "Canceled"
-        else if (sub.status === "EXPIRED") status = "Expired"
-        else if (sub.status === "UNPAID" || sub.status === "PAST_DUE") status = "Suspended"
-
-        let tier: "General" | "Pastoral" | "Board" = "General"
-        if (sub.package.type === "PASTORAL") tier = "Pastoral"
+        const statusFmtMap: Record<string, any> = {
+          ACTIVE: "Active",
+          CANCELED: "Canceled",
+          CANCELLED: "Canceled",
+          EXPIRED: "Expired",
+          PENDING: "Pending",
+          UNPAID: "Suspended",
+          PAST_DUE: "Suspended",
+        }
 
         const fmt = (d: Date) =>
           d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
@@ -899,14 +995,13 @@ export class MembershipService {
           id: sub.id,
           name: sub.user?.name || "Unknown User",
           email: sub.user?.email || "No Email",
-          tier,
+          tier: sub.package.type === "PASTORAL" ? "Pastoral" : "General",
           packageName: sub.package.name,
           billingCycle: sub.package.billingCycle as "MONTHLY" | "YEARLY",
           joinedDate: fmt(sub.createdAt),
           expiryDate: fmt(sub.currentPeriodEnd),
-          amountPaid: `${currencySymbol}${amount.toFixed(2)}`,
-          status,
-          // Payment details
+          amountPaid: `${currencySymbol} ${amount.toFixed(2)}`,
+          status: statusFmtMap[sub.status] || "Pending",
           paymentStatus: latestPayment?.status ?? null,
           stripePaymentIntentId: latestPayment?.stripePaymentIntentId ?? null,
           cardBrand: latestPayment?.cardBrand ?? null,
@@ -918,6 +1013,8 @@ export class MembershipService {
       totalCount,
       stats,
       pricingStats,
+      salesStats,
+      cancelStats,
     }
   }
 
@@ -1077,14 +1174,41 @@ export class MembershipService {
   static async getCancellationRequests(params: {
     page: number
     limit: number
+    search?: string
+    tier?: string
     status?: string
   }) {
-    const { page, limit, status } = params
+    const { page, limit, search, tier, status } = params
     const skip = (page - 1) * limit
 
     const where: any = {}
+
     if (status && status !== "ALL") {
       where.status = status as "PENDING" | "APPROVED" | "REJECTED"
+    }
+
+    if (tier && tier !== "ALL") {
+      const dbType = tier.toUpperCase() === "GENERAL" ? "GENERAL" : "PASTORAL"
+      where.subscription = {
+        package: {
+          type: dbType,
+        }
+      }
+    }
+
+    if (search) {
+      where.OR = [
+        { id: { contains: search, mode: "insensitive" } },
+        { reason: { contains: search, mode: "insensitive" } },
+        {
+          user: {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        },
+      ]
     }
 
     const [totalCount, data] = await prisma.$transaction([
@@ -1295,4 +1419,4 @@ export class MembershipService {
       subscriptionId: req.subscriptionId,
     }))
   }
-}
+}
