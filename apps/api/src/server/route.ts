@@ -1,19 +1,21 @@
 import { z } from "zod";
-import { router, publicProcedure } from "./trpc.js";
-import { userRouter } from "../apps/modules/user/user.router.js";
 import { authRouter } from "../apps/modules/auth/auth.router.js";
+import { authorRouter } from "../apps/modules/author/author.router.js";
 import { dashboardRouter } from "../apps/modules/dashboard/dashboard.router.js";
+import { donationRouter } from "../apps/modules/donation/donation.router.js";
 import { eventsRouter } from "../apps/modules/events/events.router.js";
+import { inqueryRouter } from "../apps/modules/inquery/inquery.router.js";
+import { membershipRouter } from "../apps/modules/membership/membership.router.js";
+import { newsRouter } from "../apps/modules/news/news.router.js";
+import { newsletterRouter } from "../apps/modules/newsletter/newsletter.router.js";
+import { packageRouter } from "../apps/modules/package/package.router.js";
 import { paymentRouter } from "../apps/modules/payment/payment.router.js";
 import { portalRouter } from "../apps/modules/portral/portal.router.js";
 import { resourcesRouter } from "../apps/modules/resources/resources.router.js";
-import { packageRouter } from "../apps/modules/package/package.router.js";
-import { inqueryRouter } from "../apps/modules/inquery/inquery.router.js";
 import { sponsorPlanRouter } from "../apps/modules/sponsor-plan/sponsor-plan.router.js";
-import { newsRouter } from "../apps/modules/news/news.router.js";
-import { authorRouter } from "../apps/modules/author/author.router.js";
-import { newsletterRouter } from "../apps/modules/newsletter/newsletter.router.js";
-
+import { sponsorRouter } from "../apps/modules/sponsor/sponsor.router.js";
+import { userRouter } from "../apps/modules/user/user.router.js";
+import { publicProcedure, router } from "./trpc.js";
 // Root Router
 export const appRouter = router({
   hello: publicProcedure
@@ -47,6 +49,9 @@ export const appRouter = router({
   news: newsRouter,
   author: authorRouter,
   newsletter: newsletterRouter,
+  membership: membershipRouter,
+  donation: donationRouter,
+  sponsor: sponsorRouter
 });
 
 export type AppRouter = typeof appRouter;

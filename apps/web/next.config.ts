@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        source: "/webhook/stripe",
+        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/webhook/stripe`,
+      },
+      {
         source: "/api/auth/:path*",
         destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/auth/:path*`,
       },

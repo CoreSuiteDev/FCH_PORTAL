@@ -188,6 +188,106 @@ async function main() {
   }
   console.log("Seeding membership packages completed.")
 
+  console.log("Seeding sponsor plans...")
+  const sponsorPlansToSeed = [
+    {
+      id: "diamond",
+      name: "Diamond Sponsor",
+      slug: "diamond",
+      tier: "DIAMOND" as const,
+      amount: 10000.00,
+      currency: "USD" as const,
+      description: "Ultimate sponsorship package with premier recognition and maximum impact.",
+      benefits: [
+        "All benefits of Platinum Tier",
+        "Banner on homepage",
+        "Special acknowledgement at all annual events",
+        "Lifetime recognition plaque"
+      ],
+      isActive: true,
+      isFeatured: true,
+      sortOrder: 1,
+    },
+    {
+      id: "platinum",
+      name: "Platinum Sponsor",
+      slug: "platinum",
+      tier: "PLATINUM" as const,
+      amount: 5000.00,
+      currency: "USD" as const,
+      description: "Premier sponsorship package with major brand integration and VIP access.",
+      benefits: [
+        "All benefits of Gold Tier",
+        "VIP invitations to all webinars",
+        "Speaking opportunity at annual webinar",
+        "Logo on all print publications"
+      ],
+      isActive: true,
+      isFeatured: false,
+      sortOrder: 2,
+    },
+    {
+      id: "gold",
+      name: "Gold Sponsor",
+      slug: "gold",
+      tier: "GOLD" as const,
+      amount: 3000.00,
+      currency: "USD" as const,
+      description: "Significant sponsorship package offering robust branding and recognition.",
+      benefits: [
+        "All benefits of Silver Tier",
+        "Logo in monthly newsletter",
+        "10 complimentary general memberships"
+      ],
+      isActive: true,
+      isFeatured: false,
+      sortOrder: 3,
+    },
+    {
+      id: "silver",
+      name: "Silver Sponsor",
+      slug: "silver",
+      tier: "SILVER" as const,
+      amount: 1500.00,
+      currency: "USD" as const,
+      description: "Mid-level sponsorship package providing great brand visibility.",
+      benefits: [
+        "All benefits of Bronze Tier",
+        "Prominent logo placement on website",
+        "Social media spotlight post"
+      ],
+      isActive: true,
+      isFeatured: false,
+      sortOrder: 4,
+    },
+    {
+      id: "bronze",
+      name: "Bronze Sponsor",
+      slug: "bronze",
+      tier: "BRONZE" as const,
+      amount: 500.00,
+      currency: "USD" as const,
+      description: "Supporting sponsorship package with standard visibility.",
+      benefits: [
+        "Name/Logo on website sponsors page",
+        "Mention in annual report",
+        "Certificate of appreciation"
+      ],
+      isActive: true,
+      isFeatured: false,
+      sortOrder: 5,
+    }
+  ]
+
+  for (const plan of sponsorPlansToSeed) {
+    await prisma.sponsorPlan.upsert({
+      where: { id: plan.id },
+      update: plan,
+      create: plan,
+    })
+  }
+  console.log("Seeding sponsor plans completed.")
+
   console.log("Seeding complete!")
 }
 

@@ -2,8 +2,9 @@ import { ZTCCreatePackage, ZTCUpdatePackage } from "@workspace/types"
 import { prisma } from "../../../infrastructure/database/prisma.js"
 
 export class PackageService {
-  static async getPackages() {
+  static async getPackages(filter?: { isActive?: boolean }) {
     return prisma.membershipPackage.findMany({
+      where: filter,
       orderBy: {
         sortOrder: "asc",
       },
@@ -11,58 +12,59 @@ export class PackageService {
   }
 
   static async getPackageBySlug(slug: string) {
-    return prisma.membershipPackage.findUnique({
+    const pkg = await prisma.membershipPackage.findUnique({
       where: { slug },
     })
+    if (!pkg) throw new Error(`Member package with slug '${slug}' not found`)
+
+    return pkg
   }
 
   static async createPackage(data: ZTCCreatePackage) {
-    const { name, billingCycle, currency, isActive, isPopular, price, slug, sortOrder, type, description, featureTitle, features, subTitle } = data
+
+    const existingPackage = await prisma.membershipPackage.findUnique({
+      where: { slug: data.slug },
+      select: { id: true },
+    })
+    if (existingPackage)
+      throw new Error(`A Pacakge with the slug '${data.slug}' already exists.`)
 
     return prisma.membershipPackage.create({
       data: {
-        name,
-        billingCycle,
-        currency,
-        isActive,
-        isPopular,
-        price,
-        slug,
-        sortOrder,
-        type,
-        description,
-        featureTitle,
-        features: features ?? undefined,
-        subTitle,
+        ...data,
+        features: data.features ?? undefined,
       },
     })
   }
 
   static async updatePackage(id: string, data: ZTCUpdatePackage) {
-    return prisma.membershipPackage.update({
-      where: { id },
+   try {
+    return await prisma.membershipPackage.update({
+      where: {id},
       data: {
-        name: data.name,
-        billingCycle: data.billingCycle,
-        currency: data.currency,
-        isActive: data.isActive,
-        isPopular: data.isPopular,
-        price: data.price,
-        slug: data.slug,
-        sortOrder: data.sortOrder,
-        type: data.type,
-        description: data.description,
-        featureTitle: data.featureTitle,
-        features: data.features ?? undefined,
-        subTitle: data.subTitle,
-      },
+        ...data,
+        features: data.features ?? undefined
+      }
     })
+   } catch (error: any) {
+      if (error.code === "P2025") {
+      throw new Error(`Package with ID '${id}' not exist.`)
+    }
+    throw error;
+   }
   }
 
   static async deletePackage(id: string) {
+   try {
     await prisma.membershipPackage.delete({
-      where: { id },
+      where: {id}
     })
-    return { success: true }
+    return {success: true};
+   } catch (error: any) {
+    if (error.code === "P2025") {
+      throw new Error(`Package with ID '${id}' does not exist.`)  
+    }
+    throw error
+   }
   }
 }

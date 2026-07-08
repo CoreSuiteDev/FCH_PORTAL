@@ -1,18 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Check, CheckCircle, CreditCard, X, Loader2 } from "lucide-react"
+import { Check, CheckCircle,  X, Loader2 } from "lucide-react"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { loadStripe } from "@stripe/stripe-js"
 import {
   Elements,
-  CardElement,
-  useStripe,
-  useElements,
 } from "@stripe/react-stripe-js"
 
 // Workspace UI Components
@@ -54,9 +51,6 @@ function DonateDetailsForm() {
   const params = useParams()
   const amount = Number(params.slug) || 3000
 
-  const stripe = useStripe()
-  const elements = useElements()
-
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -64,6 +58,7 @@ function DonateDetailsForm() {
   const { data: session } = authClient.useSession()
   const user = session?.user
 
+  const router = useRouter()
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
     defaultValues: {
@@ -94,46 +89,20 @@ function DonateDetailsForm() {
     setErrorMessage(null)
 
     try {
-      if (!stripe || !elements) {
-        throw new Error("Stripe has not loaded yet. Please try again.")
-      }
-
-      const cardElement = elements.getElement(CardElement)
-      if (!cardElement) {
-        throw new Error("Payment fields are not ready. Please refresh.")
-      }
-
-      const { paymentMethod, error } = await stripe.createPaymentMethod({
-        type: "card",
-        card: cardElement,
-        billing_details: {
-          name: data.name,
-          email: data.email,
-          phone: data.phone || undefined,
-        },
-      })
-
-      if (error) {
-        throw new Error(error.message || "Failed to process card details.")
-      }
-
-      if (!paymentMethod) {
-        throw new Error("Failed to process payment method. Please try again.")
-      }
-
-      await donate({
+      const res = await donate({
         amount,
         name: data.name,
         email: data.email,
         phone: data.phone || undefined,
-        paymentMethodId: paymentMethod.id,
         userId: user?.id || undefined,
+        paymentMethodId: "",
       })
 
-      // Successful payment!
-      setShowSuccessModal(true)
-      form.reset()
-      cardElement.clear()
+      if (res && res.checkoutUrl) {
+        router.push(res.checkoutUrl)
+      } else {
+        throw new Error("Failed to initiate secure checkout redirect.")
+      }
     } catch (err: unknown) {
       console.error("Payment Error:", err)
       const msg =
@@ -185,70 +154,34 @@ function DonateDetailsForm() {
           </div>
 
           {/* Right Side */}
-          <div className="relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-[#FCFCFC] shadow-lg">
-            <div className="h-1.5 w-full bg-[#AC172C]" />
-            <div className="space-y-6 p-8">
-              <div className="flex items-center gap-3">
-                <CreditCard className="h-6 w-6 text-[#AC172C]" />
-                <h2 className="text-xl font-semibold text-[#1A1A1A]">
-                  {t("payment.title")}
-                </h2>
-              </div>
+          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+            <div className="p-8">
+              <h2 className="text-xl font-bold text-gray-900">
+                {t("payment.title")}
+              </h2>
 
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
+                className="mt-6 space-y-6"
               >
-                {/* Donor Details Section */}
                 <div className="space-y-4">
                   <h3 className="text-xs font-extrabold tracking-widest text-[#8B0033] uppercase">
                     {t("payment.donorSection")}
                   </h3>
                   <FieldGroup className="space-y-4">
-                    {/*  Name */}
-                    <Controller
-                      name="name"
-                      control={form.control}
-                      render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                          <FieldLabel className="text-xs font-bold tracking-wider text-gray-500 uppercase">
-                            {t("payment.cardholder")}
-                          </FieldLabel>
-                          <Input
-                            {...field}
-                            type="text"
-                            placeholder="John Doe"
-                            disabled={isPending || !!user}
-                            aria-invalid={fieldState.invalid}
-                            className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 shadow-none focus-visible:border-gray-300 focus-visible:ring-0"
-                          />
-                          {fieldState.invalid && (
-                            <FieldError
-                              errors={[fieldState.error]}
-                              className="mt-1"
-                            />
-                          )}
-                        </Field>
-                      )}
-                    />
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      {/* Email Address */}
+                    <div className="grid gap-4 md:grid-cols-2">
                       <Controller
-                        name="email"
+                        name="name"
                         control={form.control}
                         render={({ field, fieldState }) => (
-                          <Field data-invalid={fieldState.invalid}>
+                          <Field>
                             <FieldLabel className="text-xs font-bold tracking-wider text-gray-500 uppercase">
-                              {t("payment.email")}
+                              {t("payment.cardholder")}
                             </FieldLabel>
                             <Input
                               {...field}
-                              type="email"
-                              placeholder="johndoe@example.com"
-                              disabled={isPending || !!user}
-                              aria-invalid={fieldState.invalid}
-                              className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 shadow-none focus-visible:border-gray-300 focus-visible:ring-0"
+                              placeholder="John Doe"
+                              className="mt-2 border-gray-200/80 shadow-none focus-visible:border-gray-300 focus-visible:ring-0"
                             />
                             {fieldState.invalid && (
                               <FieldError
@@ -259,23 +192,43 @@ function DonateDetailsForm() {
                           </Field>
                         )}
                       />
-
-                      {/* Phone Number */}
+                      <Controller
+                        name="email"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                          <Field>
+                            <FieldLabel className="text-xs font-bold tracking-wider text-gray-500 uppercase">
+                              {t("payment.email")}
+                            </FieldLabel>
+                            <Input
+                              {...field}
+                              type="email"
+                              placeholder="john@example.com"
+                              className="mt-2 border-gray-200/80 shadow-none focus-visible:border-gray-300 focus-visible:ring-0"
+                            />
+                            {fieldState.invalid && (
+                              <FieldError
+                                errors={[fieldState.error]}
+                                className="mt-1"
+                              />
+                            )}
+                          </Field>
+                        )}
+                      />
+                    </div>
+                    <div>
                       <Controller
                         name="phone"
                         control={form.control}
                         render={({ field, fieldState }) => (
-                          <Field data-invalid={fieldState.invalid}>
+                          <Field>
                             <FieldLabel className="text-xs font-bold tracking-wider text-gray-500 uppercase">
                               {t("payment.phone")}
                             </FieldLabel>
                             <Input
                               {...field}
-                              type="tel"
                               placeholder="+1 (555) 000-0000"
-                              disabled={isPending}
-                              aria-invalid={fieldState.invalid}
-                              className="mt-2 h-12 w-full rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-3 shadow-none focus-visible:border-gray-300 focus-visible:ring-0"
+                              className="mt-2 border-gray-200/80 shadow-none focus-visible:border-gray-300 focus-visible:ring-0"
                             />
                             {fieldState.invalid && (
                               <FieldError
@@ -291,41 +244,6 @@ function DonateDetailsForm() {
                 </div>
 
                 <hr className="border-gray-200/60" />
-
-                {/* Card Details Section */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-extrabold tracking-widest text-[#8B0033] uppercase">
-                    {t("payment.cardSection")}
-                  </h3>
-                  <div className="space-y-4 rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm">
-                    <FieldGroup className="space-y-4">
-                      <Field>
-                        <FieldLabel className="text-xs font-bold tracking-wider text-gray-500 uppercase">
-                          {t("payment.cardSection")}
-                        </FieldLabel>
-                        <div className="mt-2 rounded-lg border border-[#F1F1E8] bg-[#F8F8F1] p-4 shadow-none">
-                          <CardElement
-                            options={{
-                              style: {
-                                base: {
-                                  fontSize: "16px",
-                                  color: "#1A1A1A",
-                                  fontFamily: "inherit",
-                                  "::placeholder": {
-                                    color: "#A0A0A0",
-                                  },
-                                },
-                                invalid: {
-                                  color: "#EF4444",
-                                },
-                              },
-                            }}
-                          />
-                        </div>
-                      </Field>
-                    </FieldGroup>
-                  </div>
-                </div>
 
                 <div className="space-y-3 rounded-xl bg-[#F6F6F6] p-5 text-gray-700">
                   <div className="flex justify-between">

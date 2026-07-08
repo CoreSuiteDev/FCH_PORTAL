@@ -13,7 +13,7 @@ import { auth } from "./lib/auth.js";
 import { prisma } from "./infrastructure/database/prisma.js";
 import { writeFileSync } from "fs";
 import { AppError } from "./utils/AppError.js";
-import { appRouter } from "./server/index.js";
+import { appRouter } from "./server/route.js";
 import { createContext } from "./server/context.js";
 import sendMail from "./infrastructure/email/email.js";
 import config from "./utils/config.js";

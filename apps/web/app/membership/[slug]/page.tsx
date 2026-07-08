@@ -2,19 +2,19 @@
 
 import React, { useEffect, useState, use } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
+import Container from "@/components/shared/container"
 import {
   ShieldCheck,
   CreditCard,
   ArrowLeft,
   Loader2,
-  Check,
   CheckCircle2,
 } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { Badge } from "@workspace/ui/components/badge"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { toast } from "@workspace/ui/components/sonner"
 import {
@@ -29,9 +29,6 @@ import {
 import { loadStripe } from "@stripe/stripe-js"
 import {
   Elements,
-  CardElement,
-  useStripe,
-  useElements,
 } from "@stripe/react-stripe-js"
 
 import { usePackageStore } from "@/store/use-membership-store"
@@ -58,12 +55,9 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
   const [cardholderName, setCardholderName] = useState<string>("")
 
   const t = useTranslations("membership.checkout")
-  const tp = useTranslations("membership.packages")
+
 
   const slug = resolvedParams.slug
-
-  const stripe = useStripe()
-  const elements = useElements()
 
   const { data: session } = authClient.useSession()
   const user = session?.user
@@ -99,47 +93,22 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
       return
     }
 
-    if (!stripe || !elements) {
-      toast.error("Stripe is not fully loaded. Please try again.")
-      return
-    }
-
-    const cardElement = elements.getElement(CardElement)
-    if (!cardElement) {
-      toast.error("Payment fields are not ready. Please try again.")
-      return
-    }
-
     setIsProcessing(true)
 
     try {
-      const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
-        type: "card",
-        card: cardElement,
-        billing_details: {
-          name: cardholderName,
-          email: user.email,
-        },
-      })
-
-      if (stripeError) {
-        throw new Error(stripeError.message || "Stripe card validation failed.")
-      }
-
-      if (!paymentMethod) {
-        throw new Error("Could not process payment method details.")
-      }
-
-      await buyPackage({
+      const res = await buyPackage({
         packageId: activePackage!.id,
         name: cardholderName,
         email: user.email,
-        paymentMethodId: paymentMethod.id,
+        paymentMethodId: "",
         userId: user.id,
       })
 
-      toast.success("Subscription completed successfully!")
-      setShowSuccessModal(true)
+      if (res && res.checkoutUrl) {
+        window.location.href = res.checkoutUrl
+      } else {
+        throw new Error("Failed to initiate secure checkout redirect.")
+      }
     } catch (err: any) {
       console.error("Subscription payment error:", err)
       toast.error(err.message || "Failed to complete subscription purchase.")
@@ -179,15 +148,9 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
                 <Skeleton className="h-6 w-1/3 mb-6" />
                 <div className="space-y-4">
                   <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-full" />
-                  </div>
                   <Skeleton className="h-20 w-full" />
                 </div>
               </div>
-              <Skeleton className="h-11 w-full mt-4" />
             </div>
           </div>
         </div>
@@ -203,100 +166,53 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
     )
   }
 
-  // Determine localized properties
-  const baseSlug = activePackage.slug.split("-")[0]
-  let title = activePackage.name
-  let subtitle = activePackage.subTitle || ""
-  let description = activePackage.description || ""
-  let features = Array.isArray(activePackage.features) ? (activePackage.features as string[]) : []
-
-  try {
-    title = tp(`items.${baseSlug}.title`)
-    subtitle = tp(`items.${baseSlug}.subtitle`)
-    description = tp(`items.${baseSlug}.description`)
-    features = tp.raw(`items.${baseSlug}.features`) as string[]
-  } catch (e) {
-    // fallback to DB if localization fails
-  }
-
   const basePrice = Number(activePackage.price)
-
-  const cycleText =
-    activePackage.billingCycle === "MONTHLY" ? t("pricePerMonth") : t("pricePerYear")
+  const pkgCycleFormatted = activePackage.billingCycle === "MONTHLY" ? "mo" : "yr"
 
   return (
     <div className="min-h-screen bg-[#F6F4F2] px-4 py-16 font-sans text-[#1C1A19]">
-      <div className="mx-auto max-w-5xl">
-        <button
-          onClick={() => router.push("/membership")}
-          className="group mb-8 inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-[#1C1A19]"
+      <Container className="max-w-5xl">
+        <Link
+          href="/membership"
+          className="mb-8 flex items-center text-xs font-bold tracking-wider text-muted-foreground transition-colors hover:text-[#1C1A19] uppercase"
         >
-          <ArrowLeft
-            size={14}
-            className="transition-transform group-hover:-translate-x-0.5"
-          />
-          {t("back")}
-        </button>
+          <ArrowLeft className="mr-2 h-4 w-4" /> {t("back")}
+        </Link>
 
         <div className="grid items-stretch gap-8 md:grid-cols-12">
-          <Card className="flex flex-col justify-between border-border/60 bg-card p-4 shadow-sm md:col-span-6">
+          {/* Left Side: Summary Card */}
+          <Card className="flex flex-col justify-between rounded-2xl border-border/60 bg-card p-8 shadow-sm md:col-span-6">
             <div>
-              <CardHeader className="p-4">
-                <div className="mb-2">
-                  <Badge
-                    variant="secondary"
-                    className="bg-primary/10 text-primary hover:bg-primary/10"
-                  >
-                    {t("selectedPackage")}
-                  </Badge>
-                </div>
+              <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold tracking-wider text-primary uppercase">
+                {t("checkoutSummary")}
+              </span>
+              <CardHeader className="p-0 pt-4">
                 <CardTitle className="text-3xl font-extrabold text-[#2C2927]">
-                  {title}
+                  {activePackage?.name}
                 </CardTitle>
-                <CardDescription className="mt-3 text-xs text-[14px] font-semibold">
-                  {subtitle}
-                </CardDescription>
-                <CardDescription className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                  {description}
+                <CardDescription className="text-xs text-muted-foreground">
+                  {activePackage?.subTitle || "Exclusive package tier access"}
                 </CardDescription>
               </CardHeader>
-
-              <CardContent className="p-4">
-                <div className="mb-6 flex items-baseline border-y border-border/50 py-4 text-[#1C1A19]">
-                  <span className="text-4xl font-extrabold tracking-tight">
-                    ${basePrice.toFixed(2)}
+              <CardContent className="p-0 py-6">
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {activePackage?.description ||
+                    "Gain exclusive privilege benefits, resources access, event opportunities."}
+                </p>
+                <div className="mt-6">
+                  <span className="text-4xl font-extrabold text-primary">
+                    ${basePrice}
                   </span>
-                  <span className="ml-1.5 text-xs text-muted-foreground">
-                    / {cycleText}
+                  <span className="text-xs text-muted-foreground font-medium">
+                    /{pkgCycleFormatted}
                   </span>
-                </div>
-
-                <div className="space-y-4">
-                  <h4 className="text-xs font-bold tracking-wider text-[#2C2927] uppercase">
-                    {t("includedFeatures")}
-                  </h4>
-                  <ul className="space-y-3 text-xs text-muted-foreground">
-                    {features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2.5">
-                        <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <Check size={10} strokeWidth={3} />
-                        </span>
-                        <span className="leading-normal">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               </CardContent>
             </div>
-
-            <CardFooter className="border-t border-border/40 p-4 pt-4 text-[11px] text-muted-foreground">
-              {t("disclaimer", { cycle: cycleText })}
-            </CardFooter>
           </Card>
 
-          <Card className="relative flex flex-col justify-between overflow-hidden border-border/80 bg-card p-4 shadow-lg md:col-span-6">
-            <div className="absolute top-0 right-0 left-0 h-1 bg-primary" />
-
+          {/* Right Side: Payment Form */}
+          <Card className="flex flex-col justify-between rounded-2xl border-border/80 bg-card shadow-lg md:col-span-6">
             <div>
               <CardHeader className="flex flex-row items-center gap-2.5 space-y-0 border-b border-border/60 p-4 pb-4">
                 <CreditCard className="text-primary" size={18} />
@@ -320,31 +236,6 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
                       placeholder="John Doe"
                       className="h-10 bg-background/50 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring/20"
                     />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                      Card Details
-                    </Label>
-                    <div className="rounded-lg border border-border/80 bg-background/50 p-4">
-                      <CardElement
-                        options={{
-                          style: {
-                            base: {
-                              fontSize: "12px",
-                              color: "#1C1A19",
-                              fontFamily: "inherit",
-                              "::placeholder": {
-                                color: "#8E8C8A",
-                              },
-                            },
-                            invalid: {
-                              color: "#EF4444",
-                            },
-                          },
-                        }}
-                      />
-                    </div>
                   </div>
 
                   <div className="mt-6 space-y-2 rounded-xl bg-muted/50 p-4 text-[11px] font-medium text-muted-foreground">
@@ -385,7 +276,7 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
             </CardFooter>
           </Card>
         </div>
-      </div>
+      </Container>
 
       {showSuccessModal && (
         <div className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 py-4 backdrop-blur-sm duration-200 fade-in">
@@ -399,7 +290,7 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
               </CardTitle>
               <CardDescription className="mt-2 px-2 text-sm leading-relaxed text-muted-foreground">
                 {t("successDesc", {
-                  packageName: title,
+                  packageName: activePackage?.name || "Membership Package",
                 })}
               </CardDescription>
             </CardHeader>

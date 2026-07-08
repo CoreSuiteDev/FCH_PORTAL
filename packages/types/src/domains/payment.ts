@@ -25,7 +25,10 @@ export const ZCDonationInputSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
   userId: z.string().optional(),
-  paymentMethodId: z.string().min(1, "Payment method ID is required"),
+  paymentMethodId: z.string().optional(),
+  isAnonymous: z.boolean().optional(),
+  message: z.string().optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 })
 export type ZTDonationInput = z.infer<typeof ZCDonationInputSchema>
 
@@ -34,7 +37,8 @@ export type ZTDonationInput = z.infer<typeof ZCDonationInputSchema>
  * The frontend uses `clientSecret` with Stripe.js to confirm the payment.
  */
 export const ZCDonationResponseSchema = z.object({
-  clientSecret: z.string(),
+  clientSecret: z.string().optional(),
+  checkoutUrl: z.string().optional(),
   donationId: z.string(),
 })
 export type ZTDonationResponse = z.infer<typeof ZCDonationResponseSchema>
@@ -90,7 +94,7 @@ export const ZTSponsorshipInputSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
   userId: z.string().optional(),
-  paymentMethodId: z.string().min(1, "Payment method ID is required"),
+  paymentMethodId: z.string().optional(),
 })
 
 export type ZTSponsorshipInput = z.infer<typeof ZTSponsorshipInputSchema>
@@ -106,13 +110,14 @@ export const ZCSponsorShipInputSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
   userId: z.string().optional(),
-  paymentMethodId: z.string().min(1, "Payment method ID is required"),
+  paymentMethodId: z.string().optional(),
 })
 
 export type ZTSponsorShipInput = z.infer<typeof ZCSponsorShipInputSchema>
 
 export const ZCSponsorShipResponseSchema = z.object({
-  clientSecret: z.string(),
+  clientSecret: z.string().optional(),
+  checkoutUrl: z.string().optional(),
   sponsorshipId: z.string(),
 })
 export type ZTSponsorShipResponse = z.infer<typeof ZCSponsorShipResponseSchema>

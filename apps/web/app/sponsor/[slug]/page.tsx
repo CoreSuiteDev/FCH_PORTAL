@@ -1,12 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  CardElement,
-  Elements,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js"
+import { Elements } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
 import {
   ArrowLeft,
@@ -40,7 +35,6 @@ import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Field, FieldError, FieldLabel } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
-import { toast } from "@workspace/ui/components/sonner"
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || ""
@@ -67,10 +61,6 @@ function TierDetails() {
   const slug = params.slug as string
   const router = useRouter()
 
-  // Stripe Hooks
-  const stripe = useStripe()
-  const elements = useElements()
-
   // Session
   const { data: session } = authClient.useSession()
   const userId = session?.user?.id
@@ -90,7 +80,6 @@ function TierDetails() {
   const {
     register,
     handleSubmit,
-    trigger,
     formState: { errors },
     reset,
   } = useForm<PersonalInfoValues>({
@@ -196,48 +185,18 @@ function TierDetails() {
   const setupFee = 0
   const totalAmount = basePrice + setupFee
 
-  const handleNextStep = async () => {
-    const isValid = await trigger()
-    if (isValid) {
-      setCurrentStep(2)
-    }
-  }
+  // const handleNextStep = async () => {
+  //   const isValid = await trigger()
+  //   if (isValid) {
+  //     setCurrentStep(2)
+  //   }
+  // }
 
   const handlePaymentSubmit = async (data: PersonalInfoValues) => {
-    if (!stripe || !elements) {
-      setStripeError("Stripe has not loaded yet. Please try again.")
-      return
-    }
-
     setStripeError(null)
-    const cardElement = elements.getElement(CardElement)
-
-    if (!cardElement) {
-      setStripeError("Payment fields are not ready. Please refresh.")
-      return
-    }
 
     try {
-      const { paymentMethod, error: stripeErr } =
-        await stripe.createPaymentMethod({
-          type: "card",
-          card: cardElement,
-          billing_details: {
-            name: data.name,
-            email: data.email,
-            phone: data.phone || undefined,
-          },
-        })
-
-      if (stripeErr) {
-        throw new Error(stripeErr.message || "Failed to process card details.")
-      }
-
-      if (!paymentMethod) {
-        throw new Error("Failed to process payment method. Please try again.")
-      }
-
-      await createSponsorship({
+      const res = await createSponsorship({
         amount: basePrice,
         currency: dbTier?.currency || "USD",
         tier: dbTier?.tier || "BRONZE",
@@ -245,21 +204,20 @@ function TierDetails() {
         name: data.name,
         email: data.email,
         phone: data.phone || undefined,
-        paymentMethodId: paymentMethod.id,
+        paymentMethodId: "",
         userId: userId || undefined,
       })
 
-      // Show Toast & Redirect
-      toast.success("Payment Successful! Generating your receipt...")
-      reset()
-      cardElement.clear()
-
-      router.push(
-        `/sponsor/success?tier=${encodeURIComponent(tier.title)}&amount=${totalAmount}&currency=${dbTier?.currency || "USD"}&txId=${paymentMethod.id}`
-      )
+      if (res && res.checkoutUrl) {
+        router.push(res.checkoutUrl)
+      } else {
+        throw new Error("Failed to initiate secure checkout redirect.")
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setStripeError(err.message)
+      } else {
+        setStripeError("An unexpected error occurred during checkout.")
       }
     }
   }
@@ -390,75 +348,21 @@ function TierDetails() {
                       {errors.phone && <FieldError errors={[errors.phone]} />}
                     </Field>
                     <Button
-                      type="button"
-                      onClick={handleNextStep}
+                      type="submit"
                       className="mt-6 h-12 w-full bg-rose-800 text-base font-semibold hover:cursor-pointer hover:bg-rose-900"
                       disabled={isMutating}
                     >
-                      Continue to Payment
-                    </Button>
-                  </div>
-                )}
-
-                {currentStep === 2 && (
-                  <div className="animate-in space-y-4 fade-in slide-in-from-right-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-gray-500 uppercase">
-                        Card Details
-                      </label>
-                      <div className="rounded-md border border-gray-200 bg-white p-3 shadow-sm">
-                        <CardElement
-                          options={{
-                            style: {
-                              base: {
-                                fontSize: "16px",
-                                color: "#424770",
-                                "::placeholder": { color: "#aab7c4" },
-                              },
-                              invalid: { color: "#9e2146" },
-                            },
-                          }}
-                        />
-                      </div>
-                      {stripeError && (
-                        <p className="mt-2 text-xs font-medium text-red-500">
-                          {stripeError}
-                        </p>
+                      {isMutating ? (
+                        <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                      ) : (
+                        `Pay ${tier.price.charAt(0)}${totalAmount.toLocaleString()}`
                       )}
-                    </div>
-
-                    <div className="mt-6 space-y-3 rounded-lg border border-gray-100 p-4 text-sm">
-                      <div className="flex justify-between border-t border-gray-100 pt-3 font-bold text-gray-900">
-                        <span>Total Billable Amount:</span>
-                        <span>
-                          {tier.price.charAt(0)}
-                          {totalAmount.toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setCurrentStep(1)}
-                        className="h-12 w-1/3 hover:cursor-pointer"
-                        disabled={isMutating}
-                      >
-                        Back
-                      </Button>
-                      <Button
-                        type="submit"
-                        className="h-12 flex-1 bg-rose-800 text-base font-semibold hover:cursor-pointer hover:bg-rose-900"
-                        disabled={!stripe || isMutating}
-                      >
-                        {isMutating ? (
-                          <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : (
-                          `Pay ${tier.price.charAt(0)}${totalAmount.toLocaleString()}`
-                        )}
-                      </Button>
-                    </div>
+                    </Button>
+                    {stripeError && (
+                      <p className="mt-2 text-xs font-medium text-[#EF4444] text-center">
+                        {stripeError}
+                      </p>
+                    )}
                     <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-gray-500">
                       <ShieldCheck size={14} /> Secure Tokenized Stripe Payment
                     </div>
