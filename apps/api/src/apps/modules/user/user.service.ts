@@ -1,5 +1,8 @@
+import crypto from "crypto"
+import { addYears } from "date-fns"
+import { MembershipType, UserStatus } from "../../../generated/prisma/client.js"
 import { prisma } from "../../../infrastructure/database/prisma.js"
-import { UserStatus, MembershipType } from "../../../generated/prisma/client.js"
+import { emailQueue } from "../../../infrastructure/redis/emailQueue.js"
 import { auth } from "../../../lib/auth.js"
 
 export class UserService {
@@ -42,12 +45,8 @@ export class UserService {
               role: true,
             },
           },
-          subscriptions: {
-            include: {
-              payments: true,
-            },
-          },
         },
+        orderBy: { createdAt: "desc" },
       }),
     ])
 
@@ -58,32 +57,40 @@ export class UserService {
    * Update operational status of a user
    */
   static async updateUserStatus(id: string, status: UserStatus) {
-    return prisma.user.update({
-      where: { id },
-      data: { status },
-      include: {
-        userRoles: {
-          include: {
-            role: true,
-          },
+    try {
+      return await prisma.user.update({
+        where: { id },
+        data: { status },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          status: true,
         },
-        subscriptions: {
-          include: {
-            payments: true,
-          },
-        },
-      },
-    })
+      })
+    } catch (error: any) {
+      if (error.code === "P2025") {
+        throw new Error(`Target user with ID '${id}' does not exist.`)
+      }
+      throw error
+    }
   }
 
   /**
    * Delete a user from the database
    */
   static async deleteUser(id: string) {
-    await prisma.user.delete({
-      where: { id },
-    })
-    return { success: true }
+    try {
+      await prisma.user.delete({
+        where: { id },
+      })
+      return { success: true }
+    } catch (error: any) {
+      if (error.code === "P2025") {
+        throw new Error(`Target user with ID '${id}' does not exist.`)
+      }
+      throw error
+    }
   }
 
   /**
@@ -97,50 +104,53 @@ export class UserService {
   }) {
     const status = data.status || "ACTIVE"
 
-    // 1. Create the base User
-    const user = await prisma.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        status,
-        ...(data.tier
-          ? {
-              memberships: {
-                create: {
-                  type: data.tier,
-                  status: "ACTIVE",
-                  startsAt: new Date(),
-                  expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 Year validity
-                },
-              },
-            }
-          : {}),
-      },
+    const existingUser = await prisma.user.findUnique({
+      where: { email: data.email },
     })
+    if (existingUser)
+      throw new Error("A user with this email address already exists.")
 
-    // 2. Assign appropriate Role
     const roleName = data.tier === "PASTORAL" ? "PASTORAL" : "MEMBER"
-    let role = await prisma.role.findUnique({
-      where: { name: roleName },
-    })
+
+    const role = await prisma.role.findUnique({ where: { name: roleName } })
 
     if (!role) {
-      role = await prisma.role.create({
-        data: {
-          name: roleName,
-          description: `Automatically created role for ${roleName}`,
-        },
-      })
+      throw new Error(
+        `Critical Configurataion Error: Required system role '${roleName}' does not exist.`
+      )
     }
 
-    await prisma.userRole.create({
-      data: {
-        userId: user.id,
-        roleId: role.id,
-      },
+    const user = await prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          status,
+          ...(data.tier
+            ? {
+                memberships: {
+                  create: {
+                    type: data.tier,
+                    status: "ACTIVE",
+                    startsAt: new Date(),
+                    expiresAt: addYears(new Date(), 1),
+                  },
+                },
+              }
+            : {}),
+        },
+      })
+
+      await tx.userRole.create({
+        data: {
+          userId: newUser.id,
+          roleId: role.id,
+        },
+      })
+
+      return newUser
     })
 
-    // 3. Refetch complete record
     return UserService.findUserById(user.id)
   }
 
@@ -149,30 +159,31 @@ export class UserService {
    */
   static async updateUserRole(userId: string, roleName: string) {
     const upperRoleName = roleName.toUpperCase()
-    let role = await prisma.role.findUnique({
+
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    })
+
+    if (!userExists) throw new Error(`User with ID '${userId}' not found`)
+
+    const role = await prisma.role.findUnique({
       where: { name: upperRoleName },
     })
 
-    if (!role) {
-      role = await prisma.role.create({
-        data: {
-          name: upperRoleName,
-          description: `Automatically created role for ${upperRoleName}`,
-        },
+    if (!role)
+      throw new Error(
+        `Sequrity Error: Authorized system role '${upperRoleName}' dose not exist`
+      )
+
+    await prisma.$transaction(async (tx) => {
+      await tx.userRole.deleteMany({
+        where: { userId },
       })
-    }
 
-    // Clear previous assignments
-    await prisma.userRole.deleteMany({
-      where: { userId },
-    })
-
-    // Assign new role
-    await prisma.userRole.create({
-      data: {
-        userId,
-        roleId: role.id,
-      },
+      await tx.userRole.create({
+        data: { userId, roleId: role.id },
+      })
     })
 
     return { success: true, role: upperRoleName }
@@ -189,65 +200,78 @@ export class UserService {
       throw new Error("User with this email already registered.")
     }
 
-    const tempPassword = Math.random().toString(36).slice(-10) + "A1!"
+    const tempPassword = crypto.randomBytes(6).toString("hex") + "A1!"
     const context = await auth.$context
     const hashedPassword = await context.password.hash(tempPassword)
 
-    // Create user with passwordChangeRequired: true
-    const user = await prisma.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        status: "ACTIVE",
-        passwordChangeRequired: true,
-        accounts: {
-          create: {
-            providerId: "credential",
-            accountId: data.email,
-            password: hashedPassword,
+    const role = await prisma.role.findUnique({ where: { name: "BOARD" } })
+    if (!role) {
+      throw new Error(
+        "Critical Configuration Error: BOARD role does not exist."
+      )
+    }
+
+    const completedUser = await prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          status: "ACTIVE",
+          passwordChangeRequired: true,
+          accounts: {
+            create: {
+              providerId: "credential",
+              accountId: data.email,
+              password: hashedPassword,
+            },
           },
         },
-      },
-    })
+      })
 
-    // Assign BOARD role
-    let role = await prisma.role.findUnique({
-      where: { name: "BOARD" },
-    })
-    if (!role) {
-      role = await prisma.role.create({
-        data: {
-          name: "BOARD",
-          description: "Board Member Role",
+      await tx.userRole.create({
+        data: { userId: newUser.id, roleId: role.id },
+      })
+
+      // Inline the fetch into the transactional context
+      return tx.user.findUnique({
+        where: { id: newUser.id },
+        include: {
+          userRoles: {
+            include: {
+              role: true,
+            },
+          },
+          subscriptions: {
+            include: {
+              payments: true,
+            },
+          },
         },
       })
-    }
-
-    await prisma.userRole.create({
-      data: {
-        userId: user.id,
-        roleId: role.id,
-      },
     })
 
-    // Send email with registration and temporary password
-    try {
-      const sendMail = (await import("../../../infrastructure/email/email.js")).default
-      const subject = "Welcome to FCH Portal - Board Member Registration"
-      const text = `Dear ${data.name},\n\n` +
-        `A board member account has been created for you on the FCH Portal.\n\n` +
-        `Your login credentials are:\n` +
-        `Email: ${data.email}\n` +
-        `Temporary Password: ${tempPassword}\n\n` +
-        `Please log in using the board login page. You will be required to change your password upon your first login.\n\n` +
-        `Best regards,\nFCH Portal Admin Team`
-      await sendMail(data.email, subject, text)
-      console.log(`[Email] Registration mail sent to new board member: ${data.email}`)
-    } catch (emailError) {
-      console.error(`[Email] Failed to send board member registration email to ${data.email}:`, emailError)
-    }
+    const subject = "Welcome to FCH Portal - Board Member Registration"
+    const text =
+      `Dear ${data.name},\n\n` +
+      `Your login credentials are:\n` +
+      `Email: ${data.email}\n` +
+      `Temporary Password: ${tempPassword}\n\n` +
+      `Best regards,\nFCH Portal Admin Team`
 
-    return UserService.findUserById(user.id)
+    // Fire-and-forget directly into Redis
+    await emailQueue
+      .add(
+        "sendWelcomeEmail",
+        { to: data.email, subject, text },
+        {
+          attempts: 3,
+          backoff: { type: "exponential", delay: 5000 },
+        }
+      )
+      .catch((err) =>
+        console.error("[Queue Intercept] Failed pushing background job:", err)
+      )
+
+    return completedUser
   }
 }
-

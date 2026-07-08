@@ -481,7 +481,7 @@ export class DonationService {
   }
 }
 
-
+// Sponsorship
 export class SponsorShipService {
  static async createStripeSponsorship(body: ZTSponsorshipInput) {
     const { amount, currency, email, phone, name, paymentMethodId, tier, userId, description } = body
@@ -650,6 +650,8 @@ export class SponsorShipService {
   
 }
 
+
+// Membership
 export class MembershipService {
   static async createMembershipSubscription(body: {
     packageId: string
