@@ -20,15 +20,23 @@ export const MembershipManager = () => {
 
   // ── Members tab state ────────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [selectedTier, setSelectedTier] = useState<string>("ALL")
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL")
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 8
 
-  const { data, isLoading, isError } = useMemberships(
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  const { data, isLoading, isError, isFetching } = useMemberships(
     currentPage,
     itemsPerPage,
-    searchQuery,
+    debouncedSearch,
     selectedTier,
     selectedStatus
   )
@@ -42,7 +50,7 @@ export const MembershipManager = () => {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, selectedTier, selectedStatus])
+  }, [debouncedSearch, selectedTier, selectedStatus])
 
   useEffect(() => {
     if (isError) {
@@ -155,6 +163,7 @@ export const MembershipManager = () => {
           setSelectedStatus={setSelectedStatus}
           handleResetFilters={handleResetFilters}
           isLoading={isLoading}
+          isFetching={isFetching}
         />
       ) : (
         <CancellationRequestsPanel />

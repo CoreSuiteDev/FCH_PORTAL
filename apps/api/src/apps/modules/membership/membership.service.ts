@@ -489,6 +489,141 @@ export class MembershipService {
     return updated
   }
 
+  static async filteredMemberships(params: {
+    page: number
+    limit: number
+    skip?: number
+    search?: string
+    status?: string
+    packageId?: string
+    billingCycle?: string
+    startDate?: string
+    endDate?: string
+    minAmount?: number
+    maxAmount?: number
+  }) {
+    const {
+      page,
+      limit,
+      skip,
+      search,
+      status,
+      packageId,
+      billingCycle,
+      startDate,
+      endDate,
+      minAmount,
+      maxAmount,
+    } = params
+
+    const computedSkip = skip ?? (page - 1) * limit
+
+    const where: Prisma.SubscriptionWhereInput = {}
+
+    // Status Filter
+    if (status && status !== "ALL") {
+      const statusMap: Record<
+        string,
+        "ACTIVE" | "PENDING" | "CANCELED" | "EXPIRED" | "UNPAID"
+      > = {
+        ACTIVE: "ACTIVE",
+        PENDING: "PENDING",
+        CANCELED: "CANCELED",
+        EXPIRED: "EXPIRED",
+        UNPAID: "UNPAID",
+        Active: "ACTIVE",
+        Pending: "PENDING",
+        Canceled: "CANCELED",
+        Expired: "EXPIRED",
+        Suspended: "UNPAID",
+      }
+      const mapped = statusMap[status] || (statusMap[status.toUpperCase()] as any)
+      if (mapped) {
+        where.status = mapped
+      }
+    }
+
+    // Package ID Filter
+    if (packageId && packageId !== "ALL") {
+      where.packageId = packageId
+    }
+
+    const packageWhere: any = {}
+
+    // Billing Cycle Filter
+    if (billingCycle && billingCycle !== "ALL") {
+      packageWhere.billingCycle = billingCycle.toUpperCase()
+    }
+
+    // Amount range filter (filters packages by price)
+    if (minAmount !== undefined || maxAmount !== undefined) {
+      packageWhere.price = {
+        gte: minAmount !== undefined ? minAmount : undefined,
+        lte: maxAmount !== undefined ? maxAmount : undefined,
+      }
+    }
+
+    if (Object.keys(packageWhere).length > 0) {
+      where.package = packageWhere
+    }
+
+    // Search Filter
+    if (search) {
+      where.OR = [
+        { id: { contains: search, mode: "insensitive" } },
+        { stripeSubscriptionId: { contains: search, mode: "insensitive" } },
+        { stripeCustomerId: { contains: search, mode: "insensitive" } },
+        {
+          user: {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+              { phone: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        },
+      ]
+    }
+
+    // Date Range Filter (based on subscription creation date)
+    if (startDate || endDate) {
+      where.createdAt = {
+        gte: startDate ? new Date(startDate) : undefined,
+        lte: endDate ? new Date(endDate) : undefined,
+      }
+    }
+
+    const [totalCount, data] = await prisma.$transaction([
+      prisma.subscription.count({ where }),
+      prisma.subscription.findMany({
+        where,
+        skip: computedSkip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              createdAt: true,
+            },
+          },
+          package: true,
+          payments: {
+            orderBy: { createdAt: "desc" },
+          },
+        },
+      }),
+    ])
+
+    return {
+      data,
+      totalCount,
+    }
+  }
+
   // ── Cancellation request flow ────────────────────────────────────────────
 
   /**

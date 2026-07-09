@@ -235,4 +235,46 @@ export const membershipRouter = router({
     .mutation(async ({ input }) => {
       return MembershipController.processCancellation(input)
     }),
+
+  filteredMemberships: adminProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/payment/memberships/filter",
+        tags: ["payment"],
+        summary: "Filter membership subscriptions",
+        description: "Returns a filtered, paginated list of membership subscriptions",
+      },
+    })
+    .input(
+      z.object({
+        page: z.number().int().positive().default(1),
+        limit: z.number().int().positive().default(10),
+        skip: z.number().int().optional(),
+        search: z.string().optional().default(""),
+        status: z.string().optional().default("ALL"),
+        packageId: z.string().optional().default("ALL"),
+        billingCycle: z.string().optional().default("ALL"),
+        startDate: z.string().optional().default(""),
+        endDate: z.string().optional().default(""),
+        minAmount: z.number().optional(),
+        maxAmount: z.number().optional(),
+      })
+    )
+    .output(z.any())
+    .query(async ({ input }) => {
+      return MembershipController.filteredMemberships({
+        page: input.page,
+        limit: input.limit,
+        skip: input.skip,
+        search: input.search,
+        status: input.status,
+        packageId: input.packageId,
+        billingCycle: input.billingCycle,
+        startDate: input.startDate,
+        endDate: input.endDate,
+        minAmount: input.minAmount,
+        maxAmount: input.maxAmount,
+      })
+    }),
 })

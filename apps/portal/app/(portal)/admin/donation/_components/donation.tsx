@@ -23,7 +23,8 @@ import {
 } from "@workspace/ui/components/table"
 
 // Local Components
-import { useDonationHistory } from "@/hooks/useDonation"
+import { useFilterDonations } from "@/hooks/useDonation"
+import { useDonationStore } from "@/store/use-donation-store"
 import { ZTDonationHistoryItem } from "@workspace/types"
 import DonationStats from "./donation-stats"
 import { DonationFilter } from "./filter-donation"
@@ -33,13 +34,29 @@ export const Donation = () => {
   const itemsPerPage = 20
 
   const {
+    searchQuery,
+    selectedTier,
+    selectedDate,
+    minAmount,
+    maxAmount,
+  } = useDonationStore()
+
+  const {
     data: responseData,
     isLoading,
     isFetching,
     isError,
     error,
     refetch,
-  } = useDonationHistory(currentPage, itemsPerPage)
+  } = useFilterDonations({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchQuery,
+    role: selectedTier === "All" ? undefined : selectedTier,
+    minAmount: minAmount ? Number(minAmount) : undefined,
+    maxAmount: maxAmount ? Number(maxAmount) : undefined,
+    createdAt: selectedDate ? selectedDate.toISOString() : undefined,
+  })
 
   // Table Columns Definition
   const columnHelper = createColumnHelper<ZTDonationHistoryItem>()

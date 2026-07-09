@@ -178,6 +178,7 @@ interface MembershipTableProps {
   setSelectedStatus: (val: string) => void
   handleResetFilters: () => void
   isLoading?: boolean
+  isFetching?: boolean
 }
 
 // ─── main component ───────────────────────────────────────────────────────────
@@ -198,6 +199,7 @@ export const MembershipTable = ({
   setSelectedStatus,
   handleResetFilters,
   isLoading = false,
+  isFetching = false,
 }: MembershipTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([])
   const [dialog, setDialog] = useState<DialogState>({ kind: "none" })
@@ -535,8 +537,11 @@ export const MembershipTable = ({
         <div className="space-y-4 border-b border-slate-100 p-6 dark:border-slate-900">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <CardTitle className="text-lg font-bold text-slate-900 dark:text-slate-50">
+              <CardTitle className="text-lg font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
                 Members Directory &amp; Status Sync
+                {isFetching && !isLoading && (
+                  <RefreshCw className="size-4 animate-spin text-slate-400" />
+                )}
               </CardTitle>
               <CardDescription className="mt-0.5 text-xs">
                 {isLoading

@@ -88,6 +88,7 @@ type DialogState =
 export const CancellationRequestsPanel = () => {
   const [page, setPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [selectedTier, setSelectedTier] = useState("ALL")
   const [statusFilter, setStatusFilter] = useState("ALL")
   const [dialog, setDialog] = useState<DialogState>({ kind: "none" })
@@ -95,10 +96,17 @@ export const CancellationRequestsPanel = () => {
   const [adminNote, setAdminNote] = useState("")
   const limit = 8
 
-  const { data, isLoading, isError } = useCancellationRequests(
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  const { data, isLoading, isError, isFetching } = useCancellationRequests(
     page,
     limit,
-    searchQuery,
+    debouncedSearch,
     selectedTier,
     statusFilter
   )
@@ -106,7 +114,7 @@ export const CancellationRequestsPanel = () => {
 
   React.useEffect(() => {
     setPage(1)
-  }, [searchQuery, selectedTier, statusFilter])
+  }, [debouncedSearch, selectedTier, statusFilter])
 
   const handleResetFilters = () => {
     setSearchQuery("")
@@ -309,6 +317,7 @@ export const CancellationRequestsPanel = () => {
     },
   ]
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: requests,
     columns,
@@ -418,8 +427,11 @@ export const CancellationRequestsPanel = () => {
         <div className="p-6 border-b border-slate-100 dark:border-slate-900 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <CardTitle className="text-lg font-bold text-slate-900 dark:text-slate-50">
+              <CardTitle className="text-lg font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
                 Cancellation Requests
+                {isFetching && !isLoading && (
+                  <RefreshCw className="size-4 animate-spin text-slate-400" />
+                )}
               </CardTitle>
               <CardDescription className="text-xs mt-0.5">
                 {isLoading

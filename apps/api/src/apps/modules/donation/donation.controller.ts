@@ -18,4 +18,12 @@ export class DonationController {
     return DonationService.deleteDonation(id);
   }
 
+  static async getDonationStats() {
+    return DonationService.getDonationStats();
+  }
+
+  static async filterDonations(params: Parameters<typeof DonationService.filterDonations>[0]) {
+    return DonationService.filterDonations(params);
+  }
+
 }

@@ -49,4 +49,10 @@ export class MembershipController {
   ) {
     return MembershipService.processCancellation(body)
   }
+
+  static async filteredMemberships(
+    params: Parameters<typeof MembershipService.filteredMemberships>[0]
+  ) {
+    return MembershipService.filteredMemberships(params)
+  }
 }

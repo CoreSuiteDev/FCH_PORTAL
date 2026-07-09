@@ -106,4 +106,103 @@ export const donationRouter = router({
     .mutation(async ({ input }) => {
       return DonationController.deleteDonation(input.id)
     }),
+
+  filterDonations: adminProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/payment/donation/filter",
+        tags: ["payment"],
+        summary: "Filter donation history",
+        description: "Returns a paginated, filtered list of user donation histories",
+      },
+    })
+    .input(
+      z.object({
+        page: z.number().int().positive().default(1),
+        limit: z.number().int().positive().default(10),
+        skip: z.number().int().optional(),
+        status: z.string().optional().default("ALL"),
+        search: z.string().optional().default(""),
+        minAmount: z.number().optional(),
+        maxAmount: z.number().optional(),
+        createdAt: z.string().optional().default(""),
+        role: z.string().optional().default("ALL"),
+      })
+    )
+    .output(ZCPaginatedDonationHistorySchema)
+    .query(async ({ input }) => {
+      const page = input.page
+      const limit = input.limit
+      const skip = input.skip ?? (page - 1) * limit
+      const { totalCount, data } = await DonationController.filterDonations({
+        page,
+        limit,
+        skip,
+        status: input.status,
+        search: input.search,
+        minAmount: input.minAmount as any,
+        maxAmount: input.maxAmount as any,
+        createdAt: input.createdAt,
+        role: input.role,
+      })
+      return {
+        data: data.map((d) => {
+          let topRole = "USER"
+          if (d.user) {
+            const roles = d.user.userRoles.map((ur: any) => ur.role.name)
+            if (roles.includes("SUPER_ADMIN")) {
+              topRole = "SUPER_ADMIN"
+            } else if (roles.includes("BOARD")) {
+              topRole = "BOARD"
+            } else if (roles.includes("PASTORAL")) {
+              topRole = "PASTORAL"
+            } else if (roles.includes("MEMBER")) {
+              topRole = "MEMBER"
+            } else if (roles[0]) {
+              topRole = roles[0]
+            }
+          }
+          return {
+            id: d.id,
+            amount: Number(d.amount),
+            status: d.status,
+            currency: d.currency,
+            donator: d.donator,
+            user: d.user
+              ? {
+                  id: d.user.id,
+                  name: d.user.name,
+                  email: d.user.email,
+                  phone: d.user.phone ?? null,
+                  role: topRole,
+                  createdAt: d.user.createdAt,
+                }
+              : null,
+            receiptUrl: d.receiptUrl,
+            paymentMethod: d.paymentMethod,
+            cardBrand: d.cardBrand,
+            cardLast4: d.cardLast4,
+            stripeCustomerId: d.donator?.stripeCustomerId || null,
+            createdAt: d.createdAt,
+          }
+        }),
+        meta: getPaginationMeta(totalCount, page, limit),
+      }
+    }),
+
+  getDonationStats: adminProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/payment/donation/stats",
+        tags: ["payment"],
+        summary: "Get donation statistics",
+        description: "Returns role-based and overall donation revenue statistics",
+      },
+    })
+    .output(z.any())
+    .query(async () => {
+      return DonationController.getDonationStats()
+    }),
 })
