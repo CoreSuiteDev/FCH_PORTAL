@@ -20,11 +20,12 @@ import {
 import { AlertCircle, RefreshCcw, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 
-import { useSponsorshipHistory, useDeleteSponsorship } from "@/hooks/useSponsor"
+import { useFilterSponsorship, useDeleteSponsorship } from "@/hooks/useSponsor"
+import { useSponsorStore } from "@/store/use-sponsor-store"
 import { toast } from "@workspace/ui/components/sonner"
 import type { ZTCSPonsorshipHistoryItem } from "@workspace/types"
 import Link from "next/link"
-import { SponsorFilter } from "./sopncer-filter"
+import { SponsorFilter } from "./sponsor-filter"
 import SponsorStats from "./sponsor-stats"
 
 type SponsorshipRecord = ZTCSPonsorshipHistoryItem
@@ -284,8 +285,27 @@ export default function Sponsor() {
     [currentPage]
   )
 
+  const {
+    searchQuery,
+    selectedTier,
+    selectedSponsorship,
+    selectedDate,
+    minAmount,
+    maxAmount,
+  } = useSponsorStore()
+
   const { data, isLoading, isError, error, refetch, isFetching } =
-    useSponsorshipHistory(currentPage, ITEMS_PER_PAGE)
+    useFilterSponsorship({
+      page: currentPage,
+      limit: ITEMS_PER_PAGE,
+      status: "ALL",
+      search: searchQuery,
+      tier: selectedSponsorship === "All" ? undefined : selectedSponsorship,
+      role: selectedTier === "All" ? undefined : selectedTier,
+      minAmount: minAmount ? Number(minAmount) : undefined,
+      maxAmount: maxAmount ? Number(maxAmount) : undefined,
+      startDate: selectedDate ? selectedDate.toISOString() : undefined,
+    })
 
   console.log(data)
 

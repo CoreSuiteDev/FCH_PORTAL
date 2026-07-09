@@ -20,6 +20,38 @@ export const useDeleteSponsorship = () => {
       api.delete(`/payment/sponsorship/${id}`).then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sponsorship-history"] })
+      queryClient.invalidateQueries({ queryKey: ["sponsorship-history-filtered"] })
     },
+  })
+}
+
+export const useFilterSponsorship = (params: {
+  page?: number
+  limit?: number
+  skip?: number
+  status?: string
+  search?: string
+  minAmount?: number
+  maxAmount?: number
+  startDate?: string
+  endDate?: string
+  tier?: string
+  role?: string
+}) => {
+  return useQuery<ZTPaginatedSponsorshipHistory>({
+    queryKey: ["sponsorship-history-filtered", params],
+    queryFn: () =>
+      api
+        .get("/payment/sponsorship/filter", { params })
+        .then((res) => res.data),
+    placeholderData: (prev) => prev,
+  })
+}
+
+export const useSponsorStats = () => {
+  return useQuery({
+    queryKey: ["sponsorship-stats"],
+    queryFn: () =>
+      api.get("/payment/sponsorship/stats").then((res) => res.data),
   })
 }

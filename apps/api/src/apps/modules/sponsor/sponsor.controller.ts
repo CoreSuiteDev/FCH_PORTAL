@@ -14,4 +14,14 @@ export class SponsorshipController {
   static async deleteSponsorship(id: string) {
     return SponsorShipService.deleteSponsorship(id)
   }
+
+  static async filterSponsorship(
+    params: Parameters<typeof SponsorShipService.filterSponsorship>[0]
+  ) {
+    return SponsorShipService.filterSponsorship(params)
+  }
+
+  static async getSponsorStats() {
+    return SponsorShipService.getSponsorStats()
+  }
 }

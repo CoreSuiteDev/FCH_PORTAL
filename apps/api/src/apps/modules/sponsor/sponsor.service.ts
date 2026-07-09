@@ -162,4 +162,291 @@ export class SponsorShipService {
     }
     return sponsorship
   }
+
+
+  static async filterSponsorship(params: {
+    page: number
+    limit: number
+    skip: number
+    status: string
+    search : string
+    minAmount : number
+    maxAmount: number
+    startDate : string
+    endDate : string
+    tier?: string
+    role?: string
+  }) {
+    const { page, limit, skip, status, search, minAmount, maxAmount, startDate, endDate, tier, role } = params
+
+    const where: any = {}
+
+    // Status Filter
+    if (status && status !== "ALL") {
+      where.status = status.toUpperCase()
+    }
+
+    // Tier Filter (plan tier)
+    if (tier && tier !== "ALL") {
+      where.plan = {
+        tier: tier.toUpperCase() as any
+      }
+    }
+
+    // Role Filter (user role)
+    if (role && role !== "ALL") {
+      const dbRoleName = role.toUpperCase() === "GENERAL" ? "MEMBER" : role.toUpperCase();
+      where.user = {
+        userRoles: {
+          some: {
+            role: {
+              name: dbRoleName
+            }
+          }
+        }
+      }
+    }
+
+    // Search Filter (Sponsor name, email, phone or userId/sponsorshipId)
+    if (search) {
+      where.OR = [
+        { id: { contains: search, mode: "insensitive" } },
+        {
+          sponsor: {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+              { phone: { contains: search, mode: "insensitive" } }
+            ]
+          }
+        },
+        {
+          user: {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } }
+            ]
+          }
+        }
+      ]
+    }
+
+    // Amount Filter (minAmount, maxAmount)
+    if (minAmount !== undefined && minAmount !== null && !isNaN(minAmount)) {
+      where.amount = {
+        ...where.amount,
+        gte: minAmount
+      }
+    }
+    if (maxAmount !== undefined && maxAmount !== null && !isNaN(maxAmount)) {
+      where.amount = {
+        ...where.amount,
+        lte: maxAmount
+      }
+    }
+
+    // Date Filter (startDate, endDate)
+    if (startDate) {
+      where.createdAt = {
+        ...where.createdAt,
+        gte: new Date(startDate)
+      }
+    }
+    if (endDate) {
+      where.createdAt = {
+        ...where.createdAt,
+        lte: new Date(endDate)
+      }
+    }
+
+    const offset = skip !== undefined ? skip : (page - 1) * limit
+
+    const [data, totalCount] = await prisma.$transaction([
+      prisma.sponsorship.findMany({
+        where,
+        skip: offset,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        include: {
+          sponsor: true,
+          plan: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+              userRoles: {
+                select: {
+                  role: true,
+                },
+              },
+              createdAt: true,
+            },
+          },
+        },
+      }),
+      prisma.sponsorship.count({ where }),
+    ])
+
+    return { data, totalCount }
+  }
+
+
+  static async getSponsorStats() {
+    const now = new Date()
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+
+    const successfulSponsorships = await prisma.sponsorship.findMany({
+      where: {
+        status: "SUCCEEDED",
+      },
+      include: {
+        plan: true,
+      },
+    })
+
+    const tiers = ["DIAMOND", "PLATINUM", "GOLD", "SILVER", "BRONZE"]
+    const planStats: Record<
+      string,
+      {
+        dailyAmount: number
+        monthlyAmount: number
+        yearlyAmount: number
+        totalAmount: number
+        dailyCount: number
+        monthlyCount: number
+        yearlyCount: number
+        totalCount: number
+      }
+    > = {}
+
+    tiers.forEach((tier) => {
+      planStats[tier] = {
+        dailyAmount: 0,
+        monthlyAmount: 0,
+        yearlyAmount: 0,
+        totalAmount: 0,
+        dailyCount: 0,
+        monthlyCount: 0,
+        yearlyCount: 0,
+        totalCount: 0,
+      }
+    })
+
+    const totalStats = {
+      dailyAmount: 0,
+      monthlyAmount: 0,
+      yearlyAmount: 0,
+      totalAmount: 0,
+      dailyCount: 0,
+      monthlyCount: 0,
+      yearlyCount: 0,
+      totalCount: 0,
+    }
+
+    successfulSponsorships.forEach((s) => {
+      const amount = Number(s.amount)
+      const date = s.createdAt
+      const tier = s.plan?.tier?.toUpperCase()
+
+      // Update total/overall stats
+      totalStats.totalAmount += amount
+      totalStats.totalCount += 1
+      if (date >= oneDayAgo) {
+        totalStats.dailyAmount += amount
+        totalStats.dailyCount += 1
+      }
+      if (date >= oneMonthAgo) {
+        totalStats.monthlyAmount += amount
+        totalStats.monthlyCount += 1
+      }
+      if (date >= oneYearAgo) {
+        totalStats.yearlyAmount += amount
+        totalStats.yearlyCount += 1
+      }
+
+      // Update plan stats
+      if (tier && planStats[tier]) {
+        planStats[tier].totalAmount += amount
+        planStats[tier].totalCount += 1
+        if (date >= oneDayAgo) {
+          planStats[tier].dailyAmount += amount
+          planStats[tier].dailyCount += 1
+        }
+        if (date >= oneMonthAgo) {
+          planStats[tier].monthlyAmount += amount
+          planStats[tier].monthlyCount += 1
+        }
+        if (date >= oneYearAgo) {
+          planStats[tier].yearlyAmount += amount
+          planStats[tier].yearlyCount += 1
+        }
+      }
+    })
+
+    const formattedSponsorPackages = tiers.map((tier) => {
+      const stats = planStats[tier] || {
+        dailyAmount: 0,
+        monthlyAmount: 0,
+        yearlyAmount: 0,
+        totalAmount: 0,
+        dailyCount: 0,
+        monthlyCount: 0,
+        yearlyCount: 0,
+        totalCount: 0,
+      }
+      let color = "text-orange-600"
+      let light = "text-orange-500"
+
+      if (tier === "DIAMOND") {
+        color = "text-red-600"
+        light = "text-red-500"
+      } else if (tier === "PLATINUM") {
+        color = "text-slate-900"
+        light = "text-slate-600"
+      } else if (tier === "GOLD") {
+        color = "text-amber-600"
+        light = "text-amber-500"
+      } else if (tier === "SILVER") {
+        color = "text-blue-600"
+        light = "text-blue-500"
+      }
+
+      return {
+        title: tier,
+        total: `$${stats.totalAmount.toLocaleString()}`,
+        yearly: `$${stats.yearlyAmount.toLocaleString()}`,
+        monthly: `$${stats.monthlyAmount.toLocaleString()}`,
+        daily: `$${stats.dailyAmount.toLocaleString()}`,
+        totalCount: stats.totalCount,
+        yearlyCount: stats.yearlyCount,
+        monthlyCount: stats.monthlyCount,
+        dailyCount: stats.dailyCount,
+        color,
+        light,
+      }
+    })
+
+    const formattedTotalSummary = {
+      title: "TOTAL SPONSORSHIP REVENUE",
+      mainValue: `$${totalStats.totalAmount.toLocaleString()}`,
+      lifetime: `$${totalStats.totalAmount.toLocaleString()}`,
+      yearly: `$${totalStats.yearlyAmount.toLocaleString()}`,
+      monthly: `$${totalStats.monthlyAmount.toLocaleString()}`,
+      daily: `$${totalStats.dailyAmount.toLocaleString()}`,
+      totalCount: totalStats.totalCount,
+      yearlyCount: totalStats.yearlyCount,
+      monthlyCount: totalStats.monthlyCount,
+      dailyCount: totalStats.dailyCount,
+    }
+
+    return {
+      totalSummary: formattedTotalSummary,
+      sponsorPackages: formattedSponsorPackages,
+    }
+  }
+
 }

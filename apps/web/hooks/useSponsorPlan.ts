@@ -43,6 +43,7 @@ export const useCreateSponsorship = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sponsorship-history"] })
+      queryClient.invalidateQueries({ queryKey: ["sponsorship-history-filtered"] })
     },
   })
 }

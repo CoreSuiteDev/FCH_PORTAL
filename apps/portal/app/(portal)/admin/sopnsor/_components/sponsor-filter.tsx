@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import {
   Search,
   Calendar as CalendarIcon,
@@ -26,7 +26,8 @@ import {
 
 import { useSponsorStore } from "@/store/use-sponsor-store"
 import { cn } from "@workspace/ui/lib/utils"
-import { sponsorships } from "@/constants/sponsor-data"
+import { useFilterSponsorship } from "@/hooks/useSponsor"
+import { useSponsorPlans } from "@/hooks/useSponsorPlan"
 
 export function SponsorFilter() {
   const {
@@ -44,9 +45,64 @@ export function SponsorFilter() {
     setMaxAmount,
   } = useSponsorStore()
 
+  // Local state for immediate typing (to support debouncing)
+  const [localSearch, setLocalSearch] = useState(searchQuery)
+  const [localMin, setLocalMin] = useState(minAmount)
+  const [localMax, setLocalMax] = useState(maxAmount)
+
   const [openTier, setOpenTier] = useState(false)
   const [openSponsor, setOpenSponsor] = useState(false)
   const [openDate, setOpenDate] = useState(false)
+
+  // Debouncing Search Query (500ms delay)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchQuery(localSearch)
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [localSearch, setSearchQuery])
+
+  // Debouncing Min Amount Query (500ms delay)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setMinAmount(localMin)
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [localMin, setMinAmount])
+
+  // Debouncing Max Amount Query (500ms delay)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setMaxAmount(localMax)
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [localMax, setMaxAmount])
+
+  // Fetch all sponsor plans dynamically from API
+  const { data: sponsorPlans } = useSponsorPlans()
+
+  // Extract unique tiers from the API plans data
+  const sponsorTiers = useMemo(() => {
+    if (!sponsorPlans || sponsorPlans.length === 0) {
+      return ["All", "Diamond", "Platinum", "Gold", "Silver", "Bronze"]
+    }
+    const uniqueTiers = Array.from(
+      new Set(sponsorPlans.map((p) => p.tier.charAt(0) + p.tier.slice(1).toLowerCase()))
+    )
+    return ["All", ...uniqueTiers]
+  }, [sponsorPlans])
+
+  // Call the sponsor filter api in this file using TanStack Query
+  const { data: filteredData } = useFilterSponsorship({
+    page: 1,
+    limit: 10,
+    search: searchQuery,
+    tier: selectedSponsorship === "All" ? undefined : selectedSponsorship,
+    role: selectedTier === "All" ? undefined : selectedTier,
+    minAmount: minAmount ? Number(minAmount) : undefined,
+    maxAmount: maxAmount ? Number(maxAmount) : undefined,
+    startDate: selectedDate ? selectedDate.toISOString() : undefined,
+  })
 
   const tiers = ["All", "General", "Pastoral", "Board"]
 
@@ -59,8 +115,8 @@ export function SponsorFilter() {
               <Search className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search name, email, or ID..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={localSearch}
+                onChange={(e) => setLocalSearch(e.target.value)}
                 className="h-9 pl-9 focus-visible:ring-rose-600"
               />
             </div>
@@ -71,16 +127,16 @@ export function SponsorFilter() {
                 <Input
                   type="number"
                   placeholder="Min"
-                  value={minAmount}
-                  onChange={(e) => setMinAmount(e.target.value)}
+                  value={localMin}
+                  onChange={(e) => setLocalMin(e.target.value)}
                   className="h-7 w-16 border-none bg-transparent text-xs shadow-none"
                 />
                 <span className="text-slate-300">-</span>
                 <Input
                   type="number"
                   placeholder="Max"
-                  value={maxAmount}
-                  onChange={(e) => setMaxAmount(e.target.value)}
+                  value={localMax}
+                  onChange={(e) => setLocalMax(e.target.value)}
                   className="h-7 w-16 border-none bg-transparent text-xs shadow-none"
                 />
               </div>
@@ -138,7 +194,7 @@ export function SponsorFilter() {
                   <Command>
                     <CommandList>
                       <CommandGroup>
-                        {sponsorships.data.map((s) => (
+                        {sponsorTiers.map((s) => (
                           <CommandItem
                             key={s}
                             onSelect={() => {
