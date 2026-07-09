@@ -4,7 +4,6 @@ import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   IconArrowLeft,
-  IconAlertCircle,
   IconCheck,
   IconClock,
   IconX,
@@ -78,14 +77,14 @@ export default function UserMembershipBillingPage() {
   const [selectedSubId, setSelectedSubId] = useState<string>("")
   const [reason, setReason] = useState("")
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [now, setNow] = useState<number | null>(null)
 
   // Find the selected subscription details
   const selectedSub = memberships.find((s) => s.id === selectedSubId)
 
   // Client-side pro-rata estimation
   const estimateRefund = () => {
-    if (!selectedSub) return 0
-    const now = Date.now()
+    if (!selectedSub || !now) return 0
     const end = new Date(selectedSub.expiryDate || "").getTime()
     const amountStr = selectedSub.amountPaid?.replace(/[^0-9.]/g, "") || "0"
     const amount = parseFloat(amountStr)
@@ -121,6 +120,7 @@ export default function UserMembershipBillingPage() {
       refetch()
       setReason("")
       setSelectedSubId("")
+      setNow(null)
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed to submit cancellation request.")
     } finally {
@@ -183,7 +183,10 @@ export default function UserMembershipBillingPage() {
                     .map((sub) => (
                       <button
                         key={sub.id}
-                        onClick={() => setSelectedSubId(sub.id)}
+                        onClick={() => {
+                          setSelectedSubId(sub.id)
+                          setNow(Date.now())
+                        }}
                         className={`w-full text-left p-4 rounded-xl border-2 transition-all cursor-pointer ${
                           selectedSubId === sub.id
                             ? "border-slate-900 bg-slate-50/50 dark:border-slate-100 dark:bg-slate-900/50"

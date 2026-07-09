@@ -1,14 +1,14 @@
 "use client"
 
-import React, { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Check } from "lucide-react"
+import { usePackages } from "@/hooks/usePackage"
+import { usePackageStore } from "@/store/use-membership-store"
 import { Button } from "@workspace/ui/components/button"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { toast } from "@workspace/ui/components/sonner"
-import { usePackageStore } from "@/store/use-membership-store"
-import { usePackages } from "@/hooks/usePackage"
+import { Check } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function MembershipPackages() {
   const router = useRouter()
@@ -70,7 +70,7 @@ export default function MembershipPackages() {
             {Array.from({ length: 2 }).map((_, idx) => (
               <div
                 key={idx}
-                className="relative flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-8 shadow-md h-[450px]"
+                className="relative flex h-[450px] flex-col justify-between rounded-2xl border border-border/60 bg-card p-8 shadow-md"
               >
                 <div>
                   <div className="mb-5">
@@ -96,9 +96,12 @@ export default function MembershipPackages() {
     )
   }
 
-  const filteredPackages = packages?.filter(
-    (pkg) => pkg.isActive && pkg.billingCycle === (billingCycle === "monthly" ? "MONTHLY" : "YEARLY")
-  ) || []
+  const filteredPackages =
+    packages?.filter(
+      (pkg) =>
+        pkg.isActive &&
+        pkg.billingCycle === (billingCycle === "monthly" ? "MONTHLY" : "YEARLY")
+    ) || []
 
   const registryItems = filteredPackages.map((pkg) => {
     const baseSlug = pkg.slug.split("-")[0]
@@ -110,8 +113,12 @@ export default function MembershipPackages() {
       title = t(`items.${baseSlug}.title`)
       description = t(`items.${baseSlug}.description`)
       features = t.raw(`items.${baseSlug}.features`) as string[]
-    } catch (e) {
-      // fallback to DB if localization fails
+    } catch (e: unknown) {
+      throw new Error(
+        e instanceof Error
+          ? e.message
+          : "Failed to load membership packages. Please try again later."
+      )
     }
 
     return {

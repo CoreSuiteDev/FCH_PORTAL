@@ -1,11 +1,6 @@
 import { api } from "@/lib/axios"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import {
-  ZTContactInquery,
-  ZTPaginatedInqueries,
-  ZTNewsletter,
-  ZTPaginatedNewsletters,
-} from "@workspace/types"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { ZTPaginatedInqueries, ZTPaginatedNewsletters } from "@workspace/types"
 
 // --- Contact Inquiries Hooks ---
 
@@ -15,8 +10,7 @@ export const useInqueriesList = (params?: {
 }) => {
   return useQuery<ZTPaginatedInqueries>({
     queryKey: ["inqueries-list", params],
-    queryFn: () =>
-      api.get("/inquery/list", { params }).then((res) => res.data),
+    queryFn: () => api.get("/inquery/list", { params }).then((res) => res.data),
   })
 }
 

@@ -135,7 +135,7 @@ function ResourceLink({ title, desc, icon }: any) {
       className="group rounded-xl border bg-card p-5 transition-all hover:shadow-md"
     >
       <div className="mb-3 flex items-center gap-3">
-        <div className="rounded-lg bg-primary/10 p-2 text-primary">{icon}</div>
+        <div className="rounded-lg bg-primary/1010 p-2 text-primary">{icon}</div>
         <h4 className="font-semibold">{title}</h4>
       </div>
       <p className="mb-4 text-sm text-muted-foreground">{desc}</p>
