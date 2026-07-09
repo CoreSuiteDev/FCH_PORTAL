@@ -123,15 +123,17 @@ export class PaymentService {
               "payment_intent.latest_charge",
               "subscription",
               "subscription.latest_invoice",
-              "subscription.latest_invoice.payments",
+              "subscription.latest_invoice.payment_intent",
+              "subscription.latest_invoice.charge",
               "invoice",
-              "invoice.payments",
+              "invoice.payment_intent",
+              "invoice.charge",
             ],
           }
         )
 
         let chargeObj: Stripe.Charge | null = null
-        let invoiceObj: Stripe.Invoice | null = null
+        let invoiceObj: any = null
 
         // Subscription flow: invoice is attached to the subscription
         if (expandedSession.subscription) {
@@ -143,21 +145,17 @@ export class PaymentService {
             invoiceUrl =
               invoiceObj.hosted_invoice_url || invoiceObj.invoice_pdf || null
 
-            const firstPayment = invoiceObj.payments?.data?.[0]
-            if (firstPayment?.payment.payment_intent) {
+            if (invoiceObj.payment_intent) {
               paymentIntentId =
-                typeof firstPayment.payment.payment_intent === "string"
-                  ? firstPayment.payment.payment_intent
-                  : firstPayment.payment.payment_intent.id
+                typeof invoiceObj.payment_intent === "string"
+                  ? invoiceObj.payment_intent
+                  : invoiceObj.payment_intent.id
             }
-            if (firstPayment?.payment.charge) {
-              const charge = firstPayment.payment.charge
-              if (typeof charge === "string") {
-                stripeChargeId = charge
-              } else {
-                chargeObj = charge as Stripe.Charge
-                stripeChargeId = charge.id
-              }
+            if (invoiceObj.charge) {
+              stripeChargeId =
+                typeof invoiceObj.charge === "string"
+                  ? invoiceObj.charge
+                  : invoiceObj.charge.id
             }
           }
 
@@ -201,23 +199,19 @@ export class PaymentService {
             invoiceUrl =
               invoiceObj.hosted_invoice_url || invoiceObj.invoice_pdf || null
 
-            // Fallback: get payment intent / charge from invoice payments
+            // Fallback: get payment intent / charge from invoice
             if (!paymentIntentId || !stripeChargeId) {
-              const firstPayment = invoiceObj.payments?.data?.[0]
-              if (!paymentIntentId && firstPayment?.payment.payment_intent) {
+              if (!paymentIntentId && invoiceObj.payment_intent) {
                 paymentIntentId =
-                  typeof firstPayment.payment.payment_intent === "string"
-                    ? firstPayment.payment.payment_intent
-                    : firstPayment.payment.payment_intent.id
+                  typeof invoiceObj.payment_intent === "string"
+                    ? invoiceObj.payment_intent
+                    : invoiceObj.payment_intent.id
               }
-              if (!stripeChargeId && firstPayment?.payment.charge) {
-                const charge = firstPayment.payment.charge
-                if (typeof charge === "string") {
-                  stripeChargeId = charge
-                } else {
-                  chargeObj = charge as Stripe.Charge
-                  stripeChargeId = charge.id
-                }
+              if (!stripeChargeId && invoiceObj.charge) {
+                stripeChargeId =
+                  typeof invoiceObj.charge === "string"
+                    ? invoiceObj.charge
+                    : invoiceObj.charge.id
               }
             }
           }
