@@ -199,5 +199,46 @@ export const userRouter = router({
         user: mapUser(user),
       }
     }),
+
+  filterUsers: adminProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/users/filter",
+        tags: ["users"],
+        summary: "Filter registered users",
+        description: "Returns a paginated list of filtered users",
+      },
+    })
+    .input(
+      z.object({
+        page: z.number().int().positive().default(1),
+        limit: z.number().int().positive().default(10),
+        skip: z.number().int().optional(),
+        search: z.string().optional().default(""),
+        status: z.enum(["ACTIVE", "RESTRICTED", "SUSPENDED", "BANNED", "ALL" as any]).optional().default("ALL" as any),
+        role: z.string().optional().default("ALL"),
+        createdAt: z.string().optional().default(""),
+      })
+    )
+    .output(ZCIPaginatedUsersSchema)
+    .query(async ({ input }) => {
+      const page = input.page
+      const limit = input.limit
+      const skip = input.skip ?? (page - 1) * limit
+      const { totalCount, data } = await UserController.filterUser({
+        page,
+        limit,
+        skip,
+        search: input.search,
+        status: input.status as any,
+        role: input.role,
+        createdAt: input.createdAt,
+      })
+      return {
+        data: data.map(mapUser),
+        meta: getPaginationMeta(totalCount, page, limit),
+      }
+    }),
 })
 

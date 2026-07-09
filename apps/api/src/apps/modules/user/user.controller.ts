@@ -119,5 +119,12 @@ export class UserController {
       })
     }
   }
+
+  /**
+   * Controller for filtering and listing users dynamically
+   */
+  static async filterUser(params: Parameters<typeof UserService.filterUser>[0]) {
+    return UserService.filterUser(params)
+  }
 }
 

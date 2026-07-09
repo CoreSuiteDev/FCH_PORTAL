@@ -274,4 +274,81 @@ export class UserService {
 
     return completedUser
   }
+
+
+  static async filterUser(params: {
+    page: number
+    limit: number
+    skip?: number
+    search?: string
+    status?: UserStatus
+    role?: string
+    createdAt?: string
+  }) {
+    const { page, limit, skip, search, status, role, createdAt } = params
+    const computedSkip = skip ?? (page - 1) * limit
+
+    const where: any = {}
+
+    // Status Filter
+    if (status && status !== "ALL" as any) {
+      where.status = status
+    }
+
+    // Role Filter
+    if (role && role !== "ALL") {
+      where.userRoles = {
+        some: {
+          role: {
+            name: role.toUpperCase(),
+          },
+        },
+      }
+    }
+
+    // Search Filter (name, email, phone)
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+        { phone: { contains: search, mode: "insensitive" } },
+        { id: { contains: search } },
+      ]
+    }
+
+    // Date Filter (createdAt)
+    if (createdAt) {
+      where.createdAt = {
+        gte: new Date(createdAt),
+      }
+    }
+
+    const [totalCount, data] = await prisma.$transaction([
+      prisma.user.count({ where }),
+      prisma.user.findMany({
+        where,
+        skip: computedSkip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        include: {
+          userRoles: {
+            include: {
+              role: true,
+            },
+          },
+          subscriptions: {
+            include: {
+              package: true,
+              payments: true,
+            },
+          },
+        },
+      }),
+    ])
+
+    return {
+      data,
+      totalCount,
+    }
+  }
 }

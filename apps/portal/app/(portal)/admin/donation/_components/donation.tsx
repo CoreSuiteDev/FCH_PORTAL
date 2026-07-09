@@ -22,9 +22,10 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 
+import { Skeleton } from "@workspace/ui/components/skeleton"
+
 // Local Components
 import { useFilterDonations } from "@/hooks/useDonation"
-import { useDonationStore } from "@/store/use-donation-store"
 import { ZTDonationHistoryItem } from "@workspace/types"
 import DonationStats from "./donation-stats"
 import { DonationFilter } from "./filter-donation"
@@ -33,13 +34,11 @@ export const Donation = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 20
 
-  const {
-    searchQuery,
-    selectedTier,
-    selectedDate,
-    minAmount,
-    maxAmount,
-  } = useDonationStore()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedTier, setSelectedTier] = useState("All")
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+  const [minAmount, setMinAmount] = useState("")
+  const [maxAmount, setMaxAmount] = useState("")
 
   const {
     data: responseData,
@@ -227,7 +226,18 @@ export const Donation = () => {
       <DonationStats />
 
       <div className="mb-6">
-        <DonationFilter />
+        <DonationFilter
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedTier={selectedTier}
+          setSelectedTier={setSelectedTier}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          minAmount={minAmount}
+          setMinAmount={setMinAmount}
+          maxAmount={maxAmount}
+          setMaxAmount={setMaxAmount}
+        />
       </div>
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -279,17 +289,26 @@ export const Donation = () => {
           <TableBody>
             {/* 1. INITIAL LOADING STATE */}
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-64 text-center"
-                >
-                  <div className="flex flex-col items-center justify-center text-slate-500">
-                    <Loader2 className="mb-4 h-8 w-8 animate-spin text-slate-400" />
-                    <p>Loading donation records...</p>
-                  </div>
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i} className="border-b border-slate-100">
+                  <TableCell className="py-4"><Skeleton className="h-4 w-6" /></TableCell>
+                  <TableCell className="py-4"><Skeleton className="h-4 w-20" /></TableCell>
+                  <TableCell className="py-4">
+                    <div className="space-y-1.5">
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-4"><Skeleton className="h-5 w-14 rounded-full" /></TableCell>
+                  <TableCell className="py-4"><Skeleton className="h-4 w-10" /></TableCell>
+                  <TableCell className="py-4"><Skeleton className="h-4 w-16" /></TableCell>
+                  <TableCell className="py-4"><Skeleton className="h-4 w-14" /></TableCell>
+                  <TableCell className="py-4"><Skeleton className="h-4 w-14" /></TableCell>
+                  <TableCell className="py-4"><Skeleton className="h-4 w-10" /></TableCell>
+                  <TableCell className="py-4"><Skeleton className="h-4 w-20" /></TableCell>
+                  <TableCell className="py-4"><Skeleton className="h-4 w-16" /></TableCell>
+                </TableRow>
+              ))
             ) : /* 2. ERROR STATE */
             isError ? (
               <TableRow>

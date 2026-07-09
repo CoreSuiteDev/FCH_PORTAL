@@ -7,24 +7,41 @@ import { Button } from "@workspace/ui/components/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover"
 import { Calendar } from "@workspace/ui/components/calendar"
 import { Card, CardContent } from "@workspace/ui/components/card"
-import { useDonationStore } from "@/store/use-donation-store"
-import { useFilterDonations } from "@/hooks/useDonation"
 
-const TIERS = ["All", "General", "Pastoral", "Board", "Guest"] as const;
+const TIERS = ["All", "General", "Pastoral", "Board", "Guest"] as const
 
-export function DonationFilter() {
-  const {
-    searchQuery, selectedTier, selectedDate, minAmount, maxAmount,
-    setSearchQuery, setSelectedTier, setSelectedDate, setMinAmount, setMaxAmount
-  } = useDonationStore()
+interface DonationFilterProps {
+  searchQuery: string
+  setSearchQuery: (val: string) => void
+  selectedTier: string
+  setSelectedTier: (val: string) => void
+  selectedDate: Date | undefined
+  setSelectedDate: (date: Date | undefined) => void
+  minAmount: string
+  setMinAmount: (val: string) => void
+  maxAmount: string
+  setMaxAmount: (val: string) => void
+}
 
+export function DonationFilter({
+  searchQuery,
+  selectedTier,
+  selectedDate,
+  minAmount,
+  maxAmount,
+  setSearchQuery,
+  setSelectedTier,
+  setSelectedDate,
+  setMinAmount,
+  setMaxAmount,
+}: DonationFilterProps) {
   const [localFilters, setLocalFilters] = useState({
     search: searchQuery,
     min: minAmount,
     max: maxAmount,
   })
 
-  
+  // Debouncing Inputs (500ms delay)
   useEffect(() => {
     const handler = setTimeout(() => {
       setSearchQuery(localFilters.search)
@@ -35,9 +52,17 @@ export function DonationFilter() {
     return () => clearTimeout(handler)
   }, [localFilters.search, localFilters.min, localFilters.max, setSearchQuery, setMinAmount, setMaxAmount])
 
+  // Sync state if cleared from parent
+  useEffect(() => {
+    setLocalFilters({
+      search: searchQuery,
+      min: minAmount,
+      max: maxAmount,
+    })
+  }, [searchQuery, minAmount, maxAmount])
 
   const handleInputChange = (field: keyof typeof localFilters, value: string) => {
-    setLocalFilters(prev => ({ ...prev, [field]: value }))
+    setLocalFilters((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleClearFilters = () => {
@@ -49,25 +74,12 @@ export function DonationFilter() {
     setLocalFilters({ search: "", min: "", max: "" })
   }
 
-
   const hasActiveFilters = searchQuery || selectedTier !== "All" || selectedDate || minAmount || maxAmount
-
-
-  const { data: filteredData } = useFilterDonations({
-    page: 1,
-    limit: 10,
-    search: searchQuery,
-    role: selectedTier === "All" ? undefined : selectedTier,
-    minAmount: minAmount ? Number(minAmount) : undefined,
-    maxAmount: maxAmount ? Number(maxAmount) : undefined,
-    createdAt: selectedDate ? selectedDate.toISOString() : undefined,
-  })
 
   return (
     <Card className="border-amber-200/60 bg-white shadow-xs">
       <CardContent className="space-y-4 p-4">
         <div className="flex flex-col items-center justify-between gap-4 lg:flex-row">
-          
           {/* Search Input */}
           <div className="relative w-full lg:w-96">
             <Search className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
@@ -80,7 +92,6 @@ export function DonationFilter() {
           </div>
 
           <div className="flex w-full flex-wrap items-center justify-end gap-3 lg:w-auto">
-            
             {/* Amount Inputs */}
             <div className="flex items-center gap-2 rounded-md border border-gray-100 bg-gray-50 p-1">
               <span className="flex items-center gap-0.5 px-1 text-xs text-muted-foreground">
@@ -127,9 +138,7 @@ export function DonationFilter() {
                   key={tier}
                   onClick={() => setSelectedTier(tier)}
                   className={`rounded px-3 py-1 transition-colors hover:cursor-pointer ${
-                    selectedTier === tier
-                      ? "bg-amber-950 text-white"
-                      : "text-gray-600 hover:bg-gray-200"
+                    selectedTier === tier ? "bg-amber-950 text-white" : "text-gray-600 hover:bg-gray-200"
                   }`}
                 >
                   {tier}
