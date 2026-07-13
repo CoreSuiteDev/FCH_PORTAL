@@ -153,7 +153,12 @@ services:
       - portal
       - api
     networks:
-      - app-network
+      app-network:
+        aliases:
+          - fch-catechesis.org
+          - www.fch-catechesis.org
+          - portal.fch-catechesis.org
+          - api.fch-catechesis.org
     logging:
       driver: "json-file"
       options:
