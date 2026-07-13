@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
 import { IconCalendarOff, IconLock, IconVideo, IconCalendarEvent } from "@tabler/icons-react"
 import { useSessionInfo } from "@/hooks/use-session-info"
@@ -19,7 +19,22 @@ export default function EventsPage() {
   const checkinMutation = useCheckinEvent()
 
   const [activeCategoryId, setActiveCategoryId] = useState<string>("all")
+  const [activeType, setActiveType] = useState<string>("all")
   const [mutatingId, setMutatingId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const category = params.get("category")
+      const type = params.get("type")
+      if (category) {
+        setActiveCategoryId(category)
+      }
+      if (type) {
+        setActiveType(type.toLowerCase())
+      }
+    }
+  }, [])
 
   const user = session?.user
   const allEvents = eventsData?.data || []
@@ -39,13 +54,24 @@ export default function EventsPage() {
     return reg ? reg.checkedIn : false
   }
 
-  // Filter by selected category tab
+  // Filter by selected category and type tabs
   const filteredEvents = useMemo(() => {
-    if (activeCategoryId === "all") return allEvents
-    return allEvents.filter((ev: any) =>
-      ev.categories?.some((c: any) => c.id === activeCategoryId)
-    )
-  }, [allEvents, activeCategoryId])
+    let result = allEvents
+
+    if (activeCategoryId !== "all") {
+      result = result.filter((ev: any) =>
+        ev.categories?.some((c: any) => c.id === activeCategoryId)
+      )
+    }
+
+    if (activeType === "event") {
+      result = result.filter((ev: any) => ev.eventType === "EVENT")
+    } else if (activeType === "webinar") {
+      result = result.filter((ev: any) => ev.eventType === "WEBINAR")
+    }
+
+    return result
+  }, [allEvents, activeCategoryId, activeType])
 
   const handleRegister = async (eventId: string) => {
     setMutatingId(eventId)
@@ -133,23 +159,41 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Category Tabs */}
-      <Tabs value={activeCategoryId} onValueChange={setActiveCategoryId} className="w-full">
-        <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/60 border p-1 rounded-xl w-fit">
-          <TabsTrigger value="all" className="text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer">
-            All
-          </TabsTrigger>
-          {categories.map((cat: any) => (
-            <TabsTrigger
-              key={cat.id}
-              value={cat.id}
-              className="text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer"
-            >
-              {cat.name}
+      {/* Filters Container */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b pb-4">
+        {/* Category Tabs */}
+        <Tabs value={activeCategoryId} onValueChange={setActiveCategoryId} className="w-auto">
+          <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/60 border p-1 rounded-xl w-fit">
+            <TabsTrigger value="all" className="text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer">
+              All Categories
             </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+            {categories.map((cat: any) => (
+              <TabsTrigger
+                key={cat.id}
+                value={cat.id}
+                className="text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer"
+              >
+                {cat.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+
+        {/* Type Filter Tabs */}
+        <Tabs value={activeType} onValueChange={setActiveType} className="w-auto">
+          <TabsList className="flex h-auto gap-1 bg-muted/60 border p-1 rounded-xl w-fit">
+            <TabsTrigger value="all" className="text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer">
+              All Types
+            </TabsTrigger>
+            <TabsTrigger value="event" className="text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer">
+              Events Only
+            </TabsTrigger>
+            <TabsTrigger value="webinar" className="text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer">
+              Webinars Only
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
       {/* Events Grid */}
       {filteredEvents.length === 0 ? (

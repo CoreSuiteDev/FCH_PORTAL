@@ -88,7 +88,7 @@ export function EventCard({
           </span>
         </div>
 
-        <Link href={isWebinar ? `/portal/webinars/${event.id}` : `/portal/events/${event.id}`}>
+        <Link href={`/portal/events/${event.id}`}>
           <h3 className="line-clamp-2 text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-primary cursor-pointer hover:underline">
             {event.title}
           </h3>

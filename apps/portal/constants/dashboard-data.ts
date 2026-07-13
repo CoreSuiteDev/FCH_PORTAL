@@ -195,11 +195,6 @@ export const data = {
       icon: IconHierarchy,
     },
     {
-      title: "Advanced Webinars",
-      url: "/portal/webinars/advanced",
-      icon: IconVideo,
-    },
-    {
       title: "Special Pastoral Resources",
       url: "/portal/resources/special",
       icon: IconFileText,

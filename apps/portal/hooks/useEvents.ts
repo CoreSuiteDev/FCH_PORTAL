@@ -132,7 +132,7 @@ export const useRegisterEvent = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (eventId: string) =>
-      api.post(`/events/${eventId}/register`).then((res) => res.data),
+      api.post(`/events/${eventId}/register`, {}).then((res) => res.data),
     onSuccess: (_, eventId) => {
       queryClient.invalidateQueries({ queryKey: ["events-list"] })
       queryClient.invalidateQueries({ queryKey: ["event", eventId] })

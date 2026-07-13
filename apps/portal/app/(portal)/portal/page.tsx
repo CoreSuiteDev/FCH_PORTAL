@@ -1,103 +1,500 @@
-import { IconArrowRight, IconInfoCircle } from "@tabler/icons-react"
-import Link from "next/link"
+"use client"
 
-export default function PortalDashboardPage() {
+import React, { useMemo } from "react"
+import Link from "next/link"
+import {
+  IconArrowRight,
+  IconCalendarEvent,
+  IconCheck,
+  IconChevronRight,
+  IconClock,
+  IconFileText,
+  IconMapPin,
+  IconNews,
+  IconShieldCheck,
+  IconSpeakerphone,
+  IconUsers,
+  IconVideo,
+  IconBook,
+} from "@tabler/icons-react"
+import { useSessionInfo } from "@/hooks/use-session-info"
+import { useEventsList } from "@/hooks/useEvents"
+import { useMyMemberships } from "@/hooks/useMembership"
+import { useNewsList } from "@/hooks/useNews"
+import { Skeleton } from "@workspace/ui/components/skeleton"
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function formatDate(d: Date | string) {
+  return new Date(d).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
+
+function getGreeting() {
+  const h = new Date().getHours()
+  if (h < 12) return "Good morning"
+  if (h < 17) return "Good afternoon"
+  return "Good evening"
+}
+
+function MembershipStatusBadge({
+  status,
+}: {
+  status: string | undefined
+}) {
+  if (!status) return null
+  const map: Record<string, { label: string; cls: string }> = {
+    Active: {
+      label: "Active",
+      cls: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    },
+    Pending: {
+      label: "Pending",
+      cls: "border-amber-500/30 bg-amber-500/10 text-amber-700",
+    },
+    Expired: {
+      label: "Expired",
+      cls: "border-rose-500/30 bg-rose-500/10 text-rose-700",
+    },
+    Canceled: {
+      label: "Canceled",
+      cls: "border-slate-400/30 bg-slate-400/10 text-slate-600",
+    },
+  }
+  const cfg = map[status] ?? {
+    label: status,
+    cls: "border-slate-400/30 bg-slate-400/10 text-slate-600",
+  }
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">
-            Member Dashboard
-          </h2>
-          <p className="text-muted-foreground">
-            Welcome to the FCH Member Portal. Access announcements, event
-            signups, learning webinars, and basic resources.
-          </p>
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${cfg.cls}`}
+    >
+      <IconShieldCheck className="size-3" />
+      {cfg.label}
+    </span>
+  )
+}
+
+// ─── Quick Access Items ───────────────────────────────────────────────────────
+
+const quickLinks = [
+  {
+    title: "Events & Webinars",
+    href: "/portal/events",
+    description: "Register for upcoming summits, workshops and live webinars.",
+    icon: IconCalendarEvent,
+    color: "text-primary bg-primary/10",
+  },
+  {
+    title: "Announcements",
+    href: "/portal/announcements",
+    description: "Read latest system notifications and member updates.",
+    icon: IconSpeakerphone,
+    color: "text-amber-600 bg-amber-500/10",
+  },
+  {
+    title: "Resource Library",
+    href: "/portal/resources/basic",
+    description: "Download handbooks, outreach templates and reference files.",
+    icon: IconBook,
+    color: "text-emerald-600 bg-emerald-500/10",
+  },
+  {
+    title: "News & Newsletters",
+    href: "/portal/news",
+    description: "Browse FCH monthly newsletters and community news.",
+    icon: IconNews,
+    color: "text-sky-600 bg-sky-500/10",
+  },
+  {
+    title: "Documents",
+    href: "/portal/documents",
+    description: "Access bylaws, policies, and organizational documents.",
+    icon: IconFileText,
+    color: "text-violet-600 bg-violet-500/10",
+  },
+  {
+    title: "My Profile",
+    href: "/portal/profile",
+    description: "Update your personal details, password and preferences.",
+    icon: IconUsers,
+    color: "text-rose-600 bg-rose-500/10",
+  },
+]
+
+// ─── Stat Card ────────────────────────────────────────────────────────────────
+
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  color,
+  loading,
+}: {
+  label: string
+  value: string | number
+  icon: React.ElementType
+  color: string
+  loading?: boolean
+}) {
+  return (
+    <div className="flex items-center gap-4 rounded-2xl border bg-card p-5 shadow-xs">
+      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${color}`}>
+        <Icon className="size-5" />
+      </div>
+      <div className="min-w-0">
+        <div className="text-xs font-semibold text-muted-foreground">{label}</div>
+        {loading ? (
+          <Skeleton className="mt-1 h-7 w-10" />
+        ) : (
+          <div className="text-2xl font-extrabold text-foreground">{value}</div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── Event Mini-Card ──────────────────────────────────────────────────────────
+
+function EventMiniCard({ event }: { event: any }) {
+  const isWebinar = event.eventType === "WEBINAR"
+  const reg = event.registrations?.[0] ?? null
+  const registered = reg?.status === "CONFIRMED"
+  const checkedIn = reg?.checkedIn ?? false
+  const href = `/portal/events/${event.id}`
+
+  return (
+    <Link
+      href={href}
+      className="group flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-xs transition-all hover:border-primary/30 hover:shadow-md"
+    >
+      {/* Top badges */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span
+          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase ${
+            isWebinar
+              ? "border-sky-500/20 bg-sky-500/10 text-sky-600"
+              : "border-emerald-500/20 bg-emerald-500/10 text-emerald-600"
+          }`}
+        >
+          {isWebinar ? (
+            <IconVideo className="size-2.5" />
+          ) : (
+            <IconCalendarEvent className="size-2.5" />
+          )}
+          {isWebinar ? "Webinar" : "Event"}
+        </span>
+        {checkedIn ? (
+          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold text-emerald-700">
+            <IconCheck className="size-2.5" /> Checked In
+          </span>
+        ) : registered ? (
+          <span className="inline-flex items-center gap-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[9px] font-bold text-indigo-700">
+            <IconCheck className="size-2.5" /> Registered
+          </span>
+        ) : null}
+      </div>
+
+      {/* Title */}
+      <h4 className="line-clamp-2 text-sm font-bold text-foreground transition-colors group-hover:text-primary">
+        {event.title}
+      </h4>
+
+      {/* Meta */}
+      <div className="space-y-1 text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-1.5">
+          <IconClock className="size-3.5 shrink-0 text-primary" />
+          <span>{formatDate(event.startDate)}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {isWebinar ? (
+            <IconVideo className="size-3.5 shrink-0 text-sky-500" />
+          ) : (
+            <IconMapPin className="size-3.5 shrink-0 text-amber-500" />
+          )}
+          <span className="truncate">{event.location}</span>
         </div>
       </div>
 
-      {/* Developer Notes / TODO */}
-      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
-        <div className="flex items-start gap-3">
-          <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
-          <div>
-            <h4 className="font-semibold text-primary">
-              Developer TODO Checklist:
-            </h4>
-            <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>
-                {` Retrieve logged-in user context and display customized greetings
-                (e.g. "Welcome back, John!").`}
-              </li>
-              <li>
-                Render dynamic member badge status (Active, Expired, Canceled)
-                by verifying Stripe/MemberPress webhooks inside DB.
-              </li>
-              <li>
-                Setup widgets to show recent unread announcements, next event
-                registration, and basic statistics.
-              </li>
-            </ul>
+      <div className="flex items-center gap-1 text-[10px] font-bold text-primary">
+        View Details
+        <IconChevronRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+      </div>
+    </Link>
+  )
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function PortalDashboardPage() {
+  const { data: session, isLoading: isSessionLoading } = useSessionInfo()
+  const user = session?.user
+  const userId = user?.id ?? ""
+
+  const { data: eventsData, isLoading: isEventsLoading } = useEventsList({
+    page: 1,
+    limit: 50,
+  })
+
+  const { data: memberships, isLoading: isMemberLoading } = useMyMemberships(userId)
+
+  const { data: newsData, isLoading: isNewsLoading } = useNewsList({
+    page: 1,
+    limit: 4,
+    status: "PUBLISHED",
+  })
+
+  // Derive stats
+  const activeMembership = useMemo(
+    () => memberships?.find((m) => m.status === "Active"),
+    [memberships]
+  )
+
+  const allEvents = eventsData?.data ?? []
+  const upcomingEvents = useMemo(
+    () =>
+      allEvents
+        .filter((e) => e.status === "UPCOMING" || e.status === "ONGOING")
+        .slice(0, 6),
+    [allEvents]
+  )
+
+  const registeredCount = useMemo(
+    () =>
+      allEvents.filter(
+        (e) => e.registrations && e.registrations.length > 0 && e.registrations[0]?.status === "CONFIRMED"
+      ).length,
+    [allEvents]
+  )
+
+  const checkedInCount = useMemo(
+    () =>
+      allEvents.filter(
+        (e) =>
+          e.registrations &&
+          e.registrations.length > 0 &&
+          e.registrations[0]?.checkedIn
+      ).length,
+    [allEvents]
+  )
+
+  const recentNews = newsData?.data ?? []
+
+  return (
+    <div className="flex-1 space-y-8 p-8 pt-6">
+
+      {/* ── Hero Greeting ─────────────────────────────────────────── */}
+      <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-card to-card p-8 shadow-xs">
+        {/* decorative blobs */}
+        <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-8 left-1/3 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
+
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1.5">
+            {isSessionLoading ? (
+              <>
+                <Skeleton className="h-9 w-72" />
+                <Skeleton className="h-4 w-56" />
+              </>
+            ) : (
+              <>
+                <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+                  {getGreeting()},{" "}
+                  <span className="text-amber-600 dark:text-amber-400">
+                    {user?.name?.split(" ")[0] ?? "Member"}
+                  </span>{" "}
+                  👋
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Welcome back to your FCH Pastoral Member portal.
+                </p>
+              </>
+            )}
+          </div>
+
+          {/* Membership badge */}
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            {isMemberLoading ? (
+              <Skeleton className="h-8 w-36" />
+            ) : activeMembership ? (
+              <>
+                <MembershipStatusBadge status={activeMembership.status} />
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {activeMembership.packageName}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  Expires {formatDate(activeMembership.expiryDate)}
+                </span>
+              </>
+            ) : (
+              <span className="text-xs text-muted-foreground">No active membership</span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Dashboard Shortcuts */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[
-          {
-            title: "Member Announcements",
-            href: "/portal/announcements",
-            description: "View latest news updates and system notifications.",
-          },
-          {
-            title: "Events Registration",
-            href: "/portal/events",
-            description: "Browse upcoming workshops and register for summits.",
-          },
-          {
-            title: "Webinar Recordings",
-            href: "/portal/webinars",
-            description: "Watch past member training and guest recordings.",
-          },
-          {
-            title: "Basic Resource Library",
-            href: "/portal/resources/basic",
-            description:
-              "Download outreach templates, handbooks, and reference files.",
-          },
-          {
-            title: "FCH General Documents",
-            href: "/portal/documents",
-            description:
-              "Access bylaws, organizational policies, and safety guides.",
-          },
-          {
-            title: "News/Newsletter Archive",
-            href: "/portal/news",
-            description: "Browse monthly FCH Connection newsletters archive.",
-          },
-        ].map((item, index) => (
+      {/* ── Stats Row ──────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard
+          label="Membership Tier"
+          value={activeMembership?.tier ?? "—"}
+          icon={IconShieldCheck}
+          color="text-amber-600 bg-amber-500/10"
+          loading={isMemberLoading}
+        />
+        <StatCard
+          label="Events Available"
+          value={allEvents.length}
+          icon={IconCalendarEvent}
+          color="text-primary bg-primary/10"
+          loading={isEventsLoading}
+        />
+        <StatCard
+          label="Registered"
+          value={registeredCount}
+          icon={IconUsers}
+          color="text-indigo-600 bg-indigo-500/10"
+          loading={isEventsLoading}
+        />
+        <StatCard
+          label="Checked In"
+          value={checkedInCount}
+          icon={IconCheck}
+          color="text-emerald-600 bg-emerald-500/10"
+          loading={isEventsLoading}
+        />
+      </div>
+
+      {/* ── Upcoming Events ────────────────────────────────────────── */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-extrabold tracking-tight text-foreground">
+            Upcoming Events &amp; Webinars
+          </h2>
           <Link
-            key={index}
-            href={item.href}
-            className="group flex flex-col justify-between rounded-lg border bg-card p-6 shadow-xs transition-all hover:border-muted-foreground/30 hover:shadow-md"
+            href="/portal/events"
+            className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
           >
-            <div>
-              <h4 className="text-base font-bold tracking-tight transition-colors group-hover:text-primary">
-                {item.title}
-              </h4>
-              <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                {item.description}
-              </p>
-            </div>
-            <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-primary">
-              Access Page{" "}
-              <IconArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-            </div>
+            View all <IconArrowRight className="size-3" />
           </Link>
-        ))}
+        </div>
+
+        {isEventsLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-44 rounded-2xl" />
+            ))}
+          </div>
+        ) : upcomingEvents.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed py-16 text-center">
+            <IconCalendarEvent className="size-10 text-muted-foreground/40" />
+            <p className="text-sm font-semibold text-muted-foreground">
+              No upcoming events right now.
+            </p>
+            <p className="text-xs text-muted-foreground">Check back soon!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {upcomingEvents.map((event) => (
+              <EventMiniCard key={event.id} event={event} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Quick Access + Latest News ─────────────────────────────── */}
+      <div className="grid gap-6 lg:grid-cols-3">
+
+        {/* Quick Access */}
+        <div className="lg:col-span-2 space-y-4">
+          <h2 className="text-lg font-extrabold tracking-tight text-foreground">
+            Quick Access
+          </h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {quickLinks.map((item) => {
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="group flex items-start gap-3.5 rounded-2xl border bg-card p-4 shadow-xs transition-all hover:border-primary/30 hover:shadow-md"
+                >
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.color}`}
+                  >
+                    <Icon className="size-4.5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold text-foreground transition-colors group-hover:text-primary">
+                        {item.title}
+                      </span>
+                      <IconChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                    </div>
+                    <p className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">
+                      {item.description}
+                    </p>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Latest News */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-extrabold tracking-tight text-foreground">
+              Latest News
+            </h2>
+            <Link
+              href="/portal/news"
+              className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+            >
+              All news <IconArrowRight className="size-3" />
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border bg-card shadow-xs divide-y overflow-hidden">
+            {isNewsLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="px-5 py-4 space-y-1.5">
+                  <Skeleton className="h-3.5 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              ))
+            ) : recentNews.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+                <IconNews className="size-8 text-muted-foreground/40" />
+                <p className="text-xs text-muted-foreground">No news yet.</p>
+              </div>
+            ) : (
+              recentNews.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/portal/news`}
+                  className="group flex items-start gap-3 px-5 py-4 transition-colors hover:bg-muted/40"
+                >
+                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <IconNews className="size-3.5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-2 text-xs font-semibold text-foreground transition-colors group-hover:text-primary">
+                      {item.title}
+                    </p>
+                    <p className="mt-0.5 text-[10px] text-muted-foreground">
+                      {item.publishedAt ? formatDate(item.publishedAt) : "Draft"}
+                    </p>
+                  </div>
+                  <IconChevronRight className="mt-0.5 size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
