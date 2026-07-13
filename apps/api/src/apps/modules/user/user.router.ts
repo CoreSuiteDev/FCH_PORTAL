@@ -358,5 +358,97 @@ export const userRouter = router({
     .query(async ({ input }) => {
       return UserController.getMemberDetails({ userId: input.userId })
     }),
+
+  getAdminOverview: adminProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/users/admin-overview",
+        tags: ["users"],
+        summary: "Get admin overview matrix and operational stats",
+        description: "Returns statistics for users, revenue, recent activities, chart data, and platform upkeep logs",
+      },
+    })
+    .input(z.object({}))
+    .output(
+      z.object({
+        membersCount: z.object({
+          total: z.number(),
+          active: z.number(),
+          suspended: z.number(),
+          restricted: z.number(),
+          roles: z.object({
+            SUPER_ADMIN: z.number(),
+            ADMIN: z.number(),
+            BOARD: z.number(),
+            PASTORAL: z.number(),
+            MEMBER: z.number(),
+            USER: z.number(),
+          }),
+        }),
+        revenue: z.object({
+          total: z.number(),
+          subscriptions: z.number(),
+          donations: z.number(),
+          sponsorships: z.number(),
+        }),
+        recentBoardMembers: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            email: z.string(),
+            role: z.string(),
+            createdAt: z.date(),
+          })
+        ),
+        recentDonations: z.array(
+          z.object({
+            id: z.string(),
+            amount: z.number(),
+            currency: z.string(),
+            status: z.string(),
+            createdAt: z.date(),
+            donatorName: z.string(),
+          })
+        ),
+        recentSponsorships: z.array(
+          z.object({
+            id: z.string(),
+            amount: z.number(),
+            currency: z.string(),
+            status: z.string(),
+            createdAt: z.date(),
+            sponsorName: z.string(),
+            packageName: z.string(),
+          })
+        ),
+        pendingTasks: z.array(
+          z.object({
+            id: z.string(),
+            title: z.string(),
+            priority: z.string(),
+          })
+        ),
+        membershipTrends: z.array(
+          z.object({
+            month: z.string(),
+            general: z.number(),
+            pastoral: z.number(),
+            board: z.number(),
+            revenue: z.number(),
+          })
+        ),
+        platformUpkeepMetrics: z.array(
+          z.object({
+            id: z.number(),
+            label: z.string(),
+            value: z.string(),
+          })
+        ),
+      })
+    )
+    .query(async () => {
+      return UserController.getAdminOverview()
+    }),
 })
 

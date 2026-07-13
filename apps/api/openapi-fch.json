@@ -2348,6 +2348,360 @@
         }
       }
     },
+    "/users/admin-overview": {
+      "get": {
+        "operationId": "user-getAdminOverview",
+        "summary": "Get admin overview matrix and operational stats",
+        "description": "Returns statistics for users, revenue, recent activities, chart data, and platform upkeep logs",
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "membersCount": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "active": {
+                          "type": "number"
+                        },
+                        "suspended": {
+                          "type": "number"
+                        },
+                        "restricted": {
+                          "type": "number"
+                        },
+                        "roles": {
+                          "type": "object",
+                          "properties": {
+                            "SUPER_ADMIN": {
+                              "type": "number"
+                            },
+                            "ADMIN": {
+                              "type": "number"
+                            },
+                            "BOARD": {
+                              "type": "number"
+                            },
+                            "PASTORAL": {
+                              "type": "number"
+                            },
+                            "MEMBER": {
+                              "type": "number"
+                            },
+                            "USER": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "SUPER_ADMIN",
+                            "ADMIN",
+                            "BOARD",
+                            "PASTORAL",
+                            "MEMBER",
+                            "USER"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "active",
+                        "suspended",
+                        "restricted",
+                        "roles"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "revenue": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "subscriptions": {
+                          "type": "number"
+                        },
+                        "donations": {
+                          "type": "number"
+                        },
+                        "sponsorships": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "subscriptions",
+                        "donations",
+                        "sponsorships"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "recentBoardMembers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "email",
+                          "role",
+                          "createdAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "recentDonations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "donatorName": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "amount",
+                          "currency",
+                          "status",
+                          "createdAt",
+                          "donatorName"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "recentSponsorships": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "sponsorName": {
+                            "type": "string"
+                          },
+                          "packageName": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "amount",
+                          "currency",
+                          "status",
+                          "createdAt",
+                          "sponsorName",
+                          "packageName"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "pendingTasks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "priority": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "priority"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "membershipTrends": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "month": {
+                            "type": "string"
+                          },
+                          "general": {
+                            "type": "number"
+                          },
+                          "pastoral": {
+                            "type": "number"
+                          },
+                          "board": {
+                            "type": "number"
+                          },
+                          "revenue": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "month",
+                          "general",
+                          "pastoral",
+                          "board",
+                          "revenue"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "platformUpkeepMetrics": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "label",
+                          "value"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "membersCount",
+                    "revenue",
+                    "recentBoardMembers",
+                    "recentDonations",
+                    "recentSponsorships",
+                    "pendingTasks",
+                    "membershipTrends",
+                    "platformUpkeepMetrics"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/session/{userId}": {
       "get": {
         "operationId": "auth-session",

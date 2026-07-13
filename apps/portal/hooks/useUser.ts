@@ -157,4 +157,76 @@ export const useMemberDetails = (userId: string) => {
   })
 }
 
+export interface AdminOverviewResponse {
+  membersCount: {
+    total: number
+    active: number
+    suspended: number
+    restricted: number
+    roles: {
+      SUPER_ADMIN: number
+      ADMIN: number
+      BOARD: number
+      PASTORAL: number
+      MEMBER: number
+      USER: number
+    }
+  }
+  revenue: {
+    total: number
+    subscriptions: number
+    donations: number
+    sponsorships: number
+  }
+  recentBoardMembers: Array<{
+    id: string
+    name: string
+    email: string
+    role: string
+    createdAt: string
+  }>
+  recentDonations: Array<{
+    id: string
+    amount: number
+    currency: string
+    status: string
+    createdAt: string
+    donatorName: string
+  }>
+  recentSponsorships: Array<{
+    id: string
+    amount: number
+    currency: string
+    status: string
+    createdAt: string
+    sponsorName: string
+    packageName: string
+  }>
+  pendingTasks: Array<{
+    id: string
+    title: string
+    priority: string
+  }>
+  membershipTrends: Array<{
+    month: string
+    general: number
+    pastoral: number
+    board: number
+    revenue: number
+  }>
+  platformUpkeepMetrics: Array<{
+    id: number
+    label: string
+    value: string
+  }>
+}
+
+export const useAdminOverview = () => {
+  return useQuery<AdminOverviewResponse>({
+    queryKey: ["admin", "overview"],
+    queryFn: () => api.get("/users/admin-overview").then((res) => res.data),
+  })
+}
+
+
 

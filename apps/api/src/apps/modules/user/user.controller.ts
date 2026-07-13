@@ -162,5 +162,19 @@ export class UserController {
       })
     }
   }
+
+  /**
+   * Controller for retrieving aggregated overview statistics for the admin dashboard
+   */
+  static async getAdminOverview() {
+    try {
+      return await UserService.getAdminOverview()
+    } catch (error: any) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to fetch admin overview statistics: ${error.message}`,
+      })
+    }
+  }
 }
 
