@@ -182,7 +182,7 @@ export function EventCard({
             )}
             Check In
           </button>
-        ) : isWebinar && event.meetingLink ? (
+        ) : event.meetingLink ? (
           <a
             href={event.meetingLink}
             target="_blank"
@@ -190,7 +190,7 @@ export function EventCard({
             className="flex w-full animate-pulse cursor-pointer items-center justify-center gap-2 rounded-xl bg-sky-500 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all duration-200 hover:bg-sky-400 hover:shadow-md active:scale-98"
           >
             <IconLink className="size-4" />
-            Join Webinar
+            Join Online
           </a>
         ) : (
           <button

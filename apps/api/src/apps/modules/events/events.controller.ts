@@ -277,6 +277,26 @@ export class EventsController {
   }
 
   /**
+   * Controller for fetching all registrations for an event (Admin only)
+   */
+  static async getEventRegistrations(eventId: string) {
+    try {
+      return await EventsService.getEventRegistrations(eventId)
+    } catch (err: any) {
+      if (err.message === "Event not found") {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Event not found",
+        })
+      }
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: err.message || "Failed to fetch event registrations",
+      })
+    }
+  }
+
+  /**
    * Controller for fetching event analytics (restricted to Admins and Super Admins)
    */
   static async getEventAnalytics(eventId: string) {

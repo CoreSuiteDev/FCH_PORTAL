@@ -18,6 +18,7 @@ import { useSessionInfo } from "@/hooks/use-session-info"
 import { useEventById, useRegisterEvent, useCheckinEvent } from "@/hooks/useEvents"
 import { toast } from "@workspace/ui/components/sonner"
 import { Skeleton } from "@workspace/ui/components/skeleton"
+import Image from "next/image"
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -144,9 +145,10 @@ export default function WebinarDetailsPage({ params }: PageProps) {
           <div className="relative overflow-hidden rounded-2xl border bg-card shadow-xs">
             {event.coverImage ? (
               <div className="h-64 w-full overflow-hidden relative">
-                <img
+                <Image
                   src={event.coverImage}
                   alt={event.title}
+                  fill
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-card via-transparent to-transparent" />
@@ -200,6 +202,30 @@ export default function WebinarDetailsPage({ params }: PageProps) {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Online Join Link — visible only after check-in */}
+          {checkedIn && event.meetingLink && (
+            <div className="relative overflow-hidden rounded-2xl border border-sky-500/30 bg-sky-500/5 p-6 shadow-xs">
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-sky-500/10 blur-2xl" />
+              </div>
+              <h3 className="text-base font-bold tracking-tight mb-1 flex items-center gap-2 text-sky-700 dark:text-sky-400">
+                <IconVideo className="size-5" /> Live Webinar Link
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                You are checked in. Click the button below to join the live session.
+              </p>
+              <a
+                href={event.meetingLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full animate-pulse cursor-pointer items-center justify-center gap-2 rounded-xl bg-sky-500 px-5 py-3 text-sm font-bold text-white shadow-xs transition-all duration-200 hover:bg-sky-400 hover:shadow-md active:scale-98"
+              >
+                <IconLink className="size-5" />
+                Join Live Now
+              </a>
             </div>
           )}
 

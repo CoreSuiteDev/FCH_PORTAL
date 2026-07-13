@@ -27,6 +27,7 @@ import { EventFilters } from "./_components/event-filters"
 import { EventTable } from "./_components/event-table"
 import { EventFormDialog } from "./_components/event-form-dialog"
 import { EventDeleteDialog } from "./_components/event-delete-dialog"
+import { EventAttendeesSheet } from "./_components/event-attendees-sheet"
 
 export default function EventsAdminPage() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -38,6 +39,7 @@ export default function EventsAdminPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+  const [attendeesEvent, setAttendeesEvent] = useState<ZTEvent | null>(null)
 
   const listParams = useMemo(
     () => ({ page: currentPage, limit: 50 }), // Load more for tab filter operations
@@ -272,7 +274,8 @@ export default function EventsAdminPage() {
         onPageChange={setCurrentPage}
         onEdit={handleOpenEdit}
         onDelete={setDeleteConfirmId}
-        hideTypeColumn={false} // Show type column because both are managed here
+        onViewAttendees={setAttendeesEvent}
+        hideTypeColumn={false}
       />
 
       {/* Form Dialog */}
@@ -294,6 +297,15 @@ export default function EventsAdminPage() {
         }}
         onConfirm={handleDeleteConfirm}
         isPending={deleteEventMutation.isPending}
+      />
+
+      {/* Attendees Sheet */}
+      <EventAttendeesSheet
+        event={attendeesEvent}
+        open={!!attendeesEvent}
+        onOpenChange={(open) => {
+          if (!open) setAttendeesEvent(null)
+        }}
       />
     </div>
   )

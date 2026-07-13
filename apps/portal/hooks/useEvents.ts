@@ -154,3 +154,46 @@ export const useCheckinEvent = () => {
   })
 }
 
+// --- Event Registrations (Admin) ---
+
+export interface EventRegistrant {
+  id: string
+  eventId: string
+  userId: string
+  status: "PENDING" | "CONFIRMED" | "CANCELLED"
+  checkedIn: boolean
+  registeredAt: string
+  user: {
+    id: string
+    name: string | null
+    email: string | null
+    image: string | null
+  }
+}
+
+export const useEventRegistrations = (eventId: string | null) => {
+  return useQuery<EventRegistrant[]>({
+    queryKey: ["event-registrations", eventId],
+    queryFn: () =>
+      api.get(`/events/${eventId}/registrations`).then((res) => res.data),
+    enabled: !!eventId,
+  })
+}
+
+// --- Admin Check-in (check in another user by userId) ---
+
+export const useAdminCheckinUser = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ eventId, userId }: { eventId: string; userId: string }) =>
+      api
+        .post(`/events/${eventId}/checkin`, { userId })
+        .then((res) => res.data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["event-registrations", variables.eventId],
+      })
+      queryClient.invalidateQueries({ queryKey: ["events-list"] })
+    },
+  })
+}

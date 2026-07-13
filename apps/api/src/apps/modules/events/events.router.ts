@@ -348,6 +348,39 @@ export const eventsRouter = router({
       return EventsController.deleteMaterial(input.id, input.materialId)
     }),
 
+  listRegistrations: adminProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/events/{id}/registrations",
+        tags: ["events"],
+        summary: "List all registrations for an event",
+        description: "Returns all registrations with user details for a specific event (Admin only)",
+      },
+    })
+    .input(z.object({ id: z.string() }))
+    .output(
+      z.array(
+        z.object({
+          id: z.string(),
+          eventId: z.string(),
+          userId: z.string(),
+          status: z.enum(["PENDING", "CONFIRMED", "CANCELLED"]),
+          checkedIn: z.boolean(),
+          registeredAt: z.coerce.date(),
+          user: z.object({
+            id: z.string(),
+            name: z.string().nullable(),
+            email: z.string().nullable(),
+            image: z.string().nullable(),
+          }),
+        })
+      )
+    )
+    .query(async ({ input }) => {
+      return EventsController.getEventRegistrations(input.id)
+    }),
+
   getAnalytics: adminProcedure
     .meta({
       openapi: {

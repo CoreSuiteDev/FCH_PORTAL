@@ -29,6 +29,7 @@ import { toast } from "@workspace/ui/components/sonner"
 
 import { ZCICreateAuthorSchema, ZTCCreateAuthor } from "@workspace/types"
 import { useAuthors, useCreateAuthor, useDeleteAuthor } from "@/hooks/useAuthor"
+import Image from "next/image"
 
 export default function AuthorsPage() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -242,9 +243,10 @@ export default function AuthorsPage() {
                   <CardHeader className="flex flex-row items-start gap-4 pb-4">
                     <div className="size-12 rounded-full overflow-hidden shrink-0 border border-slate-100 dark:border-slate-800 bg-slate-50 flex items-center justify-center">
                       {author.avatar ? (
-                        <img
+                        <Image
                           src={author.avatar}
                           alt={author.name}
+                          fill
                           className="size-full object-cover"
                         />
                       ) : (

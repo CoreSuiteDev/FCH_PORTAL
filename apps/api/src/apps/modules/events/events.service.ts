@@ -607,6 +607,45 @@ export class EventsService {
   }
 
   /**
+   * Fetch all registrations for an event with user profile details (Admin only)
+   */
+  static async getEventRegistrations(eventId: string) {
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { id: true, title: true },
+    })
+
+    if (!event) {
+      throw new Error("Event not found")
+    }
+
+    const registrations = await prisma.eventRegistration.findMany({
+      where: { eventId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    })
+
+    return registrations.map((r) => ({
+      id: r.id,
+      eventId: r.eventId,
+      userId: r.userId,
+      status: r.status,
+      checkedIn: r.checkedIn,
+      registeredAt: r.createdAt,
+      user: r.user,
+    }))
+  }
+
+  /**
    * Fetch analytics metrics for a specific event
    */
   static async getEventAnalytics(eventId: string) {

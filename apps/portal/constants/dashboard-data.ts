@@ -205,19 +205,9 @@ export const data = {
       icon: IconFileText,
     },
     {
-      title: "Member Events",
+      title: "Events & Webinars",
       url: "/portal/events",
       icon: IconCalendarEvent,
-      items: [
-        {
-          title: "Events",
-          url: "/portal/events",
-        },
-        {
-          title: "Webinars",
-          url: "/portal/webinars",
-        },
-      ],
     },
   ],
   generalMenu: [
@@ -232,19 +222,9 @@ export const data = {
       icon: IconBell,
     },
     {
-      title: "Member Events",
+      title: "Events & Webinars",
       url: "/portal/events",
       icon: IconCalendarEvent,
-      items: [
-        {
-          title: "Events",
-          url: "/portal/events",
-        },
-        {
-          title: "Webinars",
-          url: "/portal/webinars",
-        },
-      ],
     },
     {
       title: "Basic Resources",

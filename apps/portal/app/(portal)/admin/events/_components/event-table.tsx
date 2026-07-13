@@ -1,16 +1,12 @@
 import {
   CalendarDays,
   Edit,
-  EyeOff,
-  Globe,
   Loader2,
-  MapPin,
   ShieldAlert,
   Trash2,
-  Users,
-  Video,
+  UserCheck,
 } from "lucide-react"
-import { Badge } from "@workspace/ui/components/badge"
+
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import {
@@ -23,11 +19,11 @@ import {
 } from "@workspace/ui/components/table"
 import type { ZTEvent } from "@workspace/types"
 import {
-  STATUS_COLORS,
   TYPE_COLORS,
   VISIBILITY_COLORS,
   formatDate,
 } from "./event-constants"
+import Image from "next/image"
 
 interface EventTableProps {
   events: ZTEvent[]
@@ -39,6 +35,7 @@ interface EventTableProps {
   onPageChange: (page: number) => void
   onEdit: (event: ZTEvent) => void
   onDelete: (id: string) => void
+  onViewAttendees: (event: ZTEvent) => void
   hideTypeColumn?: boolean
 }
 
@@ -52,6 +49,7 @@ export function EventTable({
   onPageChange,
   onEdit,
   onDelete,
+  onViewAttendees,
   hideTypeColumn = false,
 }: EventTableProps) {
   if (isLoading) {
@@ -118,9 +116,10 @@ export function EventTable({
                 <div className="flex items-center gap-3">
                   {event.coverImage ? (
                     <div className="relative h-10 w-16 overflow-hidden rounded-md border shrink-0">
-                      <img
+                      <Image
                         src={event.coverImage}
                         alt={event.title}
+                        fill
                         className="object-cover w-full h-full"
                       />
                     </div>
@@ -164,6 +163,16 @@ export function EventTable({
               </TableCell>
               <TableCell className="px-6 py-4 text-right">
                 <div className="flex justify-end gap-2">
+                  <Button
+                    onClick={() => onViewAttendees(event)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1.5 px-2.5 text-[10px] font-semibold text-indigo-600 hover:bg-indigo-500/10 hover:text-indigo-700 cursor-pointer"
+                    title="View Attendees"
+                  >
+                    <UserCheck className="h-3.5 w-3.5" />
+                    Attendees
+                  </Button>
                   <Button
                     onClick={() => onEdit(event)}
                     variant="ghost"
