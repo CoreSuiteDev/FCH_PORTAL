@@ -1,114 +1,165 @@
-import React from "react"
-import { IconVideo, IconInfoCircle, IconPlayerPlay } from "@tabler/icons-react"
+"use client"
+
+import React, { useState } from "react"
+import { IconLock } from "@tabler/icons-react"
+import { useSessionInfo } from "@/hooks/use-session-info"
+import { useEventsList, useRegisterEvent, useCheckinEvent } from "@/hooks/useEvents"
+import { toast } from "@workspace/ui/components/sonner"
+
+import { EventsHeader } from "../events/_components/events-header"
+import { EventsTabs } from "../events/_components/events-tabs"
+import { EventCard } from "../events/_components/event-card"
+import { LoadingSkeletons } from "../events/_components/loading-skeletons"
+import { EmptyState } from "../events/_components/empty-state"
 
 export default function WebinarsPage() {
+  const { data: session, isLoading: isSessionLoading } = useSessionInfo()
+  const { data: eventsData, isLoading: isEventsLoading, error, refetch } = useEventsList({
+    page: 1,
+    limit: 50,
+  })
+
+  const registerMutation = useRegisterEvent()
+  const checkinMutation = useCheckinEvent()
+
+  const [activeTab, setActiveTab] = useState<"all" | "registered">("all")
+  const [mutatingId, setMutatingId] = useState<string | null>(null)
+
+  const user = session?.user
+  const events = eventsData?.data || []
+
+  // Filter events to only show type: WEBINAR
+  const webinarList = events.filter((e: any) => e.eventType === "WEBINAR")
+
+  // Helpers to check registration and check-in status
+  const getRegistration = (event: any) => {
+    return event.registrations && event.registrations.length > 0 ? event.registrations[0] : null
+  }
+
+  const isRegistered = (event: any) => {
+    const reg = getRegistration(event)
+    return reg ? reg.status === "CONFIRMED" : false
+  }
+
+  const isCheckedIn = (event: any) => {
+    const reg = getRegistration(event)
+    return reg ? reg.checkedIn : false
+  }
+
+  // Filter webinars based on active tab
+  const filteredWebinars = webinarList.filter((event: any) => {
+    if (activeTab === "registered") {
+      return isRegistered(event)
+    }
+    return true
+  })
+
+  const handleRegister = async (eventId: string) => {
+    setMutatingId(eventId)
+    try {
+      await registerMutation.mutateAsync(eventId)
+      toast.success("Successfully registered for the webinar!")
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to register. Please try again.")
+    } finally {
+      setMutatingId(null)
+    }
+  }
+
+  const handleCheckIn = async (eventId: string) => {
+    setMutatingId(eventId)
+    try {
+      await checkinMutation.mutateAsync({ id: eventId })
+      toast.success("Successfully checked in!")
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to check in. Please try again.")
+    } finally {
+      setMutatingId(null)
+    }
+  }
+
+  const formatDateRange = (start: Date | string, end?: Date | string | null) => {
+    const startDate = new Date(start)
+    const optionsDate: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", year: "numeric" }
+    const optionsTime: Intl.DateTimeFormatOptions = { hour: "2-digit", minute: "2-digit" }
+
+    const dateStr = startDate.toLocaleDateString("en-US", optionsDate)
+    const timeStr = startDate.toLocaleTimeString("en-US", optionsTime)
+
+    if (end) {
+      const endDate = new Date(end)
+      const endTimeStr = endDate.toLocaleTimeString("en-US", optionsTime)
+      return `${dateStr} • ${timeStr} - ${endTimeStr}`
+    }
+
+    return `${dateStr} • ${timeStr}`
+  }
+
+  if (isSessionLoading || isEventsLoading) {
+    return <LoadingSkeletons />
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
+        <div className="p-4 bg-destructive/10 text-destructive rounded-full">
+          <IconLock className="size-10" />
+        </div>
+        <h3 className="text-xl font-bold">Failed to load webinars</h3>
+        <p className="text-muted-foreground max-w-md">
+          There was an error fetching the webinar list. Please check your internet connection or try again.
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/95"
+        >
+          Retry
+        </button>
+      </div>
+    )
+  }
+
+  // Stats for Webinars only
+  const totalAvailable = webinarList.length
+  const registeredCount = webinarList.filter(isRegistered).length
+
   return (
-    <div className="flex-1 space-y-6 p-8 pt-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">
-            Webinar Recordings
-          </h2>
-          <p className="text-muted-foreground">
-            Watch past member-only webinar training videos, tutorials, and guest
-            lectures.
-          </p>
-        </div>
-      </div>
+    <div className="flex-1 space-y-8 p-8 pt-6">
+      {/* Welcome & Banner */}
+      <EventsHeader
+        userName={user?.name}
+        totalAvailable={totalAvailable}
+        registeredCount={registeredCount}
+        webinarCount={totalAvailable}
+      />
 
-      {/* Developer Notes / TODO */}
-      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
-        <div className="flex items-start gap-3">
-          <IconInfoCircle className="mt-0.5 size-5 shrink-0 text-primary" />
-          <div>
-            <h4 className="font-semibold text-primary">
-              Developer TODO Checklist:
-            </h4>
-            <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-              <li>
-                Integrate video hosting (Vimeo SDK, AWS CloudFront, or Mux
-                player) to embed secure streams.
-              </li>
-              <li>
-                Setup access validation: Ensure only users with valid
-                memberships can access the dynamic webinar route
-                `[slug]/page.tsx`.
-              </li>
-              <li>
-                {` Implement a 'Bookmark' or 'Watch Later' feature for logged-in
-                user accounts.`}
-              </li>
-              <li>
-                {`  Fetch webinars metadata (title, speaker, length, description)
-                from database.`}
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      {/* Tabs / Filters */}
+      <EventsTabs
+        activeTab={activeTab as any}
+        setActiveTab={setActiveTab as any}
+        registeredCount={registeredCount}
+        showWebinarsTab={false}
+      />
 
-      {/* Mock Webinars */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {[
-          {
-            title: "Welcome to FCH: General Member Induction",
-            speaker: "Sarah Jenkins, Membership Director",
-            duration: "45 mins",
-            thumbnail: "/mock/webinar1.jpg",
-            desc: "Get an overview of your member benefits, FCH community expectations, and how to navigate core learning libraries.",
-          },
-          {
-            title: "Effective Community Planning Strategies",
-            speaker: "Fr. Robert Davis & Board Committee",
-            duration: "1 hr 12 mins",
-            thumbnail: "/mock/webinar2.jpg",
-            desc: "Learn strategic parish organization models, outreach techniques, and guidelines for organizing public faith events.",
-          },
-          {
-            title: "Introduction to Catechetical Teaching Methods",
-            speaker: "Dr. Angela Martinez, Catechesis Chair",
-            duration: "58 mins",
-            thumbnail: "/mock/webinar3.jpg",
-            desc: "A baseline breakdown of teaching templates and educational resources available for all levels of church educators.",
-          },
-        ].map((webinar, index) => (
-          <div
-            key={index}
-            className="flex flex-col overflow-hidden rounded-lg border bg-card shadow-xs transition-all hover:shadow-md"
-          >
-            {/* Video Thumbnail Placeholder */}
-            <div className="relative flex aspect-video items-center justify-center bg-zinc-950 text-white">
-              <IconVideo className="size-12 opacity-30" />
-              <button className="absolute flex size-12 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-md transition-all hover:scale-105 hover:bg-primary">
-                <IconPlayerPlay className="size-6 fill-current" />
-              </button>
-              <span className="absolute right-2 bottom-2 rounded-sm bg-black/80 px-2 py-0.5 text-[10px] font-semibold">
-                {webinar.duration}
-              </span>
-            </div>
-            {/* Details */}
-            <div className="flex flex-1 flex-col justify-between p-6">
-              <div>
-                <h4 className="cursor-pointer text-base font-semibold tracking-tight hover:underline">
-                  {webinar.title}
-                </h4>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Presented by {webinar.speaker}
-                </p>
-                <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
-                  {webinar.desc}
-                </p>
-              </div>
-              <div className="mt-5 border-t pt-3">
-                <button className="text-xs font-semibold text-primary hover:underline">
-                  View Webinar Details & Notes →
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Webinars Listing */}
+      {filteredWebinars.length === 0 ? (
+        <EmptyState activeTab={activeTab} />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredWebinars.map((event: any) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              isRegistered={isRegistered(event)}
+              isCheckedIn={isCheckedIn(event)}
+              isMutating={mutatingId === event.id}
+              handleRegister={handleRegister}
+              handleCheckIn={handleCheckIn}
+              formatDateRange={formatDateRange}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

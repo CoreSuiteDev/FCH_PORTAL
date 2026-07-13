@@ -6,6 +6,7 @@ import {
   ZTUpdateEvent,
   ZTEventCategory,
   ZTCCreateEventCategory,
+  ZTCUpdateEventCategory,
 } from "@workspace/types"
 
 // --- Response Types ---
@@ -113,3 +114,43 @@ export const useDeleteEventCategory = () => {
     },
   })
 }
+
+export const useUpdateEventCategory = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ZTCUpdateEventCategory }) =>
+      api.patch(`/event-categories/${id}`, { ...data, id }).then((res) => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["event-categories"] })
+    },
+  })
+}
+
+// --- Register for Event ---
+
+export const useRegisterEvent = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (eventId: string) =>
+      api.post(`/events/${eventId}/register`).then((res) => res.data),
+    onSuccess: (_, eventId) => {
+      queryClient.invalidateQueries({ queryKey: ["events-list"] })
+      queryClient.invalidateQueries({ queryKey: ["event", eventId] })
+    },
+  })
+}
+
+// --- Check in to Event ---
+
+export const useCheckinEvent = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, userId }: { id: string; userId?: string }) =>
+      api.post(`/events/${id}/checkin`, { userId }).then((res) => res.data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["events-list"] })
+      queryClient.invalidateQueries({ queryKey: ["event", variables.id] })
+    },
+  })
+}
+

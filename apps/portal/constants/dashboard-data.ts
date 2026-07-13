@@ -105,8 +105,8 @@ export const data = {
           url: "/admin/events",
         },
         {
-          title: "Webinar Library",
-          url: "/admin/webinars",
+          title: "Manage Categories",
+          url: "/admin/events/categories",
         },
       ],
     },
@@ -203,6 +203,21 @@ export const data = {
       title: "Special Pastoral Resources",
       url: "/portal/resources/special",
       icon: IconFileText,
+    },
+    {
+      title: "Member Events",
+      url: "/portal/events",
+      icon: IconCalendarEvent,
+      items: [
+        {
+          title: "Events",
+          url: "/portal/events",
+        },
+        {
+          title: "Webinars",
+          url: "/portal/webinars",
+        },
+      ],
     },
   ],
   generalMenu: [

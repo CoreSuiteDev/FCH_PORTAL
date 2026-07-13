@@ -3286,6 +3286,9 @@
                               }
                             ]
                           },
+                          "currentCount": {
+                            "type": "number"
+                          },
                           "meetingLink": {
                             "anyOf": [
                               {
@@ -3432,6 +3435,50 @@
                                 "fileUrl",
                                 "fileType",
                                 "eventId"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "registrations": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "createdAt": {
+                                  "type": "string"
+                                },
+                                "updatedAt": {
+                                  "type": "string"
+                                },
+                                "eventId": {
+                                  "type": "string"
+                                },
+                                "userId": {
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "type": "string",
+                                  "enum": [
+                                    "PENDING",
+                                    "CONFIRMED",
+                                    "CANCELLED"
+                                  ]
+                                },
+                                "checkedIn": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "createdAt",
+                                "updatedAt",
+                                "eventId",
+                                "userId",
+                                "status",
+                                "checkedIn"
                               ],
                               "additionalProperties": false
                             }
@@ -3703,6 +3750,9 @@
                         }
                       ]
                     },
+                    "currentCount": {
+                      "type": "number"
+                    },
                     "meetingLink": {
                       "anyOf": [
                         {
@@ -3849,6 +3899,50 @@
                           "fileUrl",
                           "fileType",
                           "eventId"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "registrations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "updatedAt": {
+                            "type": "string"
+                          },
+                          "eventId": {
+                            "type": "string"
+                          },
+                          "userId": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "CONFIRMED",
+                              "CANCELLED"
+                            ]
+                          },
+                          "checkedIn": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "createdAt",
+                          "updatedAt",
+                          "eventId",
+                          "userId",
+                          "status",
+                          "checkedIn"
                         ],
                         "additionalProperties": false
                       }
@@ -4005,6 +4099,9 @@
                         }
                       ]
                     },
+                    "currentCount": {
+                      "type": "number"
+                    },
                     "meetingLink": {
                       "anyOf": [
                         {
@@ -4151,6 +4248,50 @@
                           "fileUrl",
                           "fileType",
                           "eventId"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "registrations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "updatedAt": {
+                            "type": "string"
+                          },
+                          "eventId": {
+                            "type": "string"
+                          },
+                          "userId": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "CONFIRMED",
+                              "CANCELLED"
+                            ]
+                          },
+                          "checkedIn": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "createdAt",
+                          "updatedAt",
+                          "eventId",
+                          "userId",
+                          "status",
+                          "checkedIn"
                         ],
                         "additionalProperties": false
                       }
@@ -4396,6 +4537,9 @@
                         }
                       ]
                     },
+                    "currentCount": {
+                      "type": "number"
+                    },
                     "meetingLink": {
                       "anyOf": [
                         {
@@ -4542,6 +4686,50 @@
                           "fileUrl",
                           "fileType",
                           "eventId"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "registrations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "updatedAt": {
+                            "type": "string"
+                          },
+                          "eventId": {
+                            "type": "string"
+                          },
+                          "userId": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "CONFIRMED",
+                              "CANCELLED"
+                            ]
+                          },
+                          "checkedIn": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "createdAt",
+                          "updatedAt",
+                          "eventId",
+                          "userId",
+                          "status",
+                          "checkedIn"
                         ],
                         "additionalProperties": false
                       }

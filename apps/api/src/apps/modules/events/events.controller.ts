@@ -6,25 +6,29 @@ import { EventVisibility, EventType, EventStatus } from "../../../generated/pris
 export class EventsController {
   /**
    * Controller for resolving events listing based on visibility permissions (paginated)
+   * @param params - Request parameters including user role, page, limit, and optional user ID
+   * @returns Object containing total event count and paginated event data
    */
   static async getEventsList(params: {
     userRole: string | undefined
     page: number
     limit: number
+    userId?: string
   }) {
     const allowedVisibilities = EventPolicy.getAllowedVisibilities(params.userRole)
     return EventsService.getAllEvents({
       allowedVisibilities,
       page: params.page,
       limit: params.limit,
+      userId: params.userId,
     })
   }
 
   /**
    * Controller for resolving a single event details by ID
    */
-  static async getEventById(id: string, userRole: string) {
-    const event = await EventsService.findEventById(id)
+  static async getEventById(id: string, userRole: string, userId?: string) {
+    const event = await EventsService.findEventById(id, userId)
     if (!event) {
       throw new TRPCError({ code: "NOT_FOUND", message: "Event not found" })
     }

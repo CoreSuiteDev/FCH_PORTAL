@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { Loader2 } from "lucide-react"
 import type { UseFormReturn, FieldError } from "react-hook-form"
 import { Button } from "@workspace/ui/components/button"
@@ -40,11 +41,16 @@ export function EventFormDialog({
   categoriesList,
   onSubmit,
   isPending,
-  fixedType,
 }: EventFormDialogProps) {
   const { register, handleSubmit, setValue, watch, formState: { errors } } = form
 
-  const watchedEventType = watch("eventType")
+  const watchedCategoryIds = watch("categoryIds") || []
+  const isWebinar = useMemo(() => {
+    return watchedCategoryIds.some((id) => {
+      const cat = categoriesList.find((c) => c.id === id)
+      return cat ? cat.name.toLowerCase().includes("webinar") : false
+    })
+  }, [watchedCategoryIds, categoriesList])
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -92,29 +98,7 @@ export function EventFormDialog({
               />
             </div>
 
-            {!fixedType && (
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase">
-                  Event Type *
-                </label>
-                <Select
-                  value={watch("eventType")}
-                  onValueChange={(val: string) =>
-                    setValue("eventType", val as ZTCCreateEventInput["eventType"], {
-                      shouldValidate: true,
-                    })
-                  }
-                >
-                  <SelectTrigger className="h-10 border-slate-200">
-                    <SelectValue placeholder="Select Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="EVENT">Event</SelectItem>
-                    <SelectItem value="WEBINAR">Webinar</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+
 
             {/* Visibility */}
             <div className="space-y-1.5">
@@ -209,7 +193,7 @@ export function EventFormDialog({
             </div>
 
             {/* Meeting Link (Webinar only) */}
-            {watchedEventType === "WEBINAR" && (
+            {isWebinar && (
               <div className="space-y-1.5 md:col-span-2">
                 <label className="text-xs font-bold text-slate-500 uppercase">
                   Meeting Link{" "}
@@ -259,44 +243,36 @@ export function EventFormDialog({
               )}
             </div>
 
-            {/* Categories */}
+            {/* Category Select */}
             {categoriesList.length > 0 && (
               <div className="space-y-1.5 md:col-span-2">
                 <label className="text-xs font-bold text-slate-500 uppercase">
-                  Categories
+                  Category *
                 </label>
-                <div className="flex flex-wrap gap-2 rounded-lg border border-slate-200 p-3">
-                  {categoriesList.map((cat) => {
-                    const selected = (watch("categoryIds") || []).includes(cat.id)
-                    return (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => {
-                          const current = watch("categoryIds") || []
-                          setValue(
-                            "categoryIds",
-                            selected
-                              ? current.filter((id) => id !== cat.id)
-                              : [...current, cat.id]
-                          )
-                        }}
-                        className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                          selected
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
-                        }`}
-                      >
+                <Select
+                  value={(watch("categoryIds") || [])[0] || ""}
+                  onValueChange={(val: string) => {
+                    setValue("categoryIds", val ? [val] : [], {
+                      shouldValidate: true,
+                    })
+                  }}
+                >
+                  <SelectTrigger className="h-10 border-slate-200 text-xs">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categoriesList.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
                         {cat.name}
-                      </button>
-                    )
-                  })}
-                </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
 
             {/* Speakers (Webinar only) */}
-            {watchedEventType === "WEBINAR" && (
+            {isWebinar && (
               <div className="space-y-1.5 md:col-span-2">
                 <label className="text-xs font-bold text-slate-500 uppercase">
                   Speakers{" "}

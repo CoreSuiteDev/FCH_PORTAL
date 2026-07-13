@@ -13,8 +13,9 @@ export class EventsService {
     allowedVisibilities: EventVisibility[]
     page: number
     limit: number
+    userId?: string
   }) {
-    const { allowedVisibilities, page, limit } = params
+    const { allowedVisibilities, page, limit, userId } = params
     const skip = (page - 1) * limit
 
     const whereClause = {
@@ -32,7 +33,16 @@ export class EventsService {
         where: whereClause,
         skip,
         take: limit,
-        include: { webinar: true, categories: true, materials: true },
+        include: {
+          webinar: true,
+          categories: true,
+          materials: true,
+          eventRegistrations: {
+            where: {
+              userId: userId || "",
+            },
+          },
+        },
         orderBy: { startDate: "asc" },
       }),
     ])
@@ -43,10 +53,19 @@ export class EventsService {
   /**
    * Find a single event by ID
    */
-  static async findEventById(id: string) {
+  static async findEventById(id: string, userId?: string) {
     return prisma.event.findUnique({
       where: { id },
-      include: { webinar: true, categories: true, materials: true },
+      include: {
+        webinar: true,
+        categories: true,
+        materials: true,
+        eventRegistrations: {
+          where: {
+            userId: userId || "",
+          },
+        },
+      },
     })
   }
 
@@ -106,8 +125,26 @@ export class EventsService {
       throw new Error("Max capacity must be greater than 0")
     }
 
+    // Category validation & dynamic eventType resolution
+    let resolvedEventType: EventType = EventType.EVENT
+    if (categoryIds && categoryIds.length > 0) {
+      const categories = await prisma.eventCategory.findMany({
+        where: { id: { in: categoryIds } },
+        select: { id: true, name: true },
+      })
+
+      if (categories.length !== categoryIds.length) {
+        throw new Error("One or more categories do not exist")
+      }
+
+      const hasWebinar = categories.some((c) => c.name.toLowerCase().includes("webinar"))
+      if (hasWebinar) {
+        resolvedEventType = EventType.WEBINAR
+      }
+    }
+
     // Webinar validation
-    if (eventData.eventType === EventType.WEBINAR) {
+    if (resolvedEventType === EventType.WEBINAR) {
       if (!eventData.meetingLink?.trim()) {
         throw new Error("Meeting link is required for webinars")
       }
@@ -120,20 +157,8 @@ export class EventsService {
     }
 
     // Non-webinar validation
-    if (eventData.eventType !== EventType.WEBINAR && eventData.meetingLink) {
+    if (resolvedEventType !== EventType.WEBINAR && eventData.meetingLink) {
       throw new Error("Meeting link is only allowed for webinars")
-    }
-
-    // Category validation — guard against undefined before accessing .length
-    if (categoryIds && categoryIds.length > 0) {
-      const categories = await prisma.eventCategory.findMany({
-        where: { id: { in: categoryIds } },
-        select: { id: true },
-      })
-
-      if (categories.length !== categoryIds.length) {
-        throw new Error("One or more categories do not exist")
-      }
     }
 
     return prisma.$transaction(async (tx) => {
@@ -148,7 +173,7 @@ export class EventsService {
           maxCapacity: eventData.maxCapacity,
           meetingLink: eventData.meetingLink,
           visibility: eventData.visibility,
-          eventType: eventData.eventType,
+          eventType: resolvedEventType,
           status: "UPCOMING" as EventStatus,
           isActive: true,
           // connect expects { id: string }[], not string[]
@@ -159,7 +184,7 @@ export class EventsService {
               },
             }),
           // speakers is optional — fall back to [] to satisfy the non-nullable DB column
-          ...(eventData.eventType === EventType.WEBINAR && {
+          ...(resolvedEventType === EventType.WEBINAR && {
             webinar: {
               create: {
                 speakers: speakers ?? [],
@@ -283,7 +308,19 @@ export class EventsService {
         )
       }
 
-      const newEventType = eventData.eventType ?? event.eventType
+      let newEventType = event.eventType
+      if (categoryIds) {
+        if (categoryIds.length > 0) {
+          const categories = await tx.eventCategory.findMany({
+            where: { id: { in: categoryIds } },
+            select: { name: true },
+          })
+          const hasWebinar = categories.some((c) => c.name.toLowerCase().includes("webinar"))
+          newEventType = hasWebinar ? "WEBINAR" : "EVENT"
+        } else {
+          newEventType = "EVENT"
+        }
+      }
 
       // Validate meeting link when switching to WEBINAR type
       if (newEventType === "WEBINAR") {
@@ -309,6 +346,7 @@ export class EventsService {
         where: { id },
         data: {
           ...eventData,
+          eventType: newEventType,
 
           ...(categoryIds && {
             categories: { set: categoryIds.map((cid) => ({ id: cid })) },

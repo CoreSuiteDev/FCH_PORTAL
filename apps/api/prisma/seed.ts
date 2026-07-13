@@ -288,6 +288,150 @@ async function main() {
   }
   console.log("Seeding sponsor plans completed.")
 
+  console.log("Seeding event categories...")
+  const webinarCategory = await prisma.eventCategory.upsert({
+    where: { name: "Webinars" },
+    update: {},
+    create: {
+      name: "Webinars",
+      description: "Online seminars, lectures, and interactive training sessions.",
+    },
+  })
+  console.log(`Webinar category seeded: ${webinarCategory.name}`)
+
+  const basicEventCategory = await prisma.eventCategory.upsert({
+    where: { name: "Basic Events" },
+    update: {},
+    create: {
+      name: "Basic Events",
+      description: "General summits, roundtables, and public community events.",
+    },
+  })
+  console.log(`Basic Event category seeded: ${basicEventCategory.name}`)
+
+  console.log("Seeding events and webinars...")
+  const eventsToSeed = [
+    {
+      title: "FCH Summer Faith Summit 2026",
+      description: "Join hundreds of faith leaders, ministry practitioners, and catechists for three days of fellowship, presentations, and workshops.",
+      startDate: new Date("2026-07-12T09:00:00Z"),
+      endDate: new Date("2026-07-14T17:00:00Z"),
+      location: "Orlando Convention Center (Hybrid)",
+      maxCapacity: 500,
+      visibility: "PUBLIC" as const,
+      eventType: "EVENT" as const,
+      categoryName: "Basic Events",
+    },
+    {
+      title: "Pastoral Leaders Roundtable Discussion",
+      description: "An open roundtable for general and pastoral members focusing on parish community engagement post-pandemic.",
+      startDate: new Date("2026-07-20T15:00:00Z"),
+      endDate: new Date("2026-07-20T16:30:00Z"),
+      location: "Online (Zoom)",
+      maxCapacity: 100,
+      visibility: "PASTORAL_ONLY" as const,
+      eventType: "EVENT" as const,
+      categoryName: "Basic Events",
+    },
+    {
+      title: "Webinar: Intro to Catechesis in Spanish Communities",
+      description: "An online seminar focusing on the fundamentals of catechesis within Spanish-speaking ministry settings.",
+      startDate: new Date("2026-07-25T14:00:00Z"),
+      endDate: new Date("2026-07-25T15:30:00Z"),
+      location: "Zoom Online",
+      maxCapacity: 250,
+      visibility: "FREE_WEBINAR" as const,
+      eventType: "WEBINAR" as const,
+      meetingLink: "https://zoom.us/j/98765432101",
+      speakers: ["Dr. Maria Gomez", "Fr. John Doe"],
+      categoryName: "Webinars",
+    },
+    {
+      title: "Pastoral Webinar: Advanced Parish Ministry & Leadership Tools",
+      description: "Specialized webinar for pastoral members covering advanced planning, ministry tools, and leadership strategies.",
+      startDate: new Date("2026-08-01T13:00:00Z"),
+      endDate: new Date("2026-08-01T14:30:00Z"),
+      location: "Zoom Online",
+      maxCapacity: 150,
+      visibility: "PASTORAL_ONLY" as const,
+      eventType: "WEBINAR" as const,
+      meetingLink: "https://zoom.us/j/12345678901",
+      speakers: ["Bishop Oscar Cantu", "Sister Mary"],
+      categoryName: "Webinars",
+    },
+    {
+      title: "Pastoral Webinar: Mental Health Support in Modern Parishes",
+      description: "A specialized training seminar for pastoral workers on identifying and addressing pastoral care and mental health issues in parish groups.",
+      startDate: new Date("2026-08-15T15:00:00Z"),
+      endDate: new Date("2026-08-15T16:30:00Z"),
+      location: "Zoom Online",
+      maxCapacity: 100,
+      visibility: "PASTORAL_ONLY" as const,
+      eventType: "WEBINAR" as const,
+      meetingLink: "https://zoom.us/j/2468101214",
+      speakers: ["Dr. Thomas Brown", "Fr. Joseph Kelly"],
+      categoryName: "Webinars",
+    },
+    {
+      title: "Members Exclusive: Catechetical Best Practices & Visual Media",
+      description: "Discover how to utilize online slide decks, video materials, and visual tools to enhance parish faith education. Exclusively for registered members.",
+      startDate: new Date("2026-08-20T14:00:00Z"),
+      endDate: new Date("2026-08-20T15:30:00Z"),
+      location: "Zoom Online",
+      maxCapacity: 200,
+      visibility: "MEMBER_ONLY" as const,
+      eventType: "WEBINAR" as const,
+      meetingLink: "https://zoom.us/j/1357913579",
+      speakers: ["Sister Claire Adams", "Mark Davis"],
+      categoryName: "Webinars",
+    },
+    {
+      title: "Webinar: Launching Family Catechesis Programs",
+      description: "Learn the foundational frameworks for parent-led religious education in families. Open to all parish practitioners and volunteers.",
+      startDate: new Date("2026-08-25T10:00:00Z"),
+      endDate: new Date("2026-08-25T11:30:00Z"),
+      location: "Zoom Online",
+      maxCapacity: 300,
+      visibility: "FREE_WEBINAR" as const,
+      eventType: "WEBINAR" as const,
+      meetingLink: "https://zoom.us/j/99988877766",
+      speakers: ["Maria Ramirez", "John Smith"],
+      categoryName: "Webinars",
+    },
+  ]
+
+  for (const item of eventsToSeed) {
+    const existing = await prisma.event.findFirst({
+      where: { title: item.title },
+    })
+
+    if (!existing) {
+      const { speakers, categoryName, ...eventData } = item
+      const category = categoryName === "Webinars" ? webinarCategory : basicEventCategory
+      await prisma.event.create({
+        data: {
+          ...eventData,
+          isActive: true,
+          status: "UPCOMING",
+          categories: {
+            connect: { id: category.id },
+          },
+          ...(item.eventType === "WEBINAR" && {
+            webinar: {
+              create: {
+                speakers: speakers || [],
+              },
+            },
+          }),
+        },
+      })
+      console.log(`Created event/webinar: ${item.title}`)
+    } else {
+      console.log(`Event/webinar already exists: ${item.title}`)
+    }
+  }
+  console.log("Seeding events and webinars completed.")
+
   console.log("Seeding complete!")
 }
 
