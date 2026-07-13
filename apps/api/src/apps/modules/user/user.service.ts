@@ -112,12 +112,15 @@ export class UserService {
 
     const roleName = data.tier === "PASTORAL" ? "PASTORAL" : "MEMBER"
 
-    const role = await prisma.role.findUnique({ where: { name: roleName } })
+    let role = await prisma.role.findUnique({ where: { name: roleName } })
 
     if (!role) {
-      throw new Error(
-        `Critical Configurataion Error: Required system role '${roleName}' does not exist.`
-      )
+      role = await prisma.role.create({
+        data: {
+          name: roleName,
+          description: `${roleName} Role`,
+        },
+      })
     }
 
     const user = await prisma.$transaction(async (tx) => {
@@ -167,14 +170,18 @@ export class UserService {
 
     if (!userExists) throw new Error(`User with ID '${userId}' not found`)
 
-    const role = await prisma.role.findUnique({
+    let role = await prisma.role.findUnique({
       where: { name: upperRoleName },
     })
 
-    if (!role)
-      throw new Error(
-        `Sequrity Error: Authorized system role '${upperRoleName}' dose not exist`
-      )
+    if (!role) {
+      role = await prisma.role.create({
+        data: {
+          name: upperRoleName,
+          description: `${upperRoleName} Role`,
+        },
+      })
+    }
 
     await prisma.$transaction(async (tx) => {
       await tx.userRole.deleteMany({
@@ -204,11 +211,14 @@ export class UserService {
     const context = await auth.$context
     const hashedPassword = await context.password.hash(tempPassword)
 
-    const role = await prisma.role.findUnique({ where: { name: "BOARD" } })
+    let role = await prisma.role.findUnique({ where: { name: "BOARD" } })
     if (!role) {
-      throw new Error(
-        "Critical Configuration Error: BOARD role does not exist."
-      )
+      role = await prisma.role.create({
+        data: {
+          name: "BOARD",
+          description: "BOARD Role",
+        },
+      })
     }
 
     const completedUser = await prisma.$transaction(async (tx) => {

@@ -68,15 +68,29 @@ async function main() {
     console.log("Credential account already exists.")
   }
 
-  console.log("Seeding SUPER_ADMIN role and associating with user...")
-  const superAdminRole = await prisma.role.upsert({
-    where: { name: "SUPER_ADMIN" },
-    update: {},
-    create: {
-      name: "SUPER_ADMIN",
-      description: "Super Administrator Role with full access",
-    },
-  })
+  console.log("Seeding system roles...")
+  const rolesToSeed = [
+    { name: "SUPER_ADMIN", description: "Super Administrator Role with full access" },
+    { name: "ADMIN", description: "Administrator Role" },
+    { name: "BOARD", description: "Board Member Role" },
+    { name: "PASTORAL", description: "Pastoral Member Role" },
+    { name: "MEMBER", description: "General Member Role" },
+    { name: "USER", description: "General Registered User Role" },
+  ]
+
+  const seededRoles: Record<string, any> = {}
+
+  for (const roleInfo of rolesToSeed) {
+    const role = await prisma.role.upsert({
+      where: { name: roleInfo.name },
+      update: {},
+      create: roleInfo,
+    })
+    seededRoles[roleInfo.name] = role
+    console.log(`Role '${roleInfo.name}' seeded.`)
+  }
+
+  const superAdminRole = seededRoles["SUPER_ADMIN"]
 
   await prisma.userRole.upsert({
     where: {
