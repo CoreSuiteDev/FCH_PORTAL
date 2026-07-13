@@ -361,4 +361,226 @@ export class UserService {
       totalCount,
     }
   }
+
+
+  static async getUserMatrix() {
+    const users = await prisma.user.findMany({
+      select: {
+        status: true,
+        userRoles: {
+          select: {
+            role: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
+      }
+    })
+
+    const total = users.length
+    let activeCount = 0
+    let suspendedCount = 0
+    let restrictedCount = 0
+    let generalCount = 0
+    let pastoralCount = 0
+    let boardCount = 0
+
+    const ROLE_PRIORITY = ["SUPER_ADMIN", "BOARD", "PASTORAL", "MEMBER", "USER", "GUEST"]
+
+    for (const u of users) {
+      // Status stats
+      if (u.status === "ACTIVE") activeCount++
+      else if (u.status === "SUSPENDED") suspendedCount++
+      else if (u.status === "RESTRICTED" || u.status === "BANNED") restrictedCount++
+
+      // Role stats
+      const roles = u.userRoles.map(ur => ur.role.name.toUpperCase())
+      
+      let topRole = "USER"
+      if (roles.length === 0) {
+        topRole = "GUEST"
+      } else {
+        for (const pr of ROLE_PRIORITY) {
+          if (roles.includes(pr)) {
+            topRole = pr
+            break
+          }
+        }
+      }
+
+      if (topRole === "MEMBER" || topRole === "USER" || topRole === "GUEST") {
+        generalCount++
+      } else if (topRole === "PASTORAL") {
+        pastoralCount++
+      } else if (topRole === "BOARD" || topRole === "SUPER_ADMIN") {
+        boardCount++
+      }
+    }
+
+    return {
+      total,
+      activeCount,
+      suspendedCount,
+      restrictedCount,
+      generalCount,
+      pastoralCount,
+      boardCount,
+    }
+  }
+
+  static async getMemberDetails(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        userRoles: {
+          include: {
+            role: true,
+          },
+        },
+        subscriptions: {
+          include: {
+            package: true,
+            payments: true,
+          },
+          orderBy: { createdAt: "desc" },
+        },
+        donations: {
+          orderBy: { createdAt: "desc" },
+        },
+        sponsorShips: {
+          include: {
+            plan: true,
+          },
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    })
+
+    if (!user) return null
+
+    // Roles list
+    const roles = user.userRoles.map((ur) => ur.role.name)
+
+    // Calculate dynamic stats
+    const totalDonationAmount = user.donations
+      .filter((d) => d.status === "SUCCEEDED")
+      .reduce((sum, d) => sum + Number(d.amount), 0)
+
+    const totalSponsorAmount = user.sponsorShips
+      .filter((s) => s.status === "SUCCEEDED")
+      .reduce((sum, s) => sum + Number(s.amount), 0)
+
+    // Subscriptions payments
+    const allSubscriptionPayments = user.subscriptions.flatMap((sub) =>
+      sub.payments.map((p) => ({
+        id: p.id,
+        amount: Number(p.amount),
+        currency: p.currency,
+        status: p.status,
+        createdAt: p.createdAt,
+        type: "MEMBERSHIP",
+        description: `Membership - ${sub.package.name}`,
+      }))
+    )
+
+    // Donations payments format
+    const allDonationPayments = user.donations.map((d) => ({
+      id: d.id,
+      amount: Number(d.amount),
+      currency: d.currency,
+      status: d.status,
+      createdAt: d.createdAt,
+      type: "DONATION",
+      description: d.isAnonymous ? "Anonymous Donation" : "Donation",
+    }))
+
+    // Sponsorships payments format
+    const allSponsorshipPayments = user.sponsorShips.map((s) => ({
+      id: s.id,
+      amount: Number(s.amount),
+      currency: s.currency,
+      status: s.status,
+      createdAt: s.createdAt,
+      type: "SPONSORSHIP",
+      description: `Sponsorship - ${s.plan.name}`,
+    }))
+
+    // Combine transaction history
+    const transactionHistory = [
+      ...allSubscriptionPayments,
+      ...allDonationPayments,
+      ...allSponsorshipPayments,
+    ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+    // Check active membership
+    const activeSubscription = user.subscriptions.find(
+      (sub) => sub.status === "ACTIVE" && sub.currentPeriodEnd > new Date()
+    )
+
+    return {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        image: user.image,
+        status: user.status,
+        createdAt: user.createdAt,
+        roles,
+      },
+      membership: {
+        hasActiveMembership: !!activeSubscription,
+        activePackageName: activeSubscription ? activeSubscription.package.name : null,
+        activePeriodStart: activeSubscription ? activeSubscription.currentPeriodStart : null,
+        activePeriodEnd: activeSubscription ? activeSubscription.currentPeriodEnd : null,
+        totalPurchases: user.subscriptions.length,
+        subscriptions: user.subscriptions.map((sub) => ({
+          id: sub.id,
+          packageName: sub.package.name,
+          packageType: sub.package.type,
+          price: Number(sub.package.price),
+          status: sub.status,
+          startsAt: sub.currentPeriodStart,
+          expiresAt: sub.currentPeriodEnd,
+          createdAt: sub.createdAt,
+        })),
+      },
+      donations: {
+        hasDonated: user.donations.length > 0,
+        totalCount: user.donations.length,
+        totalAmount: totalDonationAmount,
+        list: user.donations.map((d) => ({
+          id: d.id,
+          amount: Number(d.amount),
+          currency: d.currency,
+          status: d.status,
+          createdAt: d.createdAt,
+          isAnonymous: d.isAnonymous,
+          message: d.message,
+        })),
+      },
+      sponsorships: {
+        hasSponsored: user.sponsorShips.length > 0,
+        totalCount: user.sponsorShips.length,
+        totalAmount: totalSponsorAmount,
+        list: user.sponsorShips.map((s) => ({
+          id: s.id,
+          packageName: s.plan.name,
+          tier: s.plan.tier,
+          amount: Number(s.amount),
+          status: s.status,
+          startsAt: s.startsAt,
+          expiresAt: s.expiresAt,
+          createdAt: s.createdAt,
+        })),
+      },
+      transactionHistory: transactionHistory.map(t => ({
+        ...t,
+        amount: Number(t.amount.toFixed(2))
+      })),
+    }
+  }
+
 }

@@ -240,5 +240,123 @@ export const userRouter = router({
         meta: getPaginationMeta(totalCount, page, limit),
       }
     }),
+
+  getUserMatrix: adminProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/users/matrix",
+        tags: ["users"],
+        summary: "Get user metrics matrix",
+        description: "Returns aggregated status and role metrics for users",
+      },
+    })
+    .input(z.object({}))
+    .output(
+      z.object({
+        total: z.number(),
+        activeCount: z.number(),
+        suspendedCount: z.number(),
+        restrictedCount: z.number(),
+        generalCount: z.number(),
+        pastoralCount: z.number(),
+        boardCount: z.number(),
+      })
+    )
+    .query(async () => {
+      return UserController.getUserMatrix()
+    }),
+
+  getMemberDetails: adminProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/users/{userId}/details",
+        tags: ["users"],
+        summary: "Get member detailed activities and history",
+        description: "Returns roles, activity states, subscription details, donations, sponsorships, and full transaction history",
+      },
+    })
+    .input(z.object({ userId: z.string() }))
+    .output(
+      z.object({
+        user: z.object({
+          id: z.string(),
+          name: z.string(),
+          email: z.string(),
+          phone: z.string().nullable(),
+          image: z.string().nullable(),
+          status: z.string(),
+          createdAt: z.date(),
+          roles: z.array(z.string()),
+        }),
+        membership: z.object({
+          hasActiveMembership: z.boolean(),
+          activePackageName: z.string().nullable(),
+          activePeriodStart: z.date().nullable(),
+          activePeriodEnd: z.date().nullable(),
+          totalPurchases: z.number(),
+          subscriptions: z.array(
+            z.object({
+              id: z.string(),
+              packageName: z.string(),
+              packageType: z.string(),
+              price: z.number(),
+              status: z.string(),
+              startsAt: z.date(),
+              expiresAt: z.date(),
+              createdAt: z.date(),
+            })
+          ),
+        }),
+        donations: z.object({
+          hasDonated: z.boolean(),
+          totalCount: z.number(),
+          totalAmount: z.number(),
+          list: z.array(
+            z.object({
+              id: z.string(),
+              amount: z.number(),
+              currency: z.string(),
+              status: z.string(),
+              createdAt: z.date(),
+              isAnonymous: z.boolean(),
+              message: z.string().nullable(),
+            })
+          ),
+        }),
+        sponsorships: z.object({
+          hasSponsored: z.boolean(),
+          totalCount: z.number(),
+          totalAmount: z.number(),
+          list: z.array(
+            z.object({
+              id: z.string(),
+              packageName: z.string(),
+              tier: z.string(),
+              amount: z.number(),
+              status: z.string(),
+              startsAt: z.date().nullable(),
+              expiresAt: z.date().nullable(),
+              createdAt: z.date(),
+            })
+          ),
+        }),
+        transactionHistory: z.array(
+          z.object({
+            id: z.string(),
+            amount: z.number(),
+            currency: z.string(),
+            status: z.string(),
+            createdAt: z.date(),
+            type: z.string(),
+            description: z.string(),
+          })
+        ),
+      })
+    )
+    .query(async ({ input }) => {
+      return UserController.getMemberDetails({ userId: input.userId })
+    }),
 })
 

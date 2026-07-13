@@ -368,7 +368,7 @@
               "default": 10,
               "type": "integer",
               "minimum": 1,
-              "maximum": 100
+              "maximum": 1000
             }
           }
         ],
@@ -1747,6 +1747,548 @@
                   "required": [
                     "data",
                     "meta"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/matrix": {
+      "get": {
+        "operationId": "user-getUserMatrix",
+        "summary": "Get user metrics matrix",
+        "description": "Returns aggregated status and role metrics for users",
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number"
+                    },
+                    "activeCount": {
+                      "type": "number"
+                    },
+                    "suspendedCount": {
+                      "type": "number"
+                    },
+                    "restrictedCount": {
+                      "type": "number"
+                    },
+                    "generalCount": {
+                      "type": "number"
+                    },
+                    "pastoralCount": {
+                      "type": "number"
+                    },
+                    "boardCount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "total",
+                    "activeCount",
+                    "suspendedCount",
+                    "restrictedCount",
+                    "generalCount",
+                    "pastoralCount",
+                    "boardCount"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.BAD_REQUEST"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization not provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.UNAUTHORIZED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.FORBIDDEN"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.NOT_FOUND"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{userId}/details": {
+      "get": {
+        "operationId": "user-getMemberDetails",
+        "summary": "Get member detailed activities and history",
+        "description": "Returns roles, activity states, subscription details, donations, sponsorships, and full transaction history",
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "Authorization": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "phone": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "image": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "roles": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "email",
+                        "phone",
+                        "image",
+                        "status",
+                        "createdAt",
+                        "roles"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "membership": {
+                      "type": "object",
+                      "properties": {
+                        "hasActiveMembership": {
+                          "type": "boolean"
+                        },
+                        "activePackageName": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "activePeriodStart": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "activePeriodEnd": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "totalPurchases": {
+                          "type": "number"
+                        },
+                        "subscriptions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "packageName": {
+                                "type": "string"
+                              },
+                              "packageType": {
+                                "type": "string"
+                              },
+                              "price": {
+                                "type": "number"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "startsAt": {
+                                "type": "string"
+                              },
+                              "expiresAt": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "packageName",
+                              "packageType",
+                              "price",
+                              "status",
+                              "startsAt",
+                              "expiresAt",
+                              "createdAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "hasActiveMembership",
+                        "activePackageName",
+                        "activePeriodStart",
+                        "activePeriodEnd",
+                        "totalPurchases",
+                        "subscriptions"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "donations": {
+                      "type": "object",
+                      "properties": {
+                        "hasDonated": {
+                          "type": "boolean"
+                        },
+                        "totalCount": {
+                          "type": "number"
+                        },
+                        "totalAmount": {
+                          "type": "number"
+                        },
+                        "list": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "amount": {
+                                "type": "number"
+                              },
+                              "currency": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "isAnonymous": {
+                                "type": "boolean"
+                              },
+                              "message": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "amount",
+                              "currency",
+                              "status",
+                              "createdAt",
+                              "isAnonymous",
+                              "message"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "hasDonated",
+                        "totalCount",
+                        "totalAmount",
+                        "list"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "sponsorships": {
+                      "type": "object",
+                      "properties": {
+                        "hasSponsored": {
+                          "type": "boolean"
+                        },
+                        "totalCount": {
+                          "type": "number"
+                        },
+                        "totalAmount": {
+                          "type": "number"
+                        },
+                        "list": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "packageName": {
+                                "type": "string"
+                              },
+                              "tier": {
+                                "type": "string"
+                              },
+                              "amount": {
+                                "type": "number"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "startsAt": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "expiresAt": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "packageName",
+                              "tier",
+                              "amount",
+                              "status",
+                              "startsAt",
+                              "expiresAt",
+                              "createdAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "hasSponsored",
+                        "totalCount",
+                        "totalAmount",
+                        "list"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "transactionHistory": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "amount",
+                          "currency",
+                          "status",
+                          "createdAt",
+                          "type",
+                          "description"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "user",
+                    "membership",
+                    "donations",
+                    "sponsorships",
+                    "transactionHistory"
                   ],
                   "additionalProperties": false
                 }
@@ -3211,7 +3753,7 @@
               "default": 10,
               "type": "integer",
               "minimum": 1,
-              "maximum": 100
+              "maximum": 1000
             }
           }
         ],
@@ -6256,7 +6798,7 @@
               "default": 10,
               "type": "integer",
               "minimum": 1,
-              "maximum": 100
+              "maximum": 1000
             }
           }
         ],
@@ -7677,7 +8219,7 @@
               "default": 10,
               "type": "integer",
               "minimum": 1,
-              "maximum": 100
+              "maximum": 1000
             }
           }
         ],
@@ -12484,7 +13026,7 @@
               "default": 10,
               "type": "integer",
               "minimum": 1,
-              "maximum": 100
+              "maximum": 1000
             }
           }
         ],
@@ -13542,7 +14084,7 @@
               "default": 10,
               "type": "integer",
               "minimum": 1,
-              "maximum": 100
+              "maximum": 1000
             }
           }
         ],
@@ -15059,7 +15601,7 @@
               "default": 10,
               "type": "integer",
               "minimum": 1,
-              "maximum": 100
+              "maximum": 1000
             }
           }
         ],
@@ -16078,7 +16620,7 @@
               "default": 10,
               "type": "integer",
               "minimum": 1,
-              "maximum": 100
+              "maximum": 1000
             }
           }
         ],

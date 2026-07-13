@@ -35,6 +35,40 @@ export class MembershipService {
       })
     }
 
+    // Check for active membership to enforce upgrade rules
+    const activeSub = await prisma.subscription.findFirst({
+      where: {
+        userId,
+        status: "ACTIVE",
+        currentPeriodEnd: {
+          gt: new Date(),
+        },
+      },
+      include: {
+        package: true,
+      },
+    })
+
+    if (activeSub) {
+      const activePkg = activeSub.package
+
+      let isValidUpgrade = false
+      if (activePkg.type === "GENERAL" && pkg.type === "PASTORAL") {
+        isValidUpgrade = true
+      } else if (activePkg.type === pkg.type) {
+        if (activePkg.billingCycle === "MONTHLY" && pkg.billingCycle === "YEARLY") {
+          isValidUpgrade = true
+        }
+      }
+
+      if (!isValidUpgrade) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `You already have an active ${activePkg.name} subscription. You cannot purchase a new membership, but you can upgrade from Monthly to Yearly, or General to Pastoral.`,
+        })
+      }
+    }
+
     const basePrice = Number(pkg.price)
     const amountInCents = Math.round(basePrice * 100)
 

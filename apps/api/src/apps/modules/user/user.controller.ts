@@ -126,5 +126,41 @@ export class UserController {
   static async filterUser(params: Parameters<typeof UserService.filterUser>[0]) {
     return UserService.filterUser(params)
   }
+
+  /**
+   * Controller for retrieving user matrix stats
+   */
+  static async getUserMatrix() {
+    try {
+      return await UserService.getUserMatrix()
+    } catch (error: any) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to fetch user metrics matrix: ${error.message}`,
+      })
+    }
+  }
+
+  /**
+   * Controller for retrieving detailed profile, activities, and transaction history of a single member
+   */
+  static async getMemberDetails({ userId }: { userId: string }) {
+    try {
+      const details = await UserService.getMemberDetails(userId)
+      if (!details) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `User member with ID '${userId}' not found`,
+        })
+      }
+      return details
+    } catch (error: any) {
+      if (error instanceof TRPCError) throw error
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to retrieve member details: ${error.message}`,
+      })
+    }
+  }
 }
 

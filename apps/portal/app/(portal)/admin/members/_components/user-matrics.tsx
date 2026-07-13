@@ -1,8 +1,11 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { UserCheck, UserX, Clock, Plus, CheckCircle2 } from "lucide-react"
+import { CheckCircle2, Clock, Plus, UserCheck, UserX } from "lucide-react"
+import { useEffect, useState } from "react"
 
+import { Badge } from "@workspace/ui/components/badge"
+import { Button } from "@workspace/ui/components/button"
+import { Card, CardContent } from "@workspace/ui/components/card"
 import {
   Dialog,
   DialogContent,
@@ -12,8 +15,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog"
-import { Label } from "@workspace/ui/components/label"
 import { Input } from "@workspace/ui/components/input"
+import { Label } from "@workspace/ui/components/label"
+import { Progress } from "@workspace/ui/components/progress"
 import {
   Select,
   SelectContent,
@@ -21,32 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
-import { Button } from "@workspace/ui/components/button"
-import { Card, CardContent } from "@workspace/ui/components/card"
-import { Badge } from "@workspace/ui/components/badge"
-import { Progress } from "@workspace/ui/components/progress"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 
-import { useUsers } from "@/hooks/useUser"
-
-// Helper to determine top priority role
-const getTopRole = (roles: string[] | undefined): string => {
-  if (!roles || roles.length === 0) return "GUEST"
-  const upperRoles = roles.map((r) => r.toUpperCase())
-  if (upperRoles.includes("SUPER_ADMIN")) return "SUPER_ADMIN"
-  if (upperRoles.includes("BOARD")) return "BOARD"
-  if (upperRoles.includes("PASTORAL")) return "PASTORAL"
-  if (upperRoles.includes("MEMBER")) return "MEMBER"
-  return roles[0] || "USER"
-}
+import { useUserMatrix } from "@/hooks/useUser"
 
 export default function UserMatrics() {
   const [isOpen, setIsOpen] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
 
-  // Fetch the first 200 users to calculate dynamic dashboard stats
-  const { data: usersData, isLoading, } = useUsers(1, 200)
-  const usersList = usersData?.data || []
+  // Fetch the aggregated user metrics matrix from the API
+  const { data: matrixData, isLoading } = useUserMatrix()
 
   const handleCreateUser = () => {
     // Logic for user creation is handled by signup or member additions
@@ -65,7 +53,7 @@ export default function UserMatrics() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 py-4 animate-pulse">
+      <div className="animate-pulse space-y-6 py-4">
         {/* Header section with placeholder button */}
         <div className="flex items-center justify-between">
           <Skeleton className="h-7 w-36 rounded bg-slate-200 dark:bg-slate-800" />
@@ -75,7 +63,10 @@ export default function UserMatrics() {
         {/* 3 cards skeleton */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="border border-slate-200 dark:border-slate-800 rounded-xl p-5 bg-white dark:bg-slate-950 space-y-4 shadow-none">
+            <Card
+              key={i}
+              className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-none dark:border-slate-800 dark:bg-slate-950"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-3 w-3 rounded-full bg-slate-200 dark:bg-slate-800" />
@@ -94,8 +85,11 @@ export default function UserMatrics() {
         {/* Another 3 status cards skeleton */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="border border-slate-200 dark:border-slate-800 rounded-xl p-5 bg-white dark:bg-slate-950 flex items-start gap-4 shadow-none">
-              <Skeleton className="h-11 w-11 rounded-lg bg-slate-200 dark:bg-slate-800 shrink-0" />
+            <Card
+              key={i}
+              className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-none dark:border-slate-800 dark:bg-slate-950"
+            >
+              <Skeleton className="h-11 w-11 shrink-0 rounded-lg bg-slate-200 dark:bg-slate-800" />
               <div className="flex-1 space-y-2">
                 <div className="flex items-center justify-between">
                   <Skeleton className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-800" />
@@ -110,22 +104,14 @@ export default function UserMatrics() {
     )
   }
 
-  // Calculate dynamic stats
-  const total = usersList.length || 1
-
-  const activeCount = usersList.filter((u) => u.status === "ACTIVE").length
-  const suspendedCount = usersList.filter((u) => u.status === "SUSPENDED").length
-  const restrictedCount = usersList.filter((u) => u.status === "RESTRICTED" || u.status === "BANNED").length
-
-  const generalCount = usersList.filter((u) => {
-    const r = getTopRole(u.roles)
-    return r === "MEMBER" || r === "USER" || r === "GUEST"
-  }).length
-  const pastoralCount = usersList.filter((u) => getTopRole(u.roles) === "PASTORAL").length
-  const boardCount = usersList.filter((u) => {
-    const r = getTopRole(u.roles)
-    return r === "BOARD" || r === "SUPER_ADMIN"
-  }).length
+  // Retrieve metrics from the API
+  const total = matrixData?.total || 1
+  const activeCount = matrixData?.activeCount || 0
+  const suspendedCount = matrixData?.suspendedCount || 0
+  const restrictedCount = matrixData?.restrictedCount || 0
+  const generalCount = matrixData?.generalCount || 0
+  const pastoralCount = matrixData?.pastoralCount || 0
+  const boardCount = matrixData?.boardCount || 0
 
   const dynamicTierSummaries = [
     {
@@ -181,7 +167,10 @@ export default function UserMatrics() {
         {/* Main Add User Dialog */}
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => setIsOpen(true)} className="hover:cursor-pointer">
+            <Button
+              onClick={() => setIsOpen(true)}
+              className="hover:cursor-pointer"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Add New User
             </Button>
@@ -248,10 +237,7 @@ export default function UserMatrics() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {dynamicTierSummaries.map((summary, index) => (
-          <Card
-            key={index}
-            className={`border-l-4 shadow-none ${summary.color.replace("bg-", "border-l-")}`}
-          >
+          <Card key={index} className={`shadow-none`}>
             <CardContent className="space-y-4 p-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -283,7 +269,7 @@ export default function UserMatrics() {
         {statusStats.map((stat, index) => (
           <Card
             key={index}
-            className="overflow-hidden shadow-none border border-slate-200 dark:border-slate-800 transition-all hover:shadow-sm"
+            className="overflow-hidden border border-slate-200 shadow-none transition-all hover:shadow-sm dark:border-slate-800"
           >
             <CardContent className="flex items-start gap-4 p-5">
               <div className={`rounded-lg p-3 text-white ${stat.color}`}>

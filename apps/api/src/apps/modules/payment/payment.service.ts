@@ -350,6 +350,18 @@ export class PaymentService {
             },
           })) as any
 
+          // Deactivate any other active subscriptions for this user
+          await prisma.subscription.updateMany({
+            where: {
+              userId,
+              status: "ACTIVE",
+              id: { not: subscriptionId },
+            },
+            data: {
+              status: "CANCELED",
+            },
+          })
+
           await prisma.subscription.update({
             where: { id: subscriptionId },
             data: {
