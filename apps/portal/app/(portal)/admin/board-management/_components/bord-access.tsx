@@ -4,7 +4,6 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 import {
@@ -15,7 +14,7 @@ import {
   Search,
   ShieldAlert,
 } from "lucide-react"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
@@ -88,8 +87,28 @@ export default function BoardAccess() {
   const [createName, setCreateName] = useState("")
   const [createEmail, setCreateEmail] = useState("")
 
-  // 1. Query users
-  const { data, isLoading, isError, refetch } = useUsers(currentPage, 25)
+  const selectedRole = useMemo(() => {
+    if (selectedTier === "All") return "ALL"
+    if (selectedTier === "General") return "MEMBER"
+    if (selectedTier === "Pastoral") return "PASTORAL"
+    if (selectedTier === "Board") return "BOARD"
+    if (selectedTier === "Super Admin") return "SUPER_ADMIN"
+    return "ALL"
+  }, [selectedTier])
+
+  // Reset page when filter or search changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedTier, globalFilter])
+
+  // 1. Query users with search & role filters on serverside
+  const { data, isLoading, isError, refetch } = useUsers(
+    currentPage,
+    25,
+    globalFilter,
+    selectedRole,
+    "ALL"
+  )
 
   // 2. Role Mutation
   const updateRoleMutation = useUpdateUserRole()
@@ -281,48 +300,14 @@ export default function BoardAccess() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const usersList: ZTCIUserOutput[] = data?.data || []
 
-  const finalFilteredData = useMemo(() => {
-    return usersList.filter((user) => {
-      const topRole = getTopRole(user.roles)
-      if (selectedTier === "All") return true
-      if (selectedTier === "General")
-        return topRole === "MEMBER" || topRole === "USER"
-      if (selectedTier === "Pastoral") return topRole === "PASTORAL"
-      if (selectedTier === "Board") return topRole === "BOARD"
-      if (selectedTier === "Super Admin") return topRole === "SUPER_ADMIN"
-      return true
-    })
-  }, [usersList, selectedTier])
-
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: finalFilteredData,
+    data: usersList,
     columns,
     state: { globalFilter },
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    globalFilterFn: (row, columnId, filterValue) => {
-      const search = filterValue.toLowerCase()
-      const name = String(row.getValue("name") || "").toLowerCase()
-      const id = String(row.getValue("id") || "").toLowerCase()
-      const email = String(row.original.email || "").toLowerCase()
-      return (
-        name.includes(search) || id.includes(search) || email.includes(search)
-      )
-    },
   })
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 py-24">
-        <Loader2 className="h-10 w-10 animate-spin text-slate-500" />
-        <p className="text-sm font-medium text-slate-500">
-          Retrieving security permission records...
-        </p>
-      </div>
-    )
-  }
 
   if (isError) {
     return (
@@ -424,15 +409,62 @@ export default function BoardAccess() {
                 Active Vault Records
               </CardTitle>
               <CardDescription>
-                Showing {table.getRowModel().rows.length} entries matching
-                current criteria.
+                {isLoading
+                  ? "Loading security vault entries..."
+                  : `Showing ${table.getRowModel().rows.length} entries matching current criteria.`}
               </CardDescription>
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="p-0">
-          {table.getRowModel().rows.length === 0 ? (
+          {isLoading ? (
+            <div className="block overflow-x-auto animate-pulse">
+              <Table>
+                <TableHeader className="bg-slate-50/70 dark:bg-slate-800/40">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          className="px-6 py-3 text-xs font-semibold text-slate-500 uppercase"
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <TableRow key={i}>
+                      <TableCell className="px-6 py-4">
+                        <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-800" />
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <div className="space-y-2">
+                          <div className="h-4 w-36 rounded bg-slate-200 dark:bg-slate-800" />
+                          <div className="h-3 w-28 rounded bg-slate-200 dark:bg-slate-800" />
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <div className="h-4.5 w-16 rounded bg-slate-200 dark:bg-slate-800" />
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-800" />
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <div className="h-8 w-28 rounded-md bg-slate-200 dark:bg-slate-800" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : table.getRowModel().rows.length === 0 ? (
             <div className="flex h-48 flex-col items-center justify-center gap-2 p-6 text-sm text-slate-400">
               <ShieldAlert className="h-8 w-8 text-slate-300" />
               No matching security profiles identified inside this scope.

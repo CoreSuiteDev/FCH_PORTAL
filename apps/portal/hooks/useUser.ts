@@ -12,11 +12,21 @@ interface GetUsersResponse {
   }
 }
 
-export const useUsers = (page = 1, limit = 10) => {
+export const useUsers = (
+  page = 1,
+  limit = 10,
+  search = "",
+  role = "ALL",
+  status = "ALL"
+) => {
   return useQuery<GetUsersResponse>({
-    queryKey: ["users", page, limit],
+    queryKey: ["users", page, limit, search, role, status],
     queryFn: () =>
-      api.get("/users/list", { params: { page, limit } }).then((res) => res.data),
+      api
+        .get("/users/filter", {
+          params: { page, limit, search, role, status },
+        })
+        .then((res) => res.data),
   })
 }
 
