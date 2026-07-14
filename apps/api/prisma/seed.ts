@@ -472,6 +472,168 @@ async function main() {
   }
   console.log("Seeding events and webinars completed.")
 
+  console.log("Seeding authors...")
+  const authorsToSeed = [
+    {
+      name: "Luke Admin",
+      slug: "luke-admin",
+      designation: "FCH Board Member",
+      bio: "Luke is the lead administrator for FCH, managing community outreach and platform updates.",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150&h=150",
+    },
+    {
+      name: "Dr. Maria Gomez",
+      slug: "maria-gomez",
+      designation: "FCH Theologian & Educator",
+      bio: "Dr. Maria Gomez is a theologian focusing on Hispanic faith formation and catechesis.",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150&h=150",
+    },
+    {
+      name: "Bishop Oscar Cantu",
+      slug: "oscar-cantu",
+      designation: "Board Member & Advisor",
+      bio: "Bishop Oscar Cantu provides spiritual guidance and pastoral leadership insights.",
+      avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150&h=150",
+    },
+  ]
+
+  const seededAuthors: Record<string, any> = {}
+  for (const author of authorsToSeed) {
+    const existing = await prisma.author.findUnique({
+      where: { slug: author.slug },
+    })
+    if (!existing) {
+      const created = await prisma.author.create({
+        data: author,
+      })
+      seededAuthors[author.slug] = created
+      console.log(`Created author: ${author.name}`)
+    } else {
+      seededAuthors[author.slug] = existing
+      console.log(`Author already exists: ${author.name}`)
+    }
+  }
+
+  console.log("Seeding news and blogs...")
+  const newsToSeed = [
+    {
+      title: "Augustine Institute Sponsors Fch At The La Conference",
+      supTitle: "Community & Partnership",
+      slug: "augustine-institute-sponsors-fch-la-conference",
+      excerpt: "A big thank you to the Augustine Institute for sponsoring Rev. Yojaneider Garcia, FCH Theologian, to attend the Los Angeles Conference.",
+      content: "A big thank you to the Augustine Institute for sponsoring Rev. Yojaneider Garcia, FCH Theologian, to attend the Los Angeles Religious Education Congress. This collaboration continues our mission of bringing quality catechesis and formation to the Hispanic community across the United States. We look forward to more partnerships that elevate our ministry leaders.\n\nOur presence at the LA Conference was marked by fruitful discussions and high attendance at our sessions. We thank everyone who came by our booth to learn more about the Federation for Catechesis with Hispanics.",
+      status: "PUBLISHED" as const,
+      newsType: "NEWS" as const,
+      featuredImage: "/assets/news1.jpg",
+      featuredImageAlt: "Augustine Institute Sponsor Event",
+      publishedAt: new Date("2026-05-20T10:00:00Z"),
+      authorSlug: "luke-admin",
+      tags: ["partnership", "conference", "la-congress"]
+    },
+    {
+      title: "Fch Joins Nuevo Momento Initiative At Boston College",
+      supTitle: "Academic Collaboration",
+      slug: "fch-joins-nuevo-momento-initiative-boston-college",
+      excerpt: "FCH becomes part of the Nuevo Momento, a Boston College Initiative under the direction of Dr. Hosffman Ospino to empower pastoral leaders.",
+      content: "FCH is proud to announce its participation in the Nuevo Momento Initiative at Boston College, directed by Dr. Hosffman Ospino. This initiative focuses on empowering pastoral leaders and building robust religious education frameworks tailored to Hispanic Catholic contexts.\n\nThrough this partnership, FCH will contribute to research, resource sharing, and community engagement. We will gather data on best practices from across our network and use these insights to train next-generation catechists.",
+      status: "PUBLISHED" as const,
+      newsType: "NEWS" as const,
+      featuredImage: "/assets/news2.jpg",
+      featuredImageAlt: "Boston College Nuevo Momento",
+      publishedAt: new Date("2026-05-22T10:00:00Z"),
+      authorSlug: "maria-gomez",
+      tags: ["education", "boston-college", "leadership"]
+    },
+    {
+      title: "Pope Francis 1936-2025: A Legacy of Pastoral Love",
+      supTitle: "Vatican Tributes",
+      slug: "pope-francis-legacy-pastoral-love",
+      excerpt: "May God's love and peace be a comfort to all those who knew, loved, and were blessed by the ministry of Pope Francis.",
+      content: "We reflect on the profound legacy of Pope Francis, whose ministry emphasized mercy, dialogue, and closeness to the marginalized. His teachings, particularly in Evangelii Gaudium, continue to inspire our catechetical mission. Let us pray for his eternal rest and continue the path of pastoral accompaniment he so beautifully paved.\n\nFCH members are encouraged to host prayer circles and study groups on the encyclicals and pastoral instructions that defined his historic pontificate.",
+      status: "PUBLISHED" as const,
+      newsType: "NEWS" as const,
+      featuredImage: "/assets/news3.jpg",
+      featuredImageAlt: "Pope Francis Portrait",
+      publishedAt: new Date("2026-05-25T10:00:00Z"),
+      authorSlug: "oscar-cantu",
+      tags: ["pope-francis", "vatican", "tribute"]
+    },
+    {
+      title: "Global Unity Initiative Launched",
+      supTitle: "Global Outreach",
+      slug: "global-unity-initiative-launched",
+      excerpt: "A major global initiative promoting unity and collaboration across diverse communities.",
+      content: "A new global initiative has been launched to promote unity, mutual support, and collaborative ministry across diverse Catholic communities. The program focuses on sharing resources, coordinating digital events, and establishing mentorship connections for physical classes or virtual groups. FCH is excited to be at the forefront of this initiative.\n\nWe will collaborate with organizations in Europe and Latin America to run monthly seminars on intercultural formation and shared faith experiences.",
+      status: "PUBLISHED" as const,
+      newsType: "BLOG" as const,
+      featuredImage: "https://picsum.photos/seed/unity/800/600",
+      featuredImageAlt: "Global Unity",
+      publishedAt: new Date("2026-06-01T10:00:00Z"),
+      authorSlug: "luke-admin",
+      tags: ["global", "unity", "collaboration"]
+    },
+    {
+      title: "Daily Readings & Spiritual Reflections",
+      supTitle: "Spiritual Life",
+      slug: "daily-readings-spiritual-reflections",
+      excerpt: "Access daily spiritual readings and reflections from Vatican sources for personal and parish growth.",
+      content: "Nurturing daily faith requires consistent reflection. We are happy to share that our portal will now feature curated daily readings and spiritual reflections aligned with the liturgical calendar. These resources are designed for personal prayer as well as group study within your parish communities.\n\nCatechists can use these reading plans as daily warm-ups or closing prayers during faith formation sessions.",
+      status: "PUBLISHED" as const,
+      newsType: "ANNOUNCEMENT" as const,
+      featuredImage: "https://picsum.photos/seed/readings/800/600",
+      featuredImageAlt: "Daily Bible Readings",
+      publishedAt: new Date("2026-06-05T10:00:00Z"),
+      authorSlug: "maria-gomez",
+      tags: ["readings", "spirituality", "vatican"]
+    },
+    {
+      title: "Saint of the Day and Catechetical Lessons",
+      supTitle: "Faith Education",
+      slug: "saint-of-the-day-catechetical-lessons",
+      excerpt: "Learn about the saint of the day and their teachings for modern ministry.",
+      content: "The lives of the saints offer a rich tapestry of faith, courage, and dedication. FCH is launching a weekly series highlighting the 'Saint of the Day' with accompanying lesson plans that catechists can easily download and use in their classrooms.\n\nFrom St. Teresa of Avila to St. Oscar Romero, discover how the saints can inspire contemporary discipleship in our communities.",
+      status: "PUBLISHED" as const,
+      newsType: "BLOG" as const,
+      featuredImage: "https://picsum.photos/seed/saint/800/600",
+      featuredImageAlt: "Stained Glass Saints",
+      publishedAt: new Date("2026-06-10T10:00:00Z"),
+      authorSlug: "oscar-cantu",
+      tags: ["saints", "lessons", "catechesis"]
+    }
+  ]
+
+  for (const item of newsToSeed) {
+    const existing = await prisma.news.findUnique({
+      where: { slug: item.slug },
+    })
+
+    if (!existing) {
+      const author = seededAuthors[item.authorSlug]
+      if (!author) {
+        console.error(`Could not find author for slug: ${item.authorSlug}. Skipping news: ${item.title}`)
+        continue
+      }
+
+      const { authorSlug, tags, ...newsData } = item
+      await prisma.news.create({
+        data: {
+          ...newsData,
+          authorId: author.id,
+          tags: {
+            connectOrCreate: tags.map(tag => ({
+              where: { slug: tag },
+              create: { name: tag.charAt(0).toUpperCase() + tag.slice(1), slug: tag }
+            }))
+          }
+        }
+      })
+      console.log(`Created news: ${item.title}`)
+    } else {
+      console.log(`News already exists: ${item.title}`)
+    }
+  }
+  console.log("Seeding authors and news completed.")
+
   console.log("Seeding complete!")
 }
 

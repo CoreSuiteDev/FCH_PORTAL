@@ -10100,17 +10100,7 @@
                   "featuredImage": {
                     "anyOf": [
                       {
-                        "anyOf": [
-                          {
-                            "type": "string",
-                            "format": "uri"
-                          },
-                          {
-                            "type": "string",
-                            "minLength": 0,
-                            "maxLength": 0
-                          }
-                        ]
+                        "type": "string"
                       },
                       {
                         "type": "null"
@@ -10353,17 +10343,7 @@
                     "featuredImage": {
                       "anyOf": [
                         {
-                          "anyOf": [
-                            {
-                              "type": "string",
-                              "format": "uri"
-                            },
-                            {
-                              "type": "string",
-                              "minLength": 0,
-                              "maxLength": 0
-                            }
-                          ]
+                          "type": "string"
                         },
                         {
                           "type": "null"
@@ -10805,17 +10785,7 @@
                           "featuredImage": {
                             "anyOf": [
                               {
-                                "anyOf": [
-                                  {
-                                    "type": "string",
-                                    "format": "uri"
-                                  },
-                                  {
-                                    "type": "string",
-                                    "minLength": 0,
-                                    "maxLength": 0
-                                  }
-                                ]
+                                "type": "string"
                               },
                               {
                                 "type": "null"
@@ -11259,17 +11229,7 @@
                         "featuredImage": {
                           "anyOf": [
                             {
-                              "anyOf": [
-                                {
-                                  "type": "string",
-                                  "format": "uri"
-                                },
-                                {
-                                  "type": "string",
-                                  "minLength": 0,
-                                  "maxLength": 0
-                                }
-                              ]
+                              "type": "string"
                             },
                             {
                               "type": "null"
@@ -11665,17 +11625,7 @@
                       "featuredImage": {
                         "anyOf": [
                           {
-                            "anyOf": [
-                              {
-                                "type": "string",
-                                "format": "uri"
-                              },
-                              {
-                                "type": "string",
-                                "minLength": 0,
-                                "maxLength": 0
-                              }
-                            ]
+                            "type": "string"
                           },
                           {
                             "type": "null"
@@ -11917,17 +11867,7 @@
                     "featuredImage": {
                       "anyOf": [
                         {
-                          "anyOf": [
-                            {
-                              "type": "string",
-                              "format": "uri"
-                            },
-                            {
-                              "type": "string",
-                              "minLength": 0,
-                              "maxLength": 0
-                            }
-                          ]
+                          "type": "string"
                         },
                         {
                           "type": "null"
@@ -12433,17 +12373,7 @@
                         "featuredImage": {
                           "anyOf": [
                             {
-                              "anyOf": [
-                                {
-                                  "type": "string",
-                                  "format": "uri"
-                                },
-                                {
-                                  "type": "string",
-                                  "minLength": 0,
-                                  "maxLength": 0
-                                }
-                              ]
+                              "type": "string"
                             },
                             {
                               "type": "null"
@@ -12858,17 +12788,7 @@
                     "featuredImage": {
                       "anyOf": [
                         {
-                          "anyOf": [
-                            {
-                              "type": "string",
-                              "format": "uri"
-                            },
-                            {
-                              "type": "string",
-                              "minLength": 0,
-                              "maxLength": 0
-                            }
-                          ]
+                          "type": "string"
                         },
                         {
                           "type": "null"
@@ -13294,6 +13214,12 @@
                           "type": "null"
                         }
                       ]
+                    },
+                    "publishedCount": {
+                      "type": "number"
+                    },
+                    "unpublishedCount": {
+                      "type": "number"
                     }
                   },
                   "required": [
@@ -13474,6 +13400,12 @@
                                 "type": "null"
                               }
                             ]
+                          },
+                          "publishedCount": {
+                            "type": "number"
+                          },
+                          "unpublishedCount": {
+                            "type": "number"
                           }
                         },
                         "required": [
@@ -13683,6 +13615,12 @@
                               "type": "null"
                             }
                           ]
+                        },
+                        "publishedCount": {
+                          "type": "number"
+                        },
+                        "unpublishedCount": {
+                          "type": "number"
                         }
                       },
                       "required": [
@@ -13931,6 +13869,12 @@
                           "type": "null"
                         }
                       ]
+                    },
+                    "publishedCount": {
+                      "type": "number"
+                    },
+                    "unpublishedCount": {
+                      "type": "number"
                     }
                   },
                   "required": [
@@ -14202,6 +14146,12 @@
                               "type": "null"
                             }
                           ]
+                        },
+                        "publishedCount": {
+                          "type": "number"
+                        },
+                        "unpublishedCount": {
+                          "type": "number"
                         }
                       },
                       "required": [

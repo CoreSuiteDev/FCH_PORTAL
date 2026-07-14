@@ -1,9 +1,9 @@
 import { api } from "@/lib/axios"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { ZTCCreateAuthor, ZTCUpdateAuthor, ZTCAuthor } from "@workspace/types"
+import { ZTCCreateAuthor, ZTCUpdateAuthor, ZTCAuthorOutput } from "@workspace/types"
 
 interface GetAuthorsResponse {
-  data: ZTCAuthor[]
+  data: ZTCAuthorOutput[]
   meta: {
     totalCount: number
     page: number

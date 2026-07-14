@@ -34,6 +34,8 @@ export type ZTCUpdateAuthor = z.infer<typeof ZCIUpdateAuthorSchema>
 
 export const ZCIAuthorOutputSchema = ZCIAuthorSchema.extend({
   _count: z.object({ news: z.number() }).optional().nullable(),
+  publishedCount: z.number().optional(),
+  unpublishedCount: z.number().optional(),
 })
 export type ZTCAuthorOutput = z.infer<typeof ZCIAuthorOutputSchema>
 
@@ -63,7 +65,7 @@ export const ZCINewsSchema = z.object({
   metaDescription: z.string().nullable().optional(),
   metaKeywords: z.string().nullable().optional(),
   canonicalUrl: z.string().url("Must be a valid URL").or(z.string().length(0)).nullable().optional(),
-  featuredImage: z.string().url("Must be a valid URL").or(z.string().length(0)).nullable().optional(),
+  featuredImage: z.string().nullable().optional(),
   featuredImageAlt: z.string().nullable().optional(),
   status: PublishStatusEnum.default("DRAFT"),
   newsType: NewsTypeEnum.default("NEWS"),
