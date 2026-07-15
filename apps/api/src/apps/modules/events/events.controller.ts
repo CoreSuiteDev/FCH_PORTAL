@@ -14,6 +14,7 @@ export class EventsController {
     page: number
     limit: number
     userId?: string
+    eventType?: EventType
   }) {
     const allowedVisibilities = EventPolicy.getAllowedVisibilities(params.userRole)
     return EventsService.getAllEvents({
@@ -21,6 +22,7 @@ export class EventsController {
       page: params.page,
       limit: params.limit,
       userId: params.userId,
+      eventType: params.eventType,
     })
   }
 

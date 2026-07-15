@@ -86,16 +86,22 @@ export const eventsRouter = router({
         description: "Returns a paginated list of registered upcoming events based on user access levels",
       },
     })
-    .input(PaginationInputSchema.optional())
+    .input(
+      PaginationInputSchema.extend({
+        eventType: z.enum(["EVENT", "WEBINAR"]).optional(),
+      }).optional()
+    )
     .output(ZCIPaginatedEventsSchema)
     .query(async ({ input, ctx }) => {
       const page = input?.page ?? 1
       const limit = input?.limit ?? 10
+      const eventType = input?.eventType
       const { totalCount, data } = await EventsController.getEventsList({
         userRole: ctx.role,
         page,
         limit,
         userId: ctx.user?.id,
+        eventType,
       })
       return {
         data: data.map(mapEvent),

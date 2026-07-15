@@ -14,15 +14,20 @@ export class EventsService {
     page: number
     limit: number
     userId?: string
+    eventType?: EventType
   }) {
-    const { allowedVisibilities, page, limit, userId } = params
+    const { allowedVisibilities, page, limit, userId, eventType } = params
     const skip = (page - 1) * limit
 
-    const whereClause = {
+    const whereClause: any = {
       isActive: true,
       visibility: {
         in: allowedVisibilities,
       },
+    }
+
+    if (eventType) {
+      whereClause.eventType = eventType
     }
 
     const [totalCount, data] = await prisma.$transaction([

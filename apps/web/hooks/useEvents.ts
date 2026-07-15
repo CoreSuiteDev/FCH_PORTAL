@@ -12,12 +12,22 @@ interface GetEventsResponse {
   }
 }
 
-export const usePublicEvents = (params?: { page?: number; limit?: number }) => {
+export const usePublicEvents = (params?: {
+  page?: number
+  limit?: number
+  eventType?: "EVENT" | "WEBINAR"
+}) => {
   return useQuery<GetEventsResponse>({
     queryKey: ["public-events", params],
     queryFn: () =>
       api
-        .get("/events", { params: { page: params?.page ?? 1, limit: params?.limit ?? 50 } })
+        .get("/events", {
+          params: {
+            page: params?.page ?? 1,
+            limit: params?.limit ?? 50,
+            eventType: params?.eventType,
+          },
+        })
         .then((res) => res.data),
     staleTime: 1000 * 60 * 5, // 5 minutes
   })

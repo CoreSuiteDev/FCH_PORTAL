@@ -9,7 +9,6 @@ import {
   Calendar,
   MapPin,
   Users,
-  ArrowLeft,
   Video,
   Wifi,
   Download,
@@ -161,8 +160,8 @@ export default function EventDetailPage({
       await registerMutation.mutateAsync(event.id)
       toast.success("Successfully registered for the event!")
       queryClient.invalidateQueries({ queryKey: ["event-detail", event.id] })
-    } catch (error: any) {
-      toast.error(error.message || "Failed to register for the event. Please try again.")
+    } catch (error) {
+      toast.error((error as Error).message || "Failed to register for the event. Please try again.")
     } finally {
       setRegistering(false)
     }

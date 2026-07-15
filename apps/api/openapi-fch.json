@@ -4109,6 +4109,17 @@
               "minimum": 1,
               "maximum": 1000
             }
+          },
+          {
+            "in": "query",
+            "name": "eventType",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "EVENT",
+                "WEBINAR"
+              ]
+            }
           }
         ],
         "responses": {

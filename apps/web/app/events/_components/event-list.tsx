@@ -284,12 +284,11 @@ function HeroEvent({ event }: { event: ZTEvent }) {
 
 export default function EventsList() {
   const [activeTab, setActiveTab] = useState<TabKey>("ALL")
-  const { data: eventsRes, isLoading, isError } = usePublicEvents()
+  const { data: eventsRes, isLoading, isError } = usePublicEvents({
+    eventType: "EVENT",
+  })
 
-  // Filter: only PUBLIC and FREE_WEBINAR visibility (public-facing)
-  const allPublicEvents = (eventsRes?.data ?? []).filter((e) =>
-    (PUBLIC_VISIBILITIES as readonly string[]).includes(e.visibility)
-  )
+  const allPublicEvents = eventsRes?.data ?? []
 
   // Featured = first UPCOMING or ONGOING event with cover image
   const featuredEvent =
