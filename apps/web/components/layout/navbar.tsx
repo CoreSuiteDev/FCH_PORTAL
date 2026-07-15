@@ -109,6 +109,7 @@ export default function Navbar() {
             src="/assets/fch-logo-new-xp-scaled.png"
             alt="FCH Logo"
             fill
+            sizes="120px"
             className="object-contain"
             priority
           />
@@ -237,6 +238,7 @@ export default function Navbar() {
                     src="/assets/fch-logo-new-xp-scaled.png"
                     alt="FCH Logo"
                     fill
+                    sizes="80px"
                     className="object-contain"
                     priority
                   />

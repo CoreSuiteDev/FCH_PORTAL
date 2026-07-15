@@ -6,9 +6,8 @@ import { useTranslations } from "next-intl"
 import DynamicHero from "@/components/shared/dynamic-hero"
 import EventsList from "./_components/event-list"
 
-export default function Event() {
-  // Initialize the translations for the 'about' namespace
-  const t = useTranslations("about")
+export default function EventsPage() {
+  const t = useTranslations("eventsList")
 
   return (
     <ReactLenis
@@ -27,15 +26,19 @@ export default function Event() {
       <main className="relative">
         <DynamicHero>
           <div className="relative z-10">
-            <h2 className="mb-4 font-trajan text-4xl font-bold text-white md:text-5xl">
-              {t("hero.title")}
-            </h2>
-
-            <p className="mb-8 max-w-2xl text-white md:text-lg">
-              {t("hero.description")}
+            <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-white/70">
+              Community & Faith
+            </p>
+            <h1 className="mb-4 font-trajan text-4xl font-bold text-white md:text-5xl">
+              {t("title")}
+            </h1>
+            <p className="mb-8 max-w-2xl text-white/80 md:text-lg">
+              Join us for upcoming gatherings, free webinars, and community events
+              open to all.
             </p>
           </div>
         </DynamicHero>
+
         <EventsList />
       </main>
     </ReactLenis>

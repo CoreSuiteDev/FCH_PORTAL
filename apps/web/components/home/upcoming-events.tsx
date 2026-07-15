@@ -45,11 +45,12 @@ export function UpcomingEvents() {
             >
               <Card className="overflow-hidden border border-primary bg-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 hover:shadow-[0_20px_50px_rgba(139,26,26,0.15)]">
                 <CardContent className="flex flex-col items-center gap-8 p-6 sm:flex-row">
-                  <div className="relative h-56 w-full flex-shrink-0 overflow-hidden rounded-xl sm:w-56">
+                  <div className="relative h-56 w-full shrink-0 overflow-hidden rounded-xl sm:w-56">
                     <Image
                       src={`/assets/event-1.jpg`}
                       alt={event.title}
                       fill
+                      sizes="(max-width: 640px) 100vw, 224px"
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>

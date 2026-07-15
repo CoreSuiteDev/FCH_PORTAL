@@ -15,7 +15,10 @@ import { resourcesRouter } from "../apps/modules/resources/resources.router.js";
 import { sponsorPlanRouter } from "../apps/modules/sponsor-plan/sponsor-plan.router.js";
 import { sponsorRouter } from "../apps/modules/sponsor/sponsor.router.js";
 import { userRouter } from "../apps/modules/user/user.router.js";
+import { uploadRouter } from "../apps/modules/upload/upload.router.js";
 import { publicProcedure, router } from "./trpc.js";
+
+
 // Root Router
 export const appRouter = router({
   hello: publicProcedure
@@ -51,7 +54,8 @@ export const appRouter = router({
   newsletter: newsletterRouter,
   membership: membershipRouter,
   donation: donationRouter,
-  sponsor: sponsorRouter
+  sponsor: sponsorRouter,
+  upload: uploadRouter,
 });
 
 export type AppRouter = typeof appRouter;
