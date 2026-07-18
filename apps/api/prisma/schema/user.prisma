@@ -36,6 +36,8 @@ model User {
   newsUpdated   News[] @relation("NewsUpdatedBy")
   newsPublished News[] @relation("NewsPublishedBy")
 
+  supportTickets SupportTicket[]
+
   @@unique([email])
   @@index([status])
   @@map("user")
