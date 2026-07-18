@@ -115,6 +115,11 @@ export const data = {
       icon: IconBooks,
     },
     {
+      title: "Board Meeting Manager",
+      url: "/admin/board-meetings",
+      icon: IconPresentation,
+    },
+    {
       title: "Communications",
       url: "/admin/communications",
       icon: IconMail,
@@ -169,26 +174,6 @@ export const data = {
       icon: IconBooks,
     },
     {
-      title: "Catechetical Tools",
-      url: "/portal/resources/catechetical",
-      icon: IconSchool,
-    },
-    {
-      title: "Pastoral Leadership",
-      url: "/portal/resources/leadership",
-      icon: IconAward,
-    },
-    {
-      title: "Ministry Toolkits",
-      url: "/portal/resources/toolkits",
-      icon: IconBriefcase,
-    },
-    {
-      title: "Parish & Diocese Resources",
-      url: "/portal/resources/ministry",
-      icon: IconHierarchy,
-    },
-    {
       title: "Special Pastoral Resources",
       url: "/portal/resources/special",
       icon: IconFileText,
@@ -212,11 +197,6 @@ export const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "General FCH Documents",
-      url: "/portal/documents",
-      icon: IconFileText,
-    },
     {
       title: "Newsletter Archive",
       url: "/portal/news",

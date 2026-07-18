@@ -34,18 +34,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: userinfo, isLoading, isError } = useSessionInfo()
   const roles = userinfo?.user?.roles || []
 
-  // navSecondary theke items gulo ke separate/filter kore nilam static title er jonno
-  const internalDocs = data.navSecondary.filter((item) =>
-    ["General FCH Documents", "Newsletter Archive"].includes(item.title)
-  )
-
   // Dynamically build resource menu items under FCH Resources
   const resourcesMenu = []
 
-  // Add Basic Resources (accessible to all members)
+  // Special Member Resources (for all logged-in members)
   resourcesMenu.push({
-    title: "Basic Resources",
-    url: "/portal/resources/basic",
+    title: "Special Member Resources",
+    url: "/portal/resources/member",
     icon: IconFileText,
   })
 
@@ -63,26 +58,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconBooks,
       },
       {
-        title: "Catechetical Tools",
-        url: "/portal/resources/catechetical",
-        icon: IconSchool,
-      },
-      {
-        title: "Pastoral Leadership",
-        url: "/portal/resources/leadership",
-        icon: IconAward,
-      },
-      {
-        title: "Ministry Toolkits",
-        url: "/portal/resources/toolkits",
-        icon: IconBriefcase,
-      },
-      {
-        title: "Parish & Diocese Resources",
-        url: "/portal/resources/ministry",
-        icon: IconHierarchy,
-      },
-      {
         title: "Special Pastoral Resources",
         url: "/portal/resources/special",
         icon: IconFileText,
@@ -90,8 +65,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     )
   }
 
-  // Include the original internalDocs
-  resourcesMenu.push(...internalDocs)
+  // Special Board Resources (for board members and above)
+  if (
+    roles.includes("BOARD") ||
+    roles.includes("ADMIN") ||
+    roles.includes("SUPER_ADMIN")
+  ) {
+    resourcesMenu.push({
+      title: "Special Board Resources",
+      url: "/portal/resources/board",
+      icon: IconBooks,
+    })
+  }
 
   // Dynamically build pastoral menu items
   const pastoralMenuItems = [
