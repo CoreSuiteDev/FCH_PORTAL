@@ -1,7 +1,17 @@
 "use client"
 
 import * as React from "react"
-import { IconInnerShadowTop } from "@tabler/icons-react"
+import {
+  IconInnerShadowTop,
+  IconFileText,
+  IconBooks,
+  IconSchool,
+  IconAward,
+  IconBriefcase,
+  IconHierarchy,
+  IconDashboard,
+  IconCalendarEvent,
+} from "@tabler/icons-react"
 import {
   Sidebar,
   SidebarContent,
@@ -28,6 +38,74 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const internalDocs = data.navSecondary.filter((item) =>
     ["General FCH Documents", "Newsletter Archive"].includes(item.title)
   )
+
+  // Dynamically build resource menu items under FCH Resources
+  const resourcesMenu = []
+
+  // Add Basic Resources (accessible to all members)
+  resourcesMenu.push({
+    title: "Basic Resources",
+    url: "/portal/resources/basic",
+    icon: IconFileText,
+  })
+
+  // If user has higher privileges, add the other resource libraries
+  if (
+    roles.includes("PASTORAL") ||
+    roles.includes("BOARD") ||
+    roles.includes("ADMIN") ||
+    roles.includes("SUPER_ADMIN")
+  ) {
+    resourcesMenu.push(
+      {
+        title: "Learning Library",
+        url: "/portal/resources/learning",
+        icon: IconBooks,
+      },
+      {
+        title: "Catechetical Tools",
+        url: "/portal/resources/catechetical",
+        icon: IconSchool,
+      },
+      {
+        title: "Pastoral Leadership",
+        url: "/portal/resources/leadership",
+        icon: IconAward,
+      },
+      {
+        title: "Ministry Toolkits",
+        url: "/portal/resources/toolkits",
+        icon: IconBriefcase,
+      },
+      {
+        title: "Parish & Diocese Resources",
+        url: "/portal/resources/ministry",
+        icon: IconHierarchy,
+      },
+      {
+        title: "Special Pastoral Resources",
+        url: "/portal/resources/special",
+        icon: IconFileText,
+      }
+    )
+  }
+
+  // Include the original internalDocs
+  resourcesMenu.push(...internalDocs)
+
+  // Dynamically build pastoral menu items
+  const pastoralMenuItems = [
+    {
+      title: "Pastoral Overview",
+      url: "/portal/pastoral",
+      icon: IconDashboard,
+    },
+    {
+      title: "Events & Webinars",
+      url: "/portal/events",
+      icon: IconCalendarEvent,
+    },
+  ]
 
   const supportItems = data.navSecondary.filter((item) =>
     ["Get Help", "Search"].includes(item.title)
@@ -84,15 +162,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         )}
 
-        {/* ================= Pastoral Resources ================= */}
+        {/* ================= Pastoral Area ================= */}
         {(roles.includes("PASTORAL") ||
           roles.includes("ADMIN") ||
           roles.includes("SUPER_ADMIN")) && (
           <SidebarGroup>
             <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
-              Pastoral Resources
+              Pastoral Area
             </SidebarGroupLabel>
-            <NavMain items={data.pastoralMenu} />
+            <NavMain items={pastoralMenuItems} />
           </SidebarGroup>
         )}
 
@@ -109,7 +187,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
             FCH Resources
           </SidebarGroupLabel>
-          <NavSecondary items={internalDocs} />
+          <NavSecondary items={resourcesMenu} />
         </SidebarGroup>
 
         {/* ================= Custom Section: Support ================= */}

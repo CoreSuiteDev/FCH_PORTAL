@@ -38,6 +38,9 @@ model User {
 
   supportTickets SupportTicket[]
 
+  boardMeetings   BoardMeetingAttendee[]
+  meetingRequests MeetingRequest[]
+
   @@unique([email])
   @@index([status])
   @@map("user")

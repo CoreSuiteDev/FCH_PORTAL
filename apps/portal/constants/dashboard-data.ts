@@ -110,6 +110,11 @@ export const data = {
       ],
     },
     {
+      title: "Resources Manager",
+      url: "/admin/resources",
+      icon: IconBooks,
+    },
+    {
       title: "Communications",
       url: "/admin/communications",
       icon: IconMail,
@@ -133,44 +138,29 @@ export const data = {
   boardMenu: [
     {
       title: "Board Overview",
-      url: "/board",
+      url: "/portal/board",
       icon: IconDashboard,
     },
     {
       title: "Board Meetings",
-      url: "/board/meetings",
+      url: "/portal/board/meetings",
       icon: IconPresentation,
     },
     {
       title: "Governance Docs",
-      url: "/board/documents",
+      url: "/portal/board/documents",
       icon: IconFileText,
     },
     {
       title: "Financial Reports",
-      url: "/board/financials",
+      url: "/portal/board/financials",
       icon: IconReceipt2,
-    },
-    {
-      title: "Committees",
-      url: "/board/committees",
-      icon: IconHierarchy,
-    },
-    {
-      title: "Internal Planning",
-      url: "/board/planning",
-      icon: IconBriefcase,
-    },
-    {
-      title: "Collaboration Tools",
-      url: "/board/collaboration",
-      icon: IconUsers,
     },
   ],
   pastoralMenu: [
     {
       title: "Pastoral Overview",
-      url: "/portal/resources",
+      url: "/portal/pastoral",
       icon: IconDashboard,
     },
     {
@@ -212,23 +202,13 @@ export const data = {
   generalMenu: [
     {
       title: "General Overview",
-      url: "/portal",
+      url: "/portal/general",
       icon: IconDashboard,
-    },
-    {
-      title: "Announcements",
-      url: "/portal/announcements",
-      icon: IconBell,
     },
     {
       title: "Events & Webinars",
       url: "/portal/events",
       icon: IconCalendarEvent,
-    },
-    {
-      title: "Basic Resources",
-      url: "/portal/resources/basic",
-      icon: IconFileText,
     },
   ],
   navSecondary: [

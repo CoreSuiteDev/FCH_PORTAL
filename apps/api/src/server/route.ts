@@ -17,6 +17,7 @@ import { sponsorRouter } from "../apps/modules/sponsor/sponsor.router.js";
 import { userRouter } from "../apps/modules/user/user.router.js";
 import { uploadRouter } from "../apps/modules/upload/upload.router.js";
 import { supportRouter } from "../apps/modules/support/support.router.js";
+import { meetingsRouter } from "../apps/modules/meetings/meetings.router.js";
 import { publicProcedure, router } from "./trpc.js";
 
 
@@ -58,6 +59,7 @@ export const appRouter = router({
   sponsor: sponsorRouter,
   upload: uploadRouter,
   support: supportRouter,
+  meetings: meetingsRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -1,0 +1,62 @@
+enum MeetingType {
+  ONE_TO_ONE
+  ONE_TO_MANY
+}
+
+enum MeetingRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model BoardMeeting {
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  title       String
+  description String?
+  date        DateTime
+  duration    Int          // duration in minutes
+  meetingLink String?
+  meetingType MeetingType  @default(ONE_TO_MANY)
+
+  // Attendees list
+  attendees   BoardMeetingAttendee[]
+
+  // Optional link to request if created from one
+  requestId   String?            @unique
+  request     MeetingRequest?    @relation(fields: [requestId], references: [id], onDelete: SetNull)
+
+  @@map("board_meeting")
+}
+
+model BoardMeetingAttendee {
+  id        String       @id @default(cuid())
+  meetingId String
+  userId    String
+
+  meeting   BoardMeeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, userId])
+  @@map("board_meeting_attendee")
+}
+
+model MeetingRequest {
+  id        String               @id @default(cuid())
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  userId    String
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title     String
+  reason    String
+  date      DateTime
+  status    MeetingRequestStatus @default(PENDING)
+
+  meeting   BoardMeeting?
+
+  @@map("meeting_request")
+}
