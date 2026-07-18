@@ -4,6 +4,7 @@ import {
   EventVisibility,
 } from "../../../generated/prisma/client.js"
 import { prisma } from "../../../infrastructure/database/prisma.js"
+import { UploadService } from "../upload/upload.service.js"
 
 export class EventsService {
   /**
@@ -72,6 +73,71 @@ export class EventsService {
         },
       },
     })
+  }
+
+  /**
+   * Private helper to handle and upload cover image to Cloudflare R2
+   */
+  private static async handleCoverImage(coverImage?: string): Promise<string | undefined> {
+    if (!coverImage) return undefined
+
+    let base64Data: string | null = null
+    let mimetype = "image/jpeg"
+    let extension = ".jpg"
+
+    if (coverImage.startsWith("data:")) {
+      const matches = coverImage.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+      if (matches && matches.length === 3) {
+        mimetype = matches[1] || "image/jpeg"
+        base64Data = matches[2] || null
+
+        if (mimetype.includes("png")) extension = ".png"
+        else if (mimetype.includes("webp")) extension = ".webp"
+        else if (mimetype.includes("gif")) extension = ".gif"
+      }
+    } else if (!coverImage.startsWith("http://") && !coverImage.startsWith("https://")) {
+      base64Data = coverImage
+    }
+
+    if (base64Data) {
+      const buffer = Buffer.from(base64Data, "base64")
+      const file: Express.Multer.File = {
+        fieldname: "file",
+        originalname: `cover-image${extension}`,
+        encoding: "base64",
+        mimetype,
+        buffer,
+        size: buffer.byteLength,
+        stream: null as any,
+        destination: "",
+        filename: `cover-image${extension}`,
+        path: "",
+      }
+
+      const uploadResult = await UploadService.uploadFile(file, "events")
+      return uploadResult.url
+    }
+
+    return coverImage
+  }
+
+  /**
+   * Private helper to delete a file from Cloudflare R2 given its public URL
+   */
+  private static async deleteR2FileByUrl(url?: string | null) {
+    if (!url) return
+
+    const publicUrlBase = process.env.R2_PUBLIC_URL
+    if (publicUrlBase && url.startsWith(publicUrlBase)) {
+      const key = url.replace(publicUrlBase, "").replace(/^\//, "")
+      if (key) {
+        try {
+          await UploadService.deleteFile(key)
+        } catch (error) {
+          console.error(`Failed to delete file from R2 (key: ${key}):`, error)
+        }
+      }
+    }
   }
 
   /**
@@ -166,6 +232,8 @@ export class EventsService {
       throw new Error("Meeting link is only allowed for webinars")
     }
 
+    const coverImageUrl = await EventsService.handleCoverImage(eventData.coverImage)
+
     return prisma.$transaction(async (tx) => {
       const event = await tx.event.create({
         data: {
@@ -174,7 +242,7 @@ export class EventsService {
           startDate,
           endDate: eventData.endDate,
           location,
-          coverImage: eventData.coverImage,
+          coverImage: coverImageUrl,
           maxCapacity: eventData.maxCapacity,
           meetingLink: eventData.meetingLink,
           visibility: eventData.visibility,
@@ -276,7 +344,7 @@ export class EventsService {
       startDate?: Date
       endDate?: Date
       location?: string
-      coverImage?: string
+      coverImage?: string | null
       maxCapacity?: number
       meetingLink?: string
       visibility?: EventVisibility
@@ -347,10 +415,30 @@ export class EventsService {
         })
       }
 
+      let coverImageUrl = event.coverImage
+      if (eventData.coverImage === "" || eventData.coverImage === null) {
+        coverImageUrl = null
+        if (event.coverImage) {
+          await EventsService.deleteR2FileByUrl(event.coverImage)
+        }
+      } else if (eventData.coverImage) {
+        const isNewUpload =
+          eventData.coverImage.startsWith("data:") ||
+          (!eventData.coverImage.startsWith("http://") && !eventData.coverImage.startsWith("https://"))
+
+        const uploadedUrl = await EventsService.handleCoverImage(eventData.coverImage)
+        coverImageUrl = uploadedUrl ?? null
+
+        if (isNewUpload && event.coverImage) {
+          await EventsService.deleteR2FileByUrl(event.coverImage)
+        }
+      }
+
       const updateEvent = await tx.event.update({
         where: { id },
         data: {
           ...eventData,
+          coverImage: coverImageUrl !== undefined ? coverImageUrl : undefined,
           eventType: newEventType,
 
           ...(categoryIds && {
@@ -401,6 +489,10 @@ export class EventsService {
 
       if (event._count.eventRegistrations > 0) {
         throw new Error("Cannot delete event with existing registrations")
+      }
+
+      if (event.coverImage) {
+        await EventsService.deleteR2FileByUrl(event.coverImage)
       }
 
       // Webinar and materials cascade automatically via onDelete: Cascade in schema

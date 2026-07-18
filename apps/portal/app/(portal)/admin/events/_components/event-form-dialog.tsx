@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { Loader2 } from "lucide-react"
+import { Loader2, Upload, X } from "lucide-react"
 import type { UseFormReturn, FieldError } from "react-hook-form"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -21,6 +21,7 @@ import {
 import { Textarea } from "@workspace/ui/components/textarea"
 import type { ZTCCreateEventInput, ZTEventCategory } from "@workspace/types"
 import { getErrorMessage, formatDateTimeLocal } from "./event-constants"
+import Image from "next/image"
 
 interface EventFormDialogProps {
   isOpen: boolean
@@ -51,6 +52,29 @@ export function EventFormDialog({
       return cat ? cat.name.toLowerCase().includes("webinar") : false
     })
   }, [watchedCategoryIds, categoriesList])
+
+  const watchedCoverImage = watch("coverImage")
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setValue("coverImage", reader.result as string, {
+          shouldValidate: true,
+          shouldDirty: true,
+        })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setValue("coverImage", "", {
+      shouldValidate: true,
+      shouldDirty: true,
+    })
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -213,16 +237,49 @@ export function EventFormDialog({
             )}
 
             {/* Cover Image */}
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 md:col-span-2">
               <label className="text-xs font-bold text-slate-500 uppercase">
-                Cover Image URL
+                Cover Image
               </label>
-              <Input
-                {...register("coverImage")}
-                placeholder="e.g. https://images.unsplash.com/..."
-                className="h-10 border-slate-200 text-xs"
-              />
+              {watchedCoverImage ? (
+                <div className="relative mt-1 flex items-center justify-center rounded-lg border border-slate-200 bg-slate-50/10 p-2 overflow-hidden h-40 group">
+                  <Image
+                    src={watchedCoverImage}
+                    alt="Cover preview"
+                    fill
+                    className="h-full w-full object-cover rounded-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute top-4 right-4 bg-rose-500 text-white rounded-full p-1.5 shadow-md hover:bg-rose-600 transition-colors opacity-90 hover:opacity-100 cursor-pointer"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="relative mt-1 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-200 p-6 text-center hover:bg-slate-50 transition-colors cursor-pointer group h-40">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="rounded-full bg-slate-100 p-2 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-600 transition-colors">
+                      <Upload className="size-5" />
+                    </div>
+                    <p className="text-xs font-medium text-slate-700">
+                      Click to upload cover image
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      PNG, JPG, WEBP, or GIF (max. 10MB)
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
             </div>
+
 
             {/* Max Capacity */}
             <div className="space-y-1.5">

@@ -42,6 +42,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "www.vaticannews.va",
       },
+      {
+        protocol: "https",
+        hostname: "*.r2.dev",
+      },
     ],
   },
 }

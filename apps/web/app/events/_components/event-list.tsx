@@ -12,10 +12,6 @@ import { ZTEvent } from "@workspace/types"
 
 type EventStatusKey = "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED"
 
-// ─── helpers ────────────────────────────────────────────────────────────────
-
-const PUBLIC_VISIBILITIES = ["PUBLIC", "FREE_WEBINAR"] as const
-
 function formatDate(date: Date | string) {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -112,7 +108,7 @@ function EventCard({ event }: { event: ZTEvent }) {
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+          <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-primary/10 to-primary/5">
             {isWebinar ? (
               <Video className="h-12 w-12 text-primary/30" />
             ) : (
@@ -230,10 +226,10 @@ function HeroEvent({ event }: { event: ZTEvent }) {
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
           ) : (
-            <div className="h-full w-full bg-gradient-to-br from-primary/80 to-primary/60" />
+            <div className="h-full w-full bg-linear-to-br from-primary/80 to-primary/60" />
           )}
           {/* Dark gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
         </div>
 
         {/* Content overlay */}

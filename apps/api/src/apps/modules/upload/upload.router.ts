@@ -51,4 +51,56 @@ export const uploadRouter = router({
 
       return { success: true, data }
     }),
+
+  deleteFile: publicProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/upload/delete",
+        tags: ["upload"],
+        summary: "Delete a file",
+        description: "Deletes a file from R2 storage by its key",
+      },
+    })
+    .input(
+      z.object({
+        key: z.string().min(1, "File key is required"),
+      })
+    )
+    .output(
+      z.object({
+        success: z.boolean(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await UploadService.deleteFile(input.key)
+      return { success: true }
+    }),
+
+  getDownloadPresignedUrl: publicProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/upload/presigned-url",
+        tags: ["upload"],
+        summary: "Get presigned download URL",
+        description: "Generates a temporary presigned GET URL for a file",
+      },
+    })
+    .input(
+      z.object({
+        key: z.string().min(1, "File key is required"),
+        expiresIn: z.number().optional(),
+      })
+    )
+    .output(
+      z.object({
+        url: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      const result = await UploadService.getDownloadPresignedUrl(input.key, input.expiresIn)
+      return result
+    }),
 })
+

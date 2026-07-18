@@ -3,6 +3,10 @@ import type { NextConfig } from "next"
 const nextConfig: NextConfig = {
   output: "standalone",
   transpilePackages: ["@workspace/ui", "@workspace/types"],
+  experimental: {
+    proxyClientMaxBodySize: "50mb",
+  },
+
 
   async rewrites() {
     return [
@@ -31,8 +35,13 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "*.r2.dev",
+      },
     ],
   },
 }
+
 
 export default nextConfig
