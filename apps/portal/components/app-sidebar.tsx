@@ -29,8 +29,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ["General FCH Documents", "Newsletter Archive"].includes(item.title)
   )
 
-  const accountAndHelp = data.navSecondary.filter((item) =>
-    ["My Profile", "Settings", "Get Help", "Search"].includes(item.title)
+  const supportItems = data.navSecondary.filter((item) =>
+    ["Get Help", "Search"].includes(item.title)
   )
 
   const sidebarUser = userinfo?.user
@@ -51,8 +51,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <Link href="/">
-                <IconInnerShadowTop className="size-5!" />
-                <span className="text-base font-semibold">FCH Portal</span>
+                <IconInnerShadowTop className="size-5! shrink-0" />
+                <span className="text-base font-semibold group-data-[collapsible=icon]:hidden">
+                  FCH Portal
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -110,13 +112,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavSecondary items={internalDocs} />
         </SidebarGroup>
 
-        {/* ================= Custom Section: Account & Support ================= */}
+        {/* ================= Custom Section: Support ================= */}
         {/* mt-auto deway eta ekdom niche push hoye thakbe */}
         <SidebarGroup className="mt-auto">
           <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
-            Account & Support
+            Support
           </SidebarGroupLabel>
-          <NavSecondary items={accountAndHelp} />
+          <NavSecondary items={supportItems} />
         </SidebarGroup>
       </SidebarContent>
 

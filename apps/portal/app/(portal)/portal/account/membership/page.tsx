@@ -39,7 +39,6 @@ import {
   useMyMemberships,
   useMyCancellationRequests,
   useRequestCancellation,
-  UserSubscriptionDetails,
 } from "@/hooks/useMembership"
 
 // ─── status styles ─────────────────────────────────────────────────────────
@@ -138,13 +137,13 @@ export default function UserMembershipBillingPage() {
           variant="ghost"
           size="sm"
           className="gap-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 -ml-2 cursor-pointer"
-          onClick={() => router.push("/portal/profile")}
+          onClick={() => router.push("/portal/account")}
         >
-          <IconArrowLeft className="size-4" /> Back to Profile
+          <IconArrowLeft className="size-4" /> Back to Account Settings
         </Button>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-slate-50">
               Manage Membership &amp; Billing
             </h2>
             <p className="text-slate-500 dark:text-slate-400 mt-1">
@@ -158,7 +157,7 @@ export default function UserMembershipBillingPage() {
         {/* Left Column: Form / Status */}
         <div className="space-y-6 lg:col-span-2">
           {/* Active Subscriptions Card */}
-          <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+          <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
             <CardHeader>
               <CardTitle className="text-lg font-bold">Active Subscriptions</CardTitle>
               <CardDescription>
@@ -195,7 +194,7 @@ export default function UserMembershipBillingPage() {
                       >
                         <div className="flex items-center justify-between">
                           <div className="space-y-1">
-                            <div className="font-bold text-sm text-slate-900 dark:text-slate-50">
+                            <div className="font-bold text-sm text-slate-900 dark:text-slate-55 flex items-center gap-2">
                               {sub.packageName}
                             </div>
                             <div className="text-xs text-slate-500 dark:text-slate-400">
@@ -219,7 +218,7 @@ export default function UserMembershipBillingPage() {
           </Card>
 
           {/* Previous & Inactive Memberships Card */}
-          <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+          <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
             <CardHeader>
               <CardTitle className="text-lg font-bold">Billing &amp; Subscription History</CardTitle>
               <CardDescription>
@@ -293,7 +292,7 @@ export default function UserMembershipBillingPage() {
 
           {/* Cancellation Request Section */}
           {selectedSub && (
-            <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 animate-in fade-in-50 duration-200">
+            <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl animate-in fade-in-50 duration-200">
               <CardHeader>
                 <CardTitle className="text-lg font-bold">Request Cancellation</CardTitle>
                 <CardDescription>
@@ -328,7 +327,7 @@ export default function UserMembershipBillingPage() {
                     placeholder="e.g. Relocating, changed role, or not using the portal enough (minimum 10 characters)…"
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
-                    className="resize-none text-sm border-slate-200 dark:border-slate-800"
+                    className="resize-none text-sm border-slate-200 dark:border-slate-800 rounded-xl"
                   />
                   <p className="text-[11px] text-slate-400">{reason.length} characters</p>
                 </div>
@@ -344,7 +343,7 @@ export default function UserMembershipBillingPage() {
                   <Button
                     disabled={reason.trim().length < 10 || isPending || hasPendingForSub}
                     onClick={() => setConfirmOpen(true)}
-                    className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+                    className="bg-red-600 hover:bg-red-700 text-white rounded-xl cursor-pointer"
                   >
                     Submit Cancellation Request
                   </Button>
@@ -357,7 +356,7 @@ export default function UserMembershipBillingPage() {
         {/* Right Column: Request History & Policy */}
         <div className="space-y-6">
           {/* History Card */}
-          <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+          <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
             <CardHeader>
               <CardTitle className="text-lg font-bold">Request History</CardTitle>
               <CardDescription>
@@ -429,7 +428,7 @@ export default function UserMembershipBillingPage() {
           </Card>
 
           {/* Cancellation Info Policy */}
-          <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+          <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-2xl">
             <CardHeader>
               <CardTitle className="text-sm font-bold flex items-center gap-2">
                 <IconHelp className="size-4 text-slate-400" />
@@ -474,7 +473,7 @@ export default function UserMembershipBillingPage() {
             <AlertDialogAction
               disabled={isPending}
               onClick={handleSubmit}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
             >
               {isPending ? "Submitting Request..." : "Confirm & Submit"}
             </AlertDialogAction>

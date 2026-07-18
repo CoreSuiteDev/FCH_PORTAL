@@ -944,9 +944,10 @@ export class MembershipService {
       },
     })
 
-    // Revert user role back to GENERAL
+    // Revert user role by removing the cancelled tier role (MEMBER or PASTORAL)
+    const roleName = sub.package.type === "GENERAL" ? "MEMBER" : "PASTORAL"
     const { UserService } = await import("../user/user.service.js")
-    await UserService.updateUserRole(req.user.id, "GENERAL")
+    await UserService.removeUserRole(req.user.id, roleName)
 
     // Mark the request as APPROVED
     await prisma.cancellationRequest.update({

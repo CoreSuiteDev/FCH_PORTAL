@@ -45,6 +45,7 @@ export function EventFormDialog({
 }: EventFormDialogProps) {
   const { register, handleSubmit, setValue, watch, formState: { errors } } = form
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const watchedCategoryIds = watch("categoryIds") || []
   const isWebinar = useMemo(() => {
     return watchedCategoryIds.some((id) => {

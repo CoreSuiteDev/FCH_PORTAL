@@ -19,7 +19,6 @@ import {
   IconSettings,
   IconUser,
   IconUsers,
-  IconVideo,
 } from "@tabler/icons-react"
 
 
@@ -133,7 +132,7 @@ export const data = {
   ],
   boardMenu: [
     {
-      title: "Board Room Home",
+      title: "Board Overview",
       url: "/board",
       icon: IconDashboard,
     },
@@ -169,6 +168,11 @@ export const data = {
     },
   ],
   pastoralMenu: [
+    {
+      title: "Pastoral Overview",
+      url: "/portal/resources",
+      icon: IconDashboard,
+    },
     {
       title: "Learning Library",
       url: "/portal/resources/learning",
@@ -207,8 +211,8 @@ export const data = {
   ],
   generalMenu: [
     {
-      title: "Dashboard Home",
-      url: "/",
+      title: "General Overview",
+      url: "/portal",
       icon: IconDashboard,
     },
     {
@@ -239,8 +243,8 @@ export const data = {
       icon: IconMail,
     },
     {
-      title: "My Profile",
-      url: "/portal/profile",
+      title: "Account",
+      url: "/portal/account",
       icon: IconUser,
     },
     {

@@ -197,6 +197,73 @@ export class UserService {
   }
 
   /**
+   * Add a specific role to the user, keeping existing roles
+   */
+  static async addUserRole(userId: string, roleName: string) {
+    const upperRoleName = roleName.toUpperCase()
+
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    })
+
+    if (!userExists) throw new Error(`User with ID '${userId}' not found`)
+
+    let role = await prisma.role.findUnique({
+      where: { name: upperRoleName },
+    })
+
+    if (!role) {
+      role = await prisma.role.create({
+        data: {
+          name: upperRoleName,
+          description: `${upperRoleName} Role`,
+        },
+      })
+    }
+
+    const existingUserRole = await prisma.userRole.findUnique({
+      where: {
+        userId_roleId: {
+          userId,
+          roleId: role.id,
+        },
+      },
+    })
+
+    if (!existingUserRole) {
+      await prisma.userRole.create({
+        data: { userId, roleId: role.id },
+      })
+    }
+
+    return { success: true, role: upperRoleName }
+  }
+
+  /**
+   * Remove a specific role from the user, leaving other roles intact
+   */
+  static async removeUserRole(userId: string, roleName: string) {
+    const upperRoleName = roleName.toUpperCase()
+
+    const role = await prisma.role.findUnique({
+      where: { name: upperRoleName },
+    })
+
+    if (role) {
+      await prisma.userRole.deleteMany({
+        where: {
+          userId,
+          roleId: role.id,
+        },
+      })
+    }
+
+    return { success: true }
+  }
+
+
+  /**
    * Create a new board member user with temporary password and passwordChangeRequired flag
    */
   static async createBoardMember(data: { name: string; email: string }) {

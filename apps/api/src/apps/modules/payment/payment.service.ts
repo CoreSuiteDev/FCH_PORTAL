@@ -376,7 +376,7 @@ export class PaymentService {
                 ? "MEMBER"
                 : "PASTORAL"
             const { UserService } = await import("../user/user.service.js")
-            await UserService.updateUserRole(userId, roleName)
+            await UserService.addUserRole(userId, roleName)
           }
           console.log(
             `[Webhook] Subscription payment successfully recorded for Payment: ${paymentId}`

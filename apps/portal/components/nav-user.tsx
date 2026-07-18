@@ -1,12 +1,13 @@
 "use client"
-
+import Link from "next/link"
+import { authClient } from "@/lib/auth"
 import {
-  IconCreditCard,
+  IconSettings,
   IconDotsVertical,
   IconLogout,
-  IconNotification,
   IconUserCircle,
   IconAlertCircle,
+  IconCreditCard,
 } from "@tabler/icons-react"
 import {
   Avatar,
@@ -18,6 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -44,6 +46,26 @@ export function NavUser({
   isError: boolean
 }) {
   const { isMobile } = useSidebar()
+
+
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            window.location.href =
+              process.env.NEXT_PUBLIC_LOGIN_URL || "http://localhost:3000/login"
+          },
+        },
+      })
+    } catch (error) {
+      console.error("Failed to sign out:", error)
+      // Fallback redirect
+      window.location.href =
+        process.env.NEXT_PUBLIC_LOGIN_URL || "http://localhost:3000/login"
+    }
+  }
+
 
   // Loading State with Skeleton
   if (isLoading) {
@@ -104,13 +126,13 @@ export function NavUser({
                   {user.name?.slice(0, 2).toUpperCase() || "US"}
                 </AvatarFallback>
               </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
+              <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="truncate font-medium">{user.name}</span>
                 <span className="truncate text-xs text-muted-foreground">
                   {user.email}
                 </span>
               </div>
-              <IconDotsVertical className="ml-auto size-4" />
+              <IconDotsVertical className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -137,23 +159,32 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconUserCircle />
-                Account
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href="/portal/account">
+                  <IconUserCircle className="mr-2 h-4 w-4" />
+                  <span>Account</span>
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href="/portal/account/membership">
+                  <IconCreditCard className="mr-2 h-4 w-4" />
+                  <span>Billing &amp; Membership</span>
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconNotification />
-                Notifications
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href="/portal/settings">
+                  <IconSettings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <IconLogout />
-              Log out
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-red-600 focus:text-red-700 focus:bg-red-50 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+            >
+              <IconLogout className="mr-2 h-4 w-4" />
+              <span>Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

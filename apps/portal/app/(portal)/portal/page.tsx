@@ -117,8 +117,8 @@ const quickLinks = [
     color: "text-violet-600 bg-violet-500/10",
   },
   {
-    title: "My Profile",
-    href: "/portal/profile",
+    title: "Account Settings",
+    href: "/portal/account",
     description: "Update your personal details, password and preferences.",
     icon: IconUsers,
     color: "text-rose-600 bg-rose-500/10",
@@ -171,7 +171,6 @@ function EventMiniCard({ event }: { event: any }) {
       href={href}
       className="group flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-xs transition-all hover:border-primary/30 hover:shadow-md"
     >
-      {/* Top badges */}
       <div className="flex flex-wrap items-center gap-1.5">
         <span
           className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase ${
@@ -198,12 +197,10 @@ function EventMiniCard({ event }: { event: any }) {
         ) : null}
       </div>
 
-      {/* Title */}
       <h4 className="line-clamp-2 text-sm font-bold text-foreground transition-colors group-hover:text-primary">
         {event.title}
       </h4>
 
-      {/* Meta */}
       <div className="space-y-1 text-[11px] text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <IconClock className="size-3.5 shrink-0 text-primary" />
@@ -286,9 +283,8 @@ export default function PortalDashboardPage() {
   return (
     <div className="flex-1 space-y-8 p-8 pt-6">
 
-      {/* ── Hero Greeting ─────────────────────────────────────────── */}
+      {/* Hero Greeting */}
       <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-card to-card p-8 shadow-xs">
-        {/* decorative blobs */}
         <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-8 left-1/3 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
 
@@ -336,7 +332,7 @@ export default function PortalDashboardPage() {
         </div>
       </div>
 
-      {/* ── Stats Row ──────────────────────────────────────────────── */}
+      {/* Stats Row */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           label="Membership Tier"
@@ -368,132 +364,133 @@ export default function PortalDashboardPage() {
         />
       </div>
 
-      {/* ── Upcoming Events ────────────────────────────────────────── */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-extrabold tracking-tight text-foreground">
-            Upcoming Events &amp; Webinars
-          </h2>
-          <Link
-            href="/portal/events"
-            className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-          >
-            View all <IconArrowRight className="size-3" />
-          </Link>
-        </div>
-
-        {isEventsLoading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-44 rounded-2xl" />
-            ))}
-          </div>
-        ) : upcomingEvents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed py-16 text-center">
-            <IconCalendarEvent className="size-10 text-muted-foreground/40" />
-            <p className="text-sm font-semibold text-muted-foreground">
-              No upcoming events right now.
-            </p>
-            <p className="text-xs text-muted-foreground">Check back soon!</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {upcomingEvents.map((event) => (
-              <EventMiniCard key={event.id} event={event} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* ── Quick Access + Latest News ─────────────────────────────── */}
-      <div className="grid gap-6 lg:grid-cols-3">
-
-        {/* Quick Access */}
-        <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-lg font-extrabold tracking-tight text-foreground">
-            Quick Access
-          </h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {quickLinks.map((item) => {
-              const Icon = item.icon
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="group flex items-start gap-3.5 rounded-2xl border bg-card p-4 shadow-xs transition-all hover:border-primary/30 hover:shadow-md"
-                >
-                  <div
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.color}`}
+      {/* Main Grid */}
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Left Side (Quick Access & Latest News) */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Quick Access */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold tracking-tight text-foreground">
+              General Quick Access
+            </h3>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {quickLinks.map((item) => {
+                const Icon = item.icon
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="group block rounded-2xl border bg-card p-5 shadow-xs transition-all hover:border-primary/30 hover:shadow-md"
                   >
-                    <Icon className="size-4.5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold text-foreground transition-colors group-hover:text-primary">
-                        {item.title}
-                      </span>
-                      <IconChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                    <div className="flex items-center gap-4">
+                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${item.color} group-hover:scale-105 transition-transform duration-300`}>
+                        <Icon className="size-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="truncate text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                          {item.title}
+                        </h4>
+                        <p className="truncate text-xs text-muted-foreground mt-0.5">
+                          {item.description}
+                        </p>
+                      </div>
+                      <IconChevronRight className="size-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform shrink-0" />
                     </div>
-                    <p className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">
-                      {item.description}
-                    </p>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Latest News */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold tracking-tight text-foreground">
+                Latest Announcements &amp; News
+              </h3>
+              <Link
+                href="/portal/news"
+                className="flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+              >
+                View Archive <IconArrowRight className="size-3" />
+              </Link>
+            </div>
+
+            {isNewsLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+            ) : recentNews.length === 0 ? (
+              <div className="rounded-2xl border border-dashed p-8 text-center text-muted-foreground text-sm">
+                No recent news or announcements.
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {recentNews.map((news) => (
+                  <div
+                    key={news.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border bg-card p-5 shadow-xs"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                          News
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDate(news.createdAt)}
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-bold text-foreground">
+                        {news.title}
+                      </h4>
+                      <p className="text-xs text-muted-foreground line-clamp-1">
+                        {news.content ? news.content.replace(/<[^>]*>/g, "").slice(0, 120) + "..." : ""}
+                      </p>
+                    </div>
+                    <Link
+                      href={`/portal/news`}
+                      className="inline-flex shrink-0 items-center justify-center gap-1 rounded-xl border px-3 py-2 text-xs font-bold text-foreground hover:bg-muted"
+                    >
+                      Read Article
+                    </Link>
                   </div>
-                </Link>
-              )
-            })}
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Latest News */}
+        {/* Right Side (Upcoming Events) */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-extrabold tracking-tight text-foreground">
-              Latest News
-            </h2>
+            <h3 className="text-xl font-bold tracking-tight text-foreground">
+              Upcoming Events
+            </h3>
             <Link
-              href="/portal/news"
-              className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+              href="/portal/events"
+              className="flex items-center gap-1 text-xs font-bold text-primary hover:underline"
             >
-              All news <IconArrowRight className="size-3" />
+              All Events <IconArrowRight className="size-3" />
             </Link>
           </div>
 
-          <div className="rounded-2xl border bg-card shadow-xs divide-y overflow-hidden">
-            {isNewsLoading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="px-5 py-4 space-y-1.5">
-                  <Skeleton className="h-3.5 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-              ))
-            ) : recentNews.length === 0 ? (
-              <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
-                <IconNews className="size-8 text-muted-foreground/40" />
-                <p className="text-xs text-muted-foreground">No news yet.</p>
-              </div>
-            ) : (
-              recentNews.map((item) => (
-                <Link
-                  key={item.id}
-                  href={`/portal/news`}
-                  className="group flex items-start gap-3 px-5 py-4 transition-colors hover:bg-muted/40"
-                >
-                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <IconNews className="size-3.5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-xs font-semibold text-foreground transition-colors group-hover:text-primary">
-                      {item.title}
-                    </p>
-                    <p className="mt-0.5 text-[10px] text-muted-foreground">
-                      {item.publishedAt ? formatDate(item.publishedAt) : "Draft"}
-                    </p>
-                  </div>
-                  <IconChevronRight className="mt-0.5 size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-                </Link>
-              ))
-            )}
-          </div>
+          {isEventsLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          ) : upcomingEvents.length === 0 ? (
+            <div className="rounded-2xl border border-dashed p-8 text-center text-muted-foreground text-sm">
+              No upcoming events scheduled.
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {upcomingEvents.map((ev) => (
+                <EventMiniCard key={ev.id} event={ev} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
