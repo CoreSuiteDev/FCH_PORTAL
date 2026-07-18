@@ -51,12 +51,14 @@ export const useUpdateTicketStatus = () => {
       ticketId,
       status,
       adminNote,
+      replyMessage,
     }: {
       ticketId: string
       status: SupportTicket["status"]
       adminNote?: string
+      replyMessage?: string
     }) =>
-      api.post(`/support/tickets/${ticketId}/process`, { status, adminNote }).then((res) => res.data),
+      api.post(`/support/tickets/${ticketId}/process`, { status, adminNote, replyMessage }).then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["support-tickets"] })
     },

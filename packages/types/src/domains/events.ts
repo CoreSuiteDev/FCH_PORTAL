@@ -129,6 +129,7 @@ export const ZCICreateEventSchema = z.object({
   eventType: EventTypeEnum.default("EVENT"),
   speakers: z.array(z.string()).optional(),
   categoryIds: z.array(z.string()).optional(),
+  materials: z.array(ZCICreateMaterialSchema).optional(),
 });
 export type ZTCCreateEvent = z.infer<typeof ZCICreateEventSchema>;
 export type ZTCCreateEventInput = z.input<typeof ZCICreateEventSchema>;
@@ -146,6 +147,7 @@ export const ZCIUpdateEventSchema = z.object({
   eventType: EventTypeEnum.optional(),
   speakers: z.array(z.string()).optional(),
   categoryIds: z.array(z.string()).optional(),
+  materials: z.array(ZCICreateMaterialSchema).optional(),
   isActive: z.boolean().optional(),
   status: EventStatusEnum.optional(),
 });

@@ -69,6 +69,7 @@ export default function EventsAdminPage() {
       eventType: "EVENT",
       speakers: [],
       categoryIds: [],
+      materials: [],
     },
   })
 
@@ -85,6 +86,7 @@ export default function EventsAdminPage() {
       eventType: "EVENT",
       speakers: [],
       categoryIds: [],
+      materials: [],
     })
     setIsDialogOpen(true)
   }
@@ -104,6 +106,11 @@ export default function EventsAdminPage() {
       eventType: event.eventType,
       speakers: event.webinar?.speakers ?? [],
       categoryIds: event.categories.map((c) => c.id),
+      materials: event.materials?.map((m) => ({
+        title: m.title,
+        fileUrl: m.fileUrl,
+        fileType: m.fileType,
+      })) || [],
     })
     setIsDialogOpen(true)
   }
@@ -127,6 +134,7 @@ export default function EventsAdminPage() {
       eventType: isWebinar ? "WEBINAR" : "EVENT",
       speakers: values.speakers || [],
       categoryIds: values.categoryIds || [],
+      materials: values.materials || [],
     }
 
     if (editingId) {

@@ -1,5 +1,6 @@
 import { prisma } from "../../../infrastructure/database/prisma.js"
 import { TicketStatus } from "../../../generated/prisma/client.js"
+import sendMail from "../../../infrastructure/email/email.js"
 
 export class SupportService {
   /**
@@ -81,5 +82,67 @@ export class SupportService {
         adminNote: adminNote ?? null,
       },
     })
+  }
+
+  /**
+   * Resolve a ticket, set admin note, and send email notification to the user
+   */
+  static async resolveTicketWithEmail(params: {
+    ticketId: string
+    status: TicketStatus
+    adminNote: string
+    replyMessage: string
+  }) {
+    const { ticketId, status, adminNote, replyMessage } = params
+
+    // Fetch ticket with user info
+    const ticket = await prisma.supportTicket.findUnique({
+      where: { id: ticketId },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    })
+
+    if (!ticket) {
+      throw new Error("Ticket not found")
+    }
+
+    // Update ticket in DB
+    const updated = await prisma.supportTicket.update({
+      where: { id: ticketId },
+      data: {
+        status,
+        adminNote,
+      },
+    })
+
+    // Send email to user
+    const emailSubject = `[FCH Support] Re: ${ticket.subject}`
+    const emailBody = `Hello ${ticket.user.name},
+
+Thank you for reaching out to FCH Portal Support.
+
+Regarding your ticket: "${ticket.subject}"
+
+Our team's response:
+${replyMessage}
+
+Ticket Status: ${status}
+
+If you have any further questions, please visit the Help & Support page on your portal or reply to this email.
+
+Best regards,
+FCH Portal Support Team`
+
+    try {
+      await sendMail(ticket.user.email, emailSubject, emailBody)
+    } catch (emailErr) {
+      console.error("[Support] Failed to send reply email:", emailErr)
+      // Don't block the resolution if email fails
+    }
+
+    return updated
   }
 }

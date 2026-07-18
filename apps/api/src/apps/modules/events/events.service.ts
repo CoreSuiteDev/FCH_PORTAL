@@ -156,8 +156,9 @@ export class EventsService {
     eventType: EventType
     speakers?: string[]
     categoryIds?: string[]
+    materials?: { title: string; fileUrl: string; fileType: string }[]
   }) {
-    const { categoryIds, speakers, ...eventData } = data
+    const { categoryIds, speakers, materials, ...eventData } = data
 
     const title = eventData.title?.trim()
     const location = eventData.location.trim();
@@ -249,11 +250,21 @@ export class EventsService {
           eventType: resolvedEventType,
           status: "UPCOMING" as EventStatus,
           isActive: true,
-          // connect expects { id: string }[], not string[]
+           // connect expects { id: string }[], not string[]
           ...(categoryIds &&
             categoryIds.length > 0 && {
               categories: {
                 connect: categoryIds.map((id) => ({ id })),
+              },
+            }),
+          ...(materials &&
+            materials.length > 0 && {
+              materials: {
+                create: materials.map((m) => ({
+                  title: m.title,
+                  fileUrl: m.fileUrl,
+                  fileType: m.fileType,
+                })),
               },
             }),
           // speakers is optional — fall back to [] to satisfy the non-nullable DB column
@@ -353,9 +364,10 @@ export class EventsService {
       categoryIds?: string[]
       isActive?: boolean
       status?: EventStatus
+      materials?: { title: string; fileUrl: string; fileType: string }[]
     }
   ) {
-    const { categoryIds, speakers, ...eventData } = data
+    const { categoryIds, speakers, materials, ...eventData } = data
 
     return prisma.$transaction(async (tx) => {
       const event = await tx.event.findUnique({
@@ -443,6 +455,17 @@ export class EventsService {
 
           ...(categoryIds && {
             categories: { set: categoryIds.map((cid) => ({ id: cid })) },
+          }),
+
+          ...(materials !== undefined && {
+            materials: {
+              deleteMany: {},
+              create: materials.map((m) => ({
+                title: m.title,
+                fileUrl: m.fileUrl,
+                fileType: m.fileType,
+              })),
+            },
           }),
 
           ...(newEventType === "WEBINAR" && {

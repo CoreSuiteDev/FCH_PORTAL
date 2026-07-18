@@ -79,7 +79,7 @@ export function NewsFormDialog({
   return (
 
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="max-h-[85vh] min-w-5xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
             {editingId ? "Edit Article Details" : "Create News Article"}

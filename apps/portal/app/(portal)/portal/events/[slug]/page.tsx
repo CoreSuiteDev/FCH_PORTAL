@@ -15,6 +15,7 @@ import {
   IconBook,
   IconDownload,
   IconFileText,
+  IconLock,
 } from "@tabler/icons-react"
 import { useSessionInfo } from "@/hooks/use-session-info"
 import { useEventById, useRegisterEvent, useCheckinEvent } from "@/hooks/useEvents"
@@ -233,7 +234,7 @@ export default function EventDetailsPage({ params }: PageProps) {
           )}
 
           {/* Materials Section (Downloads) */}
-          {registered && event.materials && event.materials.length > 0 && (
+          {event.materials && event.materials.length > 0 && (
             <div className="rounded-2xl border bg-card p-6 shadow-xs">
               <h3 className="text-lg font-bold tracking-tight mb-4 flex items-center gap-2">
                 <IconFileText className="size-5 text-emerald-500" /> Event Materials
@@ -250,15 +251,21 @@ export default function EventDetailsPage({ params }: PageProps) {
                         <div className="text-[10px] text-muted-foreground uppercase">{mat.fileType}</div>
                       </div>
                     </div>
-                    <a
-                      href={mat.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                      title="Download material"
-                    >
-                      <IconDownload className="size-5" />
-                    </a>
+                    {registered ? (
+                      <a
+                        href={mat.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                        title="Download material"
+                      >
+                        <IconDownload className="size-5" />
+                      </a>
+                    ) : (
+                      <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 rounded-md px-2 py-1">
+                        <IconLock className="size-3.5" /> Locked
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

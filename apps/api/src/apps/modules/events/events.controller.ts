@@ -61,6 +61,7 @@ export class EventsController {
     eventType: EventType
     speakers?: string[]
     categoryIds?: string[]
+    materials?: { title: string; fileUrl: string; fileType: string }[]
   }) {
     try {
       return await EventsService.createEvent(data)
@@ -107,6 +108,7 @@ export class EventsController {
       categoryIds?: string[]
       isActive?: boolean
       status?: EventStatus
+      materials?: { title: string; fileUrl: string; fileType: string }[]
     }
   ) {
     try {

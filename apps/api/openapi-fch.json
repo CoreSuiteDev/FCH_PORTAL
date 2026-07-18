@@ -4580,6 +4580,31 @@
                     "items": {
                       "type": "string"
                     }
+                  },
+                  "materials": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "fileUrl": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "fileType": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "title",
+                        "fileUrl",
+                        "fileType"
+                      ]
+                    }
                   }
                 },
                 "required": [
@@ -5359,6 +5384,31 @@
                     "type": "array",
                     "items": {
                       "type": "string"
+                    }
+                  },
+                  "materials": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "fileUrl": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "fileType": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "title",
+                        "fileUrl",
+                        "fileType"
+                      ]
                     }
                   },
                   "isActive": {
@@ -18423,6 +18473,9 @@
                     ]
                   },
                   "adminNote": {
+                    "type": "string"
+                  },
+                  "replyMessage": {
                     "type": "string"
                   }
                 },

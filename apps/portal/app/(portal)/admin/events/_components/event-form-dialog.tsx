@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { Loader2, Upload, X } from "lucide-react"
 import type { UseFormReturn, FieldError } from "react-hook-form"
 import { Button } from "@workspace/ui/components/button"
@@ -22,6 +22,9 @@ import { Textarea } from "@workspace/ui/components/textarea"
 import type { ZTCCreateEventInput, ZTEventCategory } from "@workspace/types"
 import { getErrorMessage, formatDateTimeLocal } from "./event-constants"
 import Image from "next/image"
+import { api } from "@/lib/axios"
+import { IconDownload, IconTrash, IconFileText } from "@tabler/icons-react"
+import { toast } from "@workspace/ui/components/sonner"
 
 interface EventFormDialogProps {
   isOpen: boolean
@@ -55,6 +58,67 @@ export function EventFormDialog({
   }, [watchedCategoryIds, categoriesList])
 
   const watchedCoverImage = watch("coverImage")
+  const watchedMaterials = (watch("materials") as any) || []
+  const [materialTitle, setMaterialTitle] = useState("")
+  const [isUploadingMaterial, setIsUploadingMaterial] = useState(false)
+
+  const handleMaterialUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!materialTitle.trim()) {
+      toast.error("Please enter a title for the resource first")
+      return
+    }
+
+    setIsUploadingMaterial(true)
+    try {
+      const reader = new FileReader()
+      reader.onloadend = async () => {
+        const base64 = (reader.result as string).split(",")[1]
+        
+        const response = await api.post("/upload", {
+          base64,
+          filename: file.name,
+          mimetype: file.type,
+          folder: "events",
+        })
+
+        if (response.data?.success) {
+          const newMaterial = {
+            title: materialTitle.trim(),
+            fileUrl: response.data.data.url,
+            fileType: file.name.split(".").pop() || "bin",
+          }
+
+          setValue("materials" as any, [...watchedMaterials, newMaterial], {
+            shouldValidate: true,
+            shouldDirty: true,
+          })
+          setMaterialTitle("")
+          toast.success("Resource uploaded successfully!")
+        } else {
+          toast.error("Failed to upload resource")
+        }
+      }
+      reader.readAsDataURL(file)
+    } catch (err) {
+      toast.error("Failed to upload resource")
+    } finally {
+      setIsUploadingMaterial(false)
+    }
+  }
+
+  const handleRemoveMaterial = (indexToRemove: number) => {
+    setValue(
+      "materials" as any,
+      watchedMaterials.filter((_: any, idx: number) => idx !== indexToRemove),
+      {
+        shouldValidate: true,
+        shouldDirty: true,
+      }
+    )
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -354,6 +418,73 @@ export function EventFormDialog({
                 />
               </div>
             )}
+
+            {/* Event Materials / Resources */}
+            <div className="space-y-3 md:col-span-2 border-t pt-4 mt-2">
+              <label className="text-xs font-bold text-slate-500 uppercase block">
+                Event Resources &amp; Materials
+              </label>
+              
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Input
+                  placeholder="e.g. Presentation Handout, Lecture Note PDF"
+                  value={materialTitle}
+                  onChange={(e) => setMaterialTitle(e.target.value)}
+                  className="flex-1 h-10 border-slate-200"
+                />
+                <label className={`flex h-10 items-center justify-center gap-2 rounded-md border border-dashed border-slate-300 px-4 text-sm font-semibold cursor-pointer hover:bg-slate-50 transition-colors ${isUploadingMaterial ? "opacity-50 pointer-events-none" : ""}`}>
+                  {isUploadingMaterial ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin text-primary" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="size-4 text-slate-500" />
+                      Upload File
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    onChange={handleMaterialUpload}
+                    disabled={isUploadingMaterial}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {/* Uploaded Materials List */}
+              {watchedMaterials.length > 0 && (
+                <div className="mt-3 rounded-lg border bg-slate-50/50 p-3 space-y-2 dark:bg-slate-900/50">
+                  {watchedMaterials.map((mat: any, idx: number) => (
+                    <div key={idx} className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded bg-white border border-slate-100 dark:bg-slate-950 dark:border-slate-800">
+                      <div className="flex items-center gap-2 truncate">
+                        <IconFileText className="size-4 text-primary shrink-0" />
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">{mat.title}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase">({mat.fileType})</span>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <a
+                          href={mat.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1 text-slate-400 hover:text-primary transition-colors"
+                        >
+                          <IconDownload className="size-4" />
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveMaterial(idx)}
+                          className="p-1 text-slate-400 hover:text-rose-500 transition-colors"
+                        >
+                          <IconTrash className="size-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <DialogFooter className="flex gap-2 border-t border-slate-100 pt-4">

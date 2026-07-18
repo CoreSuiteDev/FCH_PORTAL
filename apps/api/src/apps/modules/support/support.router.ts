@@ -91,6 +91,7 @@ export const supportRouter = router({
         ticketId: z.string(),
         status: z.enum(["PENDING", "OPEN", "RESOLVED", "CLOSED"]),
         adminNote: z.string().optional(),
+        replyMessage: z.string().optional(),
       })
     )
     .output(z.any())

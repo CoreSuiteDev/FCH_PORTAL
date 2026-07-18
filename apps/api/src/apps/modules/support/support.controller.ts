@@ -21,7 +21,16 @@ export class SupportController {
     ticketId: string
     status: any
     adminNote?: string
+    replyMessage?: string
   }) {
+    if (params.replyMessage) {
+      return SupportService.resolveTicketWithEmail({
+        ticketId: params.ticketId,
+        status: params.status,
+        adminNote: params.adminNote || "Resolved by admin",
+        replyMessage: params.replyMessage,
+      })
+    }
     return SupportService.updateTicketStatus(params)
   }
 }
