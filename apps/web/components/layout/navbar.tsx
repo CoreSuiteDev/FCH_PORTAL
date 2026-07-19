@@ -10,6 +10,7 @@ import { useEffect, useState } from "react"
 import { NavLink, navLinks } from "@/constants/nav-manus"
 import { useSessionInfo } from "@/hooks/useUser"
 import { useNavStore } from "@/store/use-nav-store"
+import { authClient } from "@/lib/auth"
 import {
   Avatar,
   AvatarFallback,
@@ -39,6 +40,16 @@ export default function Navbar() {
   const t = useTranslations("nav")
 
   const { data } = useSessionInfo()
+
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.href = "/"
+        },
+      },
+    })
+  }
 
   useEffect(() => {
     let ticking = false
@@ -201,7 +212,10 @@ export default function Navbar() {
                 {/* Visible Separator */}
                 <Separator className="my-1 h-px bg-slate-200" />
 
-                <button className="flex w-full cursor-pointer items-center rounded-md px-2 py-1.5 text-sm text-red-600 transition-colors hover:bg-red-50 hover:text-red-700">
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full cursor-pointer items-center rounded-md px-2 py-1.5 text-sm text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </button>
@@ -295,13 +309,25 @@ export default function Navbar() {
                 )}
 
                 {user ? (
-                  <Button
-                    variant="outline"
-                    className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Log out
-                  </Button>
+                  <>
+                    <Link href="/profile" onClick={() => setOpen(false)}>
+                      <Button
+                        variant="outline"
+                        className="w-full border-slate-200 text-slate-700 hover:bg-slate-50"
+                      >
+                        <UserIcon className="mr-2 h-4 w-4" />
+                        Profile
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="outline"
+                      onClick={handleLogout}
+                      className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </Button>
+                  </>
                 ) : (
                   <Link href="/registation">
                     <Button className="w-full bg-red-700 hover:bg-red-800">
