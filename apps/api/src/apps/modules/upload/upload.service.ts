@@ -9,12 +9,21 @@ export class UploadService {
    * Uploads a file to Cloudflare R2
    */
   static async uploadFile(file: Express.Multer.File, folder: string) {
+    const bucket = process.env.R2_BUCKET
+    if (!bucket) {
+      console.error("R2 UPLOAD ERROR: R2_BUCKET is not set in process.env!")
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Storage configuration error: R2_BUCKET is missing.",
+      })
+    }
+
     try {
       const key = generateFileName(file.originalname, folder)
 
       await r2Client.send(
         new PutObjectCommand({
-          Bucket: process.env.R2_BUCKET,
+          Bucket: bucket,
           Key: key,
           Body: file.buffer,
           ContentType: file.mimetype,
@@ -36,10 +45,19 @@ export class UploadService {
    * Deletes a file from Cloudflare R2
    */
   static async deleteFile(key: string) {
+    const bucket = process.env.R2_BUCKET
+    if (!bucket) {
+      console.error("R2 DELETE ERROR: R2_BUCKET is not set in process.env!")
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Storage configuration error: R2_BUCKET is missing.",
+      })
+    }
+
     try {
       await r2Client.send(
         new DeleteObjectCommand({
-          Bucket: process.env.R2_BUCKET,
+          Bucket: bucket,
           Key: key,
         })
       )
@@ -58,11 +76,20 @@ export class UploadService {
    * Generates a presigned GET URL for temporary access to private files
    */
   static async getDownloadPresignedUrl(key: string, expiresInSeconds = 3600) {
+    const bucket = process.env.R2_BUCKET
+    if (!bucket) {
+      console.error("R2 PRESIGNED URL ERROR: R2_BUCKET is not set in process.env!")
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Storage configuration error: R2_BUCKET is missing.",
+      })
+    }
+
     try {
       const url = await getSignedUrl(
         r2Client,
         new GetObjectCommand({
-          Bucket: process.env.R2_BUCKET,
+          Bucket: bucket,
           Key: key,
         }),
         { expiresIn: expiresInSeconds }
