@@ -368,7 +368,7 @@ export const MembershipTable = ({
       },
       {
         id: "stripeId",
-        header: "Stripe TXN",
+        header: "Stripe ID",
         cell: ({ row }) => {
           const txn = row.original.stripePaymentIntentId
           if (!txn) return <span className="text-xs text-slate-400">—</span>
@@ -386,6 +386,25 @@ export const MembershipTable = ({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+          )
+        },
+      },
+      {
+        id: "receiptUrl",
+        header: "Receipt URL",
+        cell: ({ row }) => {
+          const url = row.original.receiptUrl
+          if (!url) return <span className="text-xs text-slate-400">—</span>
+          return (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-350 cursor-pointer"
+            >
+              View Receipt
+              <ExternalLink className="size-3.5" />
+            </a>
           )
         },
       },
@@ -674,6 +693,10 @@ export const MembershipTable = ({
                     {/* stripe txn */}
                     <TableCell className="px-4 py-3">
                       <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    {/* receipt url */}
+                    <TableCell className="px-4 py-3">
+                      <Skeleton className="h-4 w-16" />
                     </TableCell>
                     {/* actions */}
                     <TableCell className="px-4 py-3">

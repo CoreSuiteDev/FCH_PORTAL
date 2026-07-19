@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useSessionInfo } from "@/hooks/useUser"
 import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth"
+import { api } from "@/lib/api-client"
 import Container from "@/components/shared/container"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
@@ -30,6 +31,8 @@ import {
   ArrowLeft,
   LayoutDashboard,
   CheckCircle2,
+  Camera,
+  Loader2,
 } from "lucide-react"
 
 export default function ProfilePage() {
@@ -38,7 +41,9 @@ export default function ProfilePage() {
   const user = data?.user
   
   const [name, setName] = useState("")
+  const [avatar, setAvatar] = useState("")
   const [isUpdating, setIsUpdating] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -52,7 +57,62 @@ export default function ProfilePage() {
     if (user?.name) {
       setName(user.name)
     }
+    if (user?.image) {
+      setAvatar(user.image)
+    }
   }, [user])
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Avatar size must be less than 2MB")
+        return
+      }
+      const reader = new FileReader()
+      reader.onloadend = async () => {
+        const base64Data = (reader.result as string).split(",")[1]
+        setIsUpdating(true)
+        try {
+          // 1. Upload to Cloudflare (under 'users' folder)
+          const response = await api.post("/upload", {
+            base64: base64Data,
+            filename: file.name,
+            mimetype: file.type,
+            folder: "users",
+          })
+
+          if (!response.data?.success) {
+            throw new Error("Failed to upload avatar to storage")
+          }
+
+          const imageUrl = response.data.data.url
+
+          // 2. Update user profile database
+          const { error } = await authClient.updateUser({
+            image: imageUrl,
+          })
+
+          if (error) {
+            throw new Error(error.message || "Failed to update profile image")
+          }
+
+          setAvatar(imageUrl)
+          toast.success("Avatar updated successfully!")
+          refetch()
+        } catch (err: any) {
+          toast.error(err.message || "Something went wrong")
+        } finally {
+          setIsUpdating(false)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -155,12 +215,28 @@ export default function ProfilePage() {
           <Card className="border-slate-100 shadow-lg md:col-span-4 bg-white rounded-3xl overflow-hidden">
             <div className="bg-primary h-24 w-full relative" />
             <CardContent className="p-6 text-center -mt-12 relative flex flex-col items-center">
-              <Avatar className="h-24 w-24 border-4 border-white shadow-md">
-                <AvatarImage src={user.image || ""} alt={user.name} />
-                <AvatarFallback className="bg-red-50 text-2xl font-bold text-primary">
-                  {user.name?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
+              <div
+                onClick={handleAvatarClick}
+                className="relative h-24 w-24 border-4 border-white shadow-md rounded-full overflow-hidden bg-slate-100 dark:bg-slate-900 cursor-pointer group/avatar flex items-center justify-center shrink-0"
+              >
+                <Avatar className="h-full w-full">
+                  <AvatarImage src={avatar || user.image || ""} alt={user.name} className="object-cover" />
+                  <AvatarFallback className="bg-red-50 text-2xl font-bold text-primary flex h-full w-full items-center justify-center">
+                    {user.name?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                {/* Camera icon overlay */}
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300">
+                  <Camera className="size-6 text-white" />
+                </div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleAvatarChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+              </div>
 
               <h2 className="mt-4 font-trajan text-lg font-bold text-slate-800 leading-snug">
                 {user.name}

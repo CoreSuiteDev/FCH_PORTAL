@@ -15,6 +15,7 @@ import {
 } from "@tabler/icons-react"
 import { useSessionInfo } from "@/hooks/use-session-info"
 import { authClient } from "@/lib/auth"
+import { api } from "@/lib/axios"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Skeleton } from "@workspace/ui/components/skeleton"
@@ -80,14 +81,31 @@ export default function AccountPage() {
       }
       const reader = new FileReader()
       reader.onloadend = async () => {
-        const base64String = reader.result as string
-        setAvatar(base64String)
+        const base64Data = (reader.result as string).split(",")[1]
         try {
           setIsUpdating(true)
+          
+          // 1. Upload to Cloudflare (under 'users' folder)
+          const response = await api.post("/upload", {
+            base64: base64Data,
+            filename: file.name,
+            mimetype: file.type,
+            folder: "users",
+          })
+          
+          if (!response.data?.success) {
+            throw new Error("Failed to upload avatar to storage")
+          }
+          
+          const imageUrl = response.data.data.url
+          
+          // 2. Update user profile database
           const { error } = await authClient.updateUser({
-            image: base64String,
+            image: imageUrl,
           })
           if (error) throw new Error(error.message)
+          
+          setAvatar(imageUrl)
           toast.success("Avatar updated successfully")
           refetch()
         } catch (err: any) {

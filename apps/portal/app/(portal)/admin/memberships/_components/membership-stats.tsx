@@ -10,7 +10,7 @@ import {
 } from "@workspace/ui/components/card"
 
 interface MetricRowProps {
-  label: string
+  label: string 
   count: number
   amount: number
 }
@@ -85,7 +85,7 @@ export const MembershipStats = ({
     <div className="space-y-6">
       {/* Row 1: Operational Metrics */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+        <Card className="py-4 shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               Total Memberships
