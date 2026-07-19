@@ -5,7 +5,7 @@ import {
   ZCPaginatedDonationHistorySchema,
 } from "@workspace/types/index"
 import z from "zod"
-import { adminProcedure, publicProcedure, router } from "../../../server/trpc"
+import { adminProcedure, protectedProcedure, publicProcedure, router } from "../../../server/trpc"
 import { getPaginationMeta } from "../../../utils/pagination"
 import { DonationController } from "./donation.controller"
 
@@ -27,7 +27,7 @@ export const donationRouter = router({
       return DonationController.createDonation(input)
     }),
 
-  donationHistory: publicProcedure
+  donationHistory: adminProcedure
     .meta({
       openapi: {
         method: "GET",

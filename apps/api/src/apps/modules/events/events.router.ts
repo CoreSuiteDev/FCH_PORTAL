@@ -76,7 +76,7 @@ const mapEvent = (event: any) => ({
 })
 
 export const eventsRouter = router({
-  list: publicProcedure
+  list: protectedProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -101,6 +101,37 @@ export const eventsRouter = router({
         page,
         limit,
         userId: ctx.user?.id,
+        eventType,
+      })
+      return {
+        data: data.map(mapEvent),
+        meta: getPaginationMeta(totalCount, page, limit),
+      }
+    }),
+
+  listPublic: publicProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/events/public",
+        tags: ["events"],
+        summary: "List public events",
+        description: "Returns a paginated list of public and free events/webinars only",
+      },
+    })
+    .input(
+      PaginationInputSchema.extend({
+        eventType: z.enum(["EVENT", "WEBINAR"]).optional(),
+      }).optional()
+    )
+    .output(ZCIPaginatedEventsSchema)
+    .query(async ({ input }) => {
+      const page = input?.page ?? 1
+      const limit = input?.limit ?? 10
+      const eventType = input?.eventType
+      const { totalCount, data } = await EventsController.getPublicEventsList({
+        page,
+        limit,
         eventType,
       })
       return {
@@ -317,7 +348,7 @@ export const eventsRouter = router({
       return EventsController.addMaterial(id, data)
     }),
 
-  listMaterials: publicProcedure
+  listMaterials: protectedProcedure
     .meta({
       openapi: {
         method: "GET",

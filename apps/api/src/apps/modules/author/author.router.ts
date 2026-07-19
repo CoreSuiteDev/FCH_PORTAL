@@ -26,7 +26,7 @@ export const authorRouter = router({
       return AuthorController.createAuthor(input)
     }),
 
-  getById: publicProcedure
+  getById: adminProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -58,7 +58,7 @@ export const authorRouter = router({
       return AuthorController.getAuthorBySlug(input.slug)
     }),
 
-  list: publicProcedure
+  list: adminProcedure
     .meta({
       openapi: {
         method: "GET",

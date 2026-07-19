@@ -21,7 +21,7 @@ export const usePublicEvents = (params?: {
     queryKey: ["public-events", params],
     queryFn: () =>
       api
-        .get("/events", {
+        .get("/events/public", {
           params: {
             page: params?.page ?? 1,
             limit: params?.limit ?? 50,

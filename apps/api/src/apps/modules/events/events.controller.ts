@@ -27,6 +27,22 @@ export class EventsController {
   }
 
   /**
+   * Controller for resolving public events listing (restricted to PUBLIC and FREE_WEBINAR)
+   */
+  static async getPublicEventsList(params: {
+    page: number
+    limit: number
+    eventType?: EventType
+  }) {
+    return EventsService.getAllEvents({
+      allowedVisibilities: ["PUBLIC", "FREE_WEBINAR"],
+      page: params.page,
+      limit: params.limit,
+      eventType: params.eventType,
+    })
+  }
+
+  /**
    * Controller for resolving a single event details by ID
    */
   static async getEventById(id: string, userRole: string, userId?: string) {
