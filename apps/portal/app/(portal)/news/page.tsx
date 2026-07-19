@@ -16,7 +16,7 @@ export type NewsItem = ZTCNewsOutput
 export default function NewsArchivePage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
-  const [activeTab, setActiveTab] = useState<"all" | "NEWS" | "ANNOUNCEMENT">("all")
+  const [activeTab, setActiveTab] = useState<"all" | "NEWS">("all")
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -33,7 +33,9 @@ export default function NewsArchivePage() {
     search: debouncedSearch || undefined,
   })
 
-  const filteredNews = newsData?.data ?? []
+  const filteredNews = (newsData?.data ?? []).filter(
+    (item) => item.newsType !== "ANNOUNCEMENT"
+  )
 
   return (
     <div className="flex-1 space-y-6 p-8 pt-6 min-h-screen bg-slate-50/50 dark:bg-slate-900/40">
@@ -54,9 +56,6 @@ export default function NewsArchivePage() {
             </TabsTrigger>
             <TabsTrigger value="NEWS" className="rounded-lg text-xs font-bold px-4 py-1.5 cursor-pointer">
               News
-            </TabsTrigger>
-            <TabsTrigger value="ANNOUNCEMENT" className="rounded-lg text-xs font-bold px-4 py-1.5 cursor-pointer">
-              Announcements
             </TabsTrigger>
           </TabsList>
         </Tabs>

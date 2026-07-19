@@ -12,6 +12,7 @@ import {
   IconDashboard,
   IconCalendarEvent,
   IconMail,
+  IconBell,
 } from "@tabler/icons-react"
 import {
   Sidebar,

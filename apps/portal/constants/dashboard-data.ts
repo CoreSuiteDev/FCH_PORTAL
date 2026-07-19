@@ -1,5 +1,6 @@
 import {
   IconAward,
+  IconBell,
   IconBooks,
   IconCalendarEvent,
   IconCreditCard,

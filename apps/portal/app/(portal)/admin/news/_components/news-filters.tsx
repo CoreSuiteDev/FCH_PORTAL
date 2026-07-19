@@ -51,7 +51,6 @@ export function NewsFilters({
               <SelectItem value="ALL">All Types</SelectItem>
               <SelectItem value="NEWS">News</SelectItem>
               <SelectItem value="BLOG">Blog</SelectItem>
-              <SelectItem value="ANNOUNCEMENT">Announcement</SelectItem>
             </SelectContent>
           </Select>
 

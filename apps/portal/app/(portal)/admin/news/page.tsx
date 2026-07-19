@@ -210,7 +210,7 @@ export default function NewsManagePage() {
 
   // Client search filter matching title or slug
   const displayedNews = useMemo(() => {
-    const raw = newsData?.data || []
+    const raw = (newsData?.data || []).filter((item) => item.newsType !== "ANNOUNCEMENT")
     if (!searchQuery) return raw
     const q = searchQuery.toLowerCase()
     return raw.filter(

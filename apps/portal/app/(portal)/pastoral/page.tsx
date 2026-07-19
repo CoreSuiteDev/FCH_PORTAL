@@ -4,7 +4,6 @@ import React, { useMemo } from "react"
 import Link from "next/link"
 import {
   IconArrowRight,
-  IconBook,
   IconCalendarEvent,
   IconCheck,
   IconChevronRight,
@@ -13,16 +12,15 @@ import {
   IconMapPin,
   IconNews,
   IconShieldCheck,
+  IconSpeakerphone,
+  IconUsers,
   IconVideo,
+  IconBook,
   IconBooks,
-  IconSchool,
-  IconAward,
-  IconBriefcase,
-  IconHierarchy,
-  IconDashboard,
 } from "@tabler/icons-react"
 import { useSessionInfo } from "@/hooks/use-session-info"
 import { useEventDashboardStats } from "@/hooks/useEvents"
+import { useMyMemberships } from "@/hooks/useMembership"
 import { useNewsList } from "@/hooks/useNews"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 
@@ -43,22 +41,79 @@ function getGreeting() {
   return "Good evening"
 }
 
-// ─── Quick Access Items ───────────────────────────────────────────────────────
+function MembershipStatusBadge({
+  status,
+}: {
+  status: string | undefined
+}) {
+  if (!status) return null
+  const map: Record<string, { label: string; cls: string }> = {
+    Active: {
+      label: "Active",
+      cls: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    },
+    Pending: {
+      label: "Pending",
+      cls: "border-amber-500/30 bg-amber-500/10 text-amber-700",
+    },
+    Expired: {
+      label: "Expired",
+      cls: "border-rose-500/30 bg-rose-500/10 text-rose-700",
+    },
+    Canceled: {
+      label: "Canceled",
+      cls: "border-slate-400/30 bg-slate-400/10 text-slate-600",
+    },
+  }
+  const cfg = map[status] ?? {
+    label: status,
+    cls: "border-slate-400/30 bg-slate-400/10 text-slate-600",
+  }
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${cfg.cls}`}
+    >
+      <IconShieldCheck className="size-3" />
+      {cfg.label}
+    </span>
+  )
+}
 
-const resourcesList = [
+const quickLinks = [
+  {
+    title: "Events & Webinars",
+    href: "/events",
+    description: "Register for upcoming summits, workshops and live webinars.",
+    icon: IconCalendarEvent,
+    color: "text-primary bg-primary/10",
+  },
+  {
+    title: "Announcements",
+    href: "/announcements",
+    description: "Read latest system notifications and member updates.",
+    icon: IconSpeakerphone,
+    color: "text-amber-600 bg-amber-500/10",
+  },
+  {
+    title: "Member Resources",
+    href: "/resources/member",
+    description: "Access templates, learning materials, and member-only documents.",
+    icon: IconBook,
+    color: "text-emerald-600 bg-emerald-500/10",
+  },
   {
     title: "Learning Library",
+    href: "/resources/learning",
     description: "Access theological documents, educational materials, and faith formation guides.",
-    url: "/resources/learning",
     icon: IconBooks,
     color: "text-blue-600 bg-blue-500/10 dark:text-blue-400 dark:bg-blue-950/20",
   },
   {
-    title: "Special Pastoral Resources",
-    description: "Browse curated collections for seasonal programs, retreats, and special parish events.",
-    url: "/resources/special",
-    icon: IconFileText,
-    color: "text-sky-600 bg-sky-500/10 dark:text-sky-400 dark:bg-sky-950/20",
+    title: "Account Settings",
+    href: "/account",
+    description: "Update your personal details, password and preferences.",
+    icon: IconUsers,
+    color: "text-rose-600 bg-rose-500/10",
   },
 ]
 
@@ -79,15 +134,11 @@ function StatCard({
 }) {
   return (
     <div className="flex items-center gap-4 rounded-2xl border bg-card p-5 shadow-xs">
-      <div
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${color}`}
-      >
+      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${color}`}>
         <Icon className="size-5" />
       </div>
       <div className="min-w-0">
-        <div className="text-xs font-semibold text-muted-foreground">
-          {label}
-        </div>
+        <div className="text-xs font-semibold text-muted-foreground">{label}</div>
         {loading ? (
           <Skeleton className="mt-1 h-7 w-10" />
         ) : (
@@ -170,8 +221,11 @@ function EventMiniCard({ event }: { event: any }) {
 export default function PastoralOverviewPage() {
   const { data: session, isLoading: isSessionLoading } = useSessionInfo()
   const user = session?.user
+  const userId = user?.id ?? ""
 
   const { data: statsData, isLoading: isEventsLoading } = useEventDashboardStats()
+
+  const { data: memberships, isLoading: isMemberLoading } = useMyMemberships(userId)
 
   const { data: newsData, isLoading: isNewsLoading } = useNewsList({
     page: 1,
@@ -179,18 +233,25 @@ export default function PastoralOverviewPage() {
     status: "PUBLISHED",
   })
 
+  // Derive stats
+  const activeMembership = useMemo(
+    () => memberships?.find((m) => m.status === "Active"),
+    [memberships]
+  )
+
   const totalEventsCount = statsData?.totalEvents ?? 0
   const upcomingEvents = statsData?.upcomingEvents ?? []
   const registeredCount = statsData?.registeredCount ?? 0
-  const webinarCount = statsData?.webinarCount ?? 0
+  const checkedInCount = statsData?.checkedInCount ?? 0
 
   const recentNews = newsData?.data ?? []
 
   return (
     <div className="flex-1 space-y-8 p-8 pt-6">
+
       {/* Hero Greeting */}
-      <div className="relative overflow-hidden rounded-2xl border border-rose-500/20 bg-linear-to-br from-rose-500/10 via-card to-card p-8 shadow-xs">
-        <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-rose-400/10 blur-3xl" />
+      <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-linear-to-br from-amber-500/10 via-card to-card p-8 shadow-xs">
+        <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-8 left-1/3 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
 
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -204,26 +265,35 @@ export default function PastoralOverviewPage() {
               <>
                 <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
                   {getGreeting()},{" "}
-                  <span className="text-rose-700 dark:text-rose-400">
-                    {user?.name?.split(" ")[0] ?? "Pastor"}
+                  <span className="text-amber-600 dark:text-amber-400">
+                    {user?.name?.split(" ")[0] ?? "Member"}
                   </span>{" "}
                   👋
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Welcome to your FCH Pastoral Resources &amp; Training dashboard.
+                  Welcome back to your FCH Pastoral Member portal.
                 </p>
               </>
             )}
           </div>
 
+          {/* Membership badge */}
           <div className="flex flex-col items-start gap-2 sm:items-end">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-[11px] font-bold text-rose-700 dark:text-rose-450">
-              <IconShieldCheck className="size-3.5" />
-              Pastoral Resource Access
-            </span>
-            <span className="text-[10px] text-muted-foreground">
-              Level: Full Diocese Access
-            </span>
+            {isMemberLoading ? (
+              <Skeleton className="h-8 w-36" />
+            ) : activeMembership ? (
+              <>
+                <MembershipStatusBadge status={activeMembership.status} />
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {activeMembership.packageName}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  Expires {formatDate(activeMembership.expiryDate)}
+                </span>
+              </>
+            ) : (
+              <span className="text-xs text-muted-foreground">No active membership</span>
+            )}
           </div>
         </div>
       </div>
@@ -231,10 +301,11 @@ export default function PastoralOverviewPage() {
       {/* Stats Row */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
-          label="Pastoral Modules"
-          value={resourcesList.length}
-          icon={IconBooks}
-          color="text-rose-600 bg-rose-500/10"
+          label="Membership Tier"
+          value={activeMembership?.tier ?? "—"}
+          icon={IconShieldCheck}
+          color="text-amber-600 bg-amber-500/10"
+          loading={isMemberLoading}
         />
         <StatCard
           label="Events Available"
@@ -244,49 +315,49 @@ export default function PastoralOverviewPage() {
           loading={isEventsLoading}
         />
         <StatCard
-          label="Registered Events"
+          label="Registered"
           value={registeredCount}
-          icon={IconCheck}
-          color="text-emerald-600 bg-emerald-500/10"
+          icon={IconUsers}
+          color="text-indigo-600 bg-indigo-500/10"
           loading={isEventsLoading}
         />
         <StatCard
-          label="Webinars &amp; Seminars"
-          value={webinarCount}
-          icon={IconVideo}
-          color="text-sky-600 bg-sky-500/10"
+          label="Checked In"
+          value={checkedInCount}
+          icon={IconCheck}
+          color="text-emerald-600 bg-emerald-500/10"
           loading={isEventsLoading}
         />
       </div>
 
       {/* Main Grid */}
       <div className="grid gap-8 lg:grid-cols-3">
-        {/* Left Side (Quick Access & News) */}
+        {/* Left Side (Quick Access & Latest News) */}
         <div className="lg:col-span-2 space-y-8">
           {/* Quick Access */}
           <div className="space-y-4">
             <h3 className="text-xl font-bold tracking-tight text-foreground">
-              Pastoral Resource Center
+              Quick Access
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
-              {resourcesList.map((res) => {
-                const Icon = res.icon
+              {quickLinks.map((item) => {
+                const Icon = item.icon
                 return (
                   <Link
-                    key={res.title}
-                    href={res.url}
+                    key={item.href}
+                    href={item.href}
                     className="group block rounded-2xl border bg-card p-5 shadow-xs transition-all hover:border-primary/30 hover:shadow-md"
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${res.color} group-hover:scale-105 transition-transform duration-300`}>
+                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${item.color} group-hover:scale-105 transition-transform duration-300`}>
                         <Icon className="size-5" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <h4 className="truncate text-sm font-bold text-foreground group-hover:text-primary transition-colors">
-                          {res.title}
+                          {item.title}
                         </h4>
                         <p className="truncate text-xs text-muted-foreground mt-0.5">
-                          {res.description}
+                          {item.description}
                         </p>
                       </div>
                       <IconChevronRight className="size-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform shrink-0" />

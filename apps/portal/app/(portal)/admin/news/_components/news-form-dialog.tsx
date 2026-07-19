@@ -189,7 +189,6 @@ export function NewsFormDialog({
                 <SelectContent>
                   <SelectItem value="NEWS">News</SelectItem>
                   <SelectItem value="BLOG">Blog</SelectItem>
-                  <SelectItem value="ANNOUNCEMENT">Announcement</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -14,7 +14,7 @@ interface AuthorCardProps {
 
 export function AuthorCard({ author, onEdit, onDelete }: AuthorCardProps) {
   return (
-    <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-none relative flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+    <Card className="border border-slate-200 dark:border-slate-800 pt-4 bg-white dark:bg-slate-950 shadow-none relative flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
       <CardHeader className="flex flex-row items-start gap-4 pb-4">
         {/* Constrained Avatar */}
         <div className="relative size-12 rounded-full overflow-hidden shrink-0 border border-slate-100 dark:border-slate-800 bg-slate-50 flex items-center justify-center">
