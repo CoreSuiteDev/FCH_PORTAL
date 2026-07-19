@@ -52,6 +52,7 @@ import {
   useUpdateRequestStatus,
   MeetingRequest,
 } from "@/hooks/useMeetings"
+import Link from "next/link"
 
 export default function AdminBoardMeetingsPage() {
   // Queries
@@ -268,7 +269,7 @@ export default function AdminBoardMeetingsPage() {
                       )}
 
                       {meeting.meetingLink ? (
-                        <a
+                        <Link
                           href={meeting.meetingLink}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -276,7 +277,7 @@ export default function AdminBoardMeetingsPage() {
                         >
                           <IconVideo className="h-4 w-4" />
                           Join Live Consultation
-                        </a>
+                        </Link>
                       ) : (
                         <Button
                           disabled

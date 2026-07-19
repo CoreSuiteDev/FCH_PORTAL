@@ -1,7 +1,6 @@
 "use client"
-"use no compiler"
 
-import React, { useState, useMemo } from "react"
+import { IconLoader2 } from "@tabler/icons-react"
 import {
   ColumnDef,
   flexRender,
@@ -16,7 +15,7 @@ import {
   ChevronsRight,
   Send,
 } from "lucide-react"
-import { IconLoader2 } from "@tabler/icons-react"
+import { useMemo, useState } from "react"
 
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -32,6 +31,8 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog"
 import { Input } from "@workspace/ui/components/input"
+import { Skeleton } from "@workspace/ui/components/skeleton"
+import { toast } from "@workspace/ui/components/sonner"
 import {
   Table,
   TableBody,
@@ -40,11 +41,9 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
-import { Skeleton } from "@workspace/ui/components/skeleton"
-import { toast } from "@workspace/ui/components/sonner"
 
-import { useCommunicationStore } from "@/store/use-communication-store"
 import { useAllTickets, useUpdateTicketStatus } from "@/hooks/useSupport"
+import { useCommunicationStore } from "@/store/use-communication-store"
 
 // Component for table pagination controls
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -107,7 +106,11 @@ export default function CommunicationUsers() {
   } = useCommunicationStore()
 
   // Fetch real support tickets from backend
-  const { data: supportTicketsData, isLoading: isSupportLoading, refetch } = useAllTickets({
+  const {
+    data: supportTicketsData,
+    isLoading: isSupportLoading,
+    refetch,
+  } = useAllTickets({
     page: 1,
     limit: 1000,
   })
@@ -117,18 +120,27 @@ export default function CommunicationUsers() {
   const [selectedSupport, setSelectedSupport] = useState<any | null>(null)
   const [replyText, setReplyText] = useState("")
   const [adminNoteText, setAdminNoteText] = useState("")
-  const [statusVal, setStatusVal] = useState<"PENDING" | "OPEN" | "RESOLVED" | "CLOSED">("RESOLVED")
+  const [statusVal, setStatusVal] = useState<
+    "PENDING" | "OPEN" | "RESOLVED" | "CLOSED"
+  >("RESOLVED")
   const [isResolving, setIsResolving] = useState(false)
 
   // Logic to filter real support tickets
   const allTickets = supportTicketsData?.data || []
   const filteredSupport = useMemo(
     () =>
-      allTickets.filter((s: any) =>
-        (s.user?.name || "").toLowerCase().includes(supportFilter.toLowerCase()) ||
-        (s.user?.email || "").toLowerCase().includes(supportFilter.toLowerCase()) ||
-        (s.subject || "").toLowerCase().includes(supportFilter.toLowerCase()) ||
-        (s.message || "").toLowerCase().includes(supportFilter.toLowerCase())
+      allTickets.filter(
+        (s: any) =>
+          (s.user?.name || "")
+            .toLowerCase()
+            .includes(supportFilter.toLowerCase()) ||
+          (s.user?.email || "")
+            .toLowerCase()
+            .includes(supportFilter.toLowerCase()) ||
+          (s.subject || "")
+            .toLowerCase()
+            .includes(supportFilter.toLowerCase()) ||
+          (s.message || "").toLowerCase().includes(supportFilter.toLowerCase())
       ),
     [allTickets, supportFilter]
   )
@@ -145,7 +157,9 @@ export default function CommunicationUsers() {
             <div className="font-semibold text-slate-900 dark:text-slate-100">
               {u?.name || "Unknown User"}
             </div>
-            <div className="text-xs text-slate-500">{u?.email || "No Email"}</div>
+            <div className="text-xs text-slate-500">
+              {u?.email || "No Email"}
+            </div>
           </div>
         )
       },
@@ -168,11 +182,13 @@ export default function CommunicationUsers() {
                 ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
                 : "bg-slate-500/10 text-slate-600 border border-slate-500/20"
         return (
-          <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${badgeColors}`}>
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase ${badgeColors}`}
+          >
             {status}
           </span>
         )
-      }
+      },
     },
     {
       header: "Created At",
@@ -240,7 +256,8 @@ export default function CommunicationUsers() {
       setAdminNoteText("")
       refetch()
     } catch (err: any) {
-      const errMsg = err?.response?.data?.message || "Failed to resolve support ticket"
+      const errMsg =
+        err?.response?.data?.message || "Failed to resolve support ticket"
       toast.error(errMsg)
     } finally {
       setIsResolving(false)
@@ -266,8 +283,8 @@ export default function CommunicationUsers() {
         </CardHeader>
         <CardContent className="p-0">
           {isSupportLoading ? (
-            <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b">
+            <div className="space-y-4 p-6">
+              <div className="flex items-center justify-between border-b pb-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-4 w-40" />
@@ -275,8 +292,11 @@ export default function CommunicationUsers() {
                 <Skeleton className="h-4 w-24" />
               </div>
               {[1, 2, 3, 4, 5].map((idx) => (
-                <div key={idx} className="flex items-center justify-between py-3 border-b last:border-0">
-                  <div className="flex items-center gap-3 w-1/4">
+                <div
+                  key={idx}
+                  className="flex items-center justify-between border-b py-3 last:border-0"
+                >
+                  <div className="flex w-1/4 items-center gap-3">
                     <Skeleton className="h-8 w-8 rounded-full" />
                     <div className="space-y-1">
                       <Skeleton className="h-4 w-24" />
@@ -298,7 +318,10 @@ export default function CommunicationUsers() {
                     <TableRow key={hg.id}>
                       {hg.headers.map((h) => (
                         <TableHead key={h.id}>
-                          {flexRender(h.column.columnDef.header, h.getContext())}
+                          {flexRender(
+                            h.column.columnDef.header,
+                            h.getContext()
+                          )}
                         </TableHead>
                       ))}
                     </TableRow>
@@ -320,7 +343,10 @@ export default function CommunicationUsers() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={supportColumns.length} className="text-center py-8 text-slate-400">
+                      <TableCell
+                        colSpan={supportColumns.length}
+                        className="py-8 text-center text-slate-400"
+                      >
                         No support tickets found
                       </TableCell>
                     </TableRow>
@@ -350,35 +376,46 @@ export default function CommunicationUsers() {
               Ticket ID: {selectedSupport?.id}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
-            <div className="flex flex-col gap-1 md:flex-row md:justify-between text-sm border-b pb-2">
+          <div className="max-h-[70vh] space-y-4 overflow-y-auto py-4 pr-2">
+            <div className="flex flex-col gap-1 border-b pb-2 text-sm md:flex-row md:justify-between">
               <p>
-                <strong>From:</strong> {selectedSupport?.user?.name || "Unknown User"} ({selectedSupport?.user?.email})
+                <strong>From:</strong>{" "}
+                {selectedSupport?.user?.name || "Unknown User"} (
+                {selectedSupport?.user?.email})
               </p>
               <p className="text-xs text-slate-500">
-                {selectedSupport?.createdAt && new Date(selectedSupport.createdAt).toLocaleString()}
+                {selectedSupport?.createdAt &&
+                  new Date(selectedSupport.createdAt).toLocaleString()}
               </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs font-bold text-slate-400 uppercase">Subject</span>
-              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{selectedSupport?.subject}</p>
+              <span className="text-xs font-bold text-slate-400 uppercase">
+                Subject
+              </span>
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                {selectedSupport?.subject}
+              </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs font-bold text-slate-400 uppercase">User Message</span>
-              <div className="rounded-lg bg-slate-100 dark:bg-slate-900 p-4 text-sm leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+              <span className="text-xs font-bold text-slate-400 uppercase">
+                User Message
+              </span>
+              <div className="rounded-lg bg-slate-100 p-4 text-sm leading-relaxed whitespace-pre-wrap text-slate-700 dark:bg-slate-900 dark:text-slate-300">
                 {selectedSupport?.message}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-400 uppercase">Update Status</label>
+                <label className="text-xs font-bold text-slate-400 uppercase">
+                  Update Status
+                </label>
                 <select
                   value={statusVal}
                   onChange={(e) => setStatusVal(e.target.value as any)}
-                  className="w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  className="w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/20"
                 >
                   <option value="PENDING">PENDING</option>
                   <option value="OPEN">OPEN</option>
@@ -388,7 +425,9 @@ export default function CommunicationUsers() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-400 uppercase">Admin Resolution Note (DB)</label>
+                <label className="text-xs font-bold text-slate-400 uppercase">
+                  Admin Resolution Note (DB)
+                </label>
                 <Input
                   placeholder="e.g. Issue resolved by resetting password"
                   value={adminNoteText}
@@ -398,17 +437,19 @@ export default function CommunicationUsers() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-400 uppercase">Email Reply Message (Sent to User)</label>
+              <label className="text-xs font-bold text-slate-400 uppercase">
+                Email Reply Message (Sent to User)
+              </label>
               <textarea
                 placeholder="Write the response email body that will be sent to the user's registered email..."
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 rows={5}
-                className="w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                className="w-full resize-none rounded-md border border-slate-200 bg-background px-3 py-2 text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
           </div>
-          <div className="flex gap-2 justify-end border-t pt-4">
+          <div className="flex justify-end gap-2 border-t pt-4">
             <Button
               variant="outline"
               onClick={() => {
@@ -421,11 +462,12 @@ export default function CommunicationUsers() {
             <Button
               disabled={isResolving || !replyText.trim()}
               onClick={handleResolveSubmit}
-              className="bg-primary hover:bg-primary/95 text-white"
+              className="bg-primary text-white hover:bg-primary/95"
             >
               {isResolving ? (
                 <>
-                  <IconLoader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
+                  <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                  Processing...
                 </>
               ) : (
                 <>
