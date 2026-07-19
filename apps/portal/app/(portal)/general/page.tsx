@@ -16,6 +16,7 @@ import {
   IconUsers,
   IconVideo,
   IconBook,
+  IconBooks,
 } from "@tabler/icons-react"
 import { useSessionInfo } from "@/hooks/use-session-info"
 import { useEventDashboardStats } from "@/hooks/useEvents"
@@ -101,11 +102,11 @@ const quickLinks = [
     color: "text-emerald-600 bg-emerald-500/10",
   },
   {
-    title: "News & Newsletters",
-    href: "/news",
-    description: "Browse FCH monthly newsletters and community news.",
-    icon: IconNews,
-    color: "text-sky-600 bg-sky-500/10",
+    title: "Learning Library",
+    href: "/resources/learning",
+    description: "Access theological documents, educational materials, and faith formation guides.",
+    icon: IconBooks,
+    color: "text-blue-600 bg-blue-500/10 dark:text-blue-400 dark:bg-blue-950/20",
   },
   {
     title: "Account Settings",

@@ -11,6 +11,7 @@ import {
   IconHierarchy,
   IconDashboard,
   IconCalendarEvent,
+  IconMail,
 } from "@tabler/icons-react"
 import {
   Sidebar,
@@ -37,12 +38,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Dynamically build resource menu items under FCH Resources
   const resourcesMenu = []
 
-  // Special Member Resources (for all logged-in members)
-  resourcesMenu.push({
-    title: "Special Member Resources",
-    url: "/resources/member",
-    icon: IconFileText,
-  })
+  // Special Member Resources & Learning Library (accessible to all logged-in members)
+  resourcesMenu.push(
+    {
+      title: "Special Member Resources",
+      url: "/resources/member",
+      icon: IconFileText,
+    },
+    {
+      title: "Learning Library",
+      url: "/resources/learning",
+      icon: IconBooks,
+    }
+  )
 
   // If user has higher privileges, add the other resource libraries
   if (
@@ -52,11 +60,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     roles.includes("SUPER_ADMIN")
   ) {
     resourcesMenu.push(
-      {
-        title: "Learning Library",
-        url: "/resources/learning",
-        icon: IconBooks,
-      },
       {
         title: "Special Pastoral Resources",
         url: "/resources/special",
@@ -84,6 +87,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Pastoral Overview",
       url: "/pastoral",
       icon: IconDashboard,
+    },
+    {
+      title: "News & Publications",
+      url: "/news",
+      icon: IconMail,
     },
     {
       title: "Events & Webinars",

@@ -112,8 +112,9 @@ export class NewsService {
     status?: any
     newsType?: any
     authorId?: string
+    search?: string
   }) {
-    const { page, limit, status, newsType, authorId } = params
+    const { page, limit, status, newsType, authorId, search } = params
     const skip = (page - 1) * limit
 
     const where: any = {
@@ -121,6 +122,14 @@ export class NewsService {
       status: status || undefined,
       newsType: newsType || undefined,
       authorId: authorId || undefined,
+    }
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { excerpt: { contains: search, mode: "insensitive" } },
+        { content: { contains: search, mode: "insensitive" } },
+      ]
     }
 
     const [totalCount, data] = await prisma.$transaction([

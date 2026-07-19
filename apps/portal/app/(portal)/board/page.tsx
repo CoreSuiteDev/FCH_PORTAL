@@ -5,6 +5,7 @@ import Link from "next/link"
 import {
   IconArrowRight,
   IconBook,
+  IconBooks,
   IconCalendarEvent,
   IconCheck,
   IconChevronRight,
@@ -68,39 +69,18 @@ const quickLinks = [
     color: "text-emerald-600 bg-emerald-500/10",
   },
   {
-    title: "Voting Center",
-    href: "/board/meetings",
-    description: "Active resolutions requiring your digital signature.",
-    icon: IconScale,
-    color: "text-rose-600 bg-rose-500/10",
-  },
-  {
-    title: "Resource Library",
+    title: "Special Board Resources",
     href: "/resources/board",
     description: "Executive handbooks, templates and reference files.",
     icon: IconBook,
     color: "text-violet-600 bg-violet-500/10",
   },
   {
-    title: "News & Newsletters",
-    href: "/news",
-    description: "Browse FCH monthly newsletters and community news.",
-    icon: IconNews,
-    color: "text-sky-600 bg-sky-500/10",
-  },
-  {
-    title: "Documents",
-    href: "/board/documents",
-    description: "Access filed reports, compliance documents and memos.",
-    icon: IconFileText,
-    color: "text-indigo-600 bg-indigo-500/10",
-  },
-  {
-    title: "Member Directory",
-    href: "/account",
-    description: "View board roster, pastoral and general member profiles.",
-    icon: IconUsers,
-    color: "text-teal-600 bg-teal-500/10",
+    title: "Learning Library",
+    href: "/resources/learning",
+    description: "Access theological documents, educational materials, and faith formation guides.",
+    icon: IconBooks,
+    color: "text-blue-600 bg-blue-500/10 dark:text-blue-400 dark:bg-blue-950/20",
   },
 ]
 

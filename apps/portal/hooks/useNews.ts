@@ -18,11 +18,21 @@ export const useNewsList = (params: {
   status?: string
   newsType?: string
   authorId?: string
+  search?: string
 }) => {
   return useQuery<GetNewsResponse>({
     queryKey: ["news-list", params],
     queryFn: () =>
       api.get("/news", { params }).then((res) => res.data),
+  })
+}
+
+export const useNewsBySlug = (slug: string) => {
+  return useQuery<ZTCNewsOutput>({
+    queryKey: ["news-by-slug", slug],
+    queryFn: () =>
+      api.get(`/news/slug/${slug}`).then((res) => res.data),
+    enabled: !!slug,
   })
 }
 

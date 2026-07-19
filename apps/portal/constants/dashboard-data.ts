@@ -143,6 +143,11 @@ export const data = {
       icon: IconDashboard,
     },
     {
+      title: "News & Publications",
+      url: "/news",
+      icon: IconMail,
+    },
+    {
       title: "Board Meetings",
       url: "/board/meetings",
       icon: IconPresentation,
@@ -165,6 +170,11 @@ export const data = {
       icon: IconDashboard,
     },
     {
+      title: "News & Publications",
+      url: "/news",
+      icon: IconMail,
+    },
+    {
       title: "Learning Library",
       url: "/resources/learning",
       icon: IconBooks,
@@ -185,6 +195,11 @@ export const data = {
       title: "General Overview",
       url: "/general",
       icon: IconDashboard,
+    },
+    {
+      title: "News & Publications",
+      url: "/news",
+      icon: IconMail,
     },
     {
       title: "Events & Webinars",

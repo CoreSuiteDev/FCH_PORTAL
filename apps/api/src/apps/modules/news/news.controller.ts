@@ -42,6 +42,7 @@ export class NewsController {
     status?: any
     newsType?: any
     authorId?: string
+    search?: string
   }) {
     try {
       return await NewsService.listAllNews(params)

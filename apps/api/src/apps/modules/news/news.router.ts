@@ -76,6 +76,7 @@ export const newsRouter = router({
         status: PublishStatusEnum.optional(),
         newsType: NewsTypeEnum.optional(),
         authorId: z.string().optional(),
+        search: z.string().optional(),
       })
     )
     .output(
@@ -98,6 +99,7 @@ export const newsRouter = router({
         status: input?.status,
         newsType: input?.newsType,
         authorId: input?.authorId,
+        search: input?.search,
       })
       return {
         data: data as any,
