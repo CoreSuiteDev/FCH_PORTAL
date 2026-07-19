@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server"
 import { EventsService } from "./events.service.js"
 import { EventPolicy } from "./event.policy.js"
 import { EventVisibility, EventType, EventStatus } from "../../../generated/prisma/client.js"
+import { prisma } from "../../../infrastructure/database/prisma.js"
 
 export class EventsController {
   /**
@@ -40,6 +41,96 @@ export class EventsController {
       limit: params.limit,
       eventType: params.eventType,
     })
+  }
+
+  /**
+   * Controller for returning dashboard stats for portal pages
+   */
+  static async getDashboardStats(params: {
+    userRole: string | undefined
+    userId?: string
+  }) {
+    const allowedVisibilities = EventPolicy.getAllowedVisibilities(params.userRole)
+    const userId = params.userId || ""
+
+    const whereClause: any = {
+      isActive: true,
+      visibility: {
+        in: allowedVisibilities,
+      },
+    }
+
+    // 1. Total events count (where eventType = EVENT)
+    const totalEvents = await prisma.event.count({
+      where: {
+        ...whereClause,
+        eventType: "EVENT",
+      },
+    })
+
+    // 2. Webinar count (where eventType = WEBINAR)
+    const webinarCount = await prisma.event.count({
+      where: {
+        ...whereClause,
+        eventType: "WEBINAR",
+      },
+    })
+
+    // 3. Registered count
+    const registeredCount = await prisma.event.count({
+      where: {
+        ...whereClause,
+        eventRegistrations: {
+          some: {
+            userId,
+            status: "CONFIRMED",
+          },
+        },
+      },
+    })
+
+    // 4. Upcoming events (limit 6)
+    const upcomingEvents = await prisma.event.findMany({
+      where: {
+        ...whereClause,
+        status: {
+          in: ["UPCOMING", "ONGOING"],
+        },
+      },
+      take: 6,
+      include: {
+        webinar: true,
+        categories: true,
+        materials: true,
+        eventRegistrations: {
+          where: {
+            userId,
+          },
+        },
+      },
+      orderBy: { startDate: "asc" },
+    })
+
+    // 5. Checked-in count
+    const checkedInCount = await prisma.event.count({
+      where: {
+        ...whereClause,
+        eventRegistrations: {
+          some: {
+            userId,
+            checkedIn: true,
+          },
+        },
+      },
+    })
+
+    return {
+      totalEvents,
+      webinarCount,
+      registeredCount,
+      checkedInCount,
+      upcomingEvents,
+    }
   }
 
   /**

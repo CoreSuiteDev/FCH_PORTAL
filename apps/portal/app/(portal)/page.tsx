@@ -18,11 +18,11 @@ export default function Page() {
       
       if (!isAdmin) {
         if (isBoard) {
-          router.replace("/portal/board")
+          router.replace("/board")
         } else if (roles.includes("PASTORAL")) {
-          router.replace("/portal/pastoral")
+          router.replace("/pastoral")
         } else {
-          router.replace("/portal/general")
+          router.replace("/general")
         }
       }
     }

@@ -140,6 +140,29 @@ export const eventsRouter = router({
       }
     }),
 
+  dashboardStats: protectedProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/events/dashboard-stats",
+        tags: ["events"],
+        summary: "Get dashboard stats",
+        description: "Returns event and webinar statistics and a list of upcoming events",
+      },
+    })
+    .input(z.void())
+    .output(z.any())
+    .query(async ({ ctx }) => {
+      const stats = await EventsController.getDashboardStats({
+        userRole: ctx.role,
+        userId: ctx.user?.id,
+      })
+      return {
+        ...stats,
+        upcomingEvents: stats.upcomingEvents.map(mapEvent),
+      }
+    }),
+
   getById: publicProcedure
     .meta({
       openapi: {

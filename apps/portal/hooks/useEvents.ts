@@ -34,6 +34,24 @@ export const useEventsList = (params?: {
   })
 }
 
+// --- Dashboard Stats ---
+
+export interface DashboardStatsResponse {
+  totalEvents: number
+  webinarCount: number
+  registeredCount: number
+  checkedInCount: number
+  upcomingEvents: ZTEvent[]
+}
+
+export const useEventDashboardStats = () => {
+  return useQuery<DashboardStatsResponse>({
+    queryKey: ["event-dashboard-stats"],
+    queryFn: () =>
+      api.get("/events/dashboard-stats").then((res) => res.data),
+  })
+}
+
 // --- Single Event ---
 
 export const useEventById = (id: string) => {

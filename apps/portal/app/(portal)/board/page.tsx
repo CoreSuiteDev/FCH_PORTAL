@@ -21,7 +21,7 @@ import {
   IconVideo,
 } from "@tabler/icons-react"
 import { useSessionInfo } from "@/hooks/use-session-info"
-import { useEventsList } from "@/hooks/useEvents"
+import { useEventDashboardStats } from "@/hooks/useEvents"
 import { useNewsList } from "@/hooks/useNews"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { useBoardStore } from "@/store/bord-overview-store"
@@ -48,56 +48,56 @@ function getGreeting() {
 const quickLinks = [
   {
     title: "Board Materials",
-    href: "#",
+    href: "/board/meetings",
     description: "Agendas, minutes, board packs and session documents.",
     icon: IconFileReport,
     color: "text-primary bg-primary/10",
   },
   {
     title: "Governance & Policy",
-    href: "#",
+    href: "/board/documents",
     description: "Bylaws, charter documents and organisational policies.",
     icon: IconGavel,
     color: "text-amber-600 bg-amber-500/10",
   },
   {
     title: "Financial Oversight",
-    href: "#",
+    href: "/board/financials",
     description: "Monthly balance sheets, audit trails and treasury reports.",
     icon: IconDatabase,
     color: "text-emerald-600 bg-emerald-500/10",
   },
   {
     title: "Voting Center",
-    href: "#",
+    href: "/board/meetings",
     description: "Active resolutions requiring your digital signature.",
     icon: IconScale,
     color: "text-rose-600 bg-rose-500/10",
   },
   {
     title: "Resource Library",
-    href: "#",
+    href: "/resources/board",
     description: "Executive handbooks, templates and reference files.",
     icon: IconBook,
     color: "text-violet-600 bg-violet-500/10",
   },
   {
     title: "News & Newsletters",
-    href: "#",
+    href: "/news",
     description: "Browse FCH monthly newsletters and community news.",
     icon: IconNews,
     color: "text-sky-600 bg-sky-500/10",
   },
   {
     title: "Documents",
-    href: "#",
+    href: "/board/documents",
     description: "Access filed reports, compliance documents and memos.",
     icon: IconFileText,
     color: "text-indigo-600 bg-indigo-500/10",
   },
   {
     title: "Member Directory",
-    href: "#",
+    href: "/account",
     description: "View board roster, pastoral and general member profiles.",
     icon: IconUsers,
     color: "text-teal-600 bg-teal-500/10",
@@ -147,7 +147,7 @@ function EventMiniCard({ event }: { event: any }) {
   const reg = event.registrations?.[0] ?? null
   const registered = reg?.status === "CONFIRMED"
   const checkedIn = reg?.checkedIn ?? false
-  const href = `/portal/events/${event.id}`
+  const href = `/events/${event.id}`
 
   return (
     <Link
@@ -217,10 +217,7 @@ export default function BoardDashboardPage() {
   const { pendingVotes, nextMeeting } = useBoardStore()
   const user = session?.user
 
-  const { data: eventsData, isLoading: isEventsLoading } = useEventsList({
-    page: 1,
-    limit: 50,
-  })
+  const { data: statsData, isLoading: isEventsLoading } = useEventDashboardStats()
 
   const { data: newsData, isLoading: isNewsLoading } = useNewsList({
     page: 1,
@@ -228,25 +225,9 @@ export default function BoardDashboardPage() {
     status: "PUBLISHED",
   })
 
-  const allEvents = eventsData?.data ?? []
-  const upcomingEvents = useMemo(
-    () =>
-      allEvents
-        .filter((e) => e.status === "UPCOMING" || e.status === "ONGOING")
-        .slice(0, 6),
-    [allEvents]
-  )
-
-  const registeredCount = useMemo(
-    () =>
-      allEvents.filter(
-        (e) =>
-          e.registrations &&
-          e.registrations.length > 0 &&
-          e.registrations[0]?.status === "CONFIRMED"
-      ).length,
-    [allEvents]
-  )
+  const totalEventsCount = statsData?.totalEvents ?? 0
+  const upcomingEvents = statsData?.upcomingEvents ?? []
+  const registeredCount = statsData?.registeredCount ?? 0
 
   const recentNews = newsData?.data ?? []
 
@@ -254,7 +235,7 @@ export default function BoardDashboardPage() {
     <div className="flex-1 space-y-8 p-8 pt-6">
 
       {/* ── Hero Greeting ─────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-card to-card p-8 shadow-xs">
+      <div className="relative overflow-hidden rounded-2xl border border-indigo-500/20 bg-linear-to-br from-indigo-500/10 via-card to-card p-8 shadow-xs">
         {/* decorative blobs */}
         <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-indigo-400/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-8 left-1/3 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
@@ -310,7 +291,7 @@ export default function BoardDashboardPage() {
         />
         <StatCard
           label="Events Available"
-          value={allEvents.length}
+          value={totalEventsCount}
           icon={IconCalendarEvent}
           color="text-primary bg-primary/10"
           loading={isEventsLoading}
@@ -337,7 +318,7 @@ export default function BoardDashboardPage() {
             Upcoming Events &amp; Webinars
           </h2>
           <Link
-            href="/portal/events"
+            href="/events"
             className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
           >
             View all <IconArrowRight className="size-3" />
@@ -413,7 +394,7 @@ export default function BoardDashboardPage() {
               Latest News
             </h2>
             <Link
-              href="/portal/news"
+              href="/news"
               className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
             >
               All news <IconArrowRight className="size-3" />
@@ -437,7 +418,7 @@ export default function BoardDashboardPage() {
               recentNews.map((item) => (
                 <Link
                   key={item.id}
-                  href="/portal/news"
+                  href="/news"
                   className="group flex items-start gap-3 px-5 py-4 transition-colors hover:bg-muted/40"
                 >
                   <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600">

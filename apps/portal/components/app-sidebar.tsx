@@ -40,7 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Special Member Resources (for all logged-in members)
   resourcesMenu.push({
     title: "Special Member Resources",
-    url: "/portal/resources/member",
+    url: "/resources/member",
     icon: IconFileText,
   })
 
@@ -54,12 +54,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     resourcesMenu.push(
       {
         title: "Learning Library",
-        url: "/portal/resources/learning",
+        url: "/resources/learning",
         icon: IconBooks,
       },
       {
         title: "Special Pastoral Resources",
-        url: "/portal/resources/special",
+        url: "/resources/special",
         icon: IconFileText,
       }
     )
@@ -73,7 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   ) {
     resourcesMenu.push({
       title: "Special Board Resources",
-      url: "/portal/resources/board",
+      url: "/resources/board",
       icon: IconBooks,
     })
   }
@@ -82,12 +82,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pastoralMenuItems = [
     {
       title: "Pastoral Overview",
-      url: "/portal/pastoral",
+      url: "/pastoral",
       icon: IconDashboard,
     },
     {
       title: "Events & Webinars",
-      url: "/portal/events",
+      url: "/events",
       icon: IconCalendarEvent,
     },
   ]

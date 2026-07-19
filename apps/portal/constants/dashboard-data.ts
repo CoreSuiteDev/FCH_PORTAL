@@ -1,20 +1,16 @@
 import {
   IconAward,
-  IconBell,
   IconBooks,
-  IconBriefcase,
   IconCalendarEvent,
   IconCreditCard,
   IconDashboard,
   IconFileText,
   IconHelp,
-  IconHierarchy,
   IconLockSquare,
   IconMail,
   IconMessage,
   IconPresentation,
   IconReceipt2,
-  IconSchool,
   IconSearch,
   IconSettings,
   IconUser,
@@ -143,73 +139,73 @@ export const data = {
   boardMenu: [
     {
       title: "Board Overview",
-      url: "/portal/board",
+      url: "/board",
       icon: IconDashboard,
     },
     {
       title: "Board Meetings",
-      url: "/portal/board/meetings",
+      url: "/board/meetings",
       icon: IconPresentation,
     },
     {
       title: "Governance Docs",
-      url: "/portal/board/documents",
+      url: "/board/documents",
       icon: IconFileText,
     },
     {
       title: "Financial Reports",
-      url: "/portal/board/financials",
+      url: "/board/financials",
       icon: IconReceipt2,
     },
   ],
   pastoralMenu: [
     {
       title: "Pastoral Overview",
-      url: "/portal/pastoral",
+      url: "/pastoral",
       icon: IconDashboard,
     },
     {
       title: "Learning Library",
-      url: "/portal/resources/learning",
+      url: "/resources/learning",
       icon: IconBooks,
     },
     {
       title: "Special Pastoral Resources",
-      url: "/portal/resources/special",
+      url: "/resources/special",
       icon: IconFileText,
     },
     {
       title: "Events & Webinars",
-      url: "/portal/events",
+      url: "/events",
       icon: IconCalendarEvent,
     },
   ],
   generalMenu: [
     {
       title: "General Overview",
-      url: "/portal/general",
+      url: "/general",
       icon: IconDashboard,
     },
     {
       title: "Events & Webinars",
-      url: "/portal/events",
+      url: "/events",
       icon: IconCalendarEvent,
     },
   ],
   navSecondary: [
     {
       title: "Newsletter Archive",
-      url: "/portal/news",
+      url: "/news",
       icon: IconMail,
     },
     {
       title: "Account",
-      url: "/portal/account",
+      url: "/account",
       icon: IconUser,
     },
     {
       title: "Settings",
-      url: "/portal/settings",
+      url: "/settings",
       icon: IconSettings,
     },
     {

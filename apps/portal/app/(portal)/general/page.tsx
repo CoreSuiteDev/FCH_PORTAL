@@ -18,7 +18,7 @@ import {
   IconBook,
 } from "@tabler/icons-react"
 import { useSessionInfo } from "@/hooks/use-session-info"
-import { useEventsList } from "@/hooks/useEvents"
+import { useEventDashboardStats } from "@/hooks/useEvents"
 import { useMyMemberships } from "@/hooks/useMembership"
 import { useNewsList } from "@/hooks/useNews"
 import { Skeleton } from "@workspace/ui/components/skeleton"
@@ -78,47 +78,38 @@ function MembershipStatusBadge({
   )
 }
 
-// ─── Quick Access Items ───────────────────────────────────────────────────────
-
 const quickLinks = [
   {
     title: "Events & Webinars",
-    href: "/portal/events",
+    href: "/events",
     description: "Register for upcoming summits, workshops and live webinars.",
     icon: IconCalendarEvent,
     color: "text-primary bg-primary/10",
   },
   {
     title: "Announcements",
-    href: "/portal/announcements",
+    href: "/announcements",
     description: "Read latest system notifications and member updates.",
     icon: IconSpeakerphone,
     color: "text-amber-600 bg-amber-500/10",
   },
   {
-    title: "Resource Library",
-    href: "/portal/resources/basic",
-    description: "Download handbooks, outreach templates and reference files.",
+    title: "Member Resources",
+    href: "/resources/member",
+    description: "Access templates, learning materials, and member-only documents.",
     icon: IconBook,
     color: "text-emerald-600 bg-emerald-500/10",
   },
   {
     title: "News & Newsletters",
-    href: "/portal/news",
+    href: "/news",
     description: "Browse FCH monthly newsletters and community news.",
     icon: IconNews,
     color: "text-sky-600 bg-sky-500/10",
   },
   {
-    title: "Documents",
-    href: "/portal/documents",
-    description: "Access bylaws, policies, and organizational documents.",
-    icon: IconFileText,
-    color: "text-violet-600 bg-violet-500/10",
-  },
-  {
     title: "Account Settings",
-    href: "/portal/account",
+    href: "/account",
     description: "Update your personal details, password and preferences.",
     icon: IconUsers,
     color: "text-rose-600 bg-rose-500/10",
@@ -164,7 +155,7 @@ function EventMiniCard({ event }: { event: any }) {
   const reg = event.registrations?.[0] ?? null
   const registered = reg?.status === "CONFIRMED"
   const checkedIn = reg?.checkedIn ?? false
-  const href = `/portal/events/${event.id}`
+  const href = `/events/${event.id}`
 
   return (
     <Link
@@ -231,10 +222,7 @@ export default function PortalDashboardPage() {
   const user = session?.user
   const userId = user?.id ?? ""
 
-  const { data: eventsData, isLoading: isEventsLoading } = useEventsList({
-    page: 1,
-    limit: 50,
-  })
+  const { data: statsData, isLoading: isEventsLoading } = useEventDashboardStats()
 
   const { data: memberships, isLoading: isMemberLoading } = useMyMemberships(userId)
 
@@ -250,33 +238,10 @@ export default function PortalDashboardPage() {
     [memberships]
   )
 
-  const allEvents = eventsData?.data ?? []
-  const upcomingEvents = useMemo(
-    () =>
-      allEvents
-        .filter((e) => e.status === "UPCOMING" || e.status === "ONGOING")
-        .slice(0, 6),
-    [allEvents]
-  )
-
-  const registeredCount = useMemo(
-    () =>
-      allEvents.filter(
-        (e) => e.registrations && e.registrations.length > 0 && e.registrations[0]?.status === "CONFIRMED"
-      ).length,
-    [allEvents]
-  )
-
-  const checkedInCount = useMemo(
-    () =>
-      allEvents.filter(
-        (e) =>
-          e.registrations &&
-          e.registrations.length > 0 &&
-          e.registrations[0]?.checkedIn
-      ).length,
-    [allEvents]
-  )
+  const totalEventsCount = statsData?.totalEvents ?? 0
+  const upcomingEvents = statsData?.upcomingEvents ?? []
+  const registeredCount = statsData?.registeredCount ?? 0
+  const checkedInCount = statsData?.checkedInCount ?? 0
 
   const recentNews = newsData?.data ?? []
 
@@ -284,7 +249,7 @@ export default function PortalDashboardPage() {
     <div className="flex-1 space-y-8 p-8 pt-6">
 
       {/* Hero Greeting */}
-      <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-card to-card p-8 shadow-xs">
+      <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-linear-to-br from-amber-500/10 via-card to-card p-8 shadow-xs">
         <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-8 left-1/3 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
 
@@ -343,7 +308,7 @@ export default function PortalDashboardPage() {
         />
         <StatCard
           label="Events Available"
-          value={allEvents.length}
+          value={totalEventsCount}
           icon={IconCalendarEvent}
           color="text-primary bg-primary/10"
           loading={isEventsLoading}
@@ -409,7 +374,7 @@ export default function PortalDashboardPage() {
                 Latest Announcements &amp; News
               </h3>
               <Link
-                href="/portal/news"
+                href="/news"
                 className="flex items-center gap-1 text-xs font-bold text-primary hover:underline"
               >
                 View Archive <IconArrowRight className="size-3" />
@@ -449,7 +414,7 @@ export default function PortalDashboardPage() {
                       </p>
                     </div>
                     <Link
-                      href={`/portal/news`}
+                      href={`/news`}
                       className="inline-flex shrink-0 items-center justify-center gap-1 rounded-xl border px-3 py-2 text-xs font-bold text-foreground hover:bg-muted"
                     >
                       Read Article
@@ -468,7 +433,7 @@ export default function PortalDashboardPage() {
               Upcoming Events
             </h3>
             <Link
-              href="/portal/events"
+              href="/events"
               className="flex items-center gap-1 text-xs font-bold text-primary hover:underline"
             >
               All Events <IconArrowRight className="size-3" />

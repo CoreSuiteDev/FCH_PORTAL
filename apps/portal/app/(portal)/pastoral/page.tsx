@@ -22,7 +22,7 @@ import {
   IconDashboard,
 } from "@tabler/icons-react"
 import { useSessionInfo } from "@/hooks/use-session-info"
-import { useEventsList } from "@/hooks/useEvents"
+import { useEventDashboardStats } from "@/hooks/useEvents"
 import { useNewsList } from "@/hooks/useNews"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 
@@ -49,14 +49,14 @@ const resourcesList = [
   {
     title: "Learning Library",
     description: "Access theological documents, educational materials, and faith formation guides.",
-    url: "/portal/resources/learning",
+    url: "/resources/learning",
     icon: IconBooks,
     color: "text-blue-600 bg-blue-500/10 dark:text-blue-400 dark:bg-blue-950/20",
   },
   {
     title: "Special Pastoral Resources",
     description: "Browse curated collections for seasonal programs, retreats, and special parish events.",
-    url: "/portal/resources/special",
+    url: "/resources/special",
     icon: IconFileText,
     color: "text-sky-600 bg-sky-500/10 dark:text-sky-400 dark:bg-sky-950/20",
   },
@@ -105,7 +105,7 @@ function EventMiniCard({ event }: { event: any }) {
   const reg = event.registrations?.[0] ?? null
   const registered = reg?.status === "CONFIRMED"
   const checkedIn = reg?.checkedIn ?? false
-  const href = `/portal/events/${event.id}`
+  const href = `/events/${event.id}`
 
   return (
     <Link
@@ -171,10 +171,7 @@ export default function PastoralOverviewPage() {
   const { data: session, isLoading: isSessionLoading } = useSessionInfo()
   const user = session?.user
 
-  const { data: eventsData, isLoading: isEventsLoading } = useEventsList({
-    page: 1,
-    limit: 50,
-  })
+  const { data: statsData, isLoading: isEventsLoading } = useEventDashboardStats()
 
   const { data: newsData, isLoading: isNewsLoading } = useNewsList({
     page: 1,
@@ -182,37 +179,17 @@ export default function PastoralOverviewPage() {
     status: "PUBLISHED",
   })
 
-  const allEvents = eventsData?.data ?? []
-  const upcomingEvents = useMemo(
-    () =>
-      allEvents
-        .filter((e) => e.status === "UPCOMING" || e.status === "ONGOING")
-        .slice(0, 6),
-    [allEvents]
-  )
-
-  const registeredCount = useMemo(
-    () =>
-      allEvents.filter(
-        (e) =>
-          e.registrations &&
-          e.registrations.length > 0 &&
-          e.registrations[0]?.status === "CONFIRMED"
-      ).length,
-    [allEvents]
-  )
-
-  const webinarCount = useMemo(
-    () => allEvents.filter((e) => e.eventType === "WEBINAR").length,
-    [allEvents]
-  )
+  const totalEventsCount = statsData?.totalEvents ?? 0
+  const upcomingEvents = statsData?.upcomingEvents ?? []
+  const registeredCount = statsData?.registeredCount ?? 0
+  const webinarCount = statsData?.webinarCount ?? 0
 
   const recentNews = newsData?.data ?? []
 
   return (
     <div className="flex-1 space-y-8 p-8 pt-6">
       {/* Hero Greeting */}
-      <div className="relative overflow-hidden rounded-2xl border border-rose-500/20 bg-gradient-to-br from-rose-500/10 via-card to-card p-8 shadow-xs">
+      <div className="relative overflow-hidden rounded-2xl border border-rose-500/20 bg-linear-to-br from-rose-500/10 via-card to-card p-8 shadow-xs">
         <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-rose-400/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-8 left-1/3 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
 
@@ -261,7 +238,7 @@ export default function PastoralOverviewPage() {
         />
         <StatCard
           label="Events Available"
-          value={allEvents.length}
+          value={totalEventsCount}
           icon={IconCalendarEvent}
           color="text-primary bg-primary/10"
           loading={isEventsLoading}
@@ -327,7 +304,7 @@ export default function PastoralOverviewPage() {
                 Latest Announcements &amp; News
               </h3>
               <Link
-                href="/portal/news"
+                href="/news"
                 className="flex items-center gap-1 text-xs font-bold text-primary hover:underline"
               >
                 View Archive <IconArrowRight className="size-3" />
@@ -367,7 +344,7 @@ export default function PastoralOverviewPage() {
                       </p>
                     </div>
                     <Link
-                      href={`/portal/news`}
+                      href={`/news`}
                       className="inline-flex shrink-0 items-center justify-center gap-1 rounded-xl border px-3 py-2 text-xs font-bold text-foreground hover:bg-muted"
                     >
                       Read Article
@@ -386,7 +363,7 @@ export default function PastoralOverviewPage() {
               Upcoming Events
             </h3>
             <Link
-              href="/portal/events"
+              href="/events"
               className="flex items-center gap-1 text-xs font-bold text-primary hover:underline"
             >
               All Events <IconArrowRight className="size-3" />

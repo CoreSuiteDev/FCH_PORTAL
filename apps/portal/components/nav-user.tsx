@@ -160,19 +160,19 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild className="cursor-pointer">
-                <Link href="/portal/account">
+                <Link href="/account">
                   <IconUserCircle className="mr-2 h-4 w-4" />
                   <span>Account</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="cursor-pointer">
-                <Link href="/portal/account/membership">
+                <Link href="/account/membership">
                   <IconCreditCard className="mr-2 h-4 w-4" />
                   <span>Billing &amp; Membership</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="cursor-pointer">
-                <Link href="/portal/settings">
+                <Link href="/settings">
                   <IconSettings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </Link>

@@ -212,7 +212,7 @@ export default function AccountPage() {
               </div>
             </div>
             <Link
-              href="/portal/account/membership"
+              href="/account/membership"
               className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-50 dark:hover:bg-slate-200 dark:text-slate-950 py-2.5 text-xs font-bold transition-colors cursor-pointer"
             >
               Manage Billing Details
@@ -293,7 +293,7 @@ export default function AccountPage() {
                 </p>
               </div>
               <Link
-                href="/portal/settings"
+                href="/settings"
                 className="inline-flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl px-4 py-2 text-xs font-bold transition-colors cursor-pointer"
               >
                 Go to Security Settings

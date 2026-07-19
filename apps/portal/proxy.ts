@@ -62,13 +62,13 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL("/admin", request.url))
       }
       if (roles.includes("BOARD")) {
-        return NextResponse.redirect(new URL("/portal/board", request.url))
+        return NextResponse.redirect(new URL("/board", request.url))
       }
       if (roles.includes("PASTORAL")) {
-        return NextResponse.redirect(new URL("/portal/pastoral", request.url))
+        return NextResponse.redirect(new URL("/pastoral", request.url))
       }
       if (roles.includes("MEMBER")) {
-        return NextResponse.redirect(new URL("/portal/general", request.url))
+        return NextResponse.redirect(new URL("/general", request.url))
       }
     }
 
@@ -77,7 +77,7 @@ export async function proxy(request: NextRequest) {
     }
 
     if (
-      pathname.startsWith("/portal/board") &&
+      pathname.startsWith("/board") &&
       !roles.includes("BOARD") &&
       !roles.includes("SUPER_ADMIN")
     ) {
@@ -85,7 +85,7 @@ export async function proxy(request: NextRequest) {
     }
 
     if (
-      pathname.startsWith("/portal/pastoral") &&
+      pathname.startsWith("/pastoral") &&
       !roles.includes("PASTORAL") &&
       !roles.includes("BOARD") &&
       !roles.includes("SUPER_ADMIN")
