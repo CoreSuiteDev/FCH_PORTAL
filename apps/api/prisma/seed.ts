@@ -3,8 +3,8 @@ import { auth } from "../src/lib/auth.js"
 
 async function main() {
   console.log("Seeding admin user...")
-  const adminEmail = "win.masrafi000@gmail.com"
-  const adminPassword = "masrafi@123"
+  const adminEmail = "smmasrafi01@gmail.com"
+  const adminPassword = "admin@123"
   const adminName = "Admin User"
 
   let user = await prisma.user.findUnique({
