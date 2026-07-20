@@ -70,7 +70,7 @@ services:
     environment:
       NODE_ENV: production
 
-      DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@postgres:5432/${DATABASE_DB}?sslmode=disable
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@postgres:5432/${DATABASE_DB}?sslmode=disable}
 
       REDIS_HOST: redis
       REDIS_PORT: 6379
