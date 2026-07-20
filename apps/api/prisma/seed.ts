@@ -49,58 +49,45 @@ async function main() {
       include: { accounts: true },
     })
 
+    const context = await auth.$context
+    const hashedPassword = await context.password.hash(admin.password)
+
     if (!user) {
       console.log(`Creating admin user: ${admin.email}`)
-      try {
-        await auth.api.signUpEmail({
-          body: {
-            email: admin.email,
-            password: admin.password,
-            name: admin.name,
+      user = await prisma.user.create({
+        data: {
+          email: admin.email,
+          name: admin.name,
+          emailVerified: true,
+          accounts: {
+            create: {
+              accountId: admin.email,
+              providerId: "credential",
+              password: hashedPassword,
+            },
           },
-        })
-
-        user = await prisma.user.findUnique({
-          where: { email: admin.email },
-          include: { accounts: true },
-        })
-      } catch (err) {
-        console.error(`Failed to sign up admin user ${admin.email}:`, err)
-      }
+        },
+        include: { accounts: true },
+      })
+      console.log(`Successfully created admin user: ${admin.email}`)
     } else {
-      console.log(`Admin user already exists: ${admin.email}`)
-    }
-
-    if (!user) {
-      console.error(`Could not find or create admin user ${admin.email}. Skipping role assignment.`)
-      continue
-    }
-
-    // Ensure a credential account exists for password login
-    const credentialAccount = user.accounts.find(
-      (a) => a.providerId === "credential"
-    )
-    if (!credentialAccount) {
-      console.log(`No credential account found for ${admin.email}. Creating one directly...`)
-      const context = await auth.$context
-      const hashedPassword = await context.password.hash(admin.password)
-
+      console.log(`Admin user already exists: ${admin.email}. Ensuring credential account and password...`)
+      const credentialAcc = user.accounts.find((a) => a.providerId === "credential")
       await prisma.account.upsert({
         where: {
           providerId_accountId: {
             providerId: "credential",
-            accountId: user.id,
+            accountId: credentialAcc?.accountId || admin.email,
           },
         },
         update: { password: hashedPassword },
         create: {
-          accountId: user.id,
+          accountId: admin.email,
           providerId: "credential",
           userId: user.id,
           password: hashedPassword,
         },
       })
-      console.log(`Credential account created for ${admin.email}.`)
     }
 
     await prisma.userRole.upsert({
