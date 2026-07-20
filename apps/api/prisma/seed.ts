@@ -2,72 +2,6 @@ import { prisma } from "../src/infrastructure/database/prisma.js"
 import { auth } from "../src/lib/auth.js"
 
 async function main() {
-  console.log("Seeding admin user...")
-  const adminEmail = "smmasrafi01@gmail.com"
-  const adminPassword = "admin@123"
-  const adminName = "New Admin"
-
-  let user = await prisma.user.findUnique({
-    where: { email: adminEmail },
-    include: { accounts: true },
-  })
-
-  if (!user) {
-    console.log(`Creating admin user: ${adminEmail}`)
-    try {
-      await auth.api.signUpEmail({
-        body: {
-          email: adminEmail,
-          password: adminPassword,
-          name: adminName,
-        },
-      })
-
-      user = await prisma.user.findUnique({
-        where: { email: adminEmail },
-        include: { accounts: true },
-      })
-    } catch (err) {
-      console.error("Failed to sign up admin user:", err)
-    }
-  } else {
-    console.log(`Admin user already exists: ${adminEmail}`)
-  }
-
-  if (!user) {
-    console.error("Could not find or create admin user. Aborting.")
-    process.exit(1)
-  }
-
-  // Ensure a credential account exists for password login
-  const credentialAccount = user.accounts.find(
-    (a) => a.providerId === "credential"
-  )
-  if (!credentialAccount) {
-    console.log("No credential account found. Creating one directly...")
-    const context = await auth.$context
-    const hashedPassword = await context.password.hash(adminPassword)
-
-    await prisma.account.upsert({
-      where: {
-        providerId_accountId: {
-          providerId: "credential",
-          accountId: user.id,
-        },
-      },
-      update: { password: hashedPassword },
-      create: {
-        accountId: user.id,
-        providerId: "credential",
-        userId: user.id,
-        password: hashedPassword,
-      },
-    })
-    console.log("Credential account created for admin user.")
-  } else {
-    console.log("Credential account already exists.")
-  }
-
   console.log("Seeding system roles...")
   const rolesToSeed = [
     {
@@ -95,22 +29,95 @@ async function main() {
 
   const superAdminRole = seededRoles["SUPER_ADMIN"]
 
-  await prisma.userRole.upsert({
-    where: {
-      userId_roleId: {
+  console.log("Seeding super admin users...")
+  const adminsToSeed = [
+    {
+      email: "smmasrafi01@gmail.com",
+      password: "admin@123",
+      name: "Super Admin",
+    },
+    {
+      email: "win.masrafi000@gmail.com",
+      password: "masrafi@123",
+      name: "Admin User",
+    },
+  ]
+
+  for (const admin of adminsToSeed) {
+    let user = await prisma.user.findUnique({
+      where: { email: admin.email },
+      include: { accounts: true },
+    })
+
+    if (!user) {
+      console.log(`Creating admin user: ${admin.email}`)
+      try {
+        await auth.api.signUpEmail({
+          body: {
+            email: admin.email,
+            password: admin.password,
+            name: admin.name,
+          },
+        })
+
+        user = await prisma.user.findUnique({
+          where: { email: admin.email },
+          include: { accounts: true },
+        })
+      } catch (err) {
+        console.error(`Failed to sign up admin user ${admin.email}:`, err)
+      }
+    } else {
+      console.log(`Admin user already exists: ${admin.email}`)
+    }
+
+    if (!user) {
+      console.error(`Could not find or create admin user ${admin.email}. Skipping role assignment.`)
+      continue
+    }
+
+    // Ensure a credential account exists for password login
+    const credentialAccount = user.accounts.find(
+      (a) => a.providerId === "credential"
+    )
+    if (!credentialAccount) {
+      console.log(`No credential account found for ${admin.email}. Creating one directly...`)
+      const context = await auth.$context
+      const hashedPassword = await context.password.hash(admin.password)
+
+      await prisma.account.upsert({
+        where: {
+          providerId_accountId: {
+            providerId: "credential",
+            accountId: user.id,
+          },
+        },
+        update: { password: hashedPassword },
+        create: {
+          accountId: user.id,
+          providerId: "credential",
+          userId: user.id,
+          password: hashedPassword,
+        },
+      })
+      console.log(`Credential account created for ${admin.email}.`)
+    }
+
+    await prisma.userRole.upsert({
+      where: {
+        userId_roleId: {
+          userId: user.id,
+          roleId: superAdminRole.id,
+        },
+      },
+      update: {},
+      create: {
         userId: user.id,
         roleId: superAdminRole.id,
       },
-    },
-    update: {},
-    create: {
-      userId: user.id,
-      roleId: superAdminRole.id,
-    },
-  })
-  console.log(
-    `Admin user ${adminEmail} successfully linked to SUPER_ADMIN role.`
-  )
+    })
+    console.log(`Admin user ${admin.email} successfully linked to SUPER_ADMIN role.`)
+  }
 
   console.log("Seeding membership packages...")
   const packagesToSeed = [
