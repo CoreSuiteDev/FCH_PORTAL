@@ -5,7 +5,7 @@ async function main() {
   console.log("Seeding admin user...")
   const adminEmail = "smmasrafi01@gmail.com"
   const adminPassword = "admin@123"
-  const adminName = "Admin User"
+  const adminName = "New Admin"
 
   let user = await prisma.user.findUnique({
     where: { email: adminEmail },
