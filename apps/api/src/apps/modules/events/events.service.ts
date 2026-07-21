@@ -769,63 +769,92 @@ export class EventsService {
    * Fetch analytics metrics for a specific event
    */
   static async getEventAnalytics(eventId: string) {
-    const event = await prisma.event.findUnique({
+  const [event] = await prisma.$transaction([
+    prisma.event.findUnique({
       where: { id: eventId },
       select: {
         id: true,
         title: true,
         maxCapacity: true,
       },
-    })
+    }),
+  ])
 
-    if (!event) {
-      throw new Error("Event not found")
-    }
-
-    const [
-      totalRegistrations,
-      totalCheckedIn,
-      confirmedCount,
-      pendingCount,
-      cancelledCount,
-      totalMaterials,
-    ] = await Promise.all([
-      prisma.eventRegistration.count({ where: { eventId } }),
-      prisma.eventRegistration.count({ where: { eventId, checkedIn: true } }),
-      prisma.eventRegistration.count({
-        where: { eventId, status: "CONFIRMED" },
-      }),
-      prisma.eventRegistration.count({ where: { eventId, status: "PENDING" } }),
-      prisma.eventRegistration.count({
-        where: { eventId, status: "CANCELLED" },
-      }),
-      prisma.eventMaterial.count({ where: { eventId } }),
-    ])
-
-    const attendanceRate =
-      totalRegistrations > 0
-        ? Number(((totalCheckedIn / totalRegistrations) * 100).toFixed(2))
-        : 0
-
-    const capacityUtilization =
-      event.maxCapacity && event.maxCapacity > 0
-        ? Number(((totalRegistrations / event.maxCapacity) * 100).toFixed(2))
-        : 0
-
-    return {
-      eventId: event.id,
-      title: event.title,
-      maxCapacity: event.maxCapacity,
-      totalRegistrations,
-      totalCheckedIn,
-      attendanceRate,
-      capacityUtilization,
-      statusBreakdown: {
-        CONFIRMED: confirmedCount,
-        PENDING: pendingCount,
-        CANCELLED: cancelledCount,
-      },
-      totalMaterials,
-    }
+  if (!event) {
+    throw new Error("Event not found")
   }
+
+  const [
+    totalRegistrations,
+    totalCheckedIn,
+    confirmedCount,
+    pendingCount,
+    cancelledCount,
+    totalMaterials,
+  ] = await prisma.$transaction([
+    prisma.eventRegistration.count({
+      where: { eventId },
+    }),
+
+    prisma.eventRegistration.count({
+      where: {
+        eventId,
+        checkedIn: true,
+      },
+    }),
+
+    prisma.eventRegistration.count({
+      where: {
+        eventId,
+        status: "CONFIRMED",
+      },
+    }),
+
+    prisma.eventRegistration.count({
+      where: {
+        eventId,
+        status: "PENDING",
+      },
+    }),
+
+    prisma.eventRegistration.count({
+      where: {
+        eventId,
+        status: "CANCELLED",
+      },
+    }),
+
+    prisma.eventMaterial.count({
+      where: {
+        eventId,
+      },
+    }),
+  ])
+
+  const attendanceRate =
+    totalRegistrations > 0
+      ? Number(((totalCheckedIn / totalRegistrations) * 100).toFixed(2))
+      : 0
+
+  const capacityUtilization =
+    event.maxCapacity && event.maxCapacity > 0
+      ? Number(((totalRegistrations / event.maxCapacity) * 100).toFixed(2))
+      : 0
+
+  return {
+    eventId: event.id,
+    title: event.title,
+    maxCapacity: event.maxCapacity,
+    totalRegistrations,
+    totalCheckedIn,
+    attendanceRate,
+    capacityUtilization,
+    statusBreakdown: {
+      CONFIRMED: confirmedCount,
+      PENDING: pendingCount,
+      CANCELLED: cancelledCount,
+    },
+    totalMaterials,
+  }
+}
 }
