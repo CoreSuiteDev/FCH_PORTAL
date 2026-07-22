@@ -4,6 +4,7 @@ import { MembershipType, UserStatus } from "../../../generated/prisma/client.js"
 import { prisma } from "../../../infrastructure/database/prisma.js"
 import { emailQueue } from "../../../infrastructure/redis/emailQueue.js"
 import { auth } from "../../../lib/auth.js"
+import { TRPCError } from "@trpc/server"
 
 export class UserService {
   /**
@@ -161,6 +162,13 @@ export class UserService {
    * Update the user's role by clearing existing assignments and setting a new one
    */
   static async updateUserRole(userId: string, roleName: string) {
+    if (!userId || !roleName) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "User ID and Role are required",
+      })
+    }
+
     const upperRoleName = roleName.toUpperCase()
 
     const userExists = await prisma.user.findUnique({
@@ -168,7 +176,12 @@ export class UserService {
       select: { id: true },
     })
 
-    if (!userExists) throw new Error(`User with ID '${userId}' not found`)
+    if (!userExists) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `User with ID '${userId}' not found`,
+      })
+    }
 
     let role = await prisma.role.findUnique({
       where: { name: upperRoleName },

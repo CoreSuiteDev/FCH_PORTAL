@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server"
 import { ZTCCreatePackage, ZTCUpdatePackage } from "@workspace/types"
 import { prisma } from "../../../infrastructure/database/prisma.js"
 
@@ -11,11 +12,18 @@ export class PackageService {
     })
   }
 
-  static async getPackageBySlug(slug: string) {
-    const pkg = await prisma.membershipPackage.findUnique({
-      where: { slug },
+  static async getPackageBySlug(identifier: string) {
+    const pkg = await prisma.membershipPackage.findFirst({
+      where: {
+        OR: [{ slug: identifier }, { id: identifier }],
+      },
     })
-    if (!pkg) throw new Error(`Member package with slug '${slug}' not found`)
+    if (!pkg) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Membership package '${identifier}' not found`,
+      })
+    }
 
     return pkg
   }

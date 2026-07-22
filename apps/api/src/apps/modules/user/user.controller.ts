@@ -95,6 +95,7 @@ export class UserController {
     try {
       return await UserService.updateUserRole(userId, role)
     } catch (error: any) {
+      if (error instanceof TRPCError) throw error
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: `Failed to update user role: ${error.message}`,

@@ -103,7 +103,7 @@ export class AuthController {
     });
 
     if (!user) {
-      throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
+      throw new TRPCError({ code: "NOT_FOUND", message: "User not found, please register first." });
     }
 
     const credentialAccount = user.accounts.find(a => a.providerId === "credential");

@@ -94,14 +94,14 @@ export const packageRouter = router({
       },
     })
     .input(
-      z.object({
+      ZCIUpdatePackageSchema.extend({
         id: z.string(),
-        data: ZCIUpdatePackageSchema,
       })
     )
     .output(ZCIMembershipPackageSchema)
     .mutation(async ({ input }) => {
-      const pkg = await PackageController.updatePackage(input.id, input.data)
+      const { id, ...data } = input
+      const pkg = await PackageController.updatePackage(id, data)
       return mapPackage(pkg)
     }),
 
