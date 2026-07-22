@@ -103,32 +103,6 @@ export default function MembershipPackages() {
         pkg.billingCycle === (billingCycle === "monthly" ? "MONTHLY" : "YEARLY")
     ) || []
 
-  const registryItems = filteredPackages.map((pkg) => {
-    const baseSlug = pkg.slug.split("-")[0]
-    let title = pkg.name
-    let description = pkg.description || ""
-    let features = Array.isArray(pkg.features) ? (pkg.features as string[]) : []
-
-    try {
-      const translatedTitle = t(`items.${baseSlug}.title`)
-      const translatedDescription = t(`items.${baseSlug}.description`)
-      const translatedFeatures = t.raw(`items.${baseSlug}.features`)
-
-      if (translatedTitle) title = translatedTitle
-      if (translatedDescription) description = translatedDescription
-      if (Array.isArray(translatedFeatures)) features = translatedFeatures as string[]
-    } catch {
-      // Translation not found — fall back to DB data (already set above)
-    }
-
-    return {
-      ...pkg,
-      title,
-      description,
-      features,
-    }
-  })
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-white px-4 py-20">
       <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-[#E5DCD5]/40 blur-[130px]" />
@@ -167,19 +141,20 @@ export default function MembershipPackages() {
         </div>
 
         <div className="mx-auto grid max-w-3xl items-stretch gap-8 md:grid-cols-2">
-          {registryItems.map((item) => {
-            const isPastoral = item.type === "PASTORAL"
+          {filteredPackages.map((pkg) => {
+            const isPastoral = pkg.type === "PASTORAL"
+            const features = Array.isArray(pkg.features) ? (pkg.features as string[]) : []
 
             return (
               <div
-                key={item.id}
+                key={pkg.id}
                 className={`relative flex flex-col justify-between rounded-2xl border bg-card p-8 shadow-md transition-all duration-300 hover:shadow-xl ${
                   isPastoral
                     ? "border-primary ring-2 ring-primary/20"
                     : "border-border/60"
                 }`}
               >
-                {item.isPopular && (
+                {pkg.isPopular && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold tracking-wider text-primary-foreground uppercase">
                     {t("recommended")}
                   </span>
@@ -188,20 +163,20 @@ export default function MembershipPackages() {
                 <div>
                   <div className="mb-5">
                     <h3 className="font-trajan text-xl font-extrabold text-[#2C2927]">
-                      {item.title}
+                      {pkg.name}
                     </h3>
                     <h3 className="mt-3 text-xs font-semibold">
-                      {item.subTitle}
+                      {pkg.subTitle}
                     </h3>
 
                     <p className="mt-2 text-xs text-muted-foreground">
-                      {item.description}
+                      {pkg.description}
                     </p>
                   </div>
 
                   <div className="mb-6 flex items-baseline border-b border-border/60 pb-6">
                     <span className="text-4xl font-extrabold">
-                      ${Number(item.price)}
+                      ${Number(pkg.price)}
                     </span>
                     <span className="ml-1.5 text-xs text-muted-foreground">
                       /{" "}
@@ -212,7 +187,7 @@ export default function MembershipPackages() {
                   </div>
 
                   <ul className="mb-8 space-y-3.5 text-sm text-foreground/90">
-                    {item.features.map((feat, idx) => (
+                    {features.map((feat, idx) => (
                       <li key={idx} className="flex items-start gap-2.5">
                         <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                           <Check size={12} strokeWidth={3} />
@@ -226,7 +201,7 @@ export default function MembershipPackages() {
                 </div>
 
                 <Button
-                  onClick={() => handleSelection(item.slug)}
+                  onClick={() => handleSelection(pkg.slug)}
                   variant={isPastoral ? "default" : "secondary"}
                   className="h-11 w-full font-semibold"
                 >
