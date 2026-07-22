@@ -209,4 +209,25 @@ export const sponsorRouter = router({
     .query(async () => {
       return SponsorshipController.getSponsorStats()
     }),
+
+  cancelSponsorship: publicProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/payment/sponsorship/cancel",
+        tags: ["payment"],
+        summary: "Cancel pending sponsorship",
+        description: "Updates pending sponsorship status to CANCELED when payment is abandoned or canceled",
+      },
+    })
+    .input(
+      z.object({
+        sponsorshipId: z.string().optional(),
+        sessionId: z.string().optional(),
+      })
+    )
+    .output(z.any())
+    .mutation(async ({ input }) => {
+      return SponsorshipController.cancelSponsorship(input)
+    }),
 })

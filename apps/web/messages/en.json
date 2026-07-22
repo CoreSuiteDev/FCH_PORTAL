@@ -382,6 +382,8 @@
     },
     "checkout": {
       "back": "Back to Pricing Registry",
+      "checkoutSummary": "Checkout Summary",
+      "userName": "User Name",
       "selectedPackage": "Selected Configuration Package",
       "includedFeatures": "Included Core Features:",
       "pricePerMonth": "month",

@@ -31,6 +31,21 @@ export const paymentRouter = router({
         meta: getPaginationMeta(totalCount, page, limit),
       };
     }),
-  
+
+  sessionReceipt: publicProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/payment/session-receipt",
+        tags: ["payment"],
+        summary: "Get Stripe receipt URL by session_id",
+        description: "Retrieves Stripe receipt_url for a completed checkout session",
+      },
+    })
+    .input(z.object({ sessionId: z.string() }))
+    .output(z.object({ receiptUrl: z.string().nullable(), transactionId: z.string().nullable() }))
+    .query(async ({ input }) => {
+      return PaymentController.getSessionReceipt(input.sessionId);
+    }),
 });
 

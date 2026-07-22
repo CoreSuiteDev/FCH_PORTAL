@@ -106,3 +106,25 @@ export const useUpdateRequestStatus = () => {
     },
   })
 }
+
+export const useUpdateMeeting = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      id,
+      ...body
+    }: {
+      id: string
+      title?: string
+      description?: string
+      date?: string
+      duration?: number
+      meetingLink?: string
+      meetingType?: "ONE_TO_ONE" | "ONE_TO_MANY"
+      attendeeIds?: string[]
+    }) => api.patch(`/meetings/${id}`, { id, ...body }).then((res) => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["board-meetings"] })
+    },
+  })
+}

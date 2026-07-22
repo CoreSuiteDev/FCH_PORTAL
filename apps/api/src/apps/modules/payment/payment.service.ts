@@ -538,4 +538,72 @@ export class PaymentService {
       }
     }
   }
+
+  static async getSessionReceipt(sessionId: string) {
+    try {
+      if (!sessionId) return { receiptUrl: null, transactionId: null };
+
+      // 1. Check DB first
+      const sponsorship = await prisma.sponsorship.findFirst({
+        where: { OR: [{ paymentIntentId: sessionId }, { paymentTransactionId: sessionId }] },
+        select: { receiptUrl: true, paymentTransactionId: true, paymentIntentId: true },
+      });
+      if (sponsorship?.receiptUrl) {
+        return {
+          receiptUrl: sponsorship.receiptUrl,
+          transactionId: sponsorship.paymentTransactionId || sponsorship.paymentIntentId || sessionId,
+        };
+      }
+
+      const donation = await prisma.donation.findFirst({
+        where: { OR: [{ paymentIntentId: sessionId }, { paymentTransactionId: sessionId }, { stripeChargeId: sessionId }] },
+        select: { receiptUrl: true, paymentTransactionId: true, paymentIntentId: true },
+      });
+      if (donation?.receiptUrl) {
+        return {
+          receiptUrl: donation.receiptUrl,
+          transactionId: donation.paymentTransactionId || donation.paymentIntentId || sessionId,
+        };
+      }
+
+      const payment = await prisma.payment.findFirst({
+        where: { OR: [{ stripeCheckoutSessionId: sessionId }, { stripePaymentIntentId: sessionId }] },
+        select: { receiptUrl: true, stripePaymentIntentId: true },
+      });
+      if (payment?.receiptUrl) {
+        return {
+          receiptUrl: payment.receiptUrl,
+          transactionId: payment.stripePaymentIntentId || sessionId,
+        };
+      }
+
+      // 2. Fetch directly from Stripe API
+      if (process.env.STRIPE_SECRET_KEY && !sessionId.startsWith("cs_mock_")) {
+        const session = await stripe.checkout.sessions.retrieve(sessionId, {
+          expand: ["payment_intent.latest_charge"],
+        });
+
+        let receiptUrl: string | null = null;
+        let transactionId: string | null = session.id;
+
+        if (session.payment_intent && typeof session.payment_intent !== "string") {
+          const pi = session.payment_intent as any;
+          transactionId = pi.id || session.id;
+          if (pi.latest_charge && typeof pi.latest_charge !== "string") {
+            receiptUrl = pi.latest_charge.receipt_url || null;
+          } else if (pi.latest_charge && typeof pi.latest_charge === "string") {
+            const charge = await stripe.charges.retrieve(pi.latest_charge);
+            receiptUrl = charge.receipt_url || null;
+          }
+        }
+
+        return { receiptUrl, transactionId };
+      }
+
+      return { receiptUrl: null, transactionId: sessionId };
+    } catch (err: any) {
+      console.error("[getSessionReceipt Error]:", err);
+      return { receiptUrl: null, transactionId: sessionId };
+    }
+  }
 }

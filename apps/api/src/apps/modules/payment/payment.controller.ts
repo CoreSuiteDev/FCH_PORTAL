@@ -6,6 +6,10 @@ export class PaymentController {
     return PaymentService.getHistory(params)
   }
 
+  static async getSessionReceipt(sessionId: string) {
+    return PaymentService.getSessionReceipt(sessionId)
+  }
+
   static async handleWebhook(req: Request, res: Response): Promise<void> {
     console.log(
       `[Webhook Controller] Incoming Stripe webhook POST request to /webhook/stripe. Body length: ${req.body ? req.body.length : 0} bytes.`

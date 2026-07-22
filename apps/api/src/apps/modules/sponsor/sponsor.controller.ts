@@ -24,4 +24,8 @@ export class SponsorshipController {
   static async getSponsorStats() {
     return SponsorShipService.getSponsorStats()
   }
+
+  static async cancelSponsorship(input: { sponsorshipId?: string; sessionId?: string }) {
+    return SponsorShipService.cancelSponsorship(input)
+  }
 }

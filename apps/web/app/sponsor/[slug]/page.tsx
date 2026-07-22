@@ -6,7 +6,6 @@ import { loadStripe } from "@stripe/stripe-js"
 import {
   ArrowLeft,
   Check,
-  CreditCard,
   Loader2,
   ShieldCheck,
   User,
@@ -72,11 +71,9 @@ function TierDetails() {
   const { mutateAsync: createSponsorship, isPending: isMutating } =
     useCreateSponsorship()
 
-  // Steps State
-  const [currentStep, setCurrentStep] = useState<1 | 2>(1)
   const [stripeError, setStripeError] = useState<string | null>(null)
 
-  // React Hook Form for Step 1
+  // React Hook Form
   const {
     register,
     handleSubmit,
@@ -185,13 +182,6 @@ function TierDetails() {
   const setupFee = 0
   const totalAmount = basePrice + setupFee
 
-  // const handleNextStep = async () => {
-  //   const isValid = await trigger()
-  //   if (isValid) {
-  //     setCurrentStep(2)
-  //   }
-  // }
-
   const handlePaymentSubmit = async (data: PersonalInfoValues) => {
     setStripeError(null)
 
@@ -209,7 +199,7 @@ function TierDetails() {
       })
 
       if (res && res.checkoutUrl) {
-        router.push(res.checkoutUrl)
+        window.location.href = res.checkoutUrl
       } else {
         throw new Error("Failed to initiate secure checkout redirect.")
       }
@@ -280,94 +270,82 @@ function TierDetails() {
             </CardContent>
           </Card>
 
-          {/* Right Column: 2-Step Form */}
+          {/* Right Column: Single Step Form */}
           <Card className="rounded-xl border border-gray-200 bg-white shadow-none">
             <div className="flex items-center gap-3 border-b border-gray-100 p-6">
-              {currentStep === 1 ? (
-                <User className="h-5 w-5 text-rose-900" />
-              ) : (
-                <CreditCard className="h-5 w-5 text-rose-900" />
-              )}
+              <User className="h-5 w-5 text-rose-900" />
               <h2 className="font-semibold text-gray-900">
-                {currentStep === 1 ? "Personal Information" : "Payment Details"}
+                Sponsorship Details
               </h2>
             </div>
 
             <CardContent className="p-6">
-              <div className="mb-6 flex gap-2">
-                <div
-                  className={`h-1 flex-1 rounded-full ${currentStep >= 1 ? "bg-rose-800" : "bg-gray-200"}`}
-                />
-                <div
-                  className={`h-1 flex-1 rounded-full ${currentStep === 2 ? "bg-rose-800" : "bg-gray-200"}`}
-                />
-              </div>
-
               <form
                 onSubmit={handleSubmit(handlePaymentSubmit)}
                 className="space-y-4"
               >
-                {currentStep === 1 && (
-                  <div className="animate-in space-y-4 fade-in slide-in-from-right-4">
-                    <Field data-invalid={!!errors.name}>
-                      <FieldLabel className="text-[10px] font-bold text-gray-500 uppercase">
-                        Full Name
-                      </FieldLabel>
-                      <Input
-                        {...register("name")}
-                        placeholder="John Doe"
-                        className="h-10 border-gray-200"
-                        disabled={isMutating || !!user}
-                      />
-                      {errors.name && <FieldError errors={[errors.name]} />}
-                    </Field>
-                    <Field data-invalid={!!errors.email}>
-                      <FieldLabel className="text-[10px] font-bold text-gray-500 uppercase">
-                        Email Address
-                      </FieldLabel>
-                      <Input
-                        {...register("email")}
-                        type="email"
-                        placeholder="john@example.com"
-                        className="h-10 border-gray-200"
-                        disabled={isMutating || !!user}
-                      />
-                      {errors.email && <FieldError errors={[errors.email]} />}
-                    </Field>
-                    <Field data-invalid={!!errors.phone}>
-                      <FieldLabel className="text-[10px] font-bold text-gray-500 uppercase">
-                        Phone Number
-                      </FieldLabel>
-                      <Input
-                        {...register("phone")}
-                        type="tel"
-                        placeholder="+880 1XXXXXXXXX"
-                        className="h-10 border-gray-200"
-                        disabled={isMutating || (!!user && !!(user as any).phone)}
-                      />
-                      {errors.phone && <FieldError errors={[errors.phone]} />}
-                    </Field>
-                    <Button
-                      type="submit"
-                      className="mt-6 h-12 w-full bg-rose-800 text-base font-semibold hover:cursor-pointer hover:bg-rose-900"
-                      disabled={isMutating}
-                    >
-                      {isMutating ? (
-                        <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-                      ) : (
-                        `Pay ${tier.price.charAt(0)}${totalAmount.toLocaleString()}`
-                      )}
-                    </Button>
-                    {stripeError && (
-                      <p className="mt-2 text-xs font-medium text-[#EF4444] text-center">
-                        {stripeError}
-                      </p>
-                    )}
-                    <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-gray-500">
-                      <ShieldCheck size={14} /> Secure Tokenized Stripe Payment
-                    </div>
-                  </div>
+                <Field data-invalid={!!errors.name}>
+                  <FieldLabel className="text-[10px] font-bold text-gray-500 uppercase">
+                    Full Name
+                  </FieldLabel>
+                  <Input
+                    {...register("name")}
+                    placeholder="John Doe"
+                    className="h-10 border-gray-200"
+                    disabled={isMutating || !!user}
+                  />
+                  {errors.name && <FieldError errors={[errors.name]} />}
+                </Field>
+
+                <Field data-invalid={!!errors.email}>
+                  <FieldLabel className="text-[10px] font-bold text-gray-500 uppercase">
+                    Email Address
+                  </FieldLabel>
+                  <Input
+                    {...register("email")}
+                    type="email"
+                    placeholder="john@example.com"
+                    className="h-10 border-gray-200"
+                    disabled={isMutating || !!user}
+                  />
+                  {errors.email && <FieldError errors={[errors.email]} />}
+                </Field>
+
+                <Field data-invalid={!!errors.phone}>
+                  <FieldLabel className="text-[10px] font-bold text-gray-500 uppercase">
+                    Phone Number
+                  </FieldLabel>
+                  <Input
+                    {...register("phone")}
+                    type="tel"
+                    placeholder="+880 1XXXXXXXXX"
+                    className="h-10 border-gray-200"
+                    disabled={isMutating || (!!user && !!(user as any).phone)}
+                  />
+                  {errors.phone && <FieldError errors={[errors.phone]} />}
+                </Field>
+
+                <Button
+                  type="submit"
+                  className="mt-6 h-12 w-full bg-rose-800 text-base font-semibold hover:cursor-pointer hover:bg-rose-900"
+                  disabled={isMutating}
+                >
+                  {isMutating ? (
+                    <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                  ) : (
+                    `Pay ${tier.price.charAt(0)}${totalAmount.toLocaleString()}`
+                  )}
+                </Button>
+
+                {stripeError && (
+                  <p className="mt-2 text-xs font-medium text-[#EF4444] text-center">
+                    {stripeError}
+                  </p>
                 )}
+
+                <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-gray-500">
+                  <ShieldCheck size={14} /> Secure Tokenized Stripe Payment
+                </div>
               </form>
             </CardContent>
           </Card>

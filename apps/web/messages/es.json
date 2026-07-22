@@ -382,6 +382,8 @@
     },
     "checkout": {
       "back": "Volver al Registro de Precios",
+      "checkoutSummary": "Resumen de Pago",
+      "userName": "Nombre del Usuario",
       "selectedPackage": "Paquete de Configuración Seleccionado",
       "includedFeatures": "Características Principales Incluidas:",
       "pricePerMonth": "mes",

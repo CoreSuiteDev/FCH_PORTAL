@@ -82,4 +82,24 @@ export class MeetingsController {
       })
     }
   }
+
+  static async updateMeeting(data: {
+    id: string
+    title?: string
+    description?: string
+    date?: Date
+    duration?: number
+    meetingLink?: string
+    meetingType?: MeetingType
+    attendeeIds?: string[]
+  }) {
+    try {
+      return await MeetingsService.updateMeeting(data)
+    } catch (err: any) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: err.message || "Failed to update meeting",
+      })
+    }
+  }
 }

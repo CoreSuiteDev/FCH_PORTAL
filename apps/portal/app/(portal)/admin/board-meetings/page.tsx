@@ -7,9 +7,8 @@ import {
   IconClock,
   IconVideo,
   IconPlus,
-  IconCheck,
-  IconX,
   IconUser,
+  IconCalendarTime,
 } from "@tabler/icons-react"
 import { toast } from "@workspace/ui/components/sonner"
 import { Button } from "@workspace/ui/components/button"
@@ -48,8 +47,10 @@ import { useUsers } from "@/hooks/useUser"
 import {
   useMeetingsList,
   useCreateMeeting,
+  useUpdateMeeting,
   useMeetingRequestsList,
   useUpdateRequestStatus,
+  BoardMeeting,
   MeetingRequest,
 } from "@/hooks/useMeetings"
 import Link from "next/link"
@@ -63,11 +64,13 @@ export default function AdminBoardMeetingsPage() {
 
   // Mutations
   const createMeetingMutation = useCreateMeeting()
+  const updateMeetingMutation = useUpdateMeeting()
   const updateRequestStatusMutation = useUpdateRequestStatus()
 
   // State
   const [activeTab, setActiveTab] = useState("meetings")
   const [isMeetingDialogOpen, setIsMeetingDialogOpen] = useState(false)
+  const [editingMeetingId, setEditingMeetingId] = useState<string | null>(null)
 
   // Meeting Form State
   const [mTitle, setMTitle] = useState("")
@@ -80,6 +83,7 @@ export default function AdminBoardMeetingsPage() {
   const [linkedRequestId, setLinkedRequestId] = useState<string | undefined>(undefined)
 
   const handleOpenCreateMeeting = () => {
+    setEditingMeetingId(null)
     setMTitle("")
     setMDesc("")
     setMDate("")
@@ -87,6 +91,19 @@ export default function AdminBoardMeetingsPage() {
     setMLink("")
     setMType("ONE_TO_MANY")
     setMAttendeeIds([])
+    setLinkedRequestId(undefined)
+    setIsMeetingDialogOpen(true)
+  }
+
+  const handleOpenRescheduleMeeting = (meeting: BoardMeeting) => {
+    setEditingMeetingId(meeting.id)
+    setMTitle(meeting.title)
+    setMDesc(meeting.description || "")
+    setMDate(meeting.date ? new Date(meeting.date).toISOString().slice(0, 16) : "")
+    setMDuration(meeting.duration || 60)
+    setMLink(meeting.meetingLink || "")
+    setMType(meeting.meetingType)
+    setMAttendeeIds(meeting.attendees ? meeting.attendees.map((a) => a.userId) : [])
     setLinkedRequestId(undefined)
     setIsMeetingDialogOpen(true)
   }
@@ -103,24 +120,39 @@ export default function AdminBoardMeetingsPage() {
     }
 
     try {
-      await createMeetingMutation.mutateAsync({
-        title: mTitle,
-        description: mDesc || undefined,
-        date: new Date(mDate).toISOString(),
-        duration: Number(mDuration),
-        meetingLink: mLink || undefined,
-        meetingType: mType,
-        attendeeIds: mType === "ONE_TO_ONE" ? mAttendeeIds : undefined,
-        requestId: linkedRequestId,
-      })
-      toast.success("Board meeting scheduled successfully!")
+      if (editingMeetingId) {
+        await updateMeetingMutation.mutateAsync({
+          id: editingMeetingId,
+          title: mTitle,
+          description: mDesc || undefined,
+          date: new Date(mDate).toISOString(),
+          duration: Number(mDuration),
+          meetingLink: mLink || undefined,
+          meetingType: mType,
+          attendeeIds: mType === "ONE_TO_ONE" ? mAttendeeIds : undefined,
+        })
+        toast.success("Board meeting rescheduled successfully!")
+      } else {
+        await createMeetingMutation.mutateAsync({
+          title: mTitle,
+          description: mDesc || undefined,
+          date: new Date(mDate).toISOString(),
+          duration: Number(mDuration),
+          meetingLink: mLink || undefined,
+          meetingType: mType,
+          attendeeIds: mType === "ONE_TO_ONE" ? mAttendeeIds : undefined,
+          requestId: linkedRequestId,
+        })
+        toast.success("Board meeting scheduled successfully!")
+      }
       setIsMeetingDialogOpen(false)
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to schedule meeting")
+      toast.error(err.response?.data?.message || "Failed to save meeting details")
     }
   }
 
   const handleApproveRequest = (req: MeetingRequest) => {
+    setEditingMeetingId(null)
     setMTitle(`Meeting: ${req.title}`)
     setMDesc(`Requested by board member. Reason: ${req.reason}`)
     setMDate(new Date(req.date).toISOString().slice(0, 16))
@@ -268,25 +300,36 @@ export default function AdminBoardMeetingsPage() {
                         </div>
                       )}
 
-                      {meeting.meetingLink ? (
-                        <Link
-                          href={meeting.meetingLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-2 w-full mt-4 py-2 bg-primary hover:bg-primary/95 text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-98"
-                        >
-                          <IconVideo className="h-4 w-4" />
-                          Join Live Consultation
-                        </Link>
-                      ) : (
+                      <div className="flex gap-2 mt-4">
+                        {meeting.meetingLink ? (
+                          <Link
+                            href={meeting.meetingLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex flex-1 items-center justify-center gap-2 py-2 bg-primary hover:bg-primary/95 text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-98"
+                          >
+                            <IconVideo className="h-4 w-4" />
+                            Join Live
+                          </Link>
+                        ) : (
+                          <Button
+                            disabled
+                            variant="secondary"
+                            className="flex-1 rounded-xl text-xs font-bold text-slate-400"
+                          >
+                            No Link
+                          </Button>
+                        )}
                         <Button
-                          disabled
-                          variant="secondary"
-                          className="w-full mt-4 rounded-xl text-xs font-bold text-slate-400"
+                          variant="outline"
+                          onClick={() => handleOpenRescheduleMeeting(meeting)}
+                          className="flex items-center gap-1.5 rounded-xl border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100"
+                          title="Reschedule meeting date and time"
                         >
-                          No Link Shared Yet
+                          <IconCalendarTime className="h-4 w-4 text-amber-600" />
+                          Reschedule
                         </Button>
-                      )}
+                      </div>
                     </CardContent>
                   </Card>
                 )
@@ -403,7 +446,11 @@ export default function AdminBoardMeetingsPage() {
         <DialogContent className="sm:max-w-[500px] rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-extrabold text-slate-800">
-              {linkedRequestId ? "Approve & Schedule Meeting" : "Schedule Board Meeting"}
+              {editingMeetingId
+                ? "Reschedule Board Meeting"
+                : linkedRequestId
+                ? "Approve & Schedule Meeting"
+                : "Schedule Board Meeting"}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleMeetingSubmit} className="space-y-4">
@@ -534,10 +581,16 @@ export default function AdminBoardMeetingsPage() {
               </Button>
               <Button
                 type="submit"
-                disabled={createMeetingMutation.isPending}
+                disabled={createMeetingMutation.isPending || updateMeetingMutation.isPending}
                 className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-sm"
               >
-                {createMeetingMutation.isPending ? "Scheduling..." : "Schedule Meeting"}
+                {editingMeetingId
+                  ? updateMeetingMutation.isPending
+                    ? "Rescheduling..."
+                    : "Save & Reschedule"
+                  : createMeetingMutation.isPending
+                  ? "Scheduling..."
+                  : "Schedule Meeting"}
               </Button>
             </DialogFooter>
           </form>

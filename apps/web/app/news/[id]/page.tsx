@@ -178,7 +178,7 @@ export default function NewsDetailsPage({ params }: { params: Promise<{ id: stri
               </div>
 
               {/* ── Featured Image ── */}
-              <div className="relative mb-8 aspect-[16/9] w-full overflow-hidden rounded-xl bg-slate-100 shadow-sm">
+              <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-xl bg-slate-100 shadow-sm">
                 <Image
                   src={news.featuredImage || "/assets/feature-news.jpeg"}
                   alt={news.featuredImageAlt || news.title}

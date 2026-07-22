@@ -1,9 +1,10 @@
 "use client"
 
-import React, { Suspense } from "react"
+import React, { Suspense, useState, useEffect } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { CheckCircle2, Award, ArrowRight } from "lucide-react"
+import { CheckCircle2, Award, ArrowRight, Download, ExternalLink, FileText, Copy, Check } from "lucide-react"
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from "@react-pdf/renderer"
 
 import Container from "@/components/shared/container"
 import { Button } from "@workspace/ui/components/button"
@@ -13,15 +14,217 @@ import {
   CardFooter,
   CardHeader,
 } from "@workspace/ui/components/card"
+import { api } from "@/lib/api-client"
+
+// PDF Styles
+const pdfStyles = StyleSheet.create({
+  page: {
+    padding: 40,
+    fontSize: 12,
+    fontFamily: "Helvetica",
+    backgroundColor: "#ffffff",
+  },
+  header: {
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+    paddingBottom: 15,
+  },
+  orgTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#9f1239",
+    marginBottom: 4,
+  },
+  receiptTitle: {
+    fontSize: 14,
+    color: "#374151",
+    fontWeight: "bold",
+  },
+  subtitle: {
+    fontSize: 10,
+    color: "#6b7280",
+    marginTop: 2,
+  },
+  section: {
+    marginVertical: 15,
+    padding: 15,
+    backgroundColor: "#f9fafb",
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#f3f4f6",
+  },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: "bold",
+    color: "#4b5563",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 12,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  lastRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+  },
+  label: {
+    color: "#6b7280",
+    fontSize: 11,
+  },
+  value: {
+    color: "#111827",
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+  txIdValue: {
+    color: "#111827",
+    fontSize: 10,
+    fontFamily: "Courier",
+    fontWeight: "bold",
+  },
+  linkValue: {
+    color: "#9f1239",
+    fontSize: 9,
+  },
+  footer: {
+    marginTop: 30,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+    textAlign: "center",
+  },
+  footerText: {
+    fontSize: 9,
+    color: "#9ca3af",
+  },
+})
+
+interface MembershipPDFProps {
+  packageName: string
+  billingCycle: string
+  price: string
+  date: string
+  txId: string
+  receiptUrl?: string | null
+}
+
+function MembershipReceiptPDF({ packageName, billingCycle, price, date, txId, receiptUrl }: MembershipPDFProps) {
+  return (
+    <Document title={`Membership-Receipt-${txId}.pdf`}>
+      <Page size="A4" style={pdfStyles.page}>
+        <View style={pdfStyles.header}>
+          <Text style={pdfStyles.orgTitle}>FCH Catechesis</Text>
+          <Text style={pdfStyles.receiptTitle}>Official Membership Subscription Receipt</Text>
+          <Text style={pdfStyles.subtitle}>Faith, Formation, and Community Leadership</Text>
+        </View>
+
+        <View style={pdfStyles.section}>
+          <Text style={pdfStyles.sectionTitle}>Subscription Summary</Text>
+
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Membership Package</Text>
+            <Text style={pdfStyles.value}>{packageName}</Text>
+          </View>
+
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Billing Cycle</Text>
+            <Text style={pdfStyles.value}>{billingCycle}</Text>
+          </View>
+
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Price Paid</Text>
+            <Text style={pdfStyles.value}>${price}</Text>
+          </View>
+
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Activation Date</Text>
+            <Text style={pdfStyles.value}>{date}</Text>
+          </View>
+
+          <View style={pdfStyles.row}>
+            <Text style={pdfStyles.label}>Transaction ID</Text>
+            <Text style={pdfStyles.txIdValue}>{txId}</Text>
+          </View>
+
+          {receiptUrl ? (
+            <View style={pdfStyles.lastRow}>
+              <Text style={pdfStyles.label}>Official Stripe Receipt URL</Text>
+              <Text style={pdfStyles.linkValue}>{receiptUrl}</Text>
+            </View>
+          ) : null}
+        </View>
+
+        <View style={pdfStyles.footer}>
+          <Text style={pdfStyles.footerText}>
+            Thank you for subscribing. Your membership empowers our active faith community.
+          </Text>
+          <Text style={pdfStyles.footerText}>
+            Federación para la Catequesis Hispana (FCH) • www.fchcatechesis.org
+          </Text>
+        </View>
+      </Page>
+    </Document>
+  )
+}
 
 function MembershipReceipt() {
   const searchParams = useSearchParams()
   const packageName = searchParams.get("packageName") || "Membership Package"
   const price = searchParams.get("price") || "0.00"
   const billingCycle = searchParams.get("billingCycle") || "MONTHLY"
-  
+  const sessionId = searchParams.get("session_id")
+
+  const [fetchedReceiptUrl, setFetchedReceiptUrl] = useState<string | null>(null)
+  const [fetchedTxId, setFetchedTxId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (sessionId) {
+      api
+        .get(`/payment/session-receipt?sessionId=${encodeURIComponent(sessionId)}`)
+        .then((res) => {
+          if (res.data?.receiptUrl) {
+            setFetchedReceiptUrl(res.data.receiptUrl)
+          }
+          if (res.data?.transactionId) {
+            setFetchedTxId(res.data.transactionId)
+          }
+        })
+        .catch(() => {})
+    }
+  }, [sessionId])
+
+  const rawTxId =
+    sessionId ||
+    searchParams.get("txId") ||
+    searchParams.get("transaction_id") ||
+    searchParams.get("payment_intent") ||
+    "TXN-MEMBER-" + Math.random().toString(36).substring(2, 8).toUpperCase()
+
+  const txId = fetchedTxId || rawTxId
+  const receiptUrl = searchParams.get("receipt_url") || searchParams.get("receipt") || fetchedReceiptUrl
+
+  const [copied, setCopied] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  const handleCopyTxId = () => {
+    navigator.clipboard.writeText(txId)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   const portalUrl = process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
-  
+
   const date = new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -29,7 +232,7 @@ function MembershipReceipt() {
   })
 
   return (
-    <Card className="mx-auto w-md overflow-hidden rounded-2xl border-gray-200 bg-white pt-0 shadow-xl md:w-xl lg:w-2xl">
+    <Card className="mx-auto w-full max-w-2xl overflow-hidden rounded-2xl border-gray-200 bg-white pt-0 shadow-xl">
       <CardHeader className="bg-rose-50/50 p-8 pb-6 text-center">
         <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-600">
           <CheckCircle2 size={40} />
@@ -60,20 +263,98 @@ function MembershipReceipt() {
               <span className="text-gray-500">Price Paid</span>
               <span className="font-semibold text-gray-900">${price}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between border-b border-gray-200 pb-4">
               <span className="text-gray-500">Activation Date</span>
               <span className="font-semibold text-gray-900">{date}</span>
             </div>
+            <div className="flex items-center justify-between border-b border-gray-200 pb-4">
+              <span className="text-gray-500">Transaction ID</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-semibold text-gray-900 bg-white border border-gray-200 px-2 py-1 rounded">
+                  {txId}
+                </span>
+                <button
+                  onClick={handleCopyTxId}
+                  className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                  title="Copy Transaction ID"
+                >
+                  {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            {receiptUrl && (
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-gray-500">Stripe Official Receipt</span>
+                <a
+                  href={receiptUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-rose-800 hover:underline"
+                >
+                  View Official Receipt <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
 
       <CardFooter className="flex flex-col gap-3 p-8">
+        {receiptUrl && (
+          <a href={receiptUrl} target="_blank" rel="noopener noreferrer" className="w-full">
+            <Button
+              variant="outline"
+              className="h-12 w-full border-gray-200 text-gray-700 hover:cursor-pointer hover:bg-gray-50"
+            >
+              <FileText className="mr-2 h-4 w-4 text-rose-800" /> View Official Stripe Receipt
+            </Button>
+          </a>
+        )}
+
+        {isClient ? (
+          <PDFDownloadLink
+            document={
+              <MembershipReceiptPDF
+                packageName={packageName}
+                billingCycle={billingCycle}
+                price={price}
+                date={date}
+                txId={txId}
+                receiptUrl={receiptUrl}
+              />
+            }
+            fileName={`Membership-Receipt-${txId}.pdf`}
+            className="w-full"
+          >
+            {({ loading }) => (
+              <Button
+                variant="outline"
+                disabled={loading}
+                className="h-12 w-full border-gray-200 text-gray-700 hover:cursor-pointer hover:bg-gray-50"
+              >
+                <Download className="mr-2 h-4 w-4 text-rose-800" />
+                {loading ? "Generating PDF Receipt..." : "Download Official PDF Receipt"}
+              </Button>
+            )}
+          </PDFDownloadLink>
+        ) : (
+          <Button
+            variant="outline"
+            disabled
+            className="h-12 w-full border-gray-200 text-gray-700"
+          >
+            <Download className="mr-2 h-4 w-4 text-rose-800" />
+            Preparing PDF Receipt...
+          </Button>
+        )}
+
         <a href={portalUrl} className="w-full">
           <Button className="h-12 w-full bg-rose-800 font-semibold hover:cursor-pointer hover:bg-rose-900">
             Go to Portal <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </a>
+
         <Link href="/" className="w-full">
           <Button variant="outline" className="h-12 w-full border-gray-200 text-gray-700 hover:cursor-pointer hover:bg-gray-50">
             Return to Home

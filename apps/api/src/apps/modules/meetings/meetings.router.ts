@@ -167,4 +167,35 @@ export const meetingsRouter = router({
     .mutation(async ({ input }) => {
       return MeetingsController.updateRequestStatus(input.id, input.status)
     }),
+
+  updateMeeting: adminProcedure
+    .meta({
+      openapi: {
+        method: "PATCH",
+        path: "/meetings/{id}",
+        tags: ["meetings"],
+        summary: "Update or reschedule board meeting",
+        description: "Reschedules or updates an existing board meeting (Super Admin/Admin only)",
+      },
+    })
+    .input(
+      z.object({
+        id: z.string(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        date: z.string().optional().transform((str) => (str ? new Date(str) : undefined)),
+        duration: z.number().int().min(1, "Duration must be at least 1 minute").optional(),
+        meetingLink: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+        meetingType: z.enum(["ONE_TO_ONE", "ONE_TO_MANY"]).optional(),
+        attendeeIds: z.array(z.string()).optional(),
+      })
+    )
+    .output(z.any())
+    .mutation(async ({ input }) => {
+      const { meetingLink, ...rest } = input
+      return MeetingsController.updateMeeting({
+        ...rest,
+        meetingLink: meetingLink || undefined,
+      })
+    }),
 })

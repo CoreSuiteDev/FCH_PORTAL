@@ -201,4 +201,49 @@ export class MeetingsService {
       data: { status },
     })
   }
+
+  /**
+   * Update/Reschedule a board meeting
+   */
+  static async updateMeeting(data: {
+    id: string
+    title?: string
+    description?: string
+    date?: Date
+    duration?: number
+    meetingLink?: string
+    meetingType?: MeetingType
+    attendeeIds?: string[]
+  }) {
+    return prisma.$transaction(async (tx) => {
+      const updateData: any = {}
+      if (data.title !== undefined) updateData.title = data.title
+      if (data.description !== undefined) updateData.description = data.description
+      if (data.date !== undefined) updateData.date = data.date
+      if (data.duration !== undefined) updateData.duration = data.duration
+      if (data.meetingLink !== undefined) updateData.meetingLink = data.meetingLink
+      if (data.meetingType !== undefined) updateData.meetingType = data.meetingType
+
+      const updated = await tx.boardMeeting.update({
+        where: { id: data.id },
+        data: updateData,
+      })
+
+      if (data.attendeeIds !== undefined) {
+        await tx.boardMeetingAttendee.deleteMany({
+          where: { meetingId: data.id },
+        })
+        if (data.attendeeIds.length > 0) {
+          await tx.boardMeetingAttendee.createMany({
+            data: data.attendeeIds.map((userId) => ({
+              meetingId: data.id,
+              userId,
+            })),
+          })
+        }
+      }
+
+      return updated
+    })
+  }
 }

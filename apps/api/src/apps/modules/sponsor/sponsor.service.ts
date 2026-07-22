@@ -79,7 +79,7 @@ export class SponsorShipService {
           },
         ],
         success_url: `${config.frontendUrl}/sponsor/success?tier=${encodeURIComponent(plan.name)}&amount=${amount}&currency=${currency}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${config.frontendUrl}/sponsor/cancel`,
+        cancel_url: `${config.frontendUrl}/sponsor/cancel?sponsorship_id=${sponsorship.id}&session_id={CHECKOUT_SESSION_ID}`,
         invoice_creation: { enabled: true },
         metadata: {
           type: "sponsorship",
@@ -449,4 +449,24 @@ export class SponsorShipService {
     }
   }
 
+  static async cancelSponsorship(input: { sponsorshipId?: string; sessionId?: string }) {
+    const { sponsorshipId, sessionId } = input
+    if (!sponsorshipId && !sessionId) return { success: false }
+
+    const where: any = {}
+    if (sponsorshipId) where.id = sponsorshipId
+    else if (sessionId) where.paymentIntentId = sessionId
+
+    const sponsorship = await prisma.sponsorship.findFirst({ where })
+    if (!sponsorship) return { success: false }
+
+    if (sponsorship.status === "PENDING") {
+      await prisma.sponsorship.update({
+        where: { id: sponsorship.id },
+        data: { status: "CANCELED" },
+      })
+    }
+
+    return { success: true, sponsorshipId: sponsorship.id }
+  }
 }

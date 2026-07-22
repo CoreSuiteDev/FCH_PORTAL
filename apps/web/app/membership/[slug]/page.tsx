@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   Loader2,
   CheckCircle2,
+  Check,
 } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
@@ -190,20 +191,44 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
                 <CardTitle className="text-3xl font-extrabold text-[#2C2927]">
                   {activePackage?.name}
                 </CardTitle>
-                <CardDescription className="text-xs text-muted-foreground">
-                  {activePackage?.subTitle || "Exclusive package tier access"}
-                </CardDescription>
+                {activePackage?.subTitle && (
+                  <CardDescription className="mt-1.5 text-xs font-semibold text-primary">
+                    {activePackage.subTitle}
+                  </CardDescription>
+                )}
               </CardHeader>
-              <CardContent className="p-0 py-6">
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {activePackage?.description ||
-                    "Gain exclusive privilege benefits, resources access, event opportunities."}
-                </p>
-                <div className="mt-6">
+
+              <CardContent className="p-0 py-6 space-y-6">
+                {activePackage?.description && (
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {activePackage.description}
+                  </p>
+                )}
+
+                {/* API Package Features List */}
+                {Array.isArray(activePackage?.features) && activePackage.features.length > 0 && (
+                  <div className="space-y-3 border-t border-border/60 pt-4">
+                    <p className="text-xs font-bold uppercase tracking-wider text-[#2C2927]">
+                      {t("includedFeatures")}
+                    </p>
+                    <ul className="space-y-2.5">
+                      {(activePackage.features as string[]).map((feature: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-2.5 text-xs font-medium text-muted-foreground">
+                          <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                            <Check size={12} strokeWidth={3} />
+                          </span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="border-t border-border/60 pt-4">
                   <span className="text-4xl font-extrabold text-primary">
                     ${basePrice}
                   </span>
-                  <span className="text-xs text-muted-foreground font-medium">
+                  <span className="ml-1 text-xs font-medium text-muted-foreground">
                     /{pkgCycleFormatted}
                   </span>
                 </div>
@@ -225,7 +250,7 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
                 <form onSubmit={handlePaymentSubmit} className="space-y-4">
                   <div className="space-y-1.5">
                     <Label className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                      {t("cardholder")}
+                      {t("userName")}
                     </Label>
                     <Input
                       required
@@ -233,7 +258,7 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
                       disabled={isProcessing}
                       value={cardholderName}
                       onChange={(e) => setCardholderName(e.target.value)}
-                      placeholder="John Doe"
+                      placeholder={user?.name || "Your Name"}
                       className="h-10 bg-background/50 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring/20"
                     />
                   </div>
