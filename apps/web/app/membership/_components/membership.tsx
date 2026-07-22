@@ -110,15 +110,15 @@ export default function MembershipPackages() {
     let features = Array.isArray(pkg.features) ? (pkg.features as string[]) : []
 
     try {
-      title = t(`items.${baseSlug}.title`)
-      description = t(`items.${baseSlug}.description`)
-      features = t.raw(`items.${baseSlug}.features`) as string[]
-    } catch (e: unknown) {
-      throw new Error(
-        e instanceof Error
-          ? e.message
-          : "Failed to load membership packages. Please try again later."
-      )
+      const translatedTitle = t(`items.${baseSlug}.title`)
+      const translatedDescription = t(`items.${baseSlug}.description`)
+      const translatedFeatures = t.raw(`items.${baseSlug}.features`)
+
+      if (translatedTitle) title = translatedTitle
+      if (translatedDescription) description = translatedDescription
+      if (Array.isArray(translatedFeatures)) features = translatedFeatures as string[]
+    } catch {
+      // Translation not found — fall back to DB data (already set above)
     }
 
     return {
