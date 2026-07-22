@@ -234,6 +234,12 @@
       "title": "Miembros de la Junta Directiva",
       "members": [
         {
+          "name": "Fr. Yojaneider Garcia",
+          "role": "Director y Miembro de la Junta - Capellán",
+          "bio": "El Padre Yojaneider García se desempeña como Director de la Oficina de Catequesis y Formación en la Fe de la Diócesis de Paterson y como Párroco de la Parroquia de la Resurrección en Randolph, Nueva Jersey.\n\nTiene maestrías en Sagrada Escritura y Catequesis y actualmente está completando una Maestría en Liderazgo Ministerial en Boston College a través del proyecto Nuevo Momento. También estudió Contabilidad y Administración de Empresas.\n\nEl P. Yojan se desempeñó anteriormente en el Instituto Catequético de la Universidad Franciscana de Steubenville, Ohio. Representó a la universidad en el Congreso Internacional de Catequesis de 2021 en Chile, coordinado por la Universidad Finis Terrae. Su proyecto, Formando Líderes para la Iglesia, fue reconocido como una práctica catequética destacada para la formación de líderes de ministerio.\n\nDentro de la Diócesis de Paterson, el P. Yojan se ha desempeñado como administrador temporal de la Parroquia San Jaime de la Marca en Totowa y como vicario parroquial en la Parroquia San Pedro Apóstol en Parsippany. Durante sus cinco años en San Pedro, fundó Discípulos Misioneros, una comunidad de formación en la fe para adultos. También ha enseñado español en All Saints Academy y se desempeñó como capellán del Ministerio Hispano diocesano.\n\nAntes de venir a los Estados Unidos, el P. Yojan se desempeñó como instructor del seminario y secretario del Seminario Interno de la Congregación de la Misión, Padres Vicentinos, en Colombia. A lo largo de su formación seminaria, participó en diversas iniciativas dedicadas a preparar líderes para el servicio en la Iglesia.\n\nOrdenado sacerdote en 2014 para la Diócesis de Paterson, el P. Yojan aporta un corazón profundamente catequético a cada aspecto de su ministerio.\n\nSu Visión Catequética\n\n“La catequesis es una misión sagrada y fundamental de la Iglesia. Tengo una profunda admiración por los catequistas. Son apóstoles de primera línea que ayudan a otros a encontrar a Jesús y a vivir en comunión con él. A través de su ministerio, participan en el mandato de Cristo: ‘Id, pues, y haced discípulos a todas las naciones’ (Mateo 28:19). Los catequistas son discípulos que hacen discípulos. Quiero contribuir a la renovación de la catequesis y a la nueva primavera de la Iglesia, una renovación nacida del encuentro con Jesús y nutrida por una formación integral en la fe. Al formar y capacitar a los líderes y ayudarlos a comprender la belleza de su vocación, fortalecemos tanto el presente como el futuro de la Iglesia.”",
+          "image": "/assets/Fr Yojan.jpg"
+        },
+        {
           "name": "Erin Mone",
           "role": "Miembro de la Junta - Secretaria",
           "bio": "",
@@ -250,12 +256,6 @@
           "role": "Miembro de la Junta - Formación",
           "bio": "",
           "image": "/assets/Miguel Vences (1).jpg"
-        },
-        {
-          "name": "Yojan Garcia",
-          "role": "Miembro de la Junta - Capellán",
-          "bio": "",
-          "image": "/assets/Fr Yojan.jpg"
         },
         {
           "name": "Marilyn Santos",

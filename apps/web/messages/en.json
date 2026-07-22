@@ -235,6 +235,12 @@
       "title": "Board Members",
       "members": [
         {
+          "name": "Fr. Yojaneider Garcia",
+          "role": "Director & Chaplain Board Member",
+          "bio": "Fr. Yojaneider Garcia serves as Director of the Office of Catechesis and Faith Formation for the Diocese of Paterson and as Pastor of Resurrection Parish in Randolph, New Jersey.\n\nHe holds master’s degrees in Sacred Scripture and Catechesis and is currently completing a Master of Arts in Ministerial Leadership at Boston College through the Nuevo Momento project. He also studied Accounting and Business Administration.\n\nFr. Yojan previously served at the Catechetical Institute of Franciscan University of Steubenville, Ohio. He represented the university at the 2021 International Congress of Catechesis in Chile, coordinated by Finis Terrae University. His project, Forming Leaders for the Church, was recognized as a leading catechetical practice for the formation of ministry leaders.\n\nWithin the Diocese of Paterson, Fr. Yojan has served as temporary administrator of St. James of the Marches Parish in Totowa and as parochial vicar at St. Peter the Apostle Parish in Parsippany. During his five years at St. Peter’s, he founded Missionary Disciples, an adult faith formation community. He has also taught Spanish at All Saints Academy and served as chaplain for the diocesan Hispanic Ministry.\n\nBefore coming to the United States, Fr. Yojan served as a seminary instructor and secretary of the Internal Seminary of the Congregation of the Mission, Vincentian Fathers, in Colombia. Throughout his seminary formation, he participated in several initiatives dedicated to preparing leaders for service in the Church.\n\nOrdained a priest in 2014 for the Diocese of Paterson, Fr. Yojan brings a deeply catechetical heart to every aspect of his ministry.\n\nHis Catechetical Vision\n\n“Catechesis is a sacred and fundamental mission of the Church. I have a profound admiration for catechists. They are front-line apostles who help others encounter Jesus and live in communion with him. Through their ministry, they participate in Christ’s command: ‘Go, therefore, and make disciples of all nations’ (Matthew 28:19). Catechists are disciples who make disciples. I want to contribute to the renewal of catechesis and to the new springtime of the Church, a renewal born from an encounter with Jesus and nourished by integral faith formation. By forming and empowering leaders and helping them understand the beauty of their vocation, we strengthen both the present and the future of the Church.”",
+          "image": "/assets/Fr Yojan.jpg"
+        },
+        {
           "name": "Erin Mone",
           "role": "Secretary Board Member",
           "bio": "",
@@ -251,12 +257,6 @@
           "role": "Formation Board Member",
           "bio": "",
           "image": "/assets/Miguel Vences (1).jpg"
-        },
-        {
-          "name": "Yojan Garcia",
-          "role": "Chaplain Board Member",
-          "bio": "",
-          "image": "/assets/Fr Yojan.jpg"
         },
         {
           "name": "Marilyn Santos",
