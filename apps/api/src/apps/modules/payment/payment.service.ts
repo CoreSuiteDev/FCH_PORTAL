@@ -264,9 +264,96 @@ export class PaymentService {
             `[Webhook Service] Processing donation database transaction. Donation ID: ${donationId}`
           )
 
-          await prisma.$transaction([
-            prisma.donation.update({
-              where: { id: donationId },
+          const existingDonation = await prisma.donation.findUnique({
+            where: { id: donationId },
+          })
+
+          if (existingDonation) {
+            await prisma.$transaction([
+              prisma.donation.update({
+                where: { id: donationId },
+                data: {
+                  status: "SUCCEEDED",
+                  paymentIntentId,
+                  stripeChargeId,
+                  paymentTransactionId: stripeChargeId,
+                  receiptUrl,
+                  cardBrand,
+                  cardLast4,
+                  invoiceUrl,
+                },
+              }),
+              prisma.donator.update({
+                where: { id: donatorId },
+                data: {
+                  stripeCustomerId,
+                  totalDonationAmount: { increment: amount },
+                  totalDonationCount: { increment: 1 },
+                },
+              }),
+            ])
+            console.log(
+              `[Webhook] Donation successfully recorded for: ${donationId}`
+            )
+          } else {
+            console.warn(
+              `[Webhook Warning] Donation record ${donationId} not found in database (possibly created in another environment or deleted). Creating fallback record...`
+            )
+            let donator = await prisma.donator.findUnique({ where: { id: donatorId } })
+            if (!donator) {
+              donator = await prisma.donator.create({
+                data: {
+                  id: donatorId,
+                  name: "Donor",
+                  stripeCustomerId,
+                  totalDonationAmount: amount,
+                  totalDonationCount: 1,
+                },
+              }).catch(() => null)
+            } else {
+              await prisma.donator.update({
+                where: { id: donatorId },
+                data: {
+                  stripeCustomerId,
+                  totalDonationAmount: { increment: amount },
+                  totalDonationCount: { increment: 1 },
+                },
+              }).catch(() => {})
+            }
+
+            await prisma.donation.create({
+              data: {
+                id: donationId,
+                amount,
+                currency: (metadata.currency as "USD" | "EUR") || "USD",
+                status: "SUCCEEDED",
+                donatorId: donator ? donator.id : donatorId,
+                userId: metadata.userId && metadata.userId !== "Guest" ? metadata.userId : null,
+                paymentIntentId,
+                stripeChargeId,
+                paymentTransactionId: stripeChargeId,
+                receiptUrl,
+                cardBrand,
+                cardLast4,
+                invoiceUrl,
+              },
+            }).catch((err) => {
+              console.error(`[Webhook Error] Failed to create fallback donation: ${err.message}`)
+            })
+          }
+        } else if (type === "sponsorship" && metadata.sponsorshipId) {
+          const sponsorshipId = metadata.sponsorshipId
+          console.log(
+            `[Webhook Service] Processing sponsorship database update. Sponsorship ID: ${sponsorshipId}`
+          )
+
+          const existingSponsorship = await prisma.sponsorship.findUnique({
+            where: { id: sponsorshipId },
+          })
+
+          if (existingSponsorship) {
+            await prisma.sponsorship.update({
+              where: { id: sponsorshipId },
               data: {
                 status: "SUCCEEDED",
                 paymentIntentId,
@@ -276,43 +363,42 @@ export class PaymentService {
                 cardBrand,
                 cardLast4,
                 invoiceUrl,
-              },
-            }),
-            prisma.donator.update({
-              where: { id: donatorId },
-              data: {
                 stripeCustomerId,
-                totalDonationAmount: { increment: amount },
-                totalDonationCount: { increment: 1 },
               },
-            }),
-          ])
-          console.log(
-            `[Webhook] Donation successfully recorded for: ${donationId}`
-          )
-        } else if (type === "sponsorship" && metadata.sponsorshipId) {
-          const sponsorshipId = metadata.sponsorshipId
-          console.log(
-            `[Webhook Service] Processing sponsorship database update. Sponsorship ID: ${sponsorshipId}`
-          )
-
-          await prisma.sponsorship.update({
-            where: { id: sponsorshipId },
-            data: {
-              status: "SUCCEEDED",
-              paymentIntentId,
-              stripeChargeId,
-              paymentTransactionId: stripeChargeId,
-              receiptUrl,
-              cardBrand,
-              cardLast4,
-              invoiceUrl,
-              stripeCustomerId,
-            },
-          })
-          console.log(
-            `[Webhook] Sponsorship successfully recorded for: ${sponsorshipId}`
-          )
+            })
+            console.log(
+              `[Webhook] Sponsorship successfully recorded for: ${sponsorshipId}`
+            )
+          } else {
+            console.warn(
+              `[Webhook Warning] Sponsorship record ${sponsorshipId} not found in database. Creating fallback record...`
+            )
+            const planId = metadata.planId
+            const sponsorId = metadata.sponsorId
+            if (planId && sponsorId) {
+              await prisma.sponsorship.create({
+                data: {
+                  id: sponsorshipId,
+                  planId,
+                  sponsorId,
+                  userId: metadata.userId && metadata.userId !== "Guest" ? metadata.userId : null,
+                  amount: metadata.amount ? new Prisma.Decimal(metadata.amount) : new Prisma.Decimal(0),
+                  currency: (metadata.currency as "USD" | "EUR") || "USD",
+                  status: "SUCCEEDED",
+                  paymentIntentId,
+                  stripeChargeId,
+                  paymentTransactionId: stripeChargeId,
+                  receiptUrl,
+                  cardBrand,
+                  cardLast4,
+                  invoiceUrl,
+                  stripeCustomerId,
+                },
+              }).catch((err) => {
+                console.error(`[Webhook Error] Failed to create fallback sponsorship: ${err.message}`)
+              })
+            }
+          }
         } else if (
           type === "payment" &&
           metadata.paymentId &&
