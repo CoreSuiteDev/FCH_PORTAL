@@ -46,14 +46,21 @@ export function UpcomingEvents() {
               whileHover={{ y: -5 }}
               className="group"
             >
+<<<<<<< HEAD
               <Card className="h-full overflow-hidden border border-primary bg-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 hover:shadow-[0_20px_50px_rgba(139,26,26,0.15)]">
                 {/* Flex layout that switches from column to row at 'sm' breakpoint */}
                 <CardContent className="flex h-full flex-col gap-6 p-5 sm:flex-row sm:p-6">
                   <div className="relative h-48 w-full flex-shrink-0 overflow-hidden rounded-lg sm:h-auto sm:w-48">
+=======
+              <Card className="overflow-hidden border border-primary bg-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 hover:shadow-[0_20px_50px_rgba(139,26,26,0.15)]">
+                <CardContent className="flex flex-col items-center gap-8 p-6 sm:flex-row">
+                  <div className="relative h-56 w-full shrink-0 overflow-hidden rounded-xl sm:w-56">
+>>>>>>> 1dd054157d31c1e8a1cbb43b0ff6207a77534ee4
                     <Image
                       src={event.image || `/assets/event-1.jpg`}
                       alt={event.title}
                       fill
+                      sizes="(max-width: 640px) 100vw, 224px"
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>

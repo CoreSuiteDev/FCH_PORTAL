@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-export type PackageTier = "general" | "pastoral"
+export type PackageTier = string
 
 export interface PackageMetadata {
   id: PackageTier

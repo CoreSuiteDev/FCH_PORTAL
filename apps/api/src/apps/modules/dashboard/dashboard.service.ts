@@ -13,7 +13,7 @@ export class DashboardService {
     })
 
     // Count pending memberships
-    const pendingMembers = await prisma.membership.count({
+    const pendingMembers = await prisma.subscription.count({
       where: {
         status: "PENDING",
       },
@@ -25,7 +25,7 @@ export class DashboardService {
 
     const revenueAggregate = await prisma.payment.aggregate({
       where: {
-        status: "PAID",
+        status: "SUCCEEDED",
         createdAt: {
           gte: thirtyDaysAgo,
         },
@@ -35,16 +35,16 @@ export class DashboardService {
       },
     })
 
-    const monthlyRevenue = revenueAggregate._sum.amount ? Number(revenueAggregate._sum.amount) : 0
+    const monthlyRevenue = revenueAggregate._sum?.amount ? Number(revenueAggregate._sum.amount) : 0
 
     // Calculate renewals rate as percentage of active memberships out of active + expired
-    const activeMemberships = await prisma.membership.count({
+    const activeMemberships = await prisma.subscription.count({
       where: {
         status: "ACTIVE",
       },
     })
 
-    const expiredMemberships = await prisma.membership.count({
+    const expiredMemberships = await prisma.subscription.count({
       where: {
         status: "EXPIRED",
       },

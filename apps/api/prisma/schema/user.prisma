@@ -11,11 +11,11 @@ model User {
 
   status UserStatus @default(ACTIVE)
 
+  passwordChangeRequired Boolean @default(false)
+
   sessions Session[]
   accounts Account[]
 
-  memberships   Membership[]
-  payments      Payment[]
   subscriptions Subscription[]
 
   userRoles UserRole[]
@@ -28,7 +28,18 @@ model User {
 
   donations Donation[]
 
-  sponsorShips SponsorShip[]
+  sponsorShips Sponsorship[]
+
+  cancellationRequests CancellationRequest[]
+
+  newsCreated   News[] @relation("NewsCreatedBy")
+  newsUpdated   News[] @relation("NewsUpdatedBy")
+  newsPublished News[] @relation("NewsPublishedBy")
+
+  supportTickets SupportTicket[]
+
+  boardMeetings   BoardMeetingAttendee[]
+  meetingRequests MeetingRequest[]
 
   @@unique([email])
   @@index([status])
@@ -91,53 +102,6 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
-}
-
-model Membership {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  type   MembershipType
-  status MembershipStatus
-
-  startsAt  DateTime
-  expiresAt DateTime
-
-  payments Payment[]
-
-  @@index([userId])
-  @@index([type])
-  @@index([status])
-}
-
-model Payment {
-  id String @id @default(cuid())
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  membershipId String?
-  membership   Membership? @relation(fields: [membershipId], references: [id], onDelete: SetNull)
-
-  stripeCustomerId      String?
-  stripePaymentIntentId String? @unique
-  stripeSubscriptionId  String?
-
-  amount   Decimal  @db.Decimal(10, 2)
-  currency Currency @default(USD)
-
-  status PaymentStatus
-
-  @@index([userId])
-  @@index([membershipId])
-  @@index([status])
 }
 
 model Role {

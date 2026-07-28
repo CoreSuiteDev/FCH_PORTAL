@@ -47,7 +47,8 @@ export const DeleteConfirmDialog = ({
         <DialogHeader>
           <DialogTitle>Delete Plan?</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this sponsor plan? This action cannot be undone.
+            Are you sure you want to delete this sponsor plan? This action
+            cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4">
@@ -64,7 +65,9 @@ export const DeleteConfirmDialog = ({
             disabled={deleteMutation.isPending}
             className="hover:cursor-pointer"
           >
-            {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {deleteMutation.isPending && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
             Delete
           </Button>
         </DialogFooter>

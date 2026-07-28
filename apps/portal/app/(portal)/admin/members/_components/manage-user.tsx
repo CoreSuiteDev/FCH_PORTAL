@@ -1,42 +1,24 @@
 "use client"
 
-import React, { useMemo } from "react"
 import {
-  Search,
-  Filter,
-  ShieldAlert,
-  SlidersHorizontal,
-  Mail,
-  Shield,
-  Trash2,
-  Activity,
-} from "lucide-react"
-import {
-  useReactTable,
+  ColumnDef,
+  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  flexRender,
-  ColumnDef,
+  useReactTable,
 } from "@tanstack/react-table"
+import {
+  Activity,
+  Filter,
+  Mail,
+  Search,
+  Shield,
+  ShieldAlert,
+  SlidersHorizontal,
+  Trash2,
+} from "lucide-react"
+import React, { useMemo } from "react"
 
-import { Button } from "@workspace/ui/components/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card"
-import { Badge } from "@workspace/ui/components/badge"
-import { Input } from "@workspace/ui/components/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@workspace/ui/components/table"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,6 +29,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@workspace/ui/components/alert-dialog"
+import { Badge } from "@workspace/ui/components/badge"
+import { Button } from "@workspace/ui/components/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card"
+import { Input } from "@workspace/ui/components/input"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@workspace/ui/components/table"
 
 import { UserMember } from "@/constants/manage-users-data"
 import { useManageUserStore } from "@/store/use-manage-user-store"

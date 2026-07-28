@@ -11,6 +11,7 @@ export async function proxy(request: NextRequest) {
     "/forgot-password",
     "/reset-password",
     "/verify-otp",
+    "/sp-admin",
   ].some((path) => pathname.startsWith(path))
 
   if (isAuthPage) {
@@ -35,9 +36,19 @@ export async function proxy(request: NextRequest) {
         if (response.ok) {
           const data = await response.json()
           if (data && data.authenticated && data.user) {
-            const portalUrl =
-              process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
-            return NextResponse.redirect(new URL(portalUrl))
+            const PORTAL_ROLES = ["MEMBER", "PASTORAL", "BOARD", "SUPER_ADMIN"]
+            const userRoles: string[] = data.user.roles ?? []
+            const hasPortalAccess = userRoles.some((r) =>
+              PORTAL_ROLES.includes(r)
+            )
+
+            if (hasPortalAccess) {
+              const portalUrl =
+                process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
+              return NextResponse.redirect(new URL(portalUrl))
+            } else {
+              return NextResponse.redirect(new URL("/", request.url))
+            }
           }
         }
       } catch (error) {
@@ -56,5 +67,6 @@ export const config = {
     "/forgot-password",
     "/reset-password",
     "/verify-otp",
+    "/sp-admin",
   ],
 }

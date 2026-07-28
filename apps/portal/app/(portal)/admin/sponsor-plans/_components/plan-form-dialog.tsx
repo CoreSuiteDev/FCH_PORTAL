@@ -13,6 +13,7 @@ import {
 import { ZTCSponsorPlanResponse } from "@workspace/types"
 
 import { Button } from "@workspace/ui/components/button"
+import { Switch } from "@workspace/ui/components/switch"
 import {
   Dialog,
   DialogContent,
@@ -34,12 +35,15 @@ import { toast } from "@workspace/ui/components/sonner"
 import { Textarea } from "@workspace/ui/components/textarea"
 
 const planFormSchema = z.object({
-  planName: z.string().min(1, "Plan Name is required"),
+  name: z.string().min(1, "Plan Name is required"),
   amount: z.number().positive("Amount must be positive"),
   currency: z.enum(["USD", "EUR"]),
   tier: z.enum(["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND"]),
   description: z.string().optional(),
   benefits: z.array(z.string()),
+  sortOrder: z.number().int().nonnegative("Sort order must be non-negative"),
+  isActive: z.boolean(),
+  isFeatured: z.boolean(),
 })
 
 type PlanFormValues = z.infer<typeof planFormSchema>
@@ -75,12 +79,15 @@ export const PlanFormDialog = ({
   } = useForm<PlanFormValues>({
     resolver: zodResolver(planFormSchema),
     defaultValues: {
-      planName: "",
+      name: "",
       amount: 0,
       currency: "USD",
       tier: "BRONZE",
       description: "",
       benefits: [],
+      sortOrder: 0,
+      isActive: true,
+      isFeatured: false,
     },
   })
 
@@ -94,7 +101,7 @@ export const PlanFormDialog = ({
           ? (editingPlan.benefits as string[])
           : []
         reset({
-          planName: editingPlan.planName,
+          name: editingPlan.name,
           amount: editingPlan.amount,
           currency: editingPlan.currency as "USD" | "EUR",
           tier: editingPlan.tier as
@@ -105,15 +112,21 @@ export const PlanFormDialog = ({
             | "DIAMOND",
           description: editingPlan.description || "",
           benefits: benefitsArray,
+          sortOrder: editingPlan.sortOrder ?? 0,
+          isActive: editingPlan.isActive ?? true,
+          isFeatured: editingPlan.isFeatured ?? false,
         })
       } else {
         reset({
-          planName: "",
+          name: "",
           amount: 0,
           currency: "USD",
           tier: "BRONZE",
           description: "",
           benefits: [],
+          sortOrder: 0,
+          isActive: true,
+          isFeatured: false,
         })
       }
       setBenefitInputValue("")
@@ -167,12 +180,15 @@ export const PlanFormDialog = ({
 
   const onSubmit = async (data: PlanFormValues) => {
     const payload = {
-      planName: data.planName,
+      name: data.name,
       amount: data.amount,
       currency: data.currency,
       tier: data.tier,
       description: data.description || undefined,
       benefits: data.benefits,
+      sortOrder: data.sortOrder,
+      isActive: data.isActive,
+      isFeatured: data.isFeatured,
     }
 
     try {
@@ -192,11 +208,12 @@ export const PlanFormDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-   
-      <DialogContent className="flex max-h-[90vh] flex-col min-w-md lg:min-w-xl p-0 sm:max-w-[600px]">
-        <form onSubmit={handleSubmit(onSubmit)} className="flex h-full flex-col overflow-hidden">
-          
-          <div className="px-6 pb-2 pt-6">
+      <DialogContent className="flex max-h-[90vh] min-w-md flex-col p-0 sm:max-w-[600px] lg:min-w-xl">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex h-full flex-col overflow-hidden"
+        >
+          <div className="px-6 pt-6 pb-2">
             <DialogHeader>
               <DialogTitle>
                 {editingPlan ? "Edit Sponsor Plan" : "Create Sponsor Plan"}
@@ -207,16 +224,15 @@ export const PlanFormDialog = ({
             </DialogHeader>
           </div>
 
-          {/* এই অংশটুকু স্ক্রল হবে */}
           <div className="flex-1 overflow-y-auto px-6 py-4">
             <div className="space-y-4">
-              <Field data-invalid={!!errors.planName}>
+              <Field data-invalid={!!errors.name}>
                 <FieldLabel>Plan Name</FieldLabel>
                 <Input
-                  {...register("planName")}
+                  {...register("name")}
                   placeholder="e.g. Bronze Sponsor"
                 />
-                {errors.planName && <FieldError errors={[errors.planName]} />}
+                {errors.name && <FieldError errors={[errors.name]} />}
               </Field>
 
               <div className="grid grid-cols-2 gap-4">
@@ -238,7 +254,10 @@ export const PlanFormDialog = ({
                     control={control}
                     name="currency"
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
@@ -287,6 +306,64 @@ export const PlanFormDialog = ({
                   <FieldError errors={[errors.description]} />
                 )}
               </Field>
+
+              <Field data-invalid={!!errors.sortOrder}>
+                <FieldLabel>Sort Order</FieldLabel>
+                <Input
+                  type="number"
+                  {...register("sortOrder", { valueAsNumber: true })}
+                  placeholder="0"
+                />
+                {errors.sortOrder && <FieldError errors={[errors.sortOrder]} />}
+              </Field>
+
+              <div className="flex items-center gap-6">
+                <Field
+                  orientation="horizontal"
+                  className="items-center space-y-0 space-x-2 py-0.5"
+                >
+                  <Controller
+                    control={control}
+                    name="isActive"
+                    render={({ field }) => (
+                      <Switch
+                        id="plan-isActive"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <FieldLabel
+                    htmlFor="plan-isActive"
+                    className="cursor-pointer text-sm font-medium"
+                  >
+                    Active
+                  </FieldLabel>
+                </Field>
+
+                <Field
+                  orientation="horizontal"
+                  className="items-center space-y-0 space-x-2 py-0.5"
+                >
+                  <Controller
+                    control={control}
+                    name="isFeatured"
+                    render={({ field }) => (
+                      <Switch
+                        id="plan-isFeatured"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <FieldLabel
+                    htmlFor="plan-isFeatured"
+                    className="cursor-pointer text-sm font-medium"
+                  >
+                    Featured Plan
+                  </FieldLabel>
+                </Field>
+              </div>
 
               {/* Draggable Badge Input Area */}
               <div className="space-y-3">

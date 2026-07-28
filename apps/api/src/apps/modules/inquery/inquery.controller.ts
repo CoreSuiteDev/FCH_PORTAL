@@ -8,7 +8,6 @@ export class InqueryController {
   static async createInquery(body: {
     name: string;
     email: string;
-    phone: string;
     message: string;
   }) {
     try {
@@ -66,7 +65,6 @@ export class InqueryController {
     data: {
       name?: string;
       email?: string;
-      phone?: string;
       message?: string;
     }
   ) {

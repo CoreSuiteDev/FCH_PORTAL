@@ -28,6 +28,7 @@ const mapEvent = (event: any) => ({
   location: event.location,
   coverImage: event.coverImage,
   maxCapacity: event.maxCapacity,
+  currentCount: event.currentCount,
   meetingLink: event.meetingLink,
   visibility: event.visibility,
   isActive: event.isActive,
@@ -61,10 +62,21 @@ const mapEvent = (event: any) => ({
         eventId: m.eventId,
       }))
     : [],
+  registrations: event.eventRegistrations
+    ? event.eventRegistrations.map((r: any) => ({
+        id: r.id,
+        createdAt: r.createdAt,
+        updatedAt: r.updatedAt,
+        eventId: r.eventId,
+        userId: r.userId,
+        status: r.status,
+        checkedIn: r.checkedIn,
+      }))
+    : [],
 })
 
 export const eventsRouter = router({
-  list: publicProcedure
+  list: protectedProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -74,19 +86,80 @@ export const eventsRouter = router({
         description: "Returns a paginated list of registered upcoming events based on user access levels",
       },
     })
-    .input(PaginationInputSchema.optional())
+    .input(
+      PaginationInputSchema.extend({
+        eventType: z.enum(["EVENT", "WEBINAR"]).optional(),
+      }).optional()
+    )
     .output(ZCIPaginatedEventsSchema)
     .query(async ({ input, ctx }) => {
       const page = input?.page ?? 1
       const limit = input?.limit ?? 10
+      const eventType = input?.eventType
       const { totalCount, data } = await EventsController.getEventsList({
         userRole: ctx.role,
         page,
         limit,
+        userId: ctx.user?.id,
+        eventType,
       })
       return {
         data: data.map(mapEvent),
         meta: getPaginationMeta(totalCount, page, limit),
+      }
+    }),
+
+  listPublic: publicProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/events/public",
+        tags: ["events"],
+        summary: "List public events",
+        description: "Returns a paginated list of public and free events/webinars only",
+      },
+    })
+    .input(
+      PaginationInputSchema.extend({
+        eventType: z.enum(["EVENT", "WEBINAR"]).optional(),
+      }).optional()
+    )
+    .output(ZCIPaginatedEventsSchema)
+    .query(async ({ input }) => {
+      const page = input?.page ?? 1
+      const limit = input?.limit ?? 10
+      const eventType = input?.eventType
+      const { totalCount, data } = await EventsController.getPublicEventsList({
+        page,
+        limit,
+        eventType,
+      })
+      return {
+        data: data.map(mapEvent),
+        meta: getPaginationMeta(totalCount, page, limit),
+      }
+    }),
+
+  dashboardStats: protectedProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/events/dashboard-stats",
+        tags: ["events"],
+        summary: "Get dashboard stats",
+        description: "Returns event and webinar statistics and a list of upcoming events",
+      },
+    })
+    .input(z.void())
+    .output(z.any())
+    .query(async ({ ctx }) => {
+      const stats = await EventsController.getDashboardStats({
+        userRole: ctx.role,
+        userId: ctx.user?.id,
+      })
+      return {
+        ...stats,
+        upcomingEvents: stats.upcomingEvents.map(mapEvent),
       }
     }),
 
@@ -103,11 +176,11 @@ export const eventsRouter = router({
     .input(z.object({ id: z.string() }))
     .output(ZCIEventSchema)
     .query(async ({ input, ctx }) => {
-      const event = await EventsController.getEventById(input.id, ctx.role)
+      const event = await EventsController.getEventById(input.id, ctx.role, ctx.user?.id)
       return mapEvent(event)
     }),
 
-  create: publicProcedure
+  create: adminProcedure
     .meta({
       openapi: {
         method: "POST",
@@ -142,7 +215,7 @@ export const eventsRouter = router({
     }),
 
 
-  update: publicProcedure
+  update: adminProcedure
     .meta({
       openapi: {
         method: "PATCH",
@@ -164,7 +237,7 @@ export const eventsRouter = router({
       return mapEvent(event)
     }),
 
-  delete: publicProcedure
+  delete: adminProcedure
     .meta({
       openapi: {
         method: "DELETE",
@@ -224,7 +297,7 @@ export const eventsRouter = router({
       return EventsController.getAllCategories()
     }),
 
-  createCategory: publicProcedure
+  createCategory: adminProcedure
     .meta({
       openapi: {
         method: "POST",
@@ -240,7 +313,7 @@ export const eventsRouter = router({
       return EventsController.createCategory(input)
     }),
 
-  updateCategory: publicProcedure
+  updateCategory: adminProcedure
     .meta({
       openapi: {
         method: "PATCH",
@@ -261,7 +334,7 @@ export const eventsRouter = router({
       return EventsController.updateCategory(id, data)
     }),
 
-  deleteCategory: publicProcedure
+  deleteCategory: adminProcedure
     .meta({
       openapi: {
         method: "DELETE",
@@ -277,7 +350,7 @@ export const eventsRouter = router({
       return EventsController.deleteCategory(input.id)
     }),
 
-  addMaterial: publicProcedure
+  addMaterial: adminProcedure
     .meta({
       openapi: {
         method: "POST",
@@ -298,7 +371,7 @@ export const eventsRouter = router({
       return EventsController.addMaterial(id, data)
     }),
 
-  listMaterials: publicProcedure
+  listMaterials: protectedProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -314,7 +387,7 @@ export const eventsRouter = router({
       return EventsController.getMaterials(input.id, ctx.role)
     }),
 
-  deleteMaterial: publicProcedure
+  deleteMaterial: adminProcedure
     .meta({
       openapi: {
         method: "DELETE",
@@ -333,6 +406,39 @@ export const eventsRouter = router({
     .output(z.object({ success: z.boolean() }))
     .mutation(async ({ input }) => {
       return EventsController.deleteMaterial(input.id, input.materialId)
+    }),
+
+  listRegistrations: adminProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/events/{id}/registrations",
+        tags: ["events"],
+        summary: "List all registrations for an event",
+        description: "Returns all registrations with user details for a specific event (Admin only)",
+      },
+    })
+    .input(z.object({ id: z.string() }))
+    .output(
+      z.array(
+        z.object({
+          id: z.string(),
+          eventId: z.string(),
+          userId: z.string(),
+          status: z.enum(["PENDING", "CONFIRMED", "CANCELLED"]),
+          checkedIn: z.boolean(),
+          registeredAt: z.coerce.date(),
+          user: z.object({
+            id: z.string(),
+            name: z.string().nullable(),
+            email: z.string().nullable(),
+            image: z.string().nullable(),
+          }),
+        })
+      )
+    )
+    .query(async ({ input }) => {
+      return EventsController.getEventRegistrations(input.id)
     }),
 
   getAnalytics: adminProcedure

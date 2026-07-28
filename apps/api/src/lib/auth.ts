@@ -16,6 +16,11 @@ export const auth = betterAuth({
         required: false,
         defaultValue: "ACTIVE",
       },
+      passwordChangeRequired: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+      },
     },
   },
   databaseHooks: {
@@ -23,7 +28,7 @@ export const auth = betterAuth({
       create: {
         after: async (user) => {
           try {
-            const defaultRoleName = "MEMBER"
+            const defaultRoleName = "USER"
             let role = await prisma.role.findUnique({
               where: { name: defaultRoleName },
             })
@@ -31,7 +36,7 @@ export const auth = betterAuth({
               role = await prisma.role.create({
                 data: {
                   name: defaultRoleName,
-                  description: "General Member Role",
+                  description: "General User Role",
                 },
               })
             }
@@ -42,7 +47,7 @@ export const auth = betterAuth({
                 roleId: role.id,
               },
             })
-            console.log(`[Auth Hook] Assigned default role 'MEMBER' to registered user: ${user.email}`)
+            console.log(`[Auth Hook] Assigned default role 'USER' to registered user: ${user.email}`)
           } catch (err) {
             console.error(`[Auth Hook] Error assigning default role to user: ${user.email}`, err)
           }

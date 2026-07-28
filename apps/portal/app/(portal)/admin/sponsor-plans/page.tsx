@@ -1,14 +1,14 @@
 "use client"
 
-import React, { useState } from "react"
 import { useSponsorPlans } from "@/hooks/useSponsorPlan"
-import { Button } from "@workspace/ui/components/button"
-import { Plus, Award } from "lucide-react"
 import { ZTCSponsorPlanResponse } from "@workspace/types"
+import { Button } from "@workspace/ui/components/button"
+import { Plus } from "lucide-react"
+import { useState } from "react"
 
-import { SponsorPlansTable } from "./_components/sponsor-plans-table"
-import { PlanFormDialog } from "./_components/plan-form-dialog"
 import { DeleteConfirmDialog } from "./_components/delete-confirm-dialog"
+import { PlanFormDialog } from "./_components/plan-form-dialog"
+import { SponsorPlansTable } from "./_components/sponsor-plans-table"
 
 export default function SponsorPlansPage() {
   const { data: plans = [], isLoading, isError } = useSponsorPlans()
@@ -16,7 +16,9 @@ export default function SponsorPlansPage() {
   // Modals & Context States
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [editingPlan, setEditingPlan] = useState<ZTCSponsorPlanResponse | null>(null)
+  const [editingPlan, setEditingPlan] = useState<ZTCSponsorPlanResponse | null>(
+    null
+  )
   const [planToDelete, setPlanToDelete] = useState<string | null>(null)
 
   const handleOpenCreate = () => {
@@ -47,21 +49,6 @@ export default function SponsorPlansPage() {
         <Button onClick={handleOpenCreate} className="hover:cursor-pointer">
           <Plus className="mr-2 h-4 w-4" /> Create Plan
         </Button>
-      </div>
-
-      {/* Plan Stats Overview */}
-      <div className="mb-8 grid gap-4 md:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="rounded-lg bg-indigo-50 p-3 text-indigo-600">
-              <Award className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-slate-500">Total Plans</p>
-              <h3 className="text-2xl font-bold text-slate-950">{plans.length}</h3>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Table Component */}

@@ -1,28 +1,27 @@
 model Committee {
-    id  String @id @default(cuid())
+  id String @id @default(cuid())
 
-    name String
-    
-    description String?
+  name String
 
-    members CommitteeMember[]
+  description String?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  members CommitteeMember[]
 
-    @@map("committees")
-    @@index([createdAt])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@map("committees")
 }
 
 model CommitteeMember {
-    id  String @id @default(cuid())
+  id String @id @default(cuid())
 
-    committee Committee @relation(fields:[committeeId], references:[id], onDelete: Cascade)
-    
-    committeeId String
-    
-    user User @relation(fields:[userId], references:[id], onDelete: Cascade)
-    
-    userId String
-    
-    }
+  committee Committee @relation(fields: [committeeId], references: [id], onDelete: Cascade)
+
+  committeeId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userId String
+}

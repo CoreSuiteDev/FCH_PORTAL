@@ -81,5 +81,101 @@ export class UserController {
       })
     }
   }
+
+  /**
+   * Controller for updating user roles
+   */
+  static async updateUserRole({
+    userId,
+    role,
+  }: {
+    userId: string
+    role: string
+  }) {
+    try {
+      return await UserService.updateUserRole(userId, role)
+    } catch (error: any) {
+      if (error instanceof TRPCError) throw error
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to update user role: ${error.message}`,
+      })
+    }
+  }
+
+  /**
+   * Controller for provisioning a new board member
+   */
+  static async createBoardMember(input: { name: string; email: string }) {
+    try {
+      const user = await UserService.createBoardMember(input)
+      if (!user) {
+        throw new Error("Board member user creation succeeded but lookup failed")
+      }
+      return user
+    } catch (error: any) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Failed to create board member: ${error.message}`,
+      })
+    }
+  }
+
+  /**
+   * Controller for filtering and listing users dynamically
+   */
+  static async filterUser(params: Parameters<typeof UserService.filterUser>[0]) {
+    return UserService.filterUser(params)
+  }
+
+  /**
+   * Controller for retrieving user matrix stats
+   */
+  static async getUserMatrix() {
+    try {
+      return await UserService.getUserMatrix()
+    } catch (error: any) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to fetch user metrics matrix: ${error.message}`,
+      })
+    }
+  }
+
+  /**
+   * Controller for retrieving detailed profile, activities, and transaction history of a single member
+   */
+  static async getMemberDetails({ userId }: { userId: string }) {
+    try {
+      const details = await UserService.getMemberDetails(userId)
+      if (!details) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `User member with ID '${userId}' not found`,
+        })
+      }
+      return details
+    } catch (error: any) {
+      if (error instanceof TRPCError) throw error
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to retrieve member details: ${error.message}`,
+      })
+    }
+  }
+
+  /**
+   * Controller for retrieving aggregated overview statistics for the admin dashboard
+   */
+  static async getAdminOverview() {
+    try {
+      return await UserService.getAdminOverview()
+    } catch (error: any) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to fetch admin overview statistics: ${error.message}`,
+      })
+    }
+  }
 }
 

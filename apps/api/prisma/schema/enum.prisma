@@ -21,10 +21,10 @@ enum MembershipStatus {
 enum PaymentStatus {
   PENDING
   SUCCEEDED
-  PAID
   FAILED
   REFUNDED
-  PARTIAL_REFUNDED
+  PARTIALLY_REFUNDED
+  CANCELED
 }
 
 enum Currency {
@@ -48,12 +48,14 @@ enum BillingCycle {
 }
 
 enum SubscriptionStatus {
-  ACTIVE
-  EXPIRED
-  CANCELLED
   PENDING
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  UNPAID
+  CANCELED
+  EXPIRED
 }
-
 
 enum EventVisibility {
   PUBLIC
@@ -76,12 +78,10 @@ enum RegistrationStatus {
   CANCELLED
 }
 
-
 enum EventType {
   EVENT
   WEBINAR
 }
-
 
 enum ResourceVisibility {
   MEMBER
@@ -91,3 +91,47 @@ enum ResourceVisibility {
   COMMITTEE
   SUPER_ADMIN
 }
+
+
+enum Tier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+enum PaymentMethod {
+  CARD
+  BANK_TRANSFER
+  CASH
+  OTHER
+}
+
+
+enum PublishStatus {
+  DRAFT
+  REVIEW
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum NewsType {
+  NEWS
+  BLOG
+  ANNOUNCEMENT
+}
+
+enum CancellationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TicketStatus {
+  PENDING
+  OPEN
+  RESOLVED
+  CLOSED
+}

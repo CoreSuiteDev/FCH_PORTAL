@@ -2,29 +2,142 @@ import { TRPCError } from "@trpc/server"
 import { EventsService } from "./events.service.js"
 import { EventPolicy } from "./event.policy.js"
 import { EventVisibility, EventType, EventStatus } from "../../../generated/prisma/client.js"
+import { prisma } from "../../../infrastructure/database/prisma.js"
 
 export class EventsController {
   /**
    * Controller for resolving events listing based on visibility permissions (paginated)
+   * @param params - Request parameters including user role, page, limit, and optional user ID
+   * @returns Object containing total event count and paginated event data
    */
   static async getEventsList(params: {
     userRole: string | undefined
     page: number
     limit: number
+    userId?: string
+    eventType?: EventType
   }) {
     const allowedVisibilities = EventPolicy.getAllowedVisibilities(params.userRole)
     return EventsService.getAllEvents({
       allowedVisibilities,
       page: params.page,
       limit: params.limit,
+      userId: params.userId,
+      eventType: params.eventType,
     })
+  }
+
+  /**
+   * Controller for resolving public events listing (restricted to PUBLIC and FREE_WEBINAR)
+   */
+  static async getPublicEventsList(params: {
+    page: number
+    limit: number
+    eventType?: EventType
+  }) {
+    return EventsService.getAllEvents({
+      allowedVisibilities: ["PUBLIC", "FREE_WEBINAR"],
+      page: params.page,
+      limit: params.limit,
+      eventType: params.eventType,
+    })
+  }
+
+  /**
+   * Controller for returning dashboard stats for portal pages
+   */
+  static async getDashboardStats(params: {
+    userRole: string | undefined
+    userId?: string
+  }) {
+    const allowedVisibilities = EventPolicy.getAllowedVisibilities(params.userRole)
+    const userId = params.userId || ""
+
+    const whereClause: any = {
+      isActive: true,
+      visibility: {
+        in: allowedVisibilities,
+      },
+    }
+
+    // 1. Total events count (where eventType = EVENT)
+    const totalEvents = await prisma.event.count({
+      where: {
+        ...whereClause,
+        eventType: "EVENT",
+      },
+    })
+
+    // 2. Webinar count (where eventType = WEBINAR)
+    const webinarCount = await prisma.event.count({
+      where: {
+        ...whereClause,
+        eventType: "WEBINAR",
+      },
+    })
+
+    // 3. Registered count
+    const registeredCount = await prisma.event.count({
+      where: {
+        ...whereClause,
+        eventRegistrations: {
+          some: {
+            userId,
+            status: "CONFIRMED",
+          },
+        },
+      },
+    })
+
+    // 4. Upcoming events (limit 6)
+    const upcomingEvents = await prisma.event.findMany({
+      where: {
+        ...whereClause,
+        status: {
+          in: ["UPCOMING", "ONGOING"],
+        },
+      },
+      take: 6,
+      include: {
+        webinar: true,
+        categories: true,
+        materials: true,
+        eventRegistrations: {
+          where: {
+            userId,
+          },
+        },
+      },
+      orderBy: { startDate: "asc" },
+    })
+
+    // 5. Checked-in count
+    const checkedInCount = await prisma.event.count({
+      where: {
+        ...whereClause,
+        eventRegistrations: {
+          some: {
+            userId,
+            checkedIn: true,
+          },
+        },
+      },
+    })
+
+    return {
+      totalEvents,
+      webinarCount,
+      registeredCount,
+      checkedInCount,
+      upcomingEvents,
+    }
   }
 
   /**
    * Controller for resolving a single event details by ID
    */
-  static async getEventById(id: string, userRole: string) {
-    const event = await EventsService.findEventById(id)
+  static async getEventById(id: string, userRole: string, userId?: string) {
+    const event = await EventsService.findEventById(id, userId)
     if (!event) {
       throw new TRPCError({ code: "NOT_FOUND", message: "Event not found" })
     }
@@ -55,6 +168,7 @@ export class EventsController {
     eventType: EventType
     speakers?: string[]
     categoryIds?: string[]
+    materials?: { title: string; fileUrl: string; fileType: string }[]
   }) {
     try {
       return await EventsService.createEvent(data)
@@ -101,6 +215,7 @@ export class EventsController {
       categoryIds?: string[]
       isActive?: boolean
       status?: EventStatus
+      materials?: { title: string; fileUrl: string; fileType: string }[]
     }
   ) {
     try {
@@ -268,6 +383,26 @@ export class EventsController {
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: err.message || "Failed to delete material",
+      })
+    }
+  }
+
+  /**
+   * Controller for fetching all registrations for an event (Admin only)
+   */
+  static async getEventRegistrations(eventId: string) {
+    try {
+      return await EventsService.getEventRegistrations(eventId)
+    } catch (err: any) {
+      if (err.message === "Event not found") {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Event not found",
+        })
+      }
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: err.message || "Failed to fetch event registrations",
       })
     }
   }

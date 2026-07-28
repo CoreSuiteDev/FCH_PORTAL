@@ -1,7 +1,19 @@
 "use client"
 
 import * as React from "react"
-import { IconInnerShadowTop } from "@tabler/icons-react"
+import {
+  IconInnerShadowTop,
+  IconFileText,
+  IconBooks,
+  IconSchool,
+  IconAward,
+  IconBriefcase,
+  IconHierarchy,
+  IconDashboard,
+  IconCalendarEvent,
+  IconMail,
+  IconBell,
+} from "@tabler/icons-react"
 import {
   Sidebar,
   SidebarContent,
@@ -21,23 +33,83 @@ import Link from "next/link"
 import { useSessionInfo } from "@/hooks/use-session-info"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user } = useSessionInfo()
-  const roles = user?.roles || []
+  const { data: userinfo, isLoading, isError } = useSessionInfo()
+  const roles = userinfo?.user?.roles || []
 
-  // navSecondary theke items gulo ke separate/filter kore nilam static title er jonno
-  const internalDocs = data.navSecondary.filter((item) =>
-    ["General FCH Documents", "Newsletter Archive"].includes(item.title)
+  // Dynamically build resource menu items under FCH Resources
+  const resourcesMenu = []
+
+  // Special Member Resources & Learning Library (accessible to all logged-in members)
+  resourcesMenu.push(
+    {
+      title: "Special Member Resources",
+      url: "/resources/member",
+      icon: IconFileText,
+    },
+    {
+      title: "Learning Library",
+      url: "/resources/learning",
+      icon: IconBooks,
+    }
   )
 
-  const accountAndHelp = data.navSecondary.filter((item) =>
-    ["My Profile", "Settings", "Get Help", "Search"].includes(item.title)
+  // If user has higher privileges, add the other resource libraries
+  if (
+    roles.includes("PASTORAL") ||
+    roles.includes("BOARD") ||
+    roles.includes("ADMIN") ||
+    roles.includes("SUPER_ADMIN")
+  ) {
+    resourcesMenu.push(
+      {
+        title: "Special Pastoral Resources",
+        url: "/resources/special",
+        icon: IconFileText,
+      }
+    )
+  }
+
+  // Special Board Resources (for board members and above)
+  if (
+    roles.includes("BOARD") ||
+    roles.includes("ADMIN") ||
+    roles.includes("SUPER_ADMIN")
+  ) {
+    resourcesMenu.push({
+      title: "Special Board Resources",
+      url: "/resources/board",
+      icon: IconBooks,
+    })
+  }
+
+  // Dynamically build pastoral menu items
+  const pastoralMenuItems = [
+    {
+      title: "Pastoral Overview",
+      url: "/pastoral",
+      icon: IconDashboard,
+    },
+    {
+      title: "News & Publications",
+      url: "/news",
+      icon: IconMail,
+    },
+    {
+      title: "Events & Webinars",
+      url: "/events",
+      icon: IconCalendarEvent,
+    },
+  ]
+
+  const supportItems = data.navSecondary.filter((item) =>
+    ["Get Help", "Search"].includes(item.title)
   )
 
-  const sidebarUser = user
+  const sidebarUser = userinfo?.user
     ? {
-        name: user.name,
-        email: user.email,
-        avatar: user.image || "",
+        name: userinfo.user.name,
+        email: userinfo.user.email,
+        avatar: userinfo.user.image || "",
       }
     : data.user
 
@@ -51,8 +123,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <Link href="/">
-                <IconInnerShadowTop className="size-5!" />
-                <span className="text-base font-semibold">FCH Portal</span>
+                <IconInnerShadowTop className="size-5! shrink-0" />
+                <span className="text-base font-semibold group-data-[collapsible=icon]:hidden">
+                  FCH Portal
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -82,15 +156,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         )}
 
-        {/* ================= Pastoral Resources ================= */}
+        {/* ================= Pastoral Area ================= */}
         {(roles.includes("PASTORAL") ||
           roles.includes("ADMIN") ||
           roles.includes("SUPER_ADMIN")) && (
           <SidebarGroup>
             <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
-              Pastoral Resources
+              Pastoral Area
             </SidebarGroupLabel>
-            <NavMain items={data.pastoralMenu} />
+            <NavMain items={pastoralMenuItems} />
           </SidebarGroup>
         )}
 
@@ -107,21 +181,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
             FCH Resources
           </SidebarGroupLabel>
-          <NavSecondary items={internalDocs} />
+          <NavSecondary items={resourcesMenu} />
         </SidebarGroup>
 
-        {/* ================= Custom Section: Account & Support ================= */}
+        {/* ================= Custom Section: Support ================= */}
         {/* mt-auto deway eta ekdom niche push hoye thakbe */}
         <SidebarGroup className="mt-auto">
           <SidebarGroupLabel className="mb-1 px-2 text-sm font-bold tracking-wider text-sidebar-foreground/90 uppercase">
-            Account & Support
+            Support
           </SidebarGroupLabel>
-          <NavSecondary items={accountAndHelp} />
+          <NavSecondary items={supportItems} />
         </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={sidebarUser} />
+        <NavUser user={sidebarUser} isLoading={isLoading} isError={isError} />
       </SidebarFooter>
     </Sidebar>
   )

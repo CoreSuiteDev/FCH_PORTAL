@@ -2,6 +2,7 @@ import "dotenv/config"
 import app from "./app.js"
 import config from "./utils/config.js"
 import logger from "./utils/logger.js"
+import { redisConnection } from "./infrastructure/redis/connection.js"
 
 // Handle uncaught exceptions
 process.on("uncaughtException", (err) => {

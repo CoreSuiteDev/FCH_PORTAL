@@ -1,9 +1,9 @@
 "use client"
 
-import React from "react"
 import { usePathname } from "next/navigation"
-import Navbar from "./navbar"
+import React from "react"
 import { Footer } from "./footer"
+import Navbar from "./navbar"
 
 export default function LayoutWrapper({
   children,
@@ -18,6 +18,7 @@ export default function LayoutWrapper({
     "/forgot-password",
     "/verify-otp",
     "/reset-password",
+    "/sp-admin",
   ]
 
   const isAuthRoute = authPaths.some(

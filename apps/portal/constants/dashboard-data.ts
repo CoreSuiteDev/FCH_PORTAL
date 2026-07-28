@@ -2,24 +2,22 @@ import {
   IconAward,
   IconBell,
   IconBooks,
-  IconBriefcase,
   IconCalendarEvent,
   IconCreditCard,
   IconDashboard,
   IconFileText,
   IconHelp,
-  IconHierarchy,
   IconLockSquare,
   IconMail,
+  IconMessage,
   IconPresentation,
   IconReceipt2,
-  IconSchool,
   IconSearch,
   IconSettings,
   IconUser,
   IconUsers,
-  IconVideo,
 } from "@tabler/icons-react"
+
 
 export const data = {
   user: {
@@ -39,14 +37,24 @@ export const data = {
       icon: IconUsers,
     },
     {
+      title: "Memberships Manager",
+      url: "/admin/memberships",
+      icon: IconAward,
+      items: [
+        {
+          title: "Status Manager",
+          url: "/admin/memberships",
+        },
+        {
+          title: "Membership Packages",
+          url: "/admin/membership-packages",
+        },
+      ],
+    },
+    {
       title: "Board Access",
       url: "/admin/board-management",
       icon: IconLockSquare,
-    },
-    {
-      title: "Payments & Stripe",
-      url: "/admin/payments",
-      icon: IconCreditCard,
     },
     {
       title: "Donation & Payments ",
@@ -69,26 +77,76 @@ export const data = {
       ],
     },
     {
+      title: "News Manager",
+      url: "/admin/news",
+      icon: IconFileText,
+      items: [
+        {
+          title: "Manage News",
+          url: "/admin/news",
+        },
+        {
+          title: "Manage Authors",
+          url: "/admin/news/authors",
+        },
+      ],
+    },
+    {
       title: "Events Manager",
       url: "/admin/events",
       icon: IconCalendarEvent,
+      items: [
+        {
+          title: "Manage Events",
+          url: "/admin/events",
+        },
+        {
+          title: "Manage Categories",
+          url: "/admin/events/categories",
+        },
+      ],
     },
     {
-      title: "Webinar Library",
-      url: "/admin/webinars",
-      icon: IconVideo,
+      title: "Resources Manager",
+      url: "/admin/resources",
+      icon: IconBooks,
+    },
+    {
+      title: "Board Meeting Manager",
+      url: "/admin/board-meetings",
+      icon: IconPresentation,
     },
     {
       title: "Communications",
       url: "/admin/communications",
       icon: IconMail,
     },
+    {
+      title: "Inquiries",
+      url: "/admin/inquiries/contact",
+      icon: IconMessage,
+      items: [
+        {
+          title: "Contact Inquiries",
+          url: "/admin/inquiries/contact",
+        },
+        {
+          title: "Newsletter Subscribers",
+          url: "/admin/inquiries/newsletter",
+        },
+      ],
+    },
   ],
   boardMenu: [
     {
-      title: "Board Room Home",
+      title: "Board Overview",
       url: "/board",
       icon: IconDashboard,
+    },
+    {
+      title: "News & Publications",
+      url: "/news",
+      icon: IconMail,
     },
     {
       title: "Board Meetings",
@@ -105,105 +163,65 @@ export const data = {
       url: "/board/financials",
       icon: IconReceipt2,
     },
-    {
-      title: "Committees",
-      url: "/board/committees",
-      icon: IconHierarchy,
-    },
-    {
-      title: "Internal Planning",
-      url: "/board/planning",
-      icon: IconBriefcase,
-    },
-    {
-      title: "Collaboration Tools",
-      url: "/board/collaboration",
-      icon: IconUsers,
-    },
   ],
   pastoralMenu: [
     {
+      title: "Pastoral Overview",
+      url: "/pastoral",
+      icon: IconDashboard,
+    },
+    {
+      title: "News & Publications",
+      url: "/news",
+      icon: IconMail,
+    },
+    {
       title: "Learning Library",
-      url: "/portal/resources/learning",
+      url: "/resources/learning",
       icon: IconBooks,
     },
     {
-      title: "Catechetical Tools",
-      url: "/portal/resources/catechetical",
-      icon: IconSchool,
-    },
-    {
-      title: "Pastoral Leadership",
-      url: "/portal/resources/leadership",
-      icon: IconAward,
-    },
-    {
-      title: "Ministry Toolkits",
-      url: "/portal/resources/toolkits",
-      icon: IconBriefcase,
-    },
-    {
-      title: "Parish & Diocese Resources",
-      url: "/portal/resources/ministry",
-      icon: IconHierarchy,
-    },
-    {
-      title: "Advanced Webinars",
-      url: "/portal/webinars/advanced",
-      icon: IconVideo,
-    },
-    {
       title: "Special Pastoral Resources",
-      url: "/portal/resources/special",
+      url: "/resources/special",
       icon: IconFileText,
+    },
+    {
+      title: "Events & Webinars",
+      url: "/events",
+      icon: IconCalendarEvent,
     },
   ],
   generalMenu: [
     {
-      title: "Dashboard Home",
-      url: "/",
+      title: "General Overview",
+      url: "/general",
       icon: IconDashboard,
     },
     {
-      title: "Announcements",
-      url: "/portal/announcements",
-      icon: IconBell,
+      title: "News & Publications",
+      url: "/news",
+      icon: IconMail,
     },
     {
-      title: "Member Events",
-      url: "/portal/events",
+      title: "Events & Webinars",
+      url: "/events",
       icon: IconCalendarEvent,
-    },
-    {
-      title: "Webinars",
-      url: "/portal/webinars",
-      icon: IconVideo,
-    },
-    {
-      title: "Basic Resources",
-      url: "/portal/resources/basic",
-      icon: IconFileText,
     },
   ],
   navSecondary: [
     {
-      title: "General FCH Documents",
-      url: "/portal/documents",
-      icon: IconFileText,
-    },
-    {
       title: "Newsletter Archive",
-      url: "/portal/news",
+      url: "/news",
       icon: IconMail,
     },
     {
-      title: "My Profile",
-      url: "/portal/profile",
+      title: "Account",
+      url: "/account",
       icon: IconUser,
     },
     {
       title: "Settings",
-      url: "/portal/settings",
+      url: "/settings",
       icon: IconSettings,
     },
     {

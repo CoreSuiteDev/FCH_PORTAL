@@ -74,6 +74,19 @@ export const ZCICreateMaterialSchema = z.object({
 });
 export type ZTCCreateMaterial = z.infer<typeof ZCICreateMaterialSchema>;
 
+// --- EVENT REGISTRATION ---
+
+export const ZCIEventRegistrationSchema = z.object({
+  id: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  eventId: z.string(),
+  userId: z.string(),
+  status: RegistrationStatusEnum,
+  checkedIn: z.boolean(),
+});
+export type ZTEventRegistration = z.infer<typeof ZCIEventRegistrationSchema>;
+
 // --- EVENT ---
 
 export const ZCIEventSchema = z.object({
@@ -87,6 +100,7 @@ export const ZCIEventSchema = z.object({
   location: z.string(),
   coverImage: z.string().nullable().optional(),
   maxCapacity: z.number().nullable().optional(),
+  currentCount: z.number().optional(),
   meetingLink: z.string().nullable().optional(),
   visibility: EventVisibilityEnum,
   isActive: z.boolean(),
@@ -95,21 +109,10 @@ export const ZCIEventSchema = z.object({
   webinar: ZCIWebinarSchema.nullable().optional(),
   categories: z.array(ZCIEventCategorySchema),
   materials: z.array(ZCIEventMaterialSchema),
+  registrations: z.array(ZCIEventRegistrationSchema).optional(),
 });
 export type ZTEvent = z.infer<typeof ZCIEventSchema>;
 
-// --- EVENT REGISTRATION ---
-
-export const ZCIEventRegistrationSchema = z.object({
-  id: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  eventId: z.string(),
-  userId: z.string(),
-  status: RegistrationStatusEnum,
-  checkedIn: z.boolean(),
-});
-export type ZTEventRegistration = z.infer<typeof ZCIEventRegistrationSchema>;
 
 // --- CREATE / UPDATE PAYLOADS ---
 
@@ -126,8 +129,10 @@ export const ZCICreateEventSchema = z.object({
   eventType: EventTypeEnum.default("EVENT"),
   speakers: z.array(z.string()).optional(),
   categoryIds: z.array(z.string()).optional(),
+  materials: z.array(ZCICreateMaterialSchema).optional(),
 });
 export type ZTCCreateEvent = z.infer<typeof ZCICreateEventSchema>;
+export type ZTCCreateEventInput = z.input<typeof ZCICreateEventSchema>;
 
 export const ZCIUpdateEventSchema = z.object({
   title: z.string().min(1, "Title cannot be empty").optional(),
@@ -142,10 +147,14 @@ export const ZCIUpdateEventSchema = z.object({
   eventType: EventTypeEnum.optional(),
   speakers: z.array(z.string()).optional(),
   categoryIds: z.array(z.string()).optional(),
+  materials: z.array(ZCICreateMaterialSchema).optional(),
   isActive: z.boolean().optional(),
   status: EventStatusEnum.optional(),
 });
 export type ZTUpdateEvent = z.infer<typeof ZCIUpdateEventSchema>;
+export type ZTUpdateEventInput = z.input<typeof ZCIUpdateEventSchema>;
+
+
 
 // --- ANALYTICS ---
 

@@ -1,14 +1,10 @@
 
-import { router, publicProcedure, adminProcedure } from "../../../server/trpc.js";
-import { PaymentController, DonationController, SponsorshipController } from "./payment.controller.js";
+import { z } from "zod";
+import { router, publicProcedure, adminProcedure, protectedProcedure } from "../../../server/trpc.js";
+import { PaymentController } from "./payment.controller.js";
 import {
   PaginationInputSchema,
   ZCIPaginatedPaymentsSchema,
-  ZCDonationInputSchema,
-  ZCDonationResponseSchema,
-  ZCPaginatedDonationHistorySchema,
-  ZCSponsorShipInputSchema,
-  ZCSponsorShipResponseSchema,
 } from "@workspace/types";
 import { getPaginationMeta } from "../../../utils/pagination.js";
 
@@ -36,83 +32,20 @@ export const paymentRouter = router({
       };
     }),
 
-// Donation Routers
-  donate: publicProcedure
-    .meta({
-      openapi: {
-        method: "POST",
-        path: "/payment/donate",
-        tags: ["payment"],
-        summary: "Create a donation",
-        description: "Creates a Stripe PaymentIntent and returns a clientSecret for frontend confirmation",
-      },
-    })
-    .input(ZCDonationInputSchema)
-    .output(ZCDonationResponseSchema)
-    .mutation(async ({ input }) => {
-      return DonationController.createDonation(input);
-    }),
-
-  donationHistory: publicProcedure
+  sessionReceipt: publicProcedure
     .meta({
       openapi: {
         method: "GET",
-        path: "/payment/donation-history",
+        path: "/payment/session-receipt",
         tags: ["payment"],
-        summary: "Get donation history",
-        description: "Returns a paginated list of user donation histories",
+        summary: "Get Stripe receipt URL by session_id",
+        description: "Retrieves Stripe receipt_url for a completed checkout session",
       },
     })
-    .input(PaginationInputSchema.optional())
-    .output(ZCPaginatedDonationHistorySchema)
+    .input(z.object({ sessionId: z.string() }))
+    .output(z.object({ receiptUrl: z.string().nullable(), transactionId: z.string().nullable() }))
     .query(async ({ input }) => {
-      const page = input?.page ?? 1;
-      const limit = input?.limit ?? 10;
-      const { totalCount, data } = await DonationController.getDonationHistory({ page, limit });
-      return {
-        data: data.map((d) => ({
-          id: d.id,
-          amount: d.amount,
-          status: d.status,
-          currency: d.currency,
-          donator: d.donator,
-          user: d.user
-            ? {
-                id: d.user.id,
-                name: d.user.name,
-                email: d.user.email,
-                phone: d.user.phone ?? null,
-                role: d.user.userRoles?.[0]?.role?.name ?? "Geust",
-                createdAt: d.user.createdAt,
-              }
-            : null,
-          receiptUrl: d.receiptUrl,
-          paymentMethod: d.paymentMethod,
-          cardBrand: d.cardBrand,
-          cardLast4: d.cardLast4,
-          stripeCustomerId: d.stripeCustomerId,
-          createdAt: d.createdAt,
-        })),
-        meta: getPaginationMeta(totalCount, page, limit),
-      };
+      return PaymentController.getSessionReceipt(input.sessionId);
     }),
-
-
-    // Sponsorship Routers
-
-    sponsorship: publicProcedure
-      .meta({
-        openapi: {
-          method: "POST",
-          path: "/payment/sponsorship",
-          tags: ["payment"],
-          summary: "Create a sponsorship",
-          description: "Creates a Stripe PaymentIntent and returns a clientSecret for frontend confirmation",
-        }
-      })
-      .input(ZCSponsorShipInputSchema)
-      .output(ZCSponsorShipResponseSchema)
-      .mutation(async ({ input }) => {
-        return SponsorshipController.createSponsorship(input);
-      }),
 });
+

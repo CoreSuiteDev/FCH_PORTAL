@@ -4,6 +4,7 @@ import {
   EventVisibility,
 } from "../../../generated/prisma/client.js"
 import { prisma } from "../../../infrastructure/database/prisma.js"
+import { UploadService } from "../upload/upload.service.js"
 
 export class EventsService {
   /**
@@ -13,15 +14,21 @@ export class EventsService {
     allowedVisibilities: EventVisibility[]
     page: number
     limit: number
+    userId?: string
+    eventType?: EventType
   }) {
-    const { allowedVisibilities, page, limit } = params
+    const { allowedVisibilities, page, limit, userId, eventType } = params
     const skip = (page - 1) * limit
 
-    const whereClause = {
+    const whereClause: any = {
       isActive: true,
       visibility: {
         in: allowedVisibilities,
       },
+    }
+
+    if (eventType) {
+      whereClause.eventType = eventType
     }
 
     const [totalCount, data] = await prisma.$transaction([
@@ -32,7 +39,16 @@ export class EventsService {
         where: whereClause,
         skip,
         take: limit,
-        include: { webinar: true, categories: true, materials: true },
+        include: {
+          webinar: true,
+          categories: true,
+          materials: true,
+          eventRegistrations: {
+            where: {
+              userId: userId || "",
+            },
+          },
+        },
         orderBy: { startDate: "asc" },
       }),
     ])
@@ -43,11 +59,85 @@ export class EventsService {
   /**
    * Find a single event by ID
    */
-  static async findEventById(id: string) {
+  static async findEventById(id: string, userId?: string) {
     return prisma.event.findUnique({
       where: { id },
-      include: { webinar: true, categories: true, materials: true },
+      include: {
+        webinar: true,
+        categories: true,
+        materials: true,
+        eventRegistrations: {
+          where: {
+            userId: userId || "",
+          },
+        },
+      },
     })
+  }
+
+  /**
+   * Private helper to handle and upload cover image to Cloudflare R2
+   */
+  private static async handleCoverImage(coverImage?: string): Promise<string | undefined> {
+    if (!coverImage) return undefined
+
+    let base64Data: string | null = null
+    let mimetype = "image/jpeg"
+    let extension = ".jpg"
+
+    if (coverImage.startsWith("data:")) {
+      const matches = coverImage.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+      if (matches && matches.length === 3) {
+        mimetype = matches[1] || "image/jpeg"
+        base64Data = matches[2] || null
+
+        if (mimetype.includes("png")) extension = ".png"
+        else if (mimetype.includes("webp")) extension = ".webp"
+        else if (mimetype.includes("gif")) extension = ".gif"
+      }
+    } else if (!coverImage.startsWith("http://") && !coverImage.startsWith("https://")) {
+      base64Data = coverImage
+    }
+
+    if (base64Data) {
+      const buffer = Buffer.from(base64Data, "base64")
+      const file: Express.Multer.File = {
+        fieldname: "file",
+        originalname: `cover-image${extension}`,
+        encoding: "base64",
+        mimetype,
+        buffer,
+        size: buffer.byteLength,
+        stream: null as any,
+        destination: "",
+        filename: `cover-image${extension}`,
+        path: "",
+      }
+
+      const uploadResult = await UploadService.uploadFile(file, "events")
+      return uploadResult.url
+    }
+
+    return coverImage
+  }
+
+  /**
+   * Private helper to delete a file from Cloudflare R2 given its public URL
+   */
+  private static async deleteR2FileByUrl(url?: string | null) {
+    if (!url) return
+
+    const publicUrlBase = process.env.R2_PUBLIC_URL
+    if (publicUrlBase && url.startsWith(publicUrlBase)) {
+      const key = url.replace(publicUrlBase, "").replace(/^\//, "")
+      if (key) {
+        try {
+          await UploadService.deleteFile(key)
+        } catch (error) {
+          console.error(`Failed to delete file from R2 (key: ${key}):`, error)
+        }
+      }
+    }
   }
 
   /**
@@ -66,8 +156,9 @@ export class EventsService {
     eventType: EventType
     speakers?: string[]
     categoryIds?: string[]
+    materials?: { title: string; fileUrl: string; fileType: string }[]
   }) {
-    const { categoryIds, speakers, ...eventData } = data
+    const { categoryIds, speakers, materials, ...eventData } = data
 
     const title = eventData.title?.trim()
     const location = eventData.location.trim();
@@ -106,8 +197,26 @@ export class EventsService {
       throw new Error("Max capacity must be greater than 0")
     }
 
+    // Category validation & dynamic eventType resolution
+    let resolvedEventType: EventType = EventType.EVENT
+    if (categoryIds && categoryIds.length > 0) {
+      const categories = await prisma.eventCategory.findMany({
+        where: { id: { in: categoryIds } },
+        select: { id: true, name: true },
+      })
+
+      if (categories.length !== categoryIds.length) {
+        throw new Error("One or more categories do not exist")
+      }
+
+      const hasWebinar = categories.some((c) => c.name.toLowerCase().includes("webinar"))
+      if (hasWebinar) {
+        resolvedEventType = EventType.WEBINAR
+      }
+    }
+
     // Webinar validation
-    if (eventData.eventType === EventType.WEBINAR) {
+    if (resolvedEventType === EventType.WEBINAR) {
       if (!eventData.meetingLink?.trim()) {
         throw new Error("Meeting link is required for webinars")
       }
@@ -120,21 +229,11 @@ export class EventsService {
     }
 
     // Non-webinar validation
-    if (eventData.eventType !== EventType.WEBINAR && eventData.meetingLink) {
+    if (resolvedEventType !== EventType.WEBINAR && eventData.meetingLink) {
       throw new Error("Meeting link is only allowed for webinars")
     }
 
-    // Category validation — guard against undefined before accessing .length
-    if (categoryIds && categoryIds.length > 0) {
-      const categories = await prisma.eventCategory.findMany({
-        where: { id: { in: categoryIds } },
-        select: { id: true },
-      })
-
-      if (categories.length !== categoryIds.length) {
-        throw new Error("One or more categories do not exist")
-      }
-    }
+    const coverImageUrl = await EventsService.handleCoverImage(eventData.coverImage)
 
     return prisma.$transaction(async (tx) => {
       const event = await tx.event.create({
@@ -144,22 +243,32 @@ export class EventsService {
           startDate,
           endDate: eventData.endDate,
           location,
-          coverImage: eventData.coverImage,
+          coverImage: coverImageUrl,
           maxCapacity: eventData.maxCapacity,
           meetingLink: eventData.meetingLink,
           visibility: eventData.visibility,
-          eventType: eventData.eventType,
+          eventType: resolvedEventType,
           status: "UPCOMING" as EventStatus,
           isActive: true,
-          // connect expects { id: string }[], not string[]
+           // connect expects { id: string }[], not string[]
           ...(categoryIds &&
             categoryIds.length > 0 && {
               categories: {
                 connect: categoryIds.map((id) => ({ id })),
               },
             }),
+          ...(materials &&
+            materials.length > 0 && {
+              materials: {
+                create: materials.map((m) => ({
+                  title: m.title,
+                  fileUrl: m.fileUrl,
+                  fileType: m.fileType,
+                })),
+              },
+            }),
           // speakers is optional — fall back to [] to satisfy the non-nullable DB column
-          ...(eventData.eventType === EventType.WEBINAR && {
+          ...(resolvedEventType === EventType.WEBINAR && {
             webinar: {
               create: {
                 speakers: speakers ?? [],
@@ -246,7 +355,7 @@ export class EventsService {
       startDate?: Date
       endDate?: Date
       location?: string
-      coverImage?: string
+      coverImage?: string | null
       maxCapacity?: number
       meetingLink?: string
       visibility?: EventVisibility
@@ -255,9 +364,10 @@ export class EventsService {
       categoryIds?: string[]
       isActive?: boolean
       status?: EventStatus
+      materials?: { title: string; fileUrl: string; fileType: string }[]
     }
   ) {
-    const { categoryIds, speakers, ...eventData } = data
+    const { categoryIds, speakers, materials, ...eventData } = data
 
     return prisma.$transaction(async (tx) => {
       const event = await tx.event.findUnique({
@@ -283,7 +393,19 @@ export class EventsService {
         )
       }
 
-      const newEventType = eventData.eventType ?? event.eventType
+      let newEventType = event.eventType
+      if (categoryIds) {
+        if (categoryIds.length > 0) {
+          const categories = await tx.eventCategory.findMany({
+            where: { id: { in: categoryIds } },
+            select: { name: true },
+          })
+          const hasWebinar = categories.some((c) => c.name.toLowerCase().includes("webinar"))
+          newEventType = hasWebinar ? "WEBINAR" : "EVENT"
+        } else {
+          newEventType = "EVENT"
+        }
+      }
 
       // Validate meeting link when switching to WEBINAR type
       if (newEventType === "WEBINAR") {
@@ -305,13 +427,45 @@ export class EventsService {
         })
       }
 
+      let coverImageUrl = event.coverImage
+      if (eventData.coverImage === "" || eventData.coverImage === null) {
+        coverImageUrl = null
+        if (event.coverImage) {
+          await EventsService.deleteR2FileByUrl(event.coverImage)
+        }
+      } else if (eventData.coverImage) {
+        const isNewUpload =
+          eventData.coverImage.startsWith("data:") ||
+          (!eventData.coverImage.startsWith("http://") && !eventData.coverImage.startsWith("https://"))
+
+        const uploadedUrl = await EventsService.handleCoverImage(eventData.coverImage)
+        coverImageUrl = uploadedUrl ?? null
+
+        if (isNewUpload && event.coverImage) {
+          await EventsService.deleteR2FileByUrl(event.coverImage)
+        }
+      }
+
       const updateEvent = await tx.event.update({
         where: { id },
         data: {
           ...eventData,
+          coverImage: coverImageUrl !== undefined ? coverImageUrl : undefined,
+          eventType: newEventType,
 
           ...(categoryIds && {
             categories: { set: categoryIds.map((cid) => ({ id: cid })) },
+          }),
+
+          ...(materials !== undefined && {
+            materials: {
+              deleteMany: {},
+              create: materials.map((m) => ({
+                title: m.title,
+                fileUrl: m.fileUrl,
+                fileType: m.fileType,
+              })),
+            },
           }),
 
           ...(newEventType === "WEBINAR" && {
@@ -358,6 +512,10 @@ export class EventsService {
 
       if (event._count.eventRegistrations > 0) {
         throw new Error("Cannot delete event with existing registrations")
+      }
+
+      if (event.coverImage) {
+        await EventsService.deleteR2FileByUrl(event.coverImage)
       }
 
       // Webinar and materials cascade automatically via onDelete: Cascade in schema
@@ -569,66 +727,134 @@ export class EventsService {
   }
 
   /**
-   * Fetch analytics metrics for a specific event
+   * Fetch all registrations for an event with user profile details (Admin only)
    */
-  static async getEventAnalytics(eventId: string) {
+  static async getEventRegistrations(eventId: string) {
     const event = await prisma.event.findUnique({
       where: { id: eventId },
-      select: {
-        id: true,
-        title: true,
-        maxCapacity: true,
-      },
+      select: { id: true, title: true },
     })
 
     if (!event) {
       throw new Error("Event not found")
     }
 
-    const [
-      totalRegistrations,
-      totalCheckedIn,
-      confirmedCount,
-      pendingCount,
-      cancelledCount,
-      totalMaterials,
-    ] = await Promise.all([
-      prisma.eventRegistration.count({ where: { eventId } }),
-      prisma.eventRegistration.count({ where: { eventId, checkedIn: true } }),
-      prisma.eventRegistration.count({
-        where: { eventId, status: "CONFIRMED" },
-      }),
-      prisma.eventRegistration.count({ where: { eventId, status: "PENDING" } }),
-      prisma.eventRegistration.count({
-        where: { eventId, status: "CANCELLED" },
-      }),
-      prisma.eventMaterial.count({ where: { eventId } }),
-    ])
-
-    const attendanceRate =
-      totalRegistrations > 0
-        ? Number(((totalCheckedIn / totalRegistrations) * 100).toFixed(2))
-        : 0
-
-    const capacityUtilization =
-      event.maxCapacity && event.maxCapacity > 0
-        ? Number(((totalRegistrations / event.maxCapacity) * 100).toFixed(2))
-        : 0
-
-    return {
-      eventId: event.id,
-      title: event.title,
-      maxCapacity: event.maxCapacity,
-      totalRegistrations,
-      totalCheckedIn,
-      attendanceRate,
-      capacityUtilization,
-      statusBreakdown: {
-        CONFIRMED: confirmedCount,
-        PENDING: pendingCount,
-        CANCELLED: cancelledCount,
+    const registrations = await prisma.eventRegistration.findMany({
+      where: { eventId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
       },
-      totalMaterials,
-    }
+      orderBy: { createdAt: "asc" },
+    })
+
+    return registrations.map((r) => ({
+      id: r.id,
+      eventId: r.eventId,
+      userId: r.userId,
+      status: r.status,
+      checkedIn: r.checkedIn,
+      registeredAt: r.createdAt,
+      user: r.user,
+    }))
   }
+
+  /**
+   * Fetch analytics metrics for a specific event
+   */
+  static async getEventAnalytics(eventId: string) {
+  const [event] = await prisma.$transaction([
+    prisma.event.findUnique({
+      where: { id: eventId },
+      select: {
+        id: true,
+        title: true,
+        maxCapacity: true,
+      },
+    }),
+  ])
+
+  if (!event) {
+    throw new Error("Event not found")
+  }
+
+  const [
+    totalRegistrations,
+    totalCheckedIn,
+    confirmedCount,
+    pendingCount,
+    cancelledCount,
+    totalMaterials,
+  ] = await prisma.$transaction([
+    prisma.eventRegistration.count({
+      where: { eventId },
+    }),
+
+    prisma.eventRegistration.count({
+      where: {
+        eventId,
+        checkedIn: true,
+      },
+    }),
+
+    prisma.eventRegistration.count({
+      where: {
+        eventId,
+        status: "CONFIRMED",
+      },
+    }),
+
+    prisma.eventRegistration.count({
+      where: {
+        eventId,
+        status: "PENDING",
+      },
+    }),
+
+    prisma.eventRegistration.count({
+      where: {
+        eventId,
+        status: "CANCELLED",
+      },
+    }),
+
+    prisma.eventMaterial.count({
+      where: {
+        eventId,
+      },
+    }),
+  ])
+
+  const attendanceRate =
+    totalRegistrations > 0
+      ? Number(((totalCheckedIn / totalRegistrations) * 100).toFixed(2))
+      : 0
+
+  const capacityUtilization =
+    event.maxCapacity && event.maxCapacity > 0
+      ? Number(((totalRegistrations / event.maxCapacity) * 100).toFixed(2))
+      : 0
+
+  return {
+    eventId: event.id,
+    title: event.title,
+    maxCapacity: event.maxCapacity,
+    totalRegistrations,
+    totalCheckedIn,
+    attendanceRate,
+    capacityUtilization,
+    statusBreakdown: {
+      CONFIRMED: confirmedCount,
+      PENDING: pendingCount,
+      CANCELLED: cancelledCount,
+    },
+    totalMaterials,
+  }
+}
 }

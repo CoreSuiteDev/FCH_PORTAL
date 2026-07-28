@@ -13,7 +13,7 @@ import { auth } from "./lib/auth.js";
 import { prisma } from "./infrastructure/database/prisma.js";
 import { writeFileSync } from "fs";
 import { AppError } from "./utils/AppError.js";
-import { appRouter } from "./server/index.js";
+import { appRouter } from "./server/route.js";
 import { createContext } from "./server/context.js";
 import sendMail from "./infrastructure/email/email.js";
 import config from "./utils/config.js";
@@ -47,6 +47,7 @@ app.get("/api/auth/session-info", async (req, res): Promise<any> => {
 
     const session = await auth.api.getSession({ headers })
     if (!session) {
+      console.log("[session-info] No session found in request headers")
       return res.status(200).json({ authenticated: false, roles: [] })
     }
 
@@ -62,6 +63,7 @@ app.get("/api/auth/session-info", async (req, res): Promise<any> => {
     })
 
     const roles = userWithRoles?.userRoles.map((ur) => ur.role.name) || []
+    console.log("[session-info] Found session for user:", session.user.email, "with roles:", roles)
 
     return res.status(200).json({
       authenticated: true,
@@ -86,7 +88,8 @@ app.post(
 );
 
 // Body parsing and security middleware (applied to subsequent routes)
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(helmet());
 
 const openapiDocument = generateOpenApiDocument(appRouter, {

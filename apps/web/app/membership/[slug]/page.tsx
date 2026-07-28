@@ -2,19 +2,22 @@
 
 import React, { useEffect, useState, use } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
+import Container from "@/components/shared/container"
 import {
   ShieldCheck,
   CreditCard,
   ArrowLeft,
   Loader2,
-  Check,
   CheckCircle2,
+  Check,
 } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { Badge } from "@workspace/ui/components/badge"
+import { Skeleton } from "@workspace/ui/components/skeleton"
+import { toast } from "@workspace/ui/components/sonner"
 import {
   Card,
   CardContent,
@@ -24,71 +27,139 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 
-import { PackageTier, usePackageStore } from "@/store/use-membership-store"
-import { MEMBERSHIP_REGISTRY } from "@/constants/membership"
+import { loadStripe } from "@stripe/stripe-js"
+import {
+  Elements,
+} from "@stripe/react-stripe-js"
+
+import { usePackageStore } from "@/store/use-membership-store"
+import { usePackageBySlug, useBuyPackage } from "@/hooks/usePackage"
 import { useTranslations } from "next-intl"
+import { authClient } from "@/lib/auth"
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || ""
+)
 
 interface PageProps {
   params: Promise<{ slug: string }>
 }
 
-export default function PackageDynamicDetailsPage({ params }: PageProps) {
+function PackageDynamicDetailsForm({ params }: PageProps) {
   const router = useRouter()
   const resolvedParams = use(params)
 
-  const { selectPackage, billingCycle } = usePackageStore()
+  const { selectPackage } = usePackageStore()
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
+  const [cardholderName, setCardholderName] = useState<string>("")
 
   const t = useTranslations("membership.checkout")
-  const tp = useTranslations("membership.packages")
 
-  const slugId = resolvedParams.slug as PackageTier
-  const activePackage =
-    slugId && MEMBERSHIP_REGISTRY[slugId] ? MEMBERSHIP_REGISTRY[slugId] : null
 
-  const localizedActivePackage = activePackage
-    ? {
-        ...activePackage,
-        title: tp(`items.${activePackage.id}.title`),
-        description: tp(`items.${activePackage.id}.description`),
-        features: tp.raw(`items.${activePackage.id}.features`) as string[],
-      }
-    : null
+  const slug = resolvedParams.slug
+
+  const { data: session } = authClient.useSession()
+  const user = session?.user
+
+  const { data: activePackage, isLoading, isError } = usePackageBySlug(slug)
+  const { mutateAsync: buyPackage } = useBuyPackage()
 
   useEffect(() => {
-    if (slugId && MEMBERSHIP_REGISTRY[slugId]) {
-      selectPackage(slugId)
-    } else {
+    if (activePackage) {
+      selectPackage(activePackage.slug)
+    }
+  }, [activePackage, selectPackage])
+
+  useEffect(() => {
+    if (user) {
+      setCardholderName(user.name || "")
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (isError) {
+      toast.error("Failed to load membership package. Redirecting...")
       router.push("/membership")
     }
-  }, [slugId, router, selectPackage])
+  }, [isError, router])
 
-  const getCalculatedPrice = (price: number) => {
-    return billingCycle === "monthly" ? price : Math.round(price * 10)
-  }
-
-  const basePrice = activePackage ? getCalculatedPrice(activePackage.price) : 0
-  const setupFee = basePrice > 0 ? 5.0 : 0
-  const totalInvoiceAmount = basePrice + setupFee
-
-  const handlePaymentSubmit = (e: React.FormEvent) => {
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!user) {
+      toast.error("You must be logged in to purchase a membership package.")
+      router.push("/login")
+      return
+    }
+
     setIsProcessing(true)
 
-    setTimeout(() => {
+    try {
+      const res = await buyPackage({
+        packageId: activePackage!.id,
+        name: cardholderName,
+        email: user.email,
+        paymentMethodId: "",
+        userId: user.id,
+      })
+
+      if (res && res.checkoutUrl) {
+        window.location.href = res.checkoutUrl
+      } else {
+        throw new Error("Failed to initiate secure checkout redirect.")
+      }
+    } catch (err: any) {
+      console.error("Subscription payment error:", err)
+      toast.error(err.message || "Failed to complete subscription purchase.")
+    } finally {
       setIsProcessing(false)
-      setShowSuccessModal(true)
-    }, 2000)
+    }
   }
 
   const handleModalClose = () => {
     setShowSuccessModal(false)
-    router.push(`/`)
+    const portalUrl = process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3001/"
+    window.location.href = portalUrl
   }
 
-  if (!localizedActivePackage) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F6F4F2] px-4 py-16 font-sans text-[#1C1A19]">
+        <div className="mx-auto max-w-5xl">
+          <Skeleton className="h-5 w-24 mb-8" />
+          <div className="grid items-stretch gap-8 md:grid-cols-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-8 shadow-sm md:col-span-6 h-[500px]">
+              <div>
+                <Skeleton className="h-5 w-32 rounded-full mb-4" />
+                <Skeleton className="h-10 w-3/4 mb-3" />
+                <Skeleton className="h-4 w-1/2 mb-3" />
+                <Skeleton className="h-16 w-full mb-6" />
+                <Skeleton className="h-12 w-28 mb-6" />
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-4/5" />
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-8 shadow-lg md:col-span-6 h-[500px]">
+              <div>
+                <Skeleton className="h-6 w-1/3 mb-6" />
+                <div className="space-y-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!activePackage) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F6F4F2]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -96,82 +167,77 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
     )
   }
 
-  const cycleText =
-    billingCycle === "monthly" ? t("pricePerMonth") : t("pricePerYear")
+  const basePrice = Number(activePackage.price)
+  const pkgCycleFormatted = activePackage.billingCycle === "MONTHLY" ? "mo" : "yr"
 
   return (
     <div className="min-h-screen bg-[#F6F4F2] px-4 py-16 font-sans text-[#1C1A19]">
-      <div className="mx-auto max-w-5xl">
-        <button
-          onClick={() => router.push("/membership")}
-          className="group mb-8 inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-[#1C1A19]"
+      <Container className="max-w-5xl">
+        <Link
+          href="/membership"
+          className="mb-8 flex items-center text-xs font-bold tracking-wider text-muted-foreground transition-colors hover:text-[#1C1A19] uppercase"
         >
-          <ArrowLeft
-            size={14}
-            className="transition-transform group-hover:-translate-x-0.5"
-          />
-          {t("back")}
-        </button>
+          <ArrowLeft className="mr-2 h-4 w-4" /> {t("back")}
+        </Link>
 
         <div className="grid items-stretch gap-8 md:grid-cols-12">
-          <Card className="flex flex-col justify-between border-border/60 bg-card p-4 shadow-sm md:col-span-6">
+          {/* Left Side: Summary Card */}
+          <Card className="flex flex-col justify-between rounded-2xl border-border/60 bg-card p-8 shadow-sm md:col-span-6">
             <div>
-              <CardHeader className="p-4">
-                <div className="mb-2">
-                  <Badge
-                    variant="secondary"
-                    className="bg-primary/10 text-primary hover:bg-primary/10"
-                  >
-                    {t("selectedPackage")}
-                  </Badge>
-                </div>
+              <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold tracking-wider text-primary uppercase">
+                {t("checkoutSummary")}
+              </span>
+              <CardHeader className="p-0 pt-4">
                 <CardTitle className="text-3xl font-extrabold text-[#2C2927]">
-                  {localizedActivePackage.title}
+                  {activePackage?.name}
                 </CardTitle>
-                <CardDescription className="mt-3 text-xs text-[14px] font-semibold">
-                  {localizedActivePackage.subtitle}
-                </CardDescription>
-                <CardDescription className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                  {localizedActivePackage.description}
-                </CardDescription>
+                {activePackage?.subTitle && (
+                  <CardDescription className="mt-1.5 text-xs font-semibold text-primary">
+                    {activePackage.subTitle}
+                  </CardDescription>
+                )}
               </CardHeader>
 
-              <CardContent className="p-4">
-                <div className="mb-6 flex items-baseline border-y border-border/50 py-4 text-[#1C1A19]">
-                  <span className="text-4xl font-extrabold tracking-tight">
-                    ${basePrice.toFixed(2)}
-                  </span>
-                  <span className="ml-1.5 text-xs text-muted-foreground">
-                    / {cycleText}
-                  </span>
-                </div>
+              <CardContent className="p-0 py-6 space-y-6">
+                {activePackage?.description && (
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {activePackage.description}
+                  </p>
+                )}
 
-                <div className="space-y-4">
-                  <h4 className="text-xs font-bold tracking-wider text-[#2C2927] uppercase">
-                    {t("includedFeatures")}
-                  </h4>
-                  <ul className="space-y-3 text-xs text-muted-foreground">
-                    {localizedActivePackage.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2.5">
-                        <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <Check size={10} strokeWidth={3} />
-                        </span>
-                        <span className="leading-normal">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                {/* API Package Features List */}
+                {Array.isArray(activePackage?.features) && activePackage.features.length > 0 && (
+                  <div className="space-y-3 border-t border-border/60 pt-4">
+                    <p className="text-xs font-bold uppercase tracking-wider text-[#2C2927]">
+                      {t("includedFeatures")}
+                    </p>
+                    <ul className="space-y-2.5">
+                      {(activePackage.features as string[]).map((feature: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-2.5 text-xs font-medium text-muted-foreground">
+                          <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                            <Check size={12} strokeWidth={3} />
+                          </span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="border-t border-border/60 pt-4">
+                  <span className="text-4xl font-extrabold text-primary">
+                    ${basePrice}
+                  </span>
+                  <span className="ml-1 text-xs font-medium text-muted-foreground">
+                    /{pkgCycleFormatted}
+                  </span>
                 </div>
               </CardContent>
             </div>
-
-            <CardFooter className="border-t border-border/40 p-4 pt-4 text-[11px] text-muted-foreground">
-              {t("disclaimer", { cycle: cycleText })}
-            </CardFooter>
           </Card>
 
-          <Card className="relative flex flex-col justify-between overflow-hidden border-border/80 bg-card p-4 shadow-lg md:col-span-6">
-            <div className="absolute top-0 right-0 left-0 h-1 bg-primary" />
-
+          {/* Right Side: Payment Form */}
+          <Card className="flex flex-col justify-between rounded-2xl border-border/80 bg-card shadow-lg md:col-span-6">
             <div>
               <CardHeader className="flex flex-row items-center gap-2.5 space-y-0 border-b border-border/60 p-4 pb-4">
                 <CreditCard className="text-primary" size={18} />
@@ -184,57 +250,17 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                 <form onSubmit={handlePaymentSubmit} className="space-y-4">
                   <div className="space-y-1.5">
                     <Label className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                      {t("cardholder")}
+                      {t("userName")}
                     </Label>
                     <Input
                       required
                       type="text"
                       disabled={isProcessing}
-                      placeholder="John Doe"
+                      value={cardholderName}
+                      onChange={(e) => setCardholderName(e.target.value)}
+                      placeholder={user?.name || "Your Name"}
                       className="h-10 bg-background/50 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring/20"
                     />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                      {t("cardNumber")}
-                    </Label>
-                    <Input
-                      required
-                      type="text"
-                      maxLength={16}
-                      disabled={isProcessing}
-                      placeholder="4111 2222 3333 4444"
-                      className="h-10 bg-background/50 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring/20"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                        {t("expiration")}
-                      </Label>
-                      <Input
-                        required
-                        type="text"
-                        disabled={isProcessing}
-                        placeholder="MM / YY"
-                        className="h-10 bg-background/50 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring/20"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                        {t("cvc")}
-                      </Label>
-                      <Input
-                        required
-                        type="password"
-                        maxLength={3}
-                        disabled={isProcessing}
-                        placeholder="•••"
-                        className="h-10 bg-background/50 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring/20"
-                      />
-                    </div>
                   </div>
 
                   <div className="mt-6 space-y-2 rounded-xl bg-muted/50 p-4 text-[11px] font-medium text-muted-foreground">
@@ -244,16 +270,10 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                         ${basePrice.toFixed(2)}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>{t("processingFee")}</span>
-                      <span className="text-[#1C1A19]">
-                        ${setupFee.toFixed(2)}
-                      </span>
-                    </div>
                     <div className="flex justify-between border-t border-border/60 pt-2 font-bold text-[#1C1A19]">
                       <span>{t("totalBillable")}</span>
                       <span className="text-sm font-extrabold text-primary">
-                        ${totalInvoiceAmount.toFixed(2)}
+                        ${basePrice.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -267,7 +287,7 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       t("completeCheckout", {
-                        amount: totalInvoiceAmount.toFixed(2),
+                        amount: basePrice.toFixed(2),
                       })
                     )}
                   </Button>
@@ -281,7 +301,7 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
             </CardFooter>
           </Card>
         </div>
-      </div>
+      </Container>
 
       {showSuccessModal && (
         <div className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 py-4 backdrop-blur-sm duration-200 fade-in">
@@ -295,7 +315,7 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
               </CardTitle>
               <CardDescription className="mt-2 px-2 text-sm leading-relaxed text-muted-foreground">
                 {t("successDesc", {
-                  packageName: localizedActivePackage.title,
+                  packageName: activePackage?.name || "Membership Package",
                 })}
               </CardDescription>
             </CardHeader>
@@ -312,5 +332,13 @@ export default function PackageDynamicDetailsPage({ params }: PageProps) {
         </div>
       )}
     </div>
+  )
+}
+
+export default function PackageDynamicDetailsPage({ params }: PageProps) {
+  return (
+    <Elements stripe={stripePromise}>
+      <PackageDynamicDetailsForm params={params} />
+    </Elements>
   )
 }

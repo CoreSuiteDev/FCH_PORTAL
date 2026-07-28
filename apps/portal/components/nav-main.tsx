@@ -43,6 +43,7 @@ export function NavMain({
             const hasSubItems = item.items && item.items.length > 0
             const isParentActive =
               pathname === item.url ||
+              (item.url === "/" && item.title === "Admin Overview" && ["/", "/admin", "/admin/"].includes(pathname)) ||
               (item.items && item.items.some((sub) => pathname === sub.url))
 
             return (
@@ -56,7 +57,7 @@ export function NavMain({
                       <SidebarMenuButton
                         tooltip={item.title}
                         isActive={isParentActive}
-                        className="w-full transition-colors hover:bg-accent hover:text-primary"
+                        className="w-full transition-colors active:bg-primary hover:bg-accent hover:text-primary"
                       >
                         {item.icon && <item.icon />}
                         <span className="text-sm font-medium">
@@ -76,7 +77,7 @@ export function NavMain({
                                 isActive={isSubActive}
                                 className={`w-full px-3 py-1.5 transition-colors ${
                                   isSubActive
-                                    ? "bg-slate-100 font-medium text-primary hover:bg-slate-100"
+                                    ? "bg-primary! text-white! font-medium hover:bg-primary! hover:text-white!"
                                     : "text-slate-600 hover:text-primary"
                                 }`}
                               >
@@ -99,7 +100,7 @@ export function NavMain({
                     isActive={isParentActive}
                     className={`w-full transition-colors ${
                       isParentActive
-                        ? "bg-primary text-white hover:bg-primary hover:text-white"
+                        ? "bg-primary! text-white! hover:bg-primary! hover:text-white!"
                         : "hover:bg-accent hover:text-primary"
                     }`}
                   >

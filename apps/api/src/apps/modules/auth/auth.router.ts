@@ -252,5 +252,27 @@ export const authRouter = router({
         res: ctx.res,
       });
     }),
+
+  changePasswordForced: publicProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/auth/change-password-forced",
+        tags: ["auth"],
+        summary: "Forced first-time password change",
+        description: "Enforces board members to change their temporary password on first login"
+      },
+    })
+    .input(
+      z.object({
+        email: z.string(),
+        currentPassword: z.string(),
+        newPassword: z.string(),
+      })
+    )
+    .output(z.object({ success: z.boolean() }))
+    .mutation(async ({ input }) => {
+      return AuthController.changePasswordForced(input);
+    }),
 });
 

@@ -1,17 +1,24 @@
 "use client"
 
-import React from "react"
 import { Button } from "@workspace/ui/components/button"
-import Image from "next/image"
-import Container from "../shared/container"
-import Link from "next/link"
 import { useTranslations } from "next-intl"
+import Image from "next/image"
+import Link from "next/link"
+import Container from "../shared/container"
+
+interface NewsItem {
+  id: number
+  title: string
+  description: string
+  author: string
+  role: string
+  date: string
+}
 
 export function NewsSection() {
   const t = useTranslations("home.news")
-  const newsItems = t.raw("items") as any[]
-
-  return (
+  const newsItems = t.raw("items") as NewsItem[]
+  return (  
     <section className="bg-white py-20">
       <Container className="px-6">
         <div className="mb-12 flex items-end justify-between">
@@ -41,7 +48,7 @@ export function NewsSection() {
                 />
               </div>
 
-              <div className="flex-grow p-6">
+              <div className="grow p-6">
                 <h3 className="mb-3 cursor-pointer text-lg font-bold text-gray-900 underline transition-colors hover:text-[#8b0000]">
                   {news.title}
                 </h3>

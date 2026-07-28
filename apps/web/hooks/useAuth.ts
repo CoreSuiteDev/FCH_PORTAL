@@ -97,3 +97,24 @@ export const useResetPasswordWithOtp = () => {
     },
   })
 }
+
+export const useChangePasswordForced = () => {
+  return useMutation({
+    mutationFn: async (data: {
+      email: string
+      currentPassword: string
+      newPassword: string
+    }) => {
+      try {
+        const response = await api.post("/auth/change-password-forced", data)
+        return response.data
+      } catch (err: any) {
+        throw new Error(
+          err.response?.data?.message ||
+            err.message ||
+            "Failed to change password."
+        )
+      }
+    },
+  })
+}
