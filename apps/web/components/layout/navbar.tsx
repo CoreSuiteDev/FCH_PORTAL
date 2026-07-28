@@ -40,7 +40,7 @@ export default function Navbar() {
     }
 
     const handleResize = () => {
-      if (window.innerWidth >= 768) setOpen(false)
+      if (window.innerWidth >= 1024) setOpen(false)
     }
 
     window.addEventListener("scroll", handleScroll)
@@ -59,7 +59,7 @@ export default function Navbar() {
       }`}
     >
       {/* Top Bar */}
-      <div className="hidden border-b bg-gray-50 md:block">
+      <div className="hidden border-b bg-gray-50 lg:block">
         <Container className="mx-auto flex items-center justify-between px-4 py-1 text-xs text-gray-500">
           <LanguageSwitcher />
           <div className="flex items-center gap-6">
@@ -90,7 +90,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-6 lg:flex">
           {navLinks.map((link: NavLink) => {
             const isActive = pathname === link.href
             return (
@@ -116,7 +116,7 @@ export default function Navbar() {
         </nav>
 
         {/* Mobile Trigger */}
-        <div className="flex items-center gap-3 md:hidden">
+        <div className="flex items-center gap-3 lg:hidden">
           <LanguageToggle
             activeLang={activeLang}
             setActiveLang={setActiveLang}

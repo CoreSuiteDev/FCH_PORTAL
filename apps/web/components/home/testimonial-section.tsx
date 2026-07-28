@@ -52,7 +52,11 @@ export function TestimonialSection() {
 
           <CarouselContent>
             {testimonials.map((item) => (
-              <CarouselItem key={item.id} className="md:basis-1/3">
+              /* রেসপন্সিভ ক্লাস: মোবাইল (১টা) -> md (২টা) -> lg (৩টা) */
+              <CarouselItem
+                key={item.id}
+                className="basis-full md:basis-1/2 lg:basis-1/3"
+              >
                 <div className="flex h-full flex-col justify-between rounded-xl bg-[#1a824e] p-8 text-white">
                   <div className="mb-4 text-xl text-yellow-500">★★★★★</div>
 

@@ -43,7 +43,7 @@ export function HeroCarousel() {
       </Carousel>
 
       {/* Dark overlay */}
-      <div className="pointer-events-none absolute inset-0 z-10 bg-black/60" />
+      <div className="pointer-events-none h-[100%] absolute inset-0 z-10 bg-black/60" />
 
       {/* Hero content overlay */}
       {/* Added flex items-center to center vertically, and ml-0 to force left alignment */}
