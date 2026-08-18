@@ -92,13 +92,15 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(helmet());
 
-const openapiDocument = generateOpenApiDocument(appRouter, {
-  baseUrl: 'http://localhost:5000/api/v1',
-  title: 'FCH API',
-  version: '1.0.0'
-})
+if (config.nodeEnv !== "production") {
+  const openapiDocument = generateOpenApiDocument(appRouter, {
+    baseUrl: 'http://localhost:5000/api/v1',
+    title: 'FCH API',
+    version: '1.0.0'
+  })
 
-writeFileSync("./openapi-fch.json", JSON.stringify(openapiDocument, null, 2))
+  writeFileSync("./openapi-fch.json", JSON.stringify(openapiDocument, null, 2))
+}
 
 // Logging
 app.use(morgan(config.logFormat));

@@ -62,6 +62,7 @@ services:
       target: api
 
     container_name: api
+    stop_grace_period: 2s
     restart: unless-stopped
 
     expose:
@@ -199,7 +200,6 @@ services:
 
   nginx:
     image: nginx:alpine
-
     container_name: nginx
     restart: unless-stopped
 
@@ -207,29 +207,18 @@ services:
       - "80:80"
       - "443:443"
 
-    depends_on:
-      - web
-      - portal
-      - api
-
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
 
-    networks:
-      app-network:
-        aliases:
-          - fch-catechesis.org
-          - www.fch-catechesis.org
-          - portal.fch-catechesis.org
-          - api.fch-catechesis.org
+    depends_on:
+      - web
+      - portal
+      - api
 
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
