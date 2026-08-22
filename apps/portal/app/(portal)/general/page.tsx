@@ -20,9 +20,10 @@ import {
 } from "@tabler/icons-react"
 import { useSessionInfo } from "@/hooks/use-session-info"
 import { useEventDashboardStats } from "@/hooks/useEvents"
-import { useMyMemberships } from "@/hooks/useMembership"
+import { useMyMemberships, type UserSubscriptionDetails } from "@/hooks/useMembership"
 import { useNewsList } from "@/hooks/useNews"
 import { Skeleton } from "@workspace/ui/components/skeleton"
+import type { ZTEvent, ZTCNewsOutput } from "@workspace/types"
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -151,7 +152,7 @@ function StatCard({
 
 // ─── Event Mini-Card ──────────────────────────────────────────────────────────
 
-function EventMiniCard({ event }: { event: any }) {
+function EventMiniCard({ event }: { event: ZTEvent }) {
   const isWebinar = event.eventType === "WEBINAR"
   const reg = event.registrations?.[0] ?? null
   const registered = reg?.status === "CONFIRMED"
@@ -235,12 +236,12 @@ export default function PortalDashboardPage() {
 
   // Derive stats
   const activeMembership = useMemo(
-    () => memberships?.find((m) => m.status === "Active"),
+    () => memberships?.find((m: UserSubscriptionDetails) => m.status === "Active"),
     [memberships]
   )
 
   const totalEventsCount = statsData?.totalEvents ?? 0
-  const upcomingEvents = statsData?.upcomingEvents ?? []
+  const upcomingEvents: ZTEvent[] = statsData?.upcomingEvents ?? []
   const registeredCount = statsData?.registeredCount ?? 0
   const checkedInCount = statsData?.checkedInCount ?? 0
 
@@ -271,7 +272,7 @@ export default function PortalDashboardPage() {
                   👋
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Welcome back to your FCH Pastoral Member portal.
+                  Welcome to FCH Pastoral Member portal.
                 </p>
               </>
             )}
@@ -393,7 +394,7 @@ export default function PortalDashboardPage() {
               </div>
             ) : (
               <div className="grid gap-4">
-                {recentNews.map((news) => (
+                {recentNews.map((news: ZTCNewsOutput) => (
                   <div
                     key={news.id}
                     className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border bg-card p-5 shadow-xs"
@@ -452,7 +453,7 @@ export default function PortalDashboardPage() {
             </div>
           ) : (
             <div className="grid gap-4">
-              {upcomingEvents.map((ev) => (
+              {upcomingEvents.map((ev: ZTEvent) => (
                 <EventMiniCard key={ev.id} event={ev} />
               ))}
             </div>

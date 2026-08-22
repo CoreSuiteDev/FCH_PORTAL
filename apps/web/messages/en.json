@@ -825,7 +825,7 @@
   },
   "auth": {
     "login": {
-      "title": "Welcome back",
+      "title": "Welcome to FCH",
       "subtitle": "Enter your credentials to access your account",
       "emailLabel": "Email Address",
       "passwordLabel": "Password",

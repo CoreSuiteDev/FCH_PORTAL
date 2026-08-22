@@ -26,6 +26,7 @@ import { useEventDashboardStats } from "@/hooks/useEvents"
 import { useNewsList } from "@/hooks/useNews"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { useBoardStore } from "@/store/bord-overview-store"
+import type { ZTEvent, ZTCNewsOutput } from "@workspace/types"
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -122,7 +123,7 @@ function StatCard({
 
 // ─── Event Mini-Card ──────────────────────────────────────────────────────────
 
-function EventMiniCard({ event }: { event: any }) {
+function EventMiniCard({ event }: { event: ZTEvent }) {
   const isWebinar = event.eventType === "WEBINAR"
   const reg = event.registrations?.[0] ?? null
   const registered = reg?.status === "CONFIRMED"
@@ -237,7 +238,7 @@ export default function BoardDashboardPage() {
                   👋
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Welcome back to your FCH Board Member governance portal.
+                  Welcome to FCH Board Member governance portal.
                 </p>
               </>
             )}
@@ -321,7 +322,7 @@ export default function BoardDashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {upcomingEvents.map((event) => (
+            {upcomingEvents.map((event: ZTEvent) => (
               <EventMiniCard key={event.id} event={event} />
             ))}
           </div>
@@ -395,7 +396,7 @@ export default function BoardDashboardPage() {
                 <p className="text-xs text-muted-foreground">No news yet.</p>
               </div>
             ) : (
-              recentNews.map((item) => (
+              recentNews.map((item: ZTCNewsOutput) => (
                 <Link
                   key={item.id}
                   href="/news"

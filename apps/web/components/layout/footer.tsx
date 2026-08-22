@@ -52,7 +52,7 @@ export function Footer() {
 
         <div className="mb-8 flex gap-6 text-sm">
           <a
-            href="https://facebook.com/your-page"
+            href="https://www.facebook.com/FCHcatechesis"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 hover:text-gray-200"
