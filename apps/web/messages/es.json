@@ -381,27 +381,27 @@
       }
     },
     "checkout": {
-      "back": "Volver al Registro de Precios",
-      "checkoutSummary": "Resumen de Pago",
-      "userName": "Nombre del Usuario",
-      "selectedPackage": "Paquete de Configuración Seleccionado",
-      "includedFeatures": "Características Principales Incluidas:",
+      "back": "Volver a Membresías",
+      "checkoutSummary": "Resumen del Pedido",
+      "userName": "Nombre Completo",
+      "selectedPackage": "Paquete Seleccionado",
+      "includedFeatures": "Características Incluidas:",
       "pricePerMonth": "mes",
       "pricePerYear": "año",
-      "disclaimer": "Se está suscribiendo al plan {cycle}. Una vez realizado el pago, las reglas de control de acceso se aplicarán a su cuenta.",
-      "gateway": "Integración de Pasarela de Pago",
+      "disclaimer": "Se está suscribiendo al plan {cycle}.",
+      "gateway": "Detalles de Pago",
       "cardholder": "Nombre del Titular de la Tarjeta",
       "cardNumber": "Número de Tarjeta",
       "expiration": "Fecha de Expiración",
       "cvc": "CVC",
-      "baseTier": "Acceso al Nivel Base:",
-      "processingFee": "Tarifa de Procesamiento / Configuración:",
-      "totalBillable": "Monto Total a Facturar:",
-      "completeCheckout": "Completar Pago: ${amount}",
-      "secureToken": "Validación Segura del Nodo de Suscripción con Tokenización.",
+      "baseTier": "Precio de Membresía:",
+      "processingFee": "Tarifa de Procesamiento:",
+      "totalBillable": "Monto Total:",
+      "completeCheckout": "Proceder al Pago (${amount})",
+      "secureToken": "Pago Seguro Encriptado SSL de 256 bits",
       "successTitle": "¡Pago Exitoso!",
-      "successDesc": "Ha desbloqueado correctamente el acceso al entorno de trabajo del nivel {packageName}.",
-      "goToDashboard": "Ir al Panel del Espacio de Trabajo"
+      "successDesc": "Se ha suscrito con éxito al paquete {packageName}.",
+      "goToDashboard": "Ir al Panel"
     }
   },
   "sponsorship": {
@@ -809,14 +809,15 @@
 
   "footer": {
     "nav": {
-      "about": "Sobre nosotros",
-      "events": "Eventos",
+      "about": "Acerca de",
       "membership": "Membresía",
-      "contact": "Contacto"
+      "sponsor": "Patrocinar",
+      "news": "Noticias",
+      "events": "Eventos",
+      "webinar": "Seminarios web"
     },
     "social": {
-      "facebook": "Facebook",
-      "linkedin": "LinkedIn"
+      "facebook": "Facebook"
     },
     "copyright": "Todos los derechos reservados."
   },

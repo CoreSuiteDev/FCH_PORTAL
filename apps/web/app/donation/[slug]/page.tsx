@@ -25,9 +25,8 @@ import Container from "@/components/shared/container"
 import { useDonate } from "@/hooks/useDonation"
 import { authClient } from "@/lib/auth"
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || ""
-)
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null
 
 // Zod validation schema
 const paymentSchema = z.object({
@@ -39,6 +38,10 @@ const paymentSchema = z.object({
 type PaymentFormValues = z.infer<typeof paymentSchema>
 
 export default function DonateDetailsPage() {
+  if (!stripePromise) {
+    return <DonateDetailsForm />
+  }
+
   return (
     <Elements stripe={stripePromise}>
       <DonateDetailsForm />

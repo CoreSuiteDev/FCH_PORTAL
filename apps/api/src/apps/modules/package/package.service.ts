@@ -63,16 +63,26 @@ export class PackageService {
   }
 
   static async deletePackage(id: string) {
-   try {
-    await prisma.membershipPackage.delete({
-      where: {id}
-    })
-    return {success: true};
-   } catch (error: any) {
-    if (error.code === "P2025") {
-      throw new Error(`Package with ID '${id}' does not exist.`)  
+    try {
+      await prisma.membershipPackage.delete({
+        where: { id },
+      })
+      return { success: true }
+    } catch (error: any) {
+      if (error.code === "P2025") {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Package with ID '${id}' does not exist.`,
+        })
+      }
+      if (error.code === "P2003") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Cannot delete this membership package because active or historical user subscriptions are linked to it.",
+        })
+      }
+      throw error
     }
-    throw error
-   }
   }
 }

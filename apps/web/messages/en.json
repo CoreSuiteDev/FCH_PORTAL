@@ -381,27 +381,27 @@
       }
     },
     "checkout": {
-      "back": "Back to Pricing Registry",
-      "checkoutSummary": "Checkout Summary",
-      "userName": "User Name",
-      "selectedPackage": "Selected Configuration Package",
-      "includedFeatures": "Included Core Features:",
+      "back": "Back to Packages",
+      "checkoutSummary": "Order Summary",
+      "userName": "Full Name",
+      "selectedPackage": "Selected Package",
+      "includedFeatures": "Included Features:",
       "pricePerMonth": "month",
       "pricePerYear": "year",
-      "disclaimer": "You are subscribing to the {cycle} plan. Upon payment, access control rules will be applied to your account.",
-      "gateway": "Payment Gateway Integration",
+      "disclaimer": "You are subscribing to the {cycle} plan.",
+      "gateway": "Payment Details",
       "cardholder": "Cardholder Name",
       "cardNumber": "Card Number",
       "expiration": "Expiration",
       "cvc": "CVC",
-      "baseTier": "Base Tier Access:",
-      "processingFee": "Processing / Setup Fee:",
-      "totalBillable": "Total Billable Amount:",
-      "completeCheckout": "Complete Checkout: ${amount}",
-      "secureToken": "Secure Tokenized Subscription Node Validation.",
+      "baseTier": "Membership Price:",
+      "processingFee": "Processing Fee:",
+      "totalBillable": "Total Amount:",
+      "completeCheckout": "Proceed to Checkout (${amount})",
+      "secureToken": "Secure 256-bit SSL Encrypted Payment",
       "successTitle": "Payment Successful!",
-      "successDesc": "You have successfully unlocked access to the {packageName} tier workspace environment.",
-      "goToDashboard": "Go to Workspace Dashboard"
+      "successDesc": "You have successfully subscribed to the {packageName} package.",
+      "goToDashboard": "Go to Dashboard"
     }
   },
 
@@ -812,13 +812,14 @@
   "footer": {
     "nav": {
       "about": "About",
-      "events": "Events",
       "membership": "Membership",
-      "contact": "Contact"
+      "sponsor": "Sponsor",
+      "news": "News",
+      "events": "Events",
+      "webinar": "Webinar"
     },
     "social": {
-      "facebook": "Facebook",
-      "linkedin": "LinkedIn"
+      "facebook": "Facebook"
     },
     "copyright": "All Rights Reserved."
   },

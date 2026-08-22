@@ -37,9 +37,8 @@ import { usePackageBySlug, useBuyPackage } from "@/hooks/usePackage"
 import { useTranslations } from "next-intl"
 import { authClient } from "@/lib/auth"
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || ""
-)
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -60,11 +59,18 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
 
   const slug = resolvedParams.slug
 
-  const { data: session } = authClient.useSession()
+  const { data: session, isPending: isSessionLoading } = authClient.useSession()
   const user = session?.user
 
   const { data: activePackage, isLoading, isError } = usePackageBySlug(slug)
   const { mutateAsync: buyPackage } = useBuyPackage()
+
+  useEffect(() => {
+    if (!isSessionLoading && !user) {
+      toast.error("You must be logged in to purchase a membership package.")
+      router.push("/login")
+    }
+  }, [isSessionLoading, user, router])
 
   useEffect(() => {
     if (activePackage) {
@@ -336,6 +342,10 @@ function PackageDynamicDetailsForm({ params }: PageProps) {
 }
 
 export default function PackageDynamicDetailsPage({ params }: PageProps) {
+  if (!stripePromise) {
+    return <PackageDynamicDetailsForm params={params} />
+  }
+
   return (
     <Elements stripe={stripePromise}>
       <PackageDynamicDetailsForm params={params} />

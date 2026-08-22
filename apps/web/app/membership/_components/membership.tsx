@@ -2,6 +2,7 @@
 
 import { usePackages } from "@/hooks/usePackage"
 import { usePackageStore } from "@/store/use-membership-store"
+import type { ZTCMembershipPackage } from "@workspace/types"
 import { Button } from "@workspace/ui/components/button"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { toast } from "@workspace/ui/components/sonner"
@@ -9,11 +10,15 @@ import { Check } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { authClient } from "@/lib/auth"
 
 export default function MembershipPackages() {
   const router = useRouter()
   const { selectPackage, billingCycle, setBillingCycle } = usePackageStore()
   const t = useTranslations("membership.packages")
+
+  const { data: session } = authClient.useSession()
+  const user = session?.user
 
   const { data: packages, isLoading, isError } = usePackages()
 
@@ -23,7 +28,45 @@ export default function MembershipPackages() {
     }
   }, [isError])
 
+  const activePackages =
+    packages?.filter((pkg: ZTCMembershipPackage) => pkg.isActive) || []
+
+  const hasActiveMonthly = activePackages.some(
+    (pkg: ZTCMembershipPackage) => pkg.billingCycle === "MONTHLY"
+  )
+  const hasActiveYearly = activePackages.some(
+    (pkg: ZTCMembershipPackage) => pkg.billingCycle === "YEARLY"
+  )
+
+  useEffect(() => {
+    if (!hasActiveMonthly && hasActiveYearly && billingCycle !== "yearly") {
+      setBillingCycle("yearly")
+    } else if (hasActiveMonthly && !hasActiveYearly && billingCycle !== "monthly") {
+      setBillingCycle("monthly")
+    }
+  }, [hasActiveMonthly, hasActiveYearly, billingCycle, setBillingCycle])
+
+  const showTabs = hasActiveMonthly && hasActiveYearly
+
+  const effectiveBillingCycle =
+    !hasActiveMonthly && hasActiveYearly
+      ? "yearly"
+      : hasActiveMonthly && !hasActiveYearly
+      ? "monthly"
+      : billingCycle
+
+  const filteredPackages = activePackages.filter(
+    (pkg: ZTCMembershipPackage) =>
+      pkg.billingCycle ===
+      (effectiveBillingCycle === "monthly" ? "MONTHLY" : "YEARLY")
+  )
+
   const handleSelection = (slug: string) => {
+    if (!user) {
+      toast.error("You must be logged in to purchase a membership package.")
+      router.push("/login")
+      return
+    }
     selectPackage(slug)
     router.push(`/membership/${slug}`)
   }
@@ -43,26 +86,8 @@ export default function MembershipPackages() {
             </h1>
 
             <div className="mt-8 inline-flex items-center rounded-full border border-border bg-white p-1 shadow-sm">
-              <button
-                onClick={() => setBillingCycle("monthly")}
-                className={`rounded-full px-6 py-2 text-sm font-bold transition-all ${
-                  billingCycle === "monthly"
-                    ? "bg-primary text-white"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {t("monthly")}
-              </button>
-              <button
-                onClick={() => setBillingCycle("yearly")}
-                className={`rounded-full px-6 py-2 text-sm font-bold transition-all ${
-                  billingCycle === "yearly"
-                    ? "bg-primary text-white"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {t("yearly")}
-              </button>
+              <Skeleton className="h-9 w-24 rounded-full" />
+              <Skeleton className="h-9 w-24 rounded-full" />
             </div>
           </div>
 
@@ -96,13 +121,6 @@ export default function MembershipPackages() {
     )
   }
 
-  const filteredPackages =
-    packages?.filter(
-      (pkg) =>
-        pkg.isActive &&
-        pkg.billingCycle === (billingCycle === "monthly" ? "MONTHLY" : "YEARLY")
-    ) || []
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-white px-4 py-20">
       <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-[#E5DCD5]/40 blur-[130px]" />
@@ -116,32 +134,34 @@ export default function MembershipPackages() {
             {t("title")}
           </h1>
 
-          <div className="mt-8 inline-flex items-center rounded-full border border-border bg-white p-1 shadow-sm">
-            <button
-              onClick={() => setBillingCycle("monthly")}
-              className={`rounded-full px-6 py-2 text-sm font-bold transition-all ${
-                billingCycle === "monthly"
-                  ? "bg-primary text-white"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {t("monthly")}
-            </button>
-            <button
-              onClick={() => setBillingCycle("yearly")}
-              className={`rounded-full px-6 py-2 text-sm font-bold transition-all ${
-                billingCycle === "yearly"
-                  ? "bg-primary text-white"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {t("yearly")}
-            </button>
-          </div>
+          {showTabs && (
+            <div className="mt-8 inline-flex items-center rounded-full border border-border bg-white p-1 shadow-sm">
+              <button
+                onClick={() => setBillingCycle("monthly")}
+                className={`rounded-full px-6 py-2 text-sm font-bold transition-all ${
+                  effectiveBillingCycle === "monthly"
+                    ? "bg-primary text-white"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {t("monthly")}
+              </button>
+              <button
+                onClick={() => setBillingCycle("yearly")}
+                className={`rounded-full px-6 py-2 text-sm font-bold transition-all ${
+                  effectiveBillingCycle === "yearly"
+                    ? "bg-primary text-white"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {t("yearly")}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="mx-auto grid max-w-3xl items-stretch gap-8 md:grid-cols-2">
-          {filteredPackages.map((pkg) => {
+          {filteredPackages.map((pkg: ZTCMembershipPackage) => {
             const isPastoral = pkg.type === "PASTORAL"
             const features = Array.isArray(pkg.features) ? (pkg.features as string[]) : []
 
@@ -180,7 +200,7 @@ export default function MembershipPackages() {
                     </span>
                     <span className="ml-1.5 text-xs text-muted-foreground">
                       /{" "}
-                      {billingCycle === "monthly"
+                      {effectiveBillingCycle === "monthly"
                         ? t("monthSuffix")
                         : t("yearSuffix")}
                     </span>

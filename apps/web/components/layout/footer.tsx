@@ -1,6 +1,6 @@
-import Image from "next/image"
-import Link from "next/link"
-import { useTranslations } from "next-intl"
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import Link from "next/link";
 
 export function Footer() {
   const t = useTranslations("footer")
@@ -24,17 +24,29 @@ export function Footer() {
           <Link href="/about" className="underline-offset-4 hover:underline">
             {t("nav.about")}
           </Link>
-          <Link href="/events" className="underline-offset-4 hover:underline">
-            {t("nav.events")}
-          </Link>
           <Link
             href="/membership"
             className="underline-offset-4 hover:underline"
           >
             {t("nav.membership")}
           </Link>
-          <Link href="/contact" className="underline-offset-4 hover:underline">
-            {t("nav.contact")}
+          <Link
+            href="/sponsor"
+            className="underline-offset-4 hover:underline"
+          >
+            {t("nav.sponsor")}
+          </Link>
+          <Link
+            href="/news"
+            className="underline-offset-4 hover:underline"
+          >
+            {t("nav.news")}
+          </Link>
+          <Link href="/events" className="underline-offset-4 hover:underline">
+            {t("nav.events")}
+          </Link>
+          <Link href="/webinars" className="underline-offset-4 hover:underline">
+            {t("nav.webinar")}
           </Link>
         </nav>
 
@@ -46,14 +58,6 @@ export function Footer() {
             className="flex items-center gap-2 hover:text-gray-200"
           >
             {t("social.facebook")}
-          </a>
-          <a
-            href="https://linkedin.com/company/your-company"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 hover:text-gray-200"
-          >
-            {t("social.linkedin")}
           </a>
         </div>
 

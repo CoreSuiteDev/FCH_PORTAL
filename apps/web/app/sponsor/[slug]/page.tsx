@@ -35,9 +35,8 @@ import { Card, CardContent } from "@workspace/ui/components/card"
 import { Field, FieldError, FieldLabel } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || ""
-)
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null
 
 const personalInfoSchema = z.object({
   name: z.string().min(2, "Name is required (at least 2 characters)"),
@@ -48,6 +47,10 @@ const personalInfoSchema = z.object({
 type PersonalInfoValues = z.infer<typeof personalInfoSchema>
 
 export default function TierDetailsPage() {
+  if (!stripePromise) {
+    return <TierDetails />
+  }
+
   return (
     <Elements stripe={stripePromise}>
       <TierDetails />
