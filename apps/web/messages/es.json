@@ -877,5 +877,37 @@
       "successSubtitle": "Su contraseña ha sido actualizada exitosamente. Ahora puede usar sus nuevas credenciales de seguridad para iniciar sesión.",
       "signIn": "Iniciar sesión"
     }
+  },
+  "contact": {
+    "sidebar": {
+      "title": "Conéctese con FCH",
+      "subtitle": "¿Tiene preguntas sobre nuestro ministerio, membresía, recursos o próximos eventos? Estamos aquí para acompañarle y apoyarle.",
+      "items": {
+        "mission": {
+          "title": "Ministerio y Misión",
+          "description": "Formando y equipando a quienes ministran en la catequesis con las comunidades hispanas."
+        },
+        "formation": {
+          "title": "Formación y Seminarios",
+          "description": "Acceda a seminarios web, recursos catequéticos e iniciativas nacionales de formación en la fe."
+        },
+        "community": {
+          "title": "Comunidad y Colaboración",
+          "description": "Colabore con líderes diocesanos, catequistas y voluntarios pastorales en todo el país."
+        }
+      },
+      "socialLabel": "Síganos en Facebook"
+    },
+    "form": {
+      "title": "Envíenos un Mensaje",
+      "nameLabel": "Nombre Completo",
+      "namePlaceholder": "Su nombre completo",
+      "emailLabel": "Correo Electrónico",
+      "emailPlaceholder": "nombre@ejemplo.com",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "¿Cómo podemos ayudarle o colaborar con usted?",
+      "submitButton": "Enviar Mensaje",
+      "successMessage": "¡Gracias! Su mensaje ha sido enviado exitosamente."
+    }
   }
 }

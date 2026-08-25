@@ -879,5 +879,37 @@
       "successSubtitle": "Your password has been successfully updated. You can now use your new security credentials to sign in.",
       "signIn": "Sign In"
     }
+  },
+  "contact": {
+    "sidebar": {
+      "title": "Connect With FCH",
+      "subtitle": "Have questions about our ministry, membership, resources, or upcoming events? We are here to accompany and support you.",
+      "items": {
+        "mission": {
+          "title": "Ministry & Mission",
+          "description": "Forming and equipping those who minister in catechesis with Hispanic communities."
+        },
+        "formation": {
+          "title": "Formation & Webinars",
+          "description": "Access webinars, catechetical resources, and national faith formation initiatives."
+        },
+        "community": {
+          "title": "Community & Partnership",
+          "description": "Collaborate with diocesan leaders, catechists, and pastoral volunteers nationwide."
+        }
+      },
+      "socialLabel": "Follow us on Facebook"
+    },
+    "form": {
+      "title": "Send us a Message",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "Your full name",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "name@example.com",
+      "messageLabel": "Message",
+      "messagePlaceholder": "How can we help or collaborate with you?",
+      "submitButton": "Send Message",
+      "successMessage": "Thank you! Your message has been sent successfully."
+    }
   }
 }
